@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GTRevo.Platform", "GTRevo.Platform\GTRevo.Platform.csproj", "{42CDFAD0-CB40-433E-AC6E-874F3F58E77D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GTRevo.DataAccess", "GTRevo.DataAccess\GTRevo.DataAccess.csproj", "{FA942FE7-71FD-4CF5-8959-309583FE7903}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GTRevo.Infrastructure", "GTRevo.Infrastructure\GTRevo.Infrastructure.csproj", "{6F893B4E-8119-41F8-B1C9-28EEA56946A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GTRevo.Bootstrap", "GTRevo.Boostrap\GTRevo.Bootstrap.csproj", "{F2CED506-8D77-4547-84DA-3F886C2A7BA2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{42CDFAD0-CB40-433E-AC6E-874F3F58E77D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42CDFAD0-CB40-433E-AC6E-874F3F58E77D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42CDFAD0-CB40-433E-AC6E-874F3F58E77D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42CDFAD0-CB40-433E-AC6E-874F3F58E77D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA942FE7-71FD-4CF5-8959-309583FE7903}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA942FE7-71FD-4CF5-8959-309583FE7903}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA942FE7-71FD-4CF5-8959-309583FE7903}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA942FE7-71FD-4CF5-8959-309583FE7903}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F893B4E-8119-41F8-B1C9-28EEA56946A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F893B4E-8119-41F8-B1C9-28EEA56946A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F893B4E-8119-41F8-B1C9-28EEA56946A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F893B4E-8119-41F8-B1C9-28EEA56946A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2CED506-8D77-4547-84DA-3F886C2A7BA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2CED506-8D77-4547-84DA-3F886C2A7BA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2CED506-8D77-4547-84DA-3F886C2A7BA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2CED506-8D77-4547-84DA-3F886C2A7BA2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
