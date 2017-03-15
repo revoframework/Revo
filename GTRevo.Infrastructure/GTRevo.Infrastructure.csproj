@@ -46,6 +46,10 @@
       <HintPath>..\..\GTServiceDesk\packages\MediatR.3.0.0\lib\net45\MediatR.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Experimental.Collections, Version=1.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\GTServiceDesk\packages\Microsoft.Experimental.Collections.1.0.3-alpha\lib\portable-net45+win8+wp8\Microsoft.Experimental.Collections.dll</HintPath>
       <Private>True</Private>
@@ -120,6 +124,7 @@
     <Compile Include="Security\AuthorizingRepository.cs" />
     <Compile Include="Security\Commands\AuthorizePermissionsAttribute.cs" />
     <Compile Include="Security\Commands\CommandPermissionAuthorizer.cs" />
+    <Compile Include="Security\Commands\CommandPermissionCache.cs" />
     <Compile Include="Security\Commands\EntityQueryAuthorizer.cs" />
     <Compile Include="Security\Commands\EntityQueryFilterFactory.cs" />
     <Compile Include="Security\Commands\CommandAuthorizer.cs" />

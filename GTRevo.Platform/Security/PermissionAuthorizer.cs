@@ -9,8 +9,8 @@ namespace GTRevo.Platform.Security
 {
     public class PermissionAuthorizer
     {
-        private PermissionCache permissionCache;
-        private IRolePermissionResolver rolePermissionResolver;
+        private readonly PermissionCache permissionCache;
+        private readonly IRolePermissionResolver rolePermissionResolver;
 
         public PermissionAuthorizer(PermissionCache permissionCache,
             IRolePermissionResolver rolePermissionResolver)
@@ -30,7 +30,7 @@ namespace GTRevo.Platform.Security
 
                 if (permissionClaimsIdentity.Permissions != null)
                 {
-                    return Authorize(requiredPermissions, permissionClaimsIdentity.Permissions);
+                    return CheckAuthorization(permissionClaimsIdentity.Permissions, requiredPermissions);
                 }
             }
             else
@@ -58,11 +58,11 @@ namespace GTRevo.Platform.Security
                 permissionClaimsIdentity.Permissions = permissions;
             }
 
-            return Authorize(requiredPermissions, permissions);
+            return CheckAuthorization(permissions, requiredPermissions);
         }
         
-        public bool Authorize(IEnumerable<Permission> requiredPermissions,
-            HashSet<Permission> availablePermissions)
+        public bool CheckAuthorization(IEnumerable<Permission> availablePermissions,
+            IEnumerable<Permission> requiredPermissions)
         {
             //TODO: this needs caching badly!
             PermissionTree permissionTree = new PermissionTree();

@@ -3,6 +3,7 @@ using GTRevo.Infrastructure.Domain;
 using GTRevo.Infrastructure.Domain.Projections;
 using GTRevo.Infrastructure.EventSourcing;
 using GTRevo.Infrastructure.Security.Commands;
+using GTRevo.Platform.Commands;
 using GTRevo.Platform.Core;
 using GTRevo.Platform.Core.Lifecycle;
 using GTRevo.Platform.Events;
@@ -32,6 +33,14 @@ namespace GTRevo.Infrastructure.Security
             Bind<IEntityQueryFilterFactory>()
                 .To<EntityQueryFilterFactory>()
                 .InRequestOrJobScope();
+
+            Bind<CommandPermissionCache, IApplicationStartListener>()
+                .To<CommandPermissionCache>()
+                .InSingletonScope();
+
+            Bind<IPreCommandHandler<ICommandBase>>()
+                .To<CommandPermissionAuthorizer>()
+                .InTransientScope();
         }
     }
 }

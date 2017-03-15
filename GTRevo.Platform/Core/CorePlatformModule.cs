@@ -91,7 +91,7 @@ namespace GTRevo.Platform.Core
                 .To<PermissionTypeRegistry>()
                 .InSingletonScope();
 
-            Bind<IApplicationStartListener>()
+            Bind<PermissionTypeIndexer, IApplicationStartListener>()
                 .To<PermissionTypeIndexer>()
                 .InSingletonScope();
 

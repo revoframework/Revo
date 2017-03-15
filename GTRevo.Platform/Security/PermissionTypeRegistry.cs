@@ -5,8 +5,8 @@ namespace GTRevo.Platform.Security
 {
     public class PermissionTypeRegistry : IPermissionTypeRegistry
     {
-        private Dictionary<string, PermissionType> namesToTypes = new Dictionary<string, PermissionType>();
-        private Dictionary<Guid, PermissionType> idsToTypes = new Dictionary<Guid, PermissionType>();
+        private readonly Dictionary<string, PermissionType> namesToTypes = new Dictionary<string, PermissionType>();
+        private readonly Dictionary<Guid, PermissionType> idsToTypes = new Dictionary<Guid, PermissionType>();
         
         public IEnumerable<PermissionType> PermissionTypes
         {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using GTRevo.Platform.Core;
 using GTRevo.Platform.Core.Lifecycle;
@@ -7,8 +8,9 @@ namespace GTRevo.Platform.Security
 {
     public class PermissionTypeIndexer : IApplicationStartListener
     {
-        private IPermissionTypeRegistry permissionTypeRegistry;
-        private ITypeExplorer typeExplorer;
+        private readonly IPermissionTypeRegistry permissionTypeRegistry;
+        private readonly ITypeExplorer typeExplorer;
+        private readonly HashSet<Type> registeredCatalogTypes = new HashSet<Type>();
 
         public PermissionTypeIndexer(ITypeExplorer typeExplorer,
             IPermissionTypeRegistry permissionTypeRegistry)
@@ -19,13 +21,30 @@ namespace GTRevo.Platform.Security
 
         public void OnApplicationStarted()
         {
+            Index();
+        }
+
+        public void EnsureIndexed()
+        {
+            if (registeredCatalogTypes.Count == 0)
+            {
+                Index();
+            }
+        }
+
+        private void Index()
+        {
             foreach (Type catalogType in typeExplorer.GetAllTypes()
                                             .Where(x => x.IsClass
                                                 && x.IsAbstract /* static in C# = abstract + sealed */
                                                 && x.IsSealed
                                                 && x.GetCustomAttributes(typeof(PermissionTypeCatalogAttribute), false).Any()))
             {
-                RegisterCatalog(catalogType);
+                if (!registeredCatalogTypes.Contains(catalogType))
+                {
+                    RegisterCatalog(catalogType);
+                    registeredCatalogTypes.Add(catalogType);
+                }
             }
         }
 

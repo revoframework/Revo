@@ -10,7 +10,7 @@ using GTRevo.Platform.Commands;
 
 namespace GTRevo.Infrastructure.Security
 {
-    public class AuthorizedQueryable<T> : IQueryable<T>, IDbAsyncEnumerable<T>
+    public class AuthorizedQueryable<T> : IOrderedQueryable<T>, IDbAsyncEnumerable<T>
     {
         private readonly AuthorizingQueryProvider provider;
 
