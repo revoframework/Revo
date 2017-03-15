@@ -34,7 +34,7 @@ namespace GTRevo.Platform.Web
             //sanitize
             //TODO: perhaps leave this up to the resource provider?
             string sane = templateName.Replace('\\', '/');
-            IEnumerable<string> templateNameParts = sane.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            IEnumerable<string> templateNameParts = sane.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
             templateNameParts = templateNameParts.Where(x => x != "." && x != "..");
             sane = string.Join("/", templateNameParts);
 

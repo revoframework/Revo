@@ -8,6 +8,7 @@ using GTRevo.Platform.IO.Stache;
 using GTRevo.Platform.Security;
 using GTRevo.Platform.Security.Identity;
 using GTRevo.Platform.Transactions;
+using GTRevo.Platform.Web.JSBridge;
 using GTRevo.Platform.Web.VirtualPath;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
@@ -67,6 +68,10 @@ namespace GTRevo.Platform.Core
                 .To<LocaleLoader>()
                 .InSingletonScope();
             
+            Bind<JSMessageExportCache>()
+                .ToSelf()
+                .InSingletonScope();
+
             Bind<IOwinConfigurator>()
                 .To<SecurityAppInitializer>()
                 .InSingletonScope();

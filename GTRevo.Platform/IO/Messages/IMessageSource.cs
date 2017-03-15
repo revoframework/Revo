@@ -1,8 +1,10 @@
-﻿namespace GTRevo.Platform.IO.Messages
+﻿using System.Collections.Generic;
+
+namespace GTRevo.Platform.IO.Messages
 {
     public interface IMessageSource
     {
-        //IReadOnlyDictionary<string, string> Messages { get; }
+        IEnumerable<KeyValuePair<string, string>> Messages { get; }
         bool TryGetMessage(string key, out string message);
     }
 }

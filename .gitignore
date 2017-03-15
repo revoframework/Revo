@@ -1,5 +1,7 @@
 /packages
 /*/bin
 /*/obj
+/Tests/*/bin
+/Tests/*/obj
 .vs/
 *.user

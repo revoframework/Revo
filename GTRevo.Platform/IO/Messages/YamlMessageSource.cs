@@ -8,9 +8,8 @@ namespace GTRevo.Platform.IO.Messages
 {
     public class YamlMessageSource : IMessageSource
     {
-        private Dictionary<string, string> messages = new Dictionary<string, string>();
-        private ReadOnlyDictionary<string, string> readOnlyMessages;
-        private Func<Stream> getStreamFunc;
+        private readonly Dictionary<string, string> messages = new Dictionary<string, string>();
+        private readonly Func<Stream> getStreamFunc;
 
         public YamlMessageSource(Func<Stream> getStreamFunc)
         {
@@ -23,18 +22,15 @@ namespace GTRevo.Platform.IO.Messages
             this.getStreamFunc = () => stream;
             LoadMessages();
         }
-        
-        public IReadOnlyDictionary<string, string> Messages
+
+        public IEnumerable<KeyValuePair<string, string>> Messages
         {
-            get
-            {
-                return readOnlyMessages ?? (readOnlyMessages = new ReadOnlyDictionary<string, string>(messages));
-            }
+            get { return messages; }
         }
 
         public bool TryGetMessage(string key, out string message)
         {
-            return Messages.TryGetValue(key, out message);
+            return messages.TryGetValue(key, out message);
         }
 
         private void LoadMessages()

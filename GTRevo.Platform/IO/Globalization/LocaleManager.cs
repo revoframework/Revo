@@ -6,7 +6,7 @@ namespace GTRevo.Platform.IO.Globalization
 {
     public class LocaleManager
     {
-        private Dictionary<string, Locale> locales = new Dictionary<string, Locale>();
+        private readonly Dictionary<string, Locale> locales = new Dictionary<string, Locale>();
         private ReadOnlyDictionary<string, Locale> readOnlyLocales;
 
         public IReadOnlyDictionary<string, Locale> Locales

@@ -369,6 +369,9 @@
     <Compile Include="Web\ApiControllerSelector.cs" />
     <Compile Include="Web\CustomRazorViewEngine.cs" />
     <Compile Include="IO\Resources\EmbeddedResource.cs" />
+    <Compile Include="Web\JSBridge\JSMessageExportCache.cs" />
+    <Compile Include="Web\JSBridge\JSMessageExporter.cs" />
+    <Compile Include="Web\JSBridge\JSBridgeController.cs" />
     <Compile Include="Web\ResourceApiController.cs" />
     <Compile Include="Web\RouteDataTokenKeys.cs" />
     <Compile Include="Web\TemplateRenderController.cs" />
