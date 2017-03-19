@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,6 +31,7 @@ namespace GTRevo.Infrastructure.Security
         {
             return provider.CreateQuery<TElement>(expression).GetEnumerator();
         }
+
         public IDbAsyncEnumerator<TElement> ExecuteQueryAsync<TElement>(
             Expression expression)
         {
@@ -47,12 +49,16 @@ namespace GTRevo.Infrastructure.Security
 
         public IQueryable CreateQuery(Expression expression)
         {
-            return provider.CreateQuery(expression);
+            var query = provider.CreateQuery(expression);
+            query = InjectQueryable(query);
+            return query;
         }
 
         public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
         {
-            return new AuthorizedQueryable<TElement>(this, expression);
+            var query = provider.CreateQuery<TElement>(expression);
+            query = InjectQueryable<TElement>(query);
+            return query;
         }
 
         public object Execute(Expression expression)
@@ -87,6 +93,31 @@ namespace GTRevo.Infrastructure.Security
             }
 
             return asyncProvider.ExecuteAsync<TResult>(expression, cancellationToken);
+        }
+
+        public IQueryable<T> InjectQueryable<T>(IQueryable<T> query)
+        {
+            DbQuery<T> dbQuery = query as DbQuery<T>;
+            if (dbQuery != null)
+            {
+                var providerField = typeof(DbQuery<T>).GetField("_provider", BindingFlags.Instance | BindingFlags.NonPublic);
+                providerField.SetValue(dbQuery, this);
+            }
+
+            return query;
+        }
+
+        public IQueryable InjectQueryable(IQueryable query)
+        {
+            var dbQueryType = typeof(DbQuery<>).MakeGenericType(query.ElementType);
+            
+            if (dbQueryType.IsInstanceOfType(query))
+            {
+                var providerField = dbQueryType.GetField("_provider", BindingFlags.Instance | BindingFlags.NonPublic);
+                providerField.SetValue(query, this);
+            }
+
+            return query;
         }
     }
 }

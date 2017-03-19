@@ -25,7 +25,7 @@ namespace GTRevo.Platform.Tests.Web.JSBridge
         [Fact]
         public void TestExportMessages()
         {
-            var sut = new JSMessageExporter();
+            var sut = new JsonMessageExporter();
 
             JObject messages = sut.ExportMessages(messageSource);
             Assert.Equal(JObject.Parse("{\"Lorem\":\"ipsum\", \"Dolor\":\"sit\"}"), messages);

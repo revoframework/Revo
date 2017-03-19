@@ -67,59 +67,11 @@ namespace GTRevo.Platform.Core
             Bind<IApplicationStartListener>()
                 .To<LocaleLoader>()
                 .InSingletonScope();
-            
-            Bind<JSMessageExportCache>()
-                .ToSelf()
-                .InSingletonScope();
 
             Bind<IOwinConfigurator>()
                 .To<SecurityAppInitializer>()
                 .InSingletonScope();
-
-            Bind<AppUserManager>()
-                .To<AppUserManager>()
-                .InRequestOrJobScope();
-
-            Bind<AppSignInManager/*, SignInManager<IUser, Guid>*/>()
-                .To<AppSignInManager>()
-                .InRequestOrJobScope();
-
-            Bind<IAuthenticationManager>()
-                .ToMethod(ctx =>
-                    HttpContext.Current.GetOwinContext().Authentication);
-
-            Bind<IUserContext>()
-                .To<DefaultUserContext>()
-                .InRequestOrJobScope();
-
-            Bind<IPermissionTypeRegistry>()
-                .To<PermissionTypeRegistry>()
-                .InSingletonScope();
-
-            Bind<PermissionTypeIndexer, IApplicationStartListener>()
-                .To<PermissionTypeIndexer>()
-                .InSingletonScope();
-
-            Bind<IPasswordHasher>()
-                .To<ScryptPasswordHasher>()
-                .InSingletonScope();
-
-            Bind<IPasswordValidator>()
-                .To<DefaultPasswordValidator>()
-                .InRequestOrJobScope();
-
-            Bind<IUserValidator>()
-                .To<DefaultUserValidator>()
-                .InRequestOrJobScope();
-
-            Bind<PermissionAuthorizer>()
-                .ToSelf()
-                .InRequestOrJobScope();
-
-            Bind<PermissionCache>()
-                .ToSelf()
-                .InSingletonScope();
-
+            
             Bind<IApplicationStartListener>()
                 .To<AutoMapperInitializer>()
                 .InSingletonScope();

@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 
 namespace GTRevo.Platform.Web.JSBridge
 {
-    public class JSMessageExporter
+    public class JsonMessageExporter
     {
         public JObject ExportMessages(IMessageSource messageSource)
         {

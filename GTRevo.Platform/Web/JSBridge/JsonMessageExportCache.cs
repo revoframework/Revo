@@ -8,26 +8,23 @@ using Newtonsoft.Json.Linq;
 
 namespace GTRevo.Platform.Web.JSBridge
 {
-    public class JSMessageExportCache
+    public class JsonMessageExportCache
     {
         private readonly LocaleManager localeManager;
         private readonly IMessageRepository messageRepository;
         private Dictionary<string, string> localeDictionaries;
 
-        public JSMessageExportCache(LocaleManager localeManager,
+        public JsonMessageExportCache(LocaleManager localeManager,
             IMessageRepository messageRepository)
         {
             this.localeManager = localeManager;
             this.messageRepository = messageRepository;
+
+            Initialize();
         }
 
         public string GetExportedMessages(string localeCode)
         {
-            if (localeDictionaries == null)
-            {
-                Initialize();
-            }
-
             string dictionary;
             if (localeDictionaries.TryGetValue(localeCode, out dictionary))
             {
@@ -40,7 +37,7 @@ namespace GTRevo.Platform.Web.JSBridge
         private void Initialize()
         {
             Dictionary<string, string> locales = new Dictionary<string, string>();
-            JSMessageExporter exporter = new JSMessageExporter();
+            JsonMessageExporter exporter = new JsonMessageExporter();
 
             foreach (var locale in localeManager.Locales)
             {

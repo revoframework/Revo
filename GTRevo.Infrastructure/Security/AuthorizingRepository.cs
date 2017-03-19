@@ -90,7 +90,7 @@ namespace GTRevo.Infrastructure.Security
 
         public IQueryable<T> FindAll<T>() where T : class
         {
-            return WrapQueryable(repository.FindAll<T>());
+            return InjectQueryable(repository.FindAll<T>());
         }
 
         public Task<IList<T>> FindAllAsync<T>() where T : class
@@ -110,7 +110,7 @@ namespace GTRevo.Infrastructure.Security
 
         public IQueryable<T> Where<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            return WrapQueryable(repository.Where(predicate));
+            return InjectQueryable(repository.Where(predicate));
         }
 
         public IEnumerable<T> WhereWithAdded<T>(Expression<Func<T, bool>> predicate) where T : class
@@ -143,20 +143,10 @@ namespace GTRevo.Infrastructure.Security
             return repository.SaveChangesAsync();
         }
 
-        private IQueryable<T> WrapQueryable<T>(IQueryable<T> query)
+        private IQueryable<T> InjectQueryable<T>(IQueryable<T> query)
         {
             var queryProvider = new AuthorizingQueryProvider(query.Provider, entityQueryAuthorizer);
-
-            //return queryProvider.CreateQuery<T>(query.Expression);
-
-            DbQuery<T> dbQuery = query as DbQuery<T>;
-            if (dbQuery != null)
-            {
-                var providerField = typeof(DbQuery<T>).GetField("_provider", BindingFlags.Instance | BindingFlags.NonPublic);
-                providerField.SetValue(dbQuery, queryProvider);
-            }
-
-            return query;
+            return queryProvider.InjectQueryable(query);
         }
     }
 }
