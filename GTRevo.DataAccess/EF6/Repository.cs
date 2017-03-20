@@ -6,12 +6,13 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using GTRevo.Platform.Transactions;
+using static GTRevo.DataAccess.EF6.RepositoryHelpers;
 
 namespace GTRevo.DataAccess.EF6
 {
     public class Repository : IRepository, ITransactionProvider
     {
-        private DbContext dbContext;
+        private readonly DbContext dbContext;
 
         public Repository(DbContext dbContext)
         {
@@ -168,14 +169,6 @@ namespace GTRevo.DataAccess.EF6
             if (dbContext != null)
             {
                 dbContext.Dispose();
-            }
-        }
-
-        private void ThrowIfGetFailed<T>(T t, params object[] id)
-        {
-            if (t == null)
-            {
-                throw new ArgumentException($"{typeof(T).FullName} with ID '{string.Join(", ", id)}' was not found");
             }
         }
     }

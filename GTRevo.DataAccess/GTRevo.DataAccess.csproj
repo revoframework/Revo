@@ -127,6 +127,7 @@
     <Compile Include="EF6\ModelMetadataExplorer.cs" />
     <Compile Include="EF6\PrimitivePropertyConfigurationExtensions.cs" />
     <Compile Include="EF6\Repository.cs" />
+    <Compile Include="EF6\RepositoryHelpers.cs" />
     <Compile Include="EF6\RepositoryTransaction.cs" />
     <Compile Include="EF6\TablePrefixAttribute.cs" />
     <Compile Include="Sequences\ContextSequence.cs" />
