@@ -4,7 +4,7 @@ using GTRevo.Platform.Commands;
 
 namespace GTRevo.Infrastructure.Security.Commands
 {
-    public abstract class CommandAuthorizer<T> : IPreCommandHandler<T>
+    public abstract class CommandAuthorizer<T> : ICommandFilter<T>
         where T : ICommandBase
     {
         public Task Handle(T command)

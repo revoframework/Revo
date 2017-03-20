@@ -38,7 +38,7 @@ namespace GTRevo.Infrastructure.Security
                 .To<CommandPermissionCache>()
                 .InSingletonScope();
 
-            Bind<IPreCommandHandler<ICommandBase>>()
+            Bind<ICommandFilter<ICommandBase>>()
                 .To<CommandPermissionAuthorizer>()
                 .InTransientScope();
         }

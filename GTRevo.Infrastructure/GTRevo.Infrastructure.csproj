@@ -137,6 +137,9 @@
     <Compile Include="Security\SecurityInfrastructureModule.cs" />
     <Compile Include="Security\AuthorizationQueryableExtensions.cs" />
     <Compile Include="Security\IAuthorizingRepository.cs" />
+    <Compile Include="Validation\CommandAttributeValidationFilter.cs" />
+    <Compile Include="Validation\CommandValidationException.cs" />
+    <Compile Include="Validation\ValidationInfrastructureModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

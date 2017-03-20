@@ -9,27 +9,27 @@ namespace GTRevo.Platform.Commands
     public class CommandHandlerPipeline<T> : IAsyncCommandHandler<T>
          where T : ICommand
     {
-        private readonly IPreCommandHandler<T>[] preCommandHandlers;
+        private readonly ICommandFilter<T>[] commandFilters;
         private readonly IAsyncCommandHandler<T> commandHandler;
 
-        public CommandHandlerPipeline(IPreCommandHandler<T>[] preCommandHandlers,
+        public CommandHandlerPipeline(ICommandFilter<T>[] commandFilters,
             IAsyncCommandHandler<T> commandHandler)
         {
-            this.preCommandHandlers = preCommandHandlers;
+            this.commandFilters = commandFilters;
             this.commandHandler = commandHandler;
         }
 
         public async Task Handle(T message)
         {
-            await PreHandle(message);
+            await Filter(message);
             await commandHandler.Handle(message);
         }
 
-        private async Task PreHandle(T message)
+        private async Task Filter(T message)
         {
-            foreach (var preHandler in preCommandHandlers)
+            foreach (var filter in commandFilters)
             {
-                await preHandler.Handle(message);
+                await filter.Handle(message);
             }
         }
     }
@@ -37,27 +37,27 @@ namespace GTRevo.Platform.Commands
     public class CommandHandlerPipeline<T, TResult> : IAsyncCommandHandler<T, TResult>
          where T : ICommand<TResult>
     {
-        private readonly IPreCommandHandler<T>[] preCommandHandlers;
+        private readonly ICommandFilter<T>[] commandFilters;
         private readonly IAsyncCommandHandler<T, TResult> commandHandler;
 
-        public CommandHandlerPipeline(IPreCommandHandler<T>[] preCommandHandlers,
+        public CommandHandlerPipeline(ICommandFilter<T>[] commandFilters,
             IAsyncCommandHandler<T, TResult> commandHandler)
         {
-            this.preCommandHandlers = preCommandHandlers;
+            this.commandFilters = commandFilters;
             this.commandHandler = commandHandler;
         }
 
         public async Task<TResult> Handle(T message)
         {
-            await PreHandle(message);
+            await Filter(message);
             return await commandHandler.Handle(message);
         }
 
-        private async Task PreHandle(T message)
+        private async Task Filter(T message)
         {
-            foreach (var preHandler in preCommandHandlers)
+            foreach (var filter in commandFilters)
             {
-                await preHandler.Handle(message);
+                await filter.Handle(message);
             }
         }
     }

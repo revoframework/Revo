@@ -30,6 +30,8 @@ namespace GTRevo.Platform
             config.Services.Replace(typeof(IHttpActionSelector), new HyphenApiControllerActionSelector());
             config.Services.Replace(typeof(IHttpControllerSelector), new ApiControllerSelector(config));
             config.Services.Replace(typeof(IHttpControllerTypeResolver), new ApiControllerTypeResolver());
+
+            config.Filters.Add(new ValidateApiActionModelFilterAttribute());
         }
     }
 }

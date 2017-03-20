@@ -269,7 +269,7 @@
     <Compile Include="Commands\IEntityQuery.cs" />
     <Compile Include="Commands\IEntityQueryableWrapper.cs" />
     <Compile Include="Commands\IHasContext.cs" />
-    <Compile Include="Commands\IPreCommandHandler.cs" />
+    <Compile Include="Commands\ICommandFilter.cs" />
     <Compile Include="Core\IActorContext.cs" />
     <Compile Include="Core\UserActorContext.cs" />
     <Compile Include="Events\EventQueue.cs" />
@@ -383,6 +383,7 @@
     <Compile Include="Web\ResourceApiController.cs" />
     <Compile Include="Web\RouteDataTokenKeys.cs" />
     <Compile Include="Web\TemplateRenderController.cs" />
+    <Compile Include="Web\ValidateApiActionModelFilterAttribute.cs" />
     <Compile Include="Web\VirtualPath\EmbeddedResourceAppInitializer.cs" />
     <Compile Include="Web\VirtualPath\EmbeddedResourceCacheControl.cs" />
     <Compile Include="Web\VirtualPath\EmbeddedResourceVirtualFile.cs" />
