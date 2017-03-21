@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -73,16 +74,21 @@ $@"  function {GetServiceName(apiDescription.Key)}($http) {{");
             foreach (var method in apiDescription)
             {
                 string[] parameterNames = GetMethodParameterNames(method);
-                
+
                 sb.AppendLine(
 $@"    this.{GetMethodName(method)} = function({(parameterNames.Length > 0 ? "parameters" : "")}) {{
-      return $http({{
-        'xsrfCookieName': 'bcCsrfToken',
-        'xsrfHeaderName': 'Bc-Csrf-Token',");
+      return $http({{");
+
+                if (!method.HttpMethod.IsSafe())
+                {
+                    sb.AppendLine(
+$@"        'xsrfCookieName': '{AntiForgeryConsts.CookieFormTokenName}',
+        'xsrfHeaderName': '{AntiForgeryConsts.HeaderTokenName}', ");
+                }
 
                 if (parameterNames.Length > 0)
                 {
-                    if (method.HttpMethod.Method.ToUpperInvariant() == "POST")
+                    if (method.HttpMethod.HasBody())
                     {
                         sb.AppendLine("        'data': parameters,");
                     }

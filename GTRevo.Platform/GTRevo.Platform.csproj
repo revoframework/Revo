@@ -363,11 +363,13 @@
     <Compile Include="Transactions\IUnitOfWorkListener.cs" />
     <Compile Include="Transactions\UnitOfWork.cs" />
     <Compile Include="Transactions\UnitOfWorkTransaction.cs" />
+    <Compile Include="Web\AntiForgeryConsts.cs" />
     <Compile Include="Web\CandidateAction.cs" />
     <Compile Include="Web\ApiControllerTypeResolver.cs" />
     <Compile Include="Web\CommandApiController.cs" />
     <Compile Include="Web\DictionaryExtensions.cs" />
     <Compile Include="Web\HttpControllerTypeCache.cs" />
+    <Compile Include="Web\HttpMethodHelpers.cs" />
     <Compile Include="Web\HttpRouteDataExtensions.cs" />
     <Compile Include="Web\HttpRouteExtensions.cs" />
     <Compile Include="Web\HyphenApiControllerActionSelector.cs" />
@@ -384,6 +386,7 @@
     <Compile Include="Web\RouteDataTokenKeys.cs" />
     <Compile Include="Web\TemplateRenderController.cs" />
     <Compile Include="Web\ValidateApiActionModelFilterAttribute.cs" />
+    <Compile Include="Web\ValidateHttpAntiForgeryTokenAttribute.cs" />
     <Compile Include="Web\VirtualPath\EmbeddedResourceAppInitializer.cs" />
     <Compile Include="Web\VirtualPath\EmbeddedResourceCacheControl.cs" />
     <Compile Include="Web\VirtualPath\EmbeddedResourceVirtualFile.cs" />
