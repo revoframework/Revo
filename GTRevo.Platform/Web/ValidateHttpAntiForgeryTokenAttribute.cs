@@ -71,7 +71,7 @@ namespace GTRevo.Platform.Web
             string csrfCookie, csrfFormValue;
             AntiForgery.GetTokens(null, out csrfCookie, out csrfFormValue);
 
-            actionExecutedContext.Response.Headers.AddCookies(new List<CookieHeaderValue>()
+            actionExecutedContext.Response?.Headers.AddCookies(new List<CookieHeaderValue>()
             {
                 new CookieHeaderValue(AntiForgeryConsts.CookieTokenName, csrfCookie)
                 {
