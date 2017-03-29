@@ -1,7 +1,9 @@
-﻿namespace GTRevo.Platform.Commands
+﻿using System.Web.OData.Query;
+
+namespace GTRevo.Platform.Commands
 {
     public interface IWrappedEntityQuery<TEntity, TWrapper> : IQuery<TWrapper>
-        where TWrapper : IEntityQueryableWrapper<TEntity>
     {
+        ODataQueryOptions<TEntity> QueryOptions { get; }
     }
 }

@@ -7,15 +7,12 @@ namespace GTRevo.Platform.Transactions
     {
         private readonly ITransactionProvider[] transactionProviders;
         private readonly IUnitOfWorkListener[] unitOfWorkListeners;
-        private readonly IEventQueue eventQueue;
 
         public UnitOfWork(ITransactionProvider[] transactionProviders,
-            IUnitOfWorkListener[] unitOfWorkListeners,
-            IEventQueue eventQueue)
+            IUnitOfWorkListener[] unitOfWorkListeners)
         {
             this.transactionProviders = transactionProviders;
             this.unitOfWorkListeners = unitOfWorkListeners;
-            this.eventQueue = eventQueue;
         }
 
         public ITransaction CreateTransaction()
@@ -33,7 +30,5 @@ namespace GTRevo.Platform.Transactions
 
             return tx;
         }
-
-        
     }
 }

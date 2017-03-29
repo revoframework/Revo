@@ -38,14 +38,26 @@ namespace GTRevo.DataAccess.EF6
 
         public Type GetClrTypeByTableName(string tableName)
         {
+            Type clrType = TryGetClrTypeByTableName(tableName);
+
+            if (clrType == null)
+            {
+                throw new ArgumentException($"CLR type mapping for table named '{tableName}' was not found");
+            }
+
+            return clrType;
+        }
+
+        public Type TryGetClrTypeByTableName(string tableName)
+        {
             EntityContainer container = GetEntityContainer();
             EntitySet entitySet = container.EntitySets.FirstOrDefault(x => x.Table == tableName);
 
             if (entitySet == null)
             {
-                throw new ArgumentException($"CLR type mapping for table named '{tableName}' was not found");
+                return null;
             }
-            
+
             var prop = entitySet.MetadataProperties.First(
                 y => y.Name == CustomStoreConvention.CLR_TYPE_ENTITY_SET_ANNOTATION_NAME);
             Type clrType = (Type)prop.Value;

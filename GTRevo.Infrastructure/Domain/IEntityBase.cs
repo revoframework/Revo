@@ -2,8 +2,7 @@
 
 namespace GTRevo.Infrastructure.Domain
 {
-    public interface IEntityBase : IComponent
+    public interface IEntityBase : IComponent, IHasId<Guid>
     {
-        Guid Id { get; }
     }
 }

@@ -19,8 +19,8 @@ namespace GTRevo.Infrastructure.DataAcccess
 
             return t;
         }
-        public static async Task<T> GetByIdAsync<T>(this IQueryable<T> queryable, Guid id)
-            where T : IEntityBase
+        public static async Task<T> GetByIdAsync<T, TId>(this IQueryable<T> queryable, TId id)
+            where T : IHasId<TId>
         {
             Expression idValueExpression = Expression.Constant(id);
             PropertyInfo idProperty = typeof(T).GetProperty("Id");
@@ -34,6 +34,17 @@ namespace GTRevo.Infrastructure.DataAcccess
             RepositoryHelpers.ThrowIfGetFailed(t, id);
 
             return t;
+        }
+
+        public static Expression<Func<T, TId>> CreateGetIdPropertyExpression<T, TId>()
+            where T : IHasId<TId>
+        {
+            PropertyInfo idProperty = typeof(T).GetProperty(nameof(IHasId<TId>.Id));
+            ParameterExpression xParameterExpression = Expression.Parameter(typeof(T), "x");
+            Expression idPropertyExpression = Expression.Property(xParameterExpression, idProperty);
+            Expression<Func<T, TId>> lambda =
+                (Expression<Func<T, TId>>)Expression.Lambda(idPropertyExpression, xParameterExpression);
+            return lambda;
         }
     }
 }

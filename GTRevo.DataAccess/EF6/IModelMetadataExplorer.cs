@@ -6,5 +6,6 @@ namespace GTRevo.DataAccess.EF6
     {
         string GetTableNameByClrType(Type entityType);
         Type GetClrTypeByTableName(string tableName);
+        Type TryGetClrTypeByTableName(string tableName);
     }
 }
