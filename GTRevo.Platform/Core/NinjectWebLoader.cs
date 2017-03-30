@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
+using Hangfire;
 using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 using Ninject;
 using Ninject.Web.Common;
@@ -12,6 +13,7 @@ using Ninject.Web.Mvc;
 using Ninject.Web.Mvc.Filter;
 using Ninject.Web.Mvc.Validation;
 using Ninject.Web.WebApi;
+using GlobalConfiguration = System.Web.Http.GlobalConfiguration;
 using NinjectDependencyResolver = Ninject.Web.Mvc.NinjectDependencyResolver;
 
 namespace GTRevo.Platform.Core
@@ -56,6 +58,8 @@ namespace GTRevo.Platform.Core
 
             DependencyResolver.SetResolver(((StandardKernel)Bootstrapper.Kernel).Get<IDependencyResolver>());
             GlobalConfiguration.Configuration.DependencyResolver = ((StandardKernel)Bootstrapper.Kernel).Get<Ninject.Web.WebApi.NinjectDependencyResolver>();
+            
+            Hangfire.GlobalConfiguration.Configuration.UseNinjectActivator(kernel);
         }
 
         /// <summary>

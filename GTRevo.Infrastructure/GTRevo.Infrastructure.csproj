@@ -107,11 +107,12 @@
   <ItemGroup>
     <Compile Include="DataAcccess\QueryableRepositoryExtensions.cs" />
     <Compile Include="Domain\Attributes\DomainClassIdAttribute.cs" />
+    <Compile Include="Domain\ConventionEventApplyRegistrator.cs" />
+    <Compile Include="Domain\ConventionEventApplyRegistratorCache.cs" />
+    <Compile Include="Domain\IAggregateEventRouter.cs" />
     <Compile Include="Domain\IHasId.cs" />
     <Compile Include="Domain\Projections\ClassEntityReadModel.cs" />
     <Compile Include="Domain\Projections\EntityReadModel.cs" />
-    <Compile Include="EventSourcing\ConventionEventApplyRegistrator.cs" />
-    <Compile Include="EventSourcing\ConventionEventApplyRegistratorCache.cs" />
     <Compile Include="EventSourcing\EF6\AggregateHistory.cs" />
     <Compile Include="Domain\EntityTypeManager.cs" />
     <Compile Include="Domain\AggregateEventRouter.cs" />

@@ -23,7 +23,7 @@ namespace GTRevo.Platform.Tests.Web.JSBridge
         }
 
         [Fact]
-        public void TestExportMessages()
+        public void ExportMessages_HasCorrectResul()
         {
             var sut = new JsonMessageExporter();
 

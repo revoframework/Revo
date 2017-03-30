@@ -5,7 +5,7 @@ using GTRevo.Infrastructure.EventSourcing;
 
 namespace GTRevo.Infrastructure.Domain.Projections
 {
-    public interface IEntityEventProjector
+    public interface IEntityEventProjector // TODO entity event projectors for non-event-sourced entities
     {
         Type ProjectedAggregateType { get; }
 
@@ -15,7 +15,7 @@ namespace GTRevo.Infrastructure.Domain.Projections
     }
 
     public interface IEntityEventProjector<in T> : IEntityEventProjector
-        where T : IAggregateRoot
+        where T : IEventSourcedAggregateRoot
     {
         Task ProjectEventsAsync(T aggregate, IEnumerable<DomainAggregateEvent> events);
     }

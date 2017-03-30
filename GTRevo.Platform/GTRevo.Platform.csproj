@@ -287,6 +287,7 @@
     <Compile Include="Commands\WrappedEntityQuery.cs" />
     <Compile Include="Core\HangfireOwinConfigurator.cs" />
     <Compile Include="Core\IActorContext.cs" />
+    <Compile Include="Core\TypeExplorer.cs" />
     <Compile Include="Core\UserActorContext.cs" />
     <Compile Include="Events\EventQueue.cs" />
     <Compile Include="Events\EventQueueTransaction.cs" />
@@ -316,7 +317,7 @@
     <Compile Include="Core\NinjectBindingExtension.cs" />
     <Compile Include="Core\NinjectWebLoader.cs" />
     <Compile Include="Commands\CommandBindExtensions.cs" />
-    <Compile Include="Core\TypeExplorer.cs" />
+    <Compile Include="Core\AspNetTypeExplorer.cs" />
     <Compile Include="Core\WebConfiguration.cs" />
     <Compile Include="Events\IEventQueue.cs" />
     <Compile Include="Events\IEventQueueTransactionListener.cs" />

@@ -7,10 +7,9 @@ namespace GTRevo.Platform.Core
 {
     public class TypeExplorer : ITypeExplorer
     {
-        public IEnumerable<Assembly> GetAllReferencedAssemblies()
+        public virtual IEnumerable<Assembly> GetAllReferencedAssemblies()
         {
-            return System.Web.Compilation.BuildManager.GetReferencedAssemblies()
-               .Cast<Assembly>()
+            return AppDomain.CurrentDomain.GetAssemblies()
                /*.Where(a => a.GetName().Name.StartsWith("System") == false)*/;
         }
 

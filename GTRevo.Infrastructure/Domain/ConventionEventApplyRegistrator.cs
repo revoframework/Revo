@@ -1,10 +1,8 @@
-﻿using GTRevo.Infrastructure.Domain;
-
-namespace GTRevo.Infrastructure.EventSourcing
+﻿namespace GTRevo.Infrastructure.Domain
 {
     public class ConventionEventApplyRegistrator : IEventRouterRegistrator
     {
-        public void RegisterEvents<T>(T self, AggregateEventRouter router)
+        public void RegisterEvents<T>(T self, IAggregateEventRouter router)
             where T : IComponent
         {
             var delegates = ConventionEventApplyRegistratorCache.GetApplyDelegates(self.GetType());

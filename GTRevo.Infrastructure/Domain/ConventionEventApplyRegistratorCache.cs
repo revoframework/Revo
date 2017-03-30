@@ -3,22 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using GTRevo.Infrastructure.Domain;
 using GTRevo.Platform.Core;
 using GTRevo.Platform.Core.Lifecycle;
 
-namespace GTRevo.Infrastructure.EventSourcing
+namespace GTRevo.Infrastructure.Domain
 {
     public class ConventionEventApplyRegistratorCache : IApplicationStartListener
     {
         private static readonly Dictionary<Type, EventTypeApplyDelegates> componentTypeDelegates =
             new Dictionary<Type, EventTypeApplyDelegates>();
 
-        private readonly ITypeExplorer typeExplorer;
+        private static ITypeExplorer typeExplorer;
 
         public ConventionEventApplyRegistratorCache(ITypeExplorer typeExplorer)
         {
-            this.typeExplorer = typeExplorer;
+            ConventionEventApplyRegistratorCache.typeExplorer = typeExplorer;
         }
 
         public static EventTypeApplyDelegates GetApplyDelegates(Type componentType)
@@ -43,8 +42,13 @@ namespace GTRevo.Infrastructure.EventSourcing
             CreateAggregateEventDelegates();
         }
 
-        private void CreateAggregateEventDelegates()
+        public static void CreateAggregateEventDelegates()
         {
+            if (typeExplorer == null)
+            {
+                typeExplorer = new TypeExplorer();
+            }
+
             componentTypeDelegates.Clear();
 
             var componentTypes = typeExplorer.GetAllTypes()

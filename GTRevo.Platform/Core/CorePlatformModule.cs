@@ -25,7 +25,7 @@ namespace GTRevo.Platform.Core
                 .InTransientScope();*/
 
             Bind<ITypeExplorer>()
-                .To<TypeExplorer>()
+                .To<AspNetTypeExplorer>()
                 .InSingletonScope();
 
             Bind<VirtualPathProvider>()

@@ -9,7 +9,7 @@ namespace GTRevo.Infrastructure.Domain.Projections
 {
     public abstract class EntityEventToPocoProjector<TSource, TTarget> :
         IEntityEventProjector<TSource>
-        where TSource : class, IAggregateRoot
+        where TSource : class, IEventSourcedAggregateRoot
     {
         private readonly Dictionary<Type, Func<DomainAggregateEvent, Task>> applyHandlers = new Dictionary<Type, Func<DomainAggregateEvent, Task>>();
 

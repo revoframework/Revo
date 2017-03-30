@@ -1,4 +1,6 @@
-﻿using Ninject.Syntax;
+﻿using System.Linq;
+using Hangfire;
+using Ninject.Syntax;
 using Ninject.Web.Common;
 
 namespace GTRevo.Platform.Core
@@ -7,12 +9,9 @@ namespace GTRevo.Platform.Core
     {
         public static IBindingNamedWithOrOnSyntax<T> InRequestOrJobScope<T>(this IBindingInSyntax<T> syntax)
         {
-            return syntax.InRequestScope();
-
-            //TODO: once we implement Hangfire, use this version 
-            /*return syntax
+            return syntax
                 .InNamedOrBackgroundJobScope(context => context.Kernel.Components.GetAll<INinjectHttpApplicationPlugin>()
-                    .Select(c => c.GetRequestScope(context)).FirstOrDefault(s => s != null));*/
+                    .Select(c => c.GetRequestScope(context)).FirstOrDefault(s => s != null));
         }
     }
 }

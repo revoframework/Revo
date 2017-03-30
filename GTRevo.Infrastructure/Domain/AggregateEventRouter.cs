@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace GTRevo.Infrastructure.Domain
 {
-    public class AggregateEventRouter
+    public class AggregateEventRouter : IAggregateEventRouter
     {
         private readonly IAggregateRoot aggregate;
 
@@ -18,16 +18,13 @@ namespace GTRevo.Infrastructure.Domain
             this.aggregate = aggregate;
         }
 
-        public virtual IEnumerable<DomainAggregateEvent> UncommitedEvents
-        {
-            get
-            {
-                return uncommittedEvents;
-            }
-        }
+        public virtual IEnumerable<DomainAggregateEvent> UncommitedEvents => uncommittedEvents;
 
         public void ApplyEvent<T>(T evt) where T : DomainAggregateEvent
         {
+            evt.AggregateId = aggregate.Id;
+            evt.AggregateClassId = aggregate.ClassId;
+
             ExecuteHandler(evt);
             uncommittedEvents.Add(evt);
         }
@@ -64,9 +61,6 @@ namespace GTRevo.Infrastructure.Domain
 
         private void ExecuteHandler<T>(T evt) where T : DomainAggregateEvent
         {
-            evt.AggregateId = aggregate.Id;
-            evt.AggregateClassId = aggregate.ClassId;
-
             IReadOnlyCollection<Action<DomainAggregateEvent>> eventHandlers;
             if (handlers.TryGetValue(evt.GetType(), out eventHandlers))
             {

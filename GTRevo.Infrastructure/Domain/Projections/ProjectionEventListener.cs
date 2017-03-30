@@ -32,6 +32,7 @@ namespace GTRevo.Infrastructure.Domain.Projections
 
             foreach (var crudEntityProjector in crudEntityProjectors)
             {
+                throw new NotImplementedException("CRUD entity projectors not implemented yet");
                 aggregateTypesToCrudEntityProjectors.Add(crudEntityProjector.ProjectedAggregateType, crudEntityProjector);
             }
         }
