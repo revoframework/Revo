@@ -4,13 +4,13 @@ namespace GTRevo.Infrastructure.EventSourcing
 {
     public class EventSourcedComponent : IComponent
     {
-        public EventSourcedComponent(AggregateEventRouter eventRouter)
+        public EventSourcedComponent(IAggregateEventRouter eventRouter)
         {
             EventRouter = eventRouter;
             new ConventionEventApplyRegistrator().RegisterEvents(this, EventRouter);
         }
 
-        protected AggregateEventRouter EventRouter { get; private set; }
+        protected IAggregateEventRouter EventRouter { get; }
 
         protected virtual void ApplyEvent<T>(T evt) where T : DomainAggregateEvent
         {

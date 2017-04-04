@@ -32,7 +32,7 @@ namespace GTRevo.Infrastructure.Domain
             }
         }
 
-        protected AggregateEventRouter EventRouter { get; private set; }
+        protected IAggregateEventRouter EventRouter { get; }
 
         public void Commit()
         {

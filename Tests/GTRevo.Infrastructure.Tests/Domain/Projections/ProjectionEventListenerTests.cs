@@ -54,24 +54,22 @@ namespace GTRevo.Infrastructure.Tests.Domain.Projections
             var tx = Substitute.For<ITransaction>();
             sut.OnTransactionBeginned(tx);
 
-            var aggregateId = Guid.NewGuid();
-
             var ev1 = new MyEvent()
             {
                 AggregateClassId = MyEntity1.ClassId,
-                AggregateId = aggregateId
+                AggregateId = aggregate1.Id
             };
 
             var ev2 = new MyEvent()
             {
                 AggregateClassId = MyEntity2.ClassId,
-                AggregateId = aggregateId
+                AggregateId = aggregate2.Id
             };
 
             var ev3 = new MyEvent()
             {
                 AggregateClassId = MyEntity1.ClassId,
-                AggregateId = aggregateId
+                AggregateId = aggregate1.Id
             };
 
             await sut.Handle(ev1);
@@ -92,7 +90,7 @@ namespace GTRevo.Infrastructure.Tests.Domain.Projections
             entityEventProjectors[0].Received(1).CommitChangesAsync();
 
             entityEventProjectors[1].Received(1)
-                    .ProjectEventsAsync(aggregate1, Arg.Is<IEnumerable<DomainAggregateEvent>>(x => x.SequenceEqual(new List<DomainAggregateEvent>() { ev2 })));
+                    .ProjectEventsAsync(aggregate2, Arg.Is<IEnumerable<DomainAggregateEvent>>(x => x.SequenceEqual(new List<DomainAggregateEvent>() { ev2 })));
             entityEventProjectors[1].Received(1).CommitChangesAsync();
         }
 

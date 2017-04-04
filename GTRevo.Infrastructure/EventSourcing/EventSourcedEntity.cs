@@ -5,7 +5,7 @@ namespace GTRevo.Infrastructure.EventSourcing
 {
     public class EventSourcedEntity : EventSourcedComponent, IEntityBase
     {
-        public EventSourcedEntity(Guid id, AggregateEventRouter eventRouter) : base(eventRouter)
+        public EventSourcedEntity(Guid id, IAggregateEventRouter eventRouter) : base(eventRouter)
         {
             Id = id;
         }

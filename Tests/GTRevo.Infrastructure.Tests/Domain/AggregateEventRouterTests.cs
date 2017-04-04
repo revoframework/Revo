@@ -12,7 +12,7 @@ namespace GTRevo.Infrastructure.Tests.Domain
     public class AggregateEventRouterTests
     {
         private readonly IAggregateRoot aggregate;
-        private AggregateEventRouter router;
+        private readonly AggregateEventRouter sut;
 
         public AggregateEventRouterTests()
         {
@@ -20,7 +20,7 @@ namespace GTRevo.Infrastructure.Tests.Domain
             aggregate.Id.Returns(Guid.NewGuid());
             aggregate.ClassId.Returns(Guid.NewGuid());
 
-            router = new AggregateEventRouter(aggregate);
+            sut = new AggregateEventRouter(aggregate);
         }
 
         [Fact]
@@ -29,30 +29,30 @@ namespace GTRevo.Infrastructure.Tests.Domain
             var ev1 = new Event1();
             var ev2 = new Event2();
 
-            router.ApplyEvent(ev1);
-            router.ApplyEvent(ev2);
+            sut.ApplyEvent(ev1);
+            sut.ApplyEvent(ev2);
 
-            Assert.Equal(2, router.UncommitedEvents.Count());
-            Assert.Equal(ev1, router.UncommitedEvents.ElementAt(0));
-            Assert.Equal(ev2, router.UncommitedEvents.ElementAt(1));
+            Assert.Equal(2, sut.UncommitedEvents.Count());
+            Assert.Equal(ev1, sut.UncommitedEvents.ElementAt(0));
+            Assert.Equal(ev2, sut.UncommitedEvents.ElementAt(1));
         }
 
         [Fact]
         public void ApplyEvent_SetsAggregateIdAndClassId()
         {
-            router.ApplyEvent(new Event1());
+            sut.ApplyEvent(new Event1());
             
-            Assert.Equal(aggregate.Id, router.UncommitedEvents.ElementAt(0).AggregateId);
-            Assert.Equal(aggregate.ClassId, router.UncommitedEvents.ElementAt(0).AggregateClassId);
+            Assert.Equal(aggregate.Id, sut.UncommitedEvents.ElementAt(0).AggregateId);
+            Assert.Equal(aggregate.ClassId, sut.UncommitedEvents.ElementAt(0).AggregateClassId);
         }
         
         [Fact]
         public void CommitEvents_ClearsUncomittedEvents()
         {
-            router.ApplyEvent(new Event1());
-            router.CommitEvents();
+            sut.ApplyEvent(new Event1());
+            sut.CommitEvents();
 
-            Assert.Equal(0, router.UncommitedEvents.Count());
+            Assert.Equal(0, sut.UncommitedEvents.Count());
         }
 
         [Fact]
@@ -63,9 +63,9 @@ namespace GTRevo.Infrastructure.Tests.Domain
 
             var ev1 = new Event1();
 
-            router.Register<Event1>(ev => events1.Add(ev));
-            router.Register<Event1>(ev => events2.Add(ev));
-            router.ApplyEvent(ev1);
+            sut.Register<Event1>(ev => events1.Add(ev));
+            sut.Register<Event1>(ev => events2.Add(ev));
+            sut.ApplyEvent(ev1);
 
             Assert.Equal(events1[0], ev1);
             Assert.Equal(events2[0], ev1);
@@ -78,8 +78,8 @@ namespace GTRevo.Infrastructure.Tests.Domain
 
             var ev1 = new Event1();
 
-            router.Register<Event1>(ev => events.Add(ev));
-            router.ApplyEvent(ev1);
+            sut.Register<Event1>(ev => events.Add(ev));
+            sut.ApplyEvent(ev1);
 
             Assert.Equal(events[0], ev1);
         }
@@ -87,8 +87,8 @@ namespace GTRevo.Infrastructure.Tests.Domain
         [Fact]
         public void ReplayEvents_DoesntAddUncomittedEvents()
         {
-            router.ReplayEvents(new []{ new Event1() });
-            Assert.Equal(0, router.UncommitedEvents.Count());
+            sut.ReplayEvents(new []{ new Event1() });
+            Assert.Equal(0, sut.UncommitedEvents.Count());
         }
 
         public class Event1 : DomainAggregateEvent

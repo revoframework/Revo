@@ -10,8 +10,7 @@ namespace GTRevo.Infrastructure.Domain
 {
     public class ConventionEventApplyRegistratorCache : IApplicationStartListener
     {
-        private static readonly Dictionary<Type, EventTypeApplyDelegates> componentTypeDelegates =
-            new Dictionary<Type, EventTypeApplyDelegates>();
+        private static Dictionary<Type, EventTypeApplyDelegates> componentTypeDelegates;
 
         private static ITypeExplorer typeExplorer;
 
@@ -22,6 +21,11 @@ namespace GTRevo.Infrastructure.Domain
 
         public static EventTypeApplyDelegates GetApplyDelegates(Type componentType)
         {
+            if (componentTypeDelegates == null)
+            {
+                CreateAggregateEventDelegates();
+            }
+
             if (!typeof(IComponent).IsAssignableFrom(componentType))
             {
                 throw new ArgumentException(
@@ -49,7 +53,7 @@ namespace GTRevo.Infrastructure.Domain
                 typeExplorer = new TypeExplorer();
             }
 
-            componentTypeDelegates.Clear();
+            componentTypeDelegates = new Dictionary<Type, EventTypeApplyDelegates>();
 
             var componentTypes = typeExplorer.GetAllTypes()
                 .Where(x => typeof(IComponent).IsAssignableFrom(x)
