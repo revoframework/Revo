@@ -4,6 +4,7 @@ using GTRevo.DataAccess.EF6;
 namespace GTRevo.Infrastructure.EventSourcing.EF6.Model
 {
     [TablePrefix(NamespacePrefix = "REV", ColumnPrefix = "DEP")]
+    [DatabaseEntity]
     public class DomainEventPacket
     {
         public Guid Id { get; set; }

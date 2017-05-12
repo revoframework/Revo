@@ -92,7 +92,7 @@ namespace GTRevo.Platform.Core
                  .To<UnitOfWork>()
                  .InRequestOrJobScope();
 
-            Bind<IEventQueue, IUnitOfWorkListener>()
+            Bind<IEventQueue>()
                 .To<EventQueue>()
                 .InRequestOrJobScope();
         }

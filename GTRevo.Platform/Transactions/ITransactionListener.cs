@@ -4,7 +4,7 @@ namespace GTRevo.Platform.Transactions
 {
     public interface ITransactionListener
     {
-        void OnTransactionBeginned(ITransaction transaction);
+        void OnTransactionBegin(ITransaction transaction);
         Task OnTransactionSucceededAsync(ITransaction transaction);
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GTRevo.Infrastructure.Domain;
+using GTRevo.Infrastructure.Domain.Events;
 
 namespace GTRevo.Infrastructure.EventSourcing
 {

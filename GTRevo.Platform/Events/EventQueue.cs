@@ -6,7 +6,7 @@ using GTRevo.Platform.Transactions;
 
 namespace GTRevo.Platform.Events
 {
-    public class EventQueue : IEventQueue, IUnitOfWorkListener
+    public class EventQueue : IEventQueue
     {
         private readonly IEventBus eventBus;
         private readonly Func<IEventQueueTransactionListener[]> listeners;
@@ -26,22 +26,12 @@ namespace GTRevo.Platform.Events
 
             foreach (var listener in listeners())
             {
-                listener.OnTransactionBeginned(tx);
+                listener.OnTransactionBegin(tx);
             }
 
             return tx;
         }
-
-        public void OnTransactionBeginned(ITransaction transaction)
-        {
-            CreateTransaction();
-        }
-
-        public Task OnTransactionSucceededAsync(ITransaction transaction)
-        {
-            return transactions.Peek().CommitAsync();
-        }
-
+        
         public void PushEvent(IEvent ev)
         {
             if (transactions.Count == 0)

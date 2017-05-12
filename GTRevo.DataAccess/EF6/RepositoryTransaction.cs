@@ -5,9 +5,9 @@ namespace GTRevo.DataAccess.EF6
 {
     public class RepositoryTransaction : ITransaction
     {
-        private readonly Repository repository;
+        private readonly CrudRepository repository;
 
-        public RepositoryTransaction(Repository repository)
+        public RepositoryTransaction(CrudRepository repository)
         {
             this.repository = repository;
         }

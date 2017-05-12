@@ -1,13 +1,18 @@
 ﻿using System;
 using GTRevo.Infrastructure.Domain;
+using GTRevo.Infrastructure.Domain.Events;
+using GTRevo.Infrastructure.EventSourcing.Events;
 
 namespace GTRevo.Infrastructure.EventSourcing
 {
     public abstract class EventSourcedAggregateRoot : AggregateRoot, IEventSourcedAggregateRoot
     {
-        public EventSourcedAggregateRoot(Guid id, Guid classId) : base(id, classId)
+
+
+        public EventSourcedAggregateRoot(Guid id) : base(id)
         {
             new ConventionEventApplyRegistrator().RegisterEvents(this, EventRouter);
+            //ApplyEvent(new AggregateCreated());
         }
 
         public void LoadState(AggregateState state)
@@ -20,6 +25,12 @@ namespace GTRevo.Infrastructure.EventSourcing
         {
             base.ApplyEvent(evt);
             EventRouter.ApplyEvent(evt);
+        }
+
+        protected void Delete()
+        {
+            throw new NotImplementedException();
+            //ApplyEvent(new AggregateDeleted());
         }
     }
 }

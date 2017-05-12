@@ -12,7 +12,7 @@ namespace GTRevo.Infrastructure.DataAcccess
     public static class QueryableRepositoryExtensions
     {
         public static T GetById<T>(this IQueryable<T> queryable, Guid id)
-            where T : IEntityBase
+            where T : IEntity
         {
             T t = queryable.FirstOrDefault(x => x.Id == id);
             RepositoryHelpers.ThrowIfGetFailed(t, id);

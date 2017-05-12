@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GTRevo.Infrastructure.Domain;
+using GTRevo.Infrastructure.Domain.Events;
 using GTRevo.Infrastructure.EventSourcing;
 using GTRevo.Platform.Core;
 using GTRevo.Platform.Events;
@@ -15,7 +16,6 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
     public class EventSourcedRepositoryTests
     {
         private readonly IEventStore eventStore;
-        private readonly IEventQueue eventQueue;
         private readonly IActorContext actorContext;
         private readonly IEntityTypeManager entityTypeManager;
         private readonly IClock clock;
@@ -26,12 +26,11 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
         private Guid entityClassId = Guid.NewGuid();
         private Guid entity2ClassId = Guid.NewGuid();
 
-        private readonly IEventSourcedRepository sut;
+        private readonly EventSourcedRepository sut;
 
         public EventSourcedRepositoryTests()
         {
             eventStore = Substitute.For<IEventStore>();
-            eventQueue = Substitute.For<IEventQueue>();
             actorContext = Substitute.For<IActorContext>();
             entityTypeManager = Substitute.For<IEntityTypeManager>();
 
@@ -48,14 +47,19 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
                       AggregateId = entity2Id,
                       AggregateClassId = entity2ClassId
                   }
-                }));
+                }, false));
 
             entityTypeManager.GetClrTypeByClassId(entityClassId)
                 .Returns(typeof(MyEntity));
             entityTypeManager.GetClrTypeByClassId(entity2ClassId)
                 .Returns(typeof(MyEntity2));
 
-            sut = new EventSourcedRepository(eventStore, eventQueue, actorContext,
+            entityTypeManager.GetClassIdByClrType(typeof(MyEntity))
+                .Returns(entityClassId);
+            entityTypeManager.GetClassIdByClrType(typeof(MyEntity2))
+                .Returns(entity2ClassId);
+
+            sut = new EventSourcedRepository(eventStore, actorContext,
                 clock, entityTypeManager);
         }
 
@@ -65,7 +69,6 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
             var entity = await sut.GetAsync<MyEntity2>(entity2Id);
 
             Assert.Equal(entity2Id, entity.Id);
-            Assert.Equal(entity2ClassId, entity.ClassId);
 
             Assert.Equal(1, entity.LoadedEvents.Count);
             Assert.IsType<SetFooEvent>(entity.LoadedEvents[0]);
@@ -92,10 +95,10 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
         [Fact]
         public void SaveChangesAsync_AddTwiceWithSameIdsThrows()
         {
-            var entity = new MyEntity(entityId, entityClassId, 5);
+            var entity = new MyEntity(entityId, 5);
             sut.Add(entity);
 
-            var entity2 = new MyEntity(entityId, entityClassId, 5);
+            var entity2 = new MyEntity(entityId, 5);
 
             Assert.Throws<ArgumentException>(() => sut.Add(entity2));
         }
@@ -103,7 +106,7 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
         [Fact]
         public async Task AddThenGetReturnsTheSame()
         {
-            var entity = new MyEntity(entityId, entityClassId, 5);
+            var entity = new MyEntity(entityId, 5);
             sut.Add(entity);
             var entity2 = await sut.GetAsync<MyEntity>(entity.Id);
 
@@ -113,7 +116,7 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
         [Fact]
         public async Task SaveChangesAsync_SavesChangedAggregates()
         {
-            var entity = new MyEntity(entityId, entityClassId, 5);
+            var entity = new MyEntity(entityId, 5);
             sut.Add(entity);
 
             entity.UncommitedEvents = new List<DomainAggregateEvent>()
@@ -143,30 +146,8 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
                 .PushEventsAsync(entityId,
                     Arg.Is<IEnumerable<DomainAggregateEventRecord>>(x => x.Count() == eventsRecords.Count
                         && x.Select((y, i) => new {Y = y, I = i}).All(z => eventsRecords[z.I].Equals(z.Y))),
-                    entity.Version);
+                    entity.Version + 1);
             eventStore.Received(1).CommitChangesAsync();
-        }
-
-        [Fact]
-        public async Task SaveChangesAsync_PublishesEvents()
-        {
-            var entity = new MyEntity(entityId, entityClassId, 5);
-            sut.Add(entity);
-
-            var ev = new SetFooEvent()
-            {
-                AggregateId = entityId,
-                AggregateClassId = entityClassId
-            };
-
-            entity.UncommitedEvents = new List<DomainAggregateEvent>()
-            {
-                ev
-            };
-
-            await sut.SaveChangesAsync();
-
-            eventQueue.Received(1).PushEvent(ev);
         }
 
         public class EventA : DomainAggregateEvent
@@ -179,7 +160,7 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
 
         public class MyEntity : IEventSourcedAggregateRoot
         {
-            public MyEntity(Guid id, Guid classId, int foo) : this(id, classId)
+            public MyEntity(Guid id, int foo) : this(id)
             {
                 if (foo != 5)
                 {
@@ -187,14 +168,12 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
                 }
             }
 
-            protected MyEntity(Guid id, Guid classId)
+            protected MyEntity(Guid id)
             {
                 Id = id;
-                ClassId = classId;
             }
 
             public Guid Id { get; private set; }
-            public Guid ClassId { get; }
 
             public IEnumerable<DomainAggregateEvent> UncommitedEvents { get; set; } =
                 new List<DomainAggregateEvent>();
@@ -222,11 +201,11 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
 
         public class MyEntity2 : MyEntity
         {
-            public MyEntity2(Guid id, Guid classId, int foo) : base(id, classId, foo)
+            public MyEntity2(Guid id, int foo) : base(id, foo)
             {
             }
 
-            protected MyEntity2(Guid id, Guid classId) : base(id, classId)
+            protected MyEntity2(Guid id) : base(id)
             {
             }
         }

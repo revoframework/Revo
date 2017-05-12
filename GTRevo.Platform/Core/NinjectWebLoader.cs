@@ -39,6 +39,7 @@ namespace GTRevo.Platform.Core
             RegisterPostServices(Bootstrapper.Kernel);
             
             var kernel = (StandardKernel)Bootstrapper.Kernel;
+            kernel.Settings.AllowNullInjection = true;
             kernel.Components.Add<INinjectHttpApplicationPlugin, NinjectMvcHttpApplicationPlugin>();
             //kernel.Bind<IDependencyResolver>().To<NinjectDependencyResolver>();
             kernel.Bind<IFilterProvider>().To<NinjectFilterAttributeFilterProvider>();

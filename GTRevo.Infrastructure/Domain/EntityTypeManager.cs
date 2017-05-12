@@ -29,7 +29,7 @@ namespace GTRevo.Infrastructure.Domain
         public virtual void OnApplicationStarted()
         {
             var entities = typeExplorer.GetAllTypes()
-                .Where(x => typeof(IEntityBase).IsAssignableFrom(x))
+                .Where(x => typeof(IEntity).IsAssignableFrom(x))
                 .ToList();
 
             typesToIds = entities.ToDictionary(x => x,

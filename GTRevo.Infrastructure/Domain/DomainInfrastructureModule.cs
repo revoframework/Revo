@@ -1,5 +1,6 @@
-﻿using GTRevo.Infrastructure.Domain.Projections;
+﻿using GTRevo.Infrastructure.Domain.Events;
 using GTRevo.Infrastructure.EventSourcing;
+using GTRevo.Infrastructure.Projections;
 using GTRevo.Platform.Core;
 using GTRevo.Platform.Core.Lifecycle;
 using GTRevo.Platform.Events;

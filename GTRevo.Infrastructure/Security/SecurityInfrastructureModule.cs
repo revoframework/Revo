@@ -1,6 +1,5 @@
 ﻿using GTRevo.DataAccess.EF6;
 using GTRevo.Infrastructure.Domain;
-using GTRevo.Infrastructure.Domain.Projections;
 using GTRevo.Infrastructure.EventSourcing;
 using GTRevo.Infrastructure.Security.Commands;
 using GTRevo.Platform.Commands;
@@ -17,13 +16,13 @@ namespace GTRevo.Infrastructure.Security
     {
         public override void Load()
         {
-            Rebind<IRepository>()
-                .To<Repository>()
-                .WhenInjectedInto<AuthorizingRepository>()
+            Rebind<ICrudRepository>()
+                .To<CrudRepository>()
+                .WhenInjectedInto<AuthorizingCrudRepository>()
                 .InTransientScope();
 
-            Bind<IRepository, IAuthorizingRepository>()
-                .To<AuthorizingRepository>()
+            Bind<ICrudRepository, IAuthorizingCrudRepository>()
+                .To<AuthorizingCrudRepository>()
                 .InRequestOrJobScope();
 
             Bind<IEntityQueryAuthorizer>()

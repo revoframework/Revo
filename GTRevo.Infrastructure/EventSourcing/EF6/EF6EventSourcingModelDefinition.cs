@@ -8,8 +8,6 @@ namespace GTRevo.Infrastructure.EventSourcing.EF6
     {
         public void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<DomainAggregateRecord>();
-            modelBuilder.Entity<DomainEventPacket>();
         }
     }
 }

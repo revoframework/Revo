@@ -1,9 +1,10 @@
 ﻿using System;
 using GTRevo.Infrastructure.Domain;
+using GTRevo.Infrastructure.Domain.Events;
 
 namespace GTRevo.Infrastructure.EventSourcing
 {
-    public class EventSourcedEntity : EventSourcedComponent, IEntityBase
+    public class EventSourcedEntity : EventSourcedComponent, IEntity
     {
         public EventSourcedEntity(Guid id, IAggregateEventRouter eventRouter) : base(eventRouter)
         {
@@ -19,7 +20,7 @@ namespace GTRevo.Infrastructure.EventSourcing
 
         public override bool Equals(object obj)
         {
-            IEntityBase other = obj as IEntityBase;
+            IEntity other = obj as IEntity;
             return Id == other?.Id;
         }
     }

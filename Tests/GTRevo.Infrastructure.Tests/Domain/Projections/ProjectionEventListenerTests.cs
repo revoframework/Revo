@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GTRevo.Infrastructure.Domain;
-using GTRevo.Infrastructure.Domain.Projections;
+using GTRevo.Infrastructure.Domain.Events;
 using GTRevo.Infrastructure.EventSourcing;
+using GTRevo.Infrastructure.Projections;
 using GTRevo.Platform.Transactions;
 using NSubstitute;
 using Xunit;
@@ -25,8 +26,8 @@ namespace GTRevo.Infrastructure.Tests.Domain.Projections
 
         public ProjectionEventListenerTests()
         {
-            aggregate1 = new MyEntity1(Guid.NewGuid(), MyEntity1.ClassId);
-            aggregate2 = new MyEntity2(Guid.NewGuid(), MyEntity2.ClassId);
+            aggregate1 = new MyEntity1(Guid.NewGuid());
+            aggregate2 = new MyEntity2(Guid.NewGuid());
 
             eventSourcedRepository = Substitute.For<IEventSourcedRepository>();
             eventSourcedRepository.GetAsync(aggregate1.Id).Returns(aggregate1);
@@ -52,7 +53,7 @@ namespace GTRevo.Infrastructure.Tests.Domain.Projections
         public async Task OnTransactionSucceededAsync_FiresProjections()
         {
             var tx = Substitute.For<ITransaction>();
-            sut.OnTransactionBeginned(tx);
+            sut.OnTransactionBegin(tx);
 
             var ev1 = new MyEvent()
             {
@@ -98,7 +99,7 @@ namespace GTRevo.Infrastructure.Tests.Domain.Projections
         {
             public static Guid ClassId = Guid.NewGuid();
 
-            public MyEntity1(Guid id, Guid classId) : base(id, classId)
+            public MyEntity1(Guid id) : base(id)
             {
             }
 
@@ -111,7 +112,7 @@ namespace GTRevo.Infrastructure.Tests.Domain.Projections
         {
             public static Guid ClassId = Guid.NewGuid();
 
-            public MyEntity2(Guid id, Guid classId) : base(id, classId)
+            public MyEntity2(Guid id) : base(id)
             {
             }
 

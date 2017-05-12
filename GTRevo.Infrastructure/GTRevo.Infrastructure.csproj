@@ -30,6 +30,22 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AutoMapper, Version=5.2.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\AutoMapper.5.2.0\lib\net45\AutoMapper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="AutoMapper.EF6, Version=0.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\AutoMapper.EF6.0.5.0\lib\net45\AutoMapper.EF6.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DelegateDecompiler, Version=1.0.0.0, Culture=neutral, PublicKeyToken=93b26a10a04705bd, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\DelegateDecompiler.0.18.1\lib\net40-Client\DelegateDecompiler.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DelegateDecompiler.EntityFramework, Version=1.0.0.0, Culture=neutral, PublicKeyToken=93b26a10a04705bd, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\DelegateDecompiler.EntityFramework.0.18.1\lib\net45\DelegateDecompiler.EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\..\GTServiceDesk\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
       <Private>True</Private>
@@ -78,6 +94,10 @@
       <HintPath>..\..\GTServiceDesk\packages\Microsoft.Owin.Host.SystemWeb.3.0.1\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Mono.Reflection, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\Mono.Reflection.1.0.0.0\lib\Mono.Reflection.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="MoreLinq, Version=2.0.20029.0, Culture=neutral, PublicKeyToken=384d532d7e88985d, processorArchitecture=MSIL">
       <HintPath>..\..\GTServiceDesk\packages\morelinq.2.2.0\lib\net35\MoreLinq.dll</HintPath>
       <Private>True</Private>
@@ -105,26 +125,48 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataAcccess\CustomStoreConventionEx.cs" />
+    <Compile Include="DataAcccess\InfrastructureDataAccessModule.cs" />
     <Compile Include="DataAcccess\QueryableRepositoryExtensions.cs" />
     <Compile Include="Domain\Attributes\DomainClassIdAttribute.cs" />
-    <Compile Include="Domain\ConventionEventApplyRegistrator.cs" />
-    <Compile Include="Domain\ConventionEventApplyRegistratorCache.cs" />
-    <Compile Include="Domain\IAggregateEventRouter.cs" />
+    <Compile Include="Domain\Basic\BasicAggregateRoot.cs" />
+    <Compile Include="Domain\Basic\BasicClassAggregateRoot.cs" />
+    <Compile Include="Domain\Basic\BasicClassEntity.cs" />
+    <Compile Include="Domain\Basic\BasicDomainModelDefinition.cs" />
+    <Compile Include="Domain\Basic\BasicEntity.cs" />
+    <Compile Include="ReadModel\ClassEntityView.cs" />
+    <Compile Include="ReadModel\EntityView.cs" />
+    <Compile Include="ReadModel\ReadModelDefinition.cs" />
+    <Compile Include="Domain\Basic\DataType.cs" />
+    <Compile Include="Domain\Basic\Dto\ClassEntityDto.cs" />
+    <Compile Include="Domain\Basic\Dto\EntityBaseDto.cs" />
+    <Compile Include="Domain\Basic\Entity.cs" />
+    <Compile Include="Domain\Events\ConventionEventApplyRegistrator.cs" />
+    <Compile Include="Domain\Events\ConventionEventApplyRegistratorCache.cs" />
+    <Compile Include="Domain\Events\IAggregateEventRouter.cs" />
     <Compile Include="Domain\IHasId.cs" />
-    <Compile Include="Domain\Projections\ClassEntityReadModel.cs" />
-    <Compile Include="Domain\Projections\EntityReadModel.cs" />
+    <Compile Include="Domain\IQueryableEntity.cs" />
+    <Compile Include="EventSourcing\Events\AggregateCreated.cs" />
+    <Compile Include="EventSourcing\Events\AggregateDeleted.cs" />
+    <Compile Include="History\EntityAttributeChange.cs" />
+    <Compile Include="History\IChangeTracker.cs" />
+    <Compile Include="ReadModel\ClassEntityReadModel.cs" />
+    <Compile Include="ReadModel\EntityReadModel.cs" />
+    <Compile Include="ReadModel\ReadModelForEntityAttribute.cs" />
+    <Compile Include="Repositories\IRepository.cs" />
+    <Compile Include="Repositories\Repository.cs" />
     <Compile Include="EventSourcing\EF6\AggregateHistory.cs" />
     <Compile Include="Domain\EntityTypeManager.cs" />
-    <Compile Include="Domain\AggregateEventRouter.cs" />
+    <Compile Include="Domain\Events\AggregateEventRouter.cs" />
     <Compile Include="EventSourcing\EventSourcedComponent.cs" />
-    <Compile Include="Domain\IAggregateHistory.cs" />
-    <Compile Include="Domain\AggregateState.cs" />
+    <Compile Include="EventSourcing\IAggregateHistory.cs" />
+    <Compile Include="EventSourcing\AggregateState.cs" />
     <Compile Include="Domain\AggregateRoot.cs" />
     <Compile Include="Domain\Attributes\EventVersionAttribute.cs" />
-    <Compile Include="Domain\DomainAggregateEvent.cs" />
-    <Compile Include="Domain\DomainEvent.cs" />
-    <Compile Include="Domain\DomainAggregateEventRecord.cs" />
-    <Compile Include="Domain\DomainEventTypeCache.cs" />
+    <Compile Include="Domain\Events\DomainAggregateEvent.cs" />
+    <Compile Include="Domain\Events\DomainEvent.cs" />
+    <Compile Include="Domain\Events\DomainAggregateEventRecord.cs" />
+    <Compile Include="Domain\Events\DomainEventTypeCache.cs" />
     <Compile Include="EventSourcing\EF6\Model\DomainAggregateRecord.cs" />
     <Compile Include="EventSourcing\EventSourcedAggregateRoot.cs" />
     <Compile Include="EventSourcing\EventSourcedEntity.cs" />
@@ -136,26 +178,31 @@
     <Compile Include="EventSourcing\EF6\EF6EventSourcingModule.cs" />
     <Compile Include="EventSourcing\EF6\EF6EventStore.cs" />
     <Compile Include="Domain\IAggregateRoot.cs" />
-    <Compile Include="Domain\IClassEntityBase.cs" />
+    <Compile Include="Domain\IHasClassId.cs" />
     <Compile Include="Domain\IComponent.cs" />
-    <Compile Include="Domain\IEventRouterRegistrator.cs" />
+    <Compile Include="Domain\Events\IEventRouterRegistrator.cs" />
     <Compile Include="Domain\IEntityTypeManager.cs" />
     <Compile Include="EventSourcing\IEventSourcedAggregateRoot.cs" />
     <Compile Include="EventSourcing\IEventSourcedRepository.cs" />
-    <Compile Include="Domain\IEntityBase.cs" />
+    <Compile Include="Domain\IEntity.cs" />
     <Compile Include="EventSourcing\IEventStore.cs" />
     <Compile Include="Domain\DomainInfrastructureModule.cs" />
     <Compile Include="Domain\ISaga.cs" />
-    <Compile Include="Domain\Projections\EntityEventToPocoProjector.cs" />
-    <Compile Include="Domain\Projections\ICrudEntityProjector.cs" />
-    <Compile Include="Domain\Projections\IEntityEventProjector.cs" />
-    <Compile Include="Domain\Projections\IEventTypeProjector.cs" />
-    <Compile Include="Domain\Projections\ISubEntityEventProjector.cs" />
-    <Compile Include="Domain\Projections\ProjectionEventListener.cs" />
+    <Compile Include="Projections\EntityEventToPocoProjector.cs" />
+    <Compile Include="Projections\ICrudEntityProjector.cs" />
+    <Compile Include="Projections\IEntityEventProjector.cs" />
+    <Compile Include="Projections\IEventTypeProjector.cs" />
+    <Compile Include="Projections\ISubEntityEventProjector.cs" />
+    <Compile Include="Projections\ProjectionEventListener.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Domain\Saga.cs" />
+    <Compile Include="Repositories\DomainRepositoryModule.cs" />
+    <Compile Include="Repositories\EF6AggregateStore.cs" />
+    <Compile Include="Repositories\EventSourcedAggregateStore.cs" />
+    <Compile Include="Repositories\IAggregateStore.cs" />
+    <Compile Include="Repositories\IQueryableAggregateStore.cs" />
     <Compile Include="Security\AuthorizingQueryProvider.cs" />
-    <Compile Include="Security\AuthorizingRepository.cs" />
+    <Compile Include="Security\AuthorizingCrudRepository.cs" />
     <Compile Include="Security\Commands\AuthorizePermissionsAttribute.cs" />
     <Compile Include="Security\Commands\CommandPermissionAuthorizer.cs" />
     <Compile Include="Security\Commands\CommandPermissionCache.cs" />
@@ -167,7 +214,7 @@
     <Compile Include="Security\Commands\IEntityQueryFilterFactory.cs" />
     <Compile Include="Security\SecurityInfrastructureModule.cs" />
     <Compile Include="Security\AuthorizationQueryableExtensions.cs" />
-    <Compile Include="Security\IAuthorizingRepository.cs" />
+    <Compile Include="Security\IAuthorizingCrudRepository.cs" />
     <Compile Include="Validation\CommandAttributeValidationFilter.cs" />
     <Compile Include="Validation\CommandValidationException.cs" />
     <Compile Include="Validation\ValidationInfrastructureModule.cs" />
@@ -177,6 +224,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\AutoMapper.Attributes\AutoMapper.Attributes.V5\AutoMapper.Attributes.V5.csproj">
+      <Project>{6a6191b1-fea5-4a40-a01a-6497eb452d92}</Project>
+      <Name>AutoMapper.Attributes.V5</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GTRevo.DataAccess\GTRevo.DataAccess.csproj">
       <Project>{fa942fe7-71fd-4cf5-8959-309583fe7903}</Project>
       <Name>GTRevo.DataAccess</Name>
@@ -189,6 +240,7 @@
   <ItemGroup>
     <Content Include="database\01_REV_CREATE.sql" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

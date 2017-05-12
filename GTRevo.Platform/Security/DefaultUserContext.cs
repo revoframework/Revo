@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using GTRevo.Platform.Security.Identity;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
+using Ninject;
 
 namespace GTRevo.Platform.Security
 {
@@ -11,11 +12,11 @@ namespace GTRevo.Platform.Security
     {
         private readonly IAuthenticationManager authenticationManager;
         private readonly AppUserManager userManager;
+        private readonly Lazy<Guid?> userIdLazy;
         private IUser user;
         private IEnumerable<Permission> userPermissions;
-        private Lazy<Guid?> userIdLazy;
 
-        public DefaultUserContext(IAuthenticationManager authenticationManager,
+        public DefaultUserContext([Optional] IAuthenticationManager authenticationManager,
             AppUserManager userManager)
         {
             this.authenticationManager = authenticationManager;
@@ -32,14 +33,11 @@ namespace GTRevo.Platform.Security
         {
             get
             {
-                return authenticationManager.User?.Identity?.IsAuthenticated ?? false;
+                return authenticationManager?.User?.Identity?.IsAuthenticated ?? false;
             }
         }
 
-        public Guid? UserId
-        {
-            get { return userIdLazy.Value; }
-        }
+        public Guid? UserId => userIdLazy.Value;
 
         public async Task<IEnumerable<Permission>> GetPermissionsAsync()
         {

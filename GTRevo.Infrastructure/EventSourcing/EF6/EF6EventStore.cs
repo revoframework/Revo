@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GTRevo.DataAccess.EF6;
 using GTRevo.Infrastructure.Domain;
+using GTRevo.Infrastructure.Domain.Events;
 using GTRevo.Infrastructure.EventSourcing.EF6.Model;
 using GTRevo.Platform.Core;
 using Newtonsoft.Json;
@@ -14,11 +15,11 @@ namespace GTRevo.Infrastructure.EventSourcing.EF6
 {
     public class EF6EventStore : IEventStore
     {
-        private readonly IRepository repository;
+        private readonly ICrudRepository repository;
         private readonly DomainEventTypeCache domainEventTypeCache;
         private readonly IClock clock;
 
-        public EF6EventStore(IRepository repository,
+        public EF6EventStore(ICrudRepository repository,
             DomainEventTypeCache domainEventTypeCache,
             IClock clock)
         {
@@ -58,7 +59,9 @@ namespace GTRevo.Infrastructure.EventSourcing.EF6
                 .SelectMany(SelectEventRecordsFromPackets)
                 .Select(SelectEventFromRecord);
 
-            AggregateState state = new AggregateState(packets.Last().SequenceNumber, events);
+            bool isDeleted = false; //events.Any(x => x is AggregateDeleted)
+
+            AggregateState state = new AggregateState(packets.Last().SequenceNumber, events, isDeleted);
             return state;
         }
 

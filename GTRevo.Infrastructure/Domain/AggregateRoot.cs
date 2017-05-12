@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using GTRevo.Infrastructure.Domain.Events;
 
 namespace GTRevo.Infrastructure.Domain
 {
     public abstract class AggregateRoot : IAggregateRoot
     {
-        public AggregateRoot(Guid id, Guid classId) : this()
+        public AggregateRoot(Guid id) : this()
         {
             Id = id;
-            ClassId = classId;
             Version = 0;
         }
 
@@ -21,7 +21,6 @@ namespace GTRevo.Infrastructure.Domain
         }
 
         public virtual Guid Id { get; private set; }
-        public virtual Guid ClassId { get; private set; }
         public virtual int Version { get; protected set; }
 
         public virtual IEnumerable<DomainAggregateEvent> UncommitedEvents
@@ -32,7 +31,7 @@ namespace GTRevo.Infrastructure.Domain
             }
         }
 
-        protected IAggregateEventRouter EventRouter { get; }
+        protected internal IAggregateEventRouter EventRouter { get; }
 
         public void Commit()
         {

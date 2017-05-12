@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using GTRevo.Infrastructure.Domain.Events;
 
 namespace GTRevo.Infrastructure.Domain
 {
-    public interface IAggregateRoot : IClassEntityBase
+    public interface IAggregateRoot : IEntity
     {
         IEnumerable<DomainAggregateEvent> UncommitedEvents { get; }
         int Version { get; }

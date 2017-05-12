@@ -7,15 +7,17 @@ using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Ninject;
 
 namespace GTRevo.DataAccess.EF6
 {
     public class CustomStoreConvention : Convention,
         IStoreModelConvention<EntitySet>, IStoreModelConvention<EdmProperty>
     {
-        public const string CLR_TYPE_ENTITY_SET_ANNOTATION_NAME = "ClrType";
+        public const string ClrTypeEntitySetAnnotationName = "ClrType";
 
-        private Dictionary<string, Type> configuredEntityTypes = new Dictionary<string, Type>();
+        private readonly Dictionary<string, Type> configuredEntityTypes = new Dictionary<string, Type>();
+        private readonly Dictionary<Type, ConventionTypeConfiguration> entityTypeConfigurations = new Dictionary<Type, ConventionTypeConfiguration>();
 
         public CustomStoreConvention()
         {
@@ -23,74 +25,12 @@ namespace GTRevo.DataAccess.EF6
             Properties().Configure(ConfigureProperty);
         }
 
-        private Type GetRealDeclaringType(PropertyInfo propertyInfo)
+        public string CurrentSchemaSpace { get; set; } = "Default";
+
+        public void Reset()
         {
-            Stack<Type> typeHierarchy = new Stack<Type>();
-            typeHierarchy.Push(propertyInfo.ReflectedType);
-
-            while (typeHierarchy.First() != propertyInfo.DeclaringType)
-            {
-                typeHierarchy.Push(typeHierarchy.First().BaseType);
-            }
-
-            Type type;
-            do
-            {
-                type = typeHierarchy.First();
-                typeHierarchy.Pop();
-            }
-            while (!configuredEntityTypes.Values.Contains(type));
-
-            return type;
-        }
-
-        private void ConfigureProperty(ConventionPrimitivePropertyConfiguration config)
-        {
-            /*string name = config.ClrPropertyInfo.Name;
-            Type realDeclaringType = GetRealDeclaringType(config.ClrPropertyInfo);
-
-            if (name == "ID")
-            {
-                name = realDeclaringType.Name + "Id";
-            }
-            
-            name = GetColumnName(realDeclaringType, name);
-
-            if (name.EndsWith("_ID"))
-            {
-                name = name.Substring(0, name.Length - 3) + "Id";
-            }
-
-            //config.HasColumnName(name);*/
-        }
-
-        private void ConfigureType(ConventionTypeConfiguration config)
-        {
-            if (!configuredEntityTypes.Values.Contains(config.ClrType))
-            {
-                configuredEntityTypes.Add(config.ClrType.Name, config.ClrType);
-            }
-
-            string namespacePrefix, columnPrefix;
-            GetEntityPrefixes(config.ClrType, out namespacePrefix, out columnPrefix);
-
-            string tableName;
-            bool isView;
-            ConvertTypeNameToEntityName(config.ClrType.Name, out tableName, out isView);
-
-            tableName = ConvertNameToSnakeCase(tableName);
-
-            if (namespacePrefix != null)
-            {
-                tableName = namespacePrefix + "_" + (isView ? "VW_" : "") + tableName;
-            }
-
-            config.ToTable(tableName);
-
-            if (!configuredEntityTypes.ContainsKey(tableName))
-            {
-                configuredEntityTypes.Add(tableName, config.ClrType);
-            }
+            configuredEntityTypes.Clear();
+            entityTypeConfigurations.Clear();
         }
 
         public void Apply(EdmProperty item, DbModel model)
@@ -127,20 +67,91 @@ namespace GTRevo.DataAccess.EF6
 
         public void Apply(EntitySet item, DbModel model)
         {
-            item.AddAnnotation(CLR_TYPE_ENTITY_SET_ANNOTATION_NAME, GetEntityType(item.Name));
+            item.AddAnnotation(ClrTypeEntitySetAnnotationName, GetEntityType(item.Name));
+        }
 
-            /*string namespacePrefix, columnPrefix;
-            GetEntityPrefixes(GetEntityType(item.Name), out namespacePrefix, out columnPrefix);
+        private void ConfigureProperty(ConventionPrimitivePropertyConfiguration config)
+        {
+        }
+        
+        private bool ConfigureTableType(Type clrType)
+        {
+            var mapping = GetDefaultMapping(clrType);
+            Type existingType;
+            if (configuredEntityTypes.TryGetValue(mapping.TableName.ToLowerInvariant(), out existingType)
+                && existingType != clrType)
+            {
+                string newTypeSchema = EntityTypeDiscovery.DetectEntitySchemaSpace(clrType);
+                string existingTypeSchema = EntityTypeDiscovery.DetectEntitySchemaSpace(existingType);
 
-            string tableName = item.Name;
-            tableName = ConvertNameToSnakeCase(tableName);
+                if (newTypeSchema != CurrentSchemaSpace)
+                {
+                    return false;
+                }
+                else if (existingTypeSchema != CurrentSchemaSpace)
+                {
+                    var existingTypeConfiguration = entityTypeConfigurations[existingType];
+                    existingTypeConfiguration.Ignore();
+                    entityTypeConfigurations.Remove(existingType);
+                    configuredEntityTypes.Remove(mapping.TableName.ToLowerInvariant());
+                }
+                else
+                {
+                    throw new InvalidOperationException("Conflicting entity types");
+                }
+            }
+
+            if (!configuredEntityTypes.ContainsKey(clrType.Name.ToLowerInvariant()))
+            {
+                configuredEntityTypes.Add(clrType.Name.ToLowerInvariant(), clrType);
+            }
+
+            if (!configuredEntityTypes.ContainsKey(mapping.TableName.ToLowerInvariant()))
+            {
+                configuredEntityTypes.Add(mapping.TableName.ToLowerInvariant(), clrType);
+            }
+
+            return true;
+        }
+
+        protected virtual TableMapping GetDefaultMapping(Type clrType)
+        {
+            string entityName = GetEntityName(clrType);
+            string tableName = GetTableName(clrType, entityName);
+            
+            return new TableMapping()
+            {
+                TableName = tableName,
+                EntityName = entityName
+            };
+        }
+
+        protected virtual string GetTableName(Type clrType, string entityName)
+        {
+            string namespacePrefix, columnPrefix;
+            GetEntityPrefixes(clrType, out namespacePrefix, out columnPrefix);
+
+            string tableName = ConvertNameToSnakeCase(entityName);
 
             if (namespacePrefix != null)
             {
                 tableName = namespacePrefix + "_" + tableName;
             }
+
+            return tableName;
+        }
+
+        private void ConfigureType(ConventionTypeConfiguration config)
+        {
+            if (!ConfigureTableType(config.ClrType))
+            {
+                config.Ignore();
+                return;
+            }
             
-            //item.Table = tableName;*/
+            entityTypeConfigurations[config.ClrType] = config;
+            var mapping = GetDefaultMapping(config.ClrType);
+            config.ToTable(mapping.TableName);
         }
 
         private Type GetEntityType(string typeName)
@@ -150,7 +161,8 @@ namespace GTRevo.DataAccess.EF6
                    .Where(t => t.IsClass && t.Name.Equals(typeName));*/
 
             var entityTypes = configuredEntityTypes.Where(
-                   t => t.Value.IsClass && t.Key.Equals(typeName));
+                   t => t.Value.IsClass && t.Key.Equals(typeName.ToLowerInvariant()))
+                   .ToList();
 
             if (entityTypes.Count() == 0)
             {
@@ -164,15 +176,13 @@ namespace GTRevo.DataAccess.EF6
             return entityTypes.First().Value;
         }
 
-        private void GetEntityPrefixes(Type entityType, out string namespacePrefix, out string columnPrefix)
+        protected virtual void GetEntityPrefixes(Type entityType, out string namespacePrefix, out string columnPrefix)
         {
-            CustomAttributeData tablePrefixAttribute = entityType.CustomAttributes.FirstOrDefault(
-                x => x.AttributeType == typeof(TablePrefixAttribute));
+            TablePrefixAttribute tablePrefixAttribute = (TablePrefixAttribute)
+                entityType.GetCustomAttributes(typeof(TablePrefixAttribute)).FirstOrDefault();
 
-            columnPrefix = (string)tablePrefixAttribute?.NamedArguments.FirstOrDefault(
-                    x => x.MemberName == nameof(TablePrefixAttribute.ColumnPrefix)).TypedValue.Value;
-            namespacePrefix = (string)tablePrefixAttribute?.NamedArguments.FirstOrDefault(
-                x => x.MemberName == nameof(TablePrefixAttribute.NamespacePrefix)).TypedValue.Value;
+            columnPrefix = tablePrefixAttribute?.ColumnPrefix;
+            namespacePrefix = tablePrefixAttribute?.NamespacePrefix;
         }
 
         private string GetColumnName(Type entityType, string propertyName)
@@ -181,10 +191,7 @@ namespace GTRevo.DataAccess.EF6
             GetEntityPrefixes(entityType, out namespacePrefix, out columnPrefix);
 
             string columnName = propertyName;
-
-            string entityName;
-            bool isView;
-            ConvertTypeNameToEntityName(entityType.Name, out entityName, out isView);
+            string entityName = GetEntityName(entityType);
 
             if (columnName.ToLower() == "id")
             {
@@ -204,27 +211,42 @@ namespace GTRevo.DataAccess.EF6
             return columnName;
         }
 
-        private void ConvertTypeNameToEntityName(string typeName, out string entityName, out bool isView)
+        protected virtual string GetEntityName(Type clrType)
         {
-            entityName = typeName;
-
-            isView = typeName.EndsWith("View");
-            if (isView)
-            {
-                entityName = entityName.Substring(0, entityName.Length - "View".Length);
-            }
-            
-            bool isReadModel = typeName.EndsWith("ReadModel");
-            if (isReadModel)
-            {
-                entityName = entityName.Substring(0, entityName.Length - "ReadModel".Length);
-            }
+            return clrType.Name;
         }
 
-        private string ConvertNameToSnakeCase(string pascalCasedName)
+        protected string ConvertNameToSnakeCase(string pascalCasedName)
         {
             return Regex.Replace(pascalCasedName, "([A-Z])([A-Z][a-z])|([a-z0-9])(?=[A-Z])", "$1$3_$2")
                 .ToUpper();
         }
+
+        protected struct TableMapping
+        {
+            public string TableName { get; set; }
+            public string EntityName { get; set; }
+        }
+
+        /*private Type GetRealDeclaringType(PropertyInfo propertyInfo)
+        {
+            Stack<Type> typeHierarchy = new Stack<Type>();
+            typeHierarchy.Push(propertyInfo.ReflectedType);
+
+            while (typeHierarchy.First() != propertyInfo.DeclaringType)
+            {
+                typeHierarchy.Push(typeHierarchy.First().BaseType);
+            }
+
+            Type type;
+            do
+            {
+                type = typeHierarchy.First();
+                typeHierarchy.Pop();
+            }
+            while (!configuredEntityTypes.Values.Contains(type));
+
+            return type;
+        }*/
     }
 }

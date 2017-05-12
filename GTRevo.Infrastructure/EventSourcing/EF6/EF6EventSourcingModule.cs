@@ -12,8 +12,8 @@ namespace GTRevo.Infrastructure.EventSourcing.EF6
                 .To<EF6EventStore>()
                 .InRequestOrJobScope();
 
-            Bind<IRepository>()
-                .To<Repository>()
+            Bind<ICrudRepository>()
+                .To<CrudRepository>()
                 .WhenInjectedInto<EF6EventStore>()
                 .InTransientScope();
         }

@@ -4,8 +4,8 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using GTRevo.Infrastructure.Domain;
+using GTRevo.Infrastructure.Domain.Events;
 using GTRevo.Platform.Core;
-using GTRevo.Platform.Events;
 using GTRevo.Platform.Transactions;
 
 namespace GTRevo.Infrastructure.EventSourcing
@@ -15,19 +15,16 @@ namespace GTRevo.Infrastructure.EventSourcing
         private readonly Dictionary<Guid, IEventSourcedAggregateRoot> aggregates = new Dictionary<Guid, IEventSourcedAggregateRoot>();
 
         private readonly IEventStore eventStore;
-        private readonly IEventQueue eventQueue;
         private readonly IActorContext actorContext;
         private readonly IClock clock;
         private readonly IEntityTypeManager entityTypeManager;
 
         public EventSourcedRepository(IEventStore eventStore,
-            IEventQueue eventQueue,
             IActorContext actorContext,
             IClock clock,
             IEntityTypeManager entityTypeManager)
         {
             this.eventStore = eventStore;
-            this.eventQueue = eventQueue;
             this.actorContext = actorContext;
             this.clock = clock;
             this.entityTypeManager = entityTypeManager;
@@ -38,15 +35,16 @@ namespace GTRevo.Infrastructure.EventSourcing
             return new EventSourcedRepositoryTransaction(this);
         }
 
-        public void Add<T>(T aggregateRoot) where T : class, IEventSourcedAggregateRoot
+        public void Add<T>(T aggregate) where T : class, IEventSourcedAggregateRoot
         {
-            if (aggregates.ContainsKey(aggregateRoot.Id))
+            if (aggregates.ContainsKey(aggregate.Id))
             {
-                throw new ArgumentException($"Duplicate aggregate root with ID '{aggregateRoot.Id}' and type '{typeof(T).FullName}'");
+                throw new ArgumentException($"Duplicate aggregate root with ID '{aggregate.Id}' and type '{typeof(T).FullName}'");
             }
 
-            aggregates.Add(aggregateRoot.Id, aggregateRoot);
-            eventStore.AddAggregate(aggregateRoot.Id, aggregateRoot.ClassId);
+            aggregates.Add(aggregate.Id, aggregate);
+            var classId = entityTypeManager.GetClassIdByClrType(aggregate.GetType());
+            eventStore.AddAggregate(aggregate.Id, classId);
         }
 
         public T Get<T>(Guid id) where T : class, IEventSourcedAggregateRoot
@@ -85,6 +83,16 @@ namespace GTRevo.Infrastructure.EventSourcing
             return aggregate;
         }
 
+        public IEnumerable<IAggregateRoot> GetLoadedAggregates()
+        {
+            return aggregates.Values;
+        }
+
+        public void Remove<T>(T aggregateRoot) where T : class, IEventSourcedAggregateRoot
+        {
+            throw new NotImplementedException();
+        }
+
         public void SaveChanges()
         {
             throw new NotImplementedException();
@@ -95,7 +103,7 @@ namespace GTRevo.Infrastructure.EventSourcing
             bool anyEvents = false;
             foreach (var aggregate in aggregates.Values)
             {
-                if (aggregate.UncommitedEvents.Count() > 0)
+                if (aggregate.UncommitedEvents.Any())
                 {
                     int newAggregateVersion = aggregate.Version + 1;
                     var eventRecords = ConstructEventsRecords(aggregate.UncommitedEvents, newAggregateVersion);
@@ -109,19 +117,6 @@ namespace GTRevo.Infrastructure.EventSourcing
             if (anyEvents)
             {
                 await eventStore.CommitChangesAsync();
-
-                foreach (var aggregate in aggregates.Values)
-                {
-                    if (aggregate.UncommitedEvents.Count() > 0)
-                    {
-                        foreach (DomainAggregateEvent domainEvent in aggregate.UncommitedEvents)
-                        {
-                            eventQueue.PushEvent(domainEvent);
-                        }
-
-                        aggregate.Commit();
-                    }
-                }
             }
         }
 
@@ -154,11 +149,7 @@ namespace GTRevo.Infrastructure.EventSourcing
                     throw new ArgumentException($"Domain aggregate event '{_event.GetType().FullName}' queued for saving has an invalid or empty AggregateId value: {_event.AggregateId}");
                 }
 
-                if (_event.AggregateClassId != aggregate.ClassId)
-                {
-                    // NOTE disabled for now because the first *Created event will usually have zero ClassId (virtual getter called from base constructor...)
-                    //throw new ArgumentException($"Domain aggregate event '{_event.GetType().FullName}' queued for saving has an invalid or empty AggregateClassId value: {_event.AggregateClassId}");
-                }
+                _event.AggregateClassId = entityTypeManager.GetClassIdByClrType(aggregate.GetType());
             }
         }
 
@@ -171,14 +162,14 @@ namespace GTRevo.Infrastructure.EventSourcing
 
             //TODO: optimize and cache
             ConstructorInfo constructor = entityType.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance,
-                null, new Type[] { typeof(Guid), typeof(Guid) }, new ParameterModifier[] {});
+                null, new Type[] { typeof(Guid) }, new ParameterModifier[] {});
 
             if (constructor == null)
             {
-                throw new InvalidOperationException($"Event sourced type {entityType.FullName} does not have a 2-Guid-parameter constructor to be loaded from event repository");
+                throw new InvalidOperationException($"Event sourced entity of type {entityType.FullName} does not have a constructor with 1 Guid parameters");
             }
 
-            IEventSourcedAggregateRoot aggregate = (IEventSourcedAggregateRoot)constructor.Invoke(new object[] { id, classId });
+            IEventSourcedAggregateRoot aggregate = (IEventSourcedAggregateRoot)constructor.Invoke(new object[] { id });
             aggregate.LoadState(state);
 
             return aggregate;

@@ -29,7 +29,7 @@ namespace GTRevo.Platform.Tests.Events
         {
             using (var tx = sut.CreateTransaction())
             {
-                listeners[0].Received(1).OnTransactionBeginned(tx);
+                listeners[0].Received(1).OnTransactionBegin(tx);
             }
         }
 

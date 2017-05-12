@@ -76,6 +76,7 @@
     <Compile Include="Domain\Projections\ProjectionEventListenerTests.cs" />
     <Compile Include="EventSourcing\EventSourcedRepositoryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repositories\RepositoryTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

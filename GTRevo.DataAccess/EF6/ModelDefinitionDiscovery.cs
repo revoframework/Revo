@@ -16,12 +16,7 @@ namespace GTRevo.DataAccess.EF6
             this.typeExplorer = typeExplorer;
             this.kernel = kernel;
         }
-
-        public void OnApplicationStarted()
-        {
-            DiscoverModelDefinitions();
-        }
-
+        
         public IEnumerable<IModelDefinition> DiscoverModelDefinitions()
         {
             var modelDefinitionTypes = typeExplorer.GetAllTypes()

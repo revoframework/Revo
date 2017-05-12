@@ -287,6 +287,7 @@
     <Compile Include="Commands\WrappedEntityQuery.cs" />
     <Compile Include="Core\HangfireOwinConfigurator.cs" />
     <Compile Include="Core\IActorContext.cs" />
+    <Compile Include="Core\StringExtensions.cs" />
     <Compile Include="Core\TypeExplorer.cs" />
     <Compile Include="Core\UserActorContext.cs" />
     <Compile Include="Events\EventQueue.cs" />
@@ -351,6 +352,7 @@
     <Compile Include="Security\Identity\AppUserManager.cs" />
     <Compile Include="Security\Identity\DefaultPasswordValidator.cs" />
     <Compile Include="Security\Identity\DefaultUserValidator.cs" />
+    <Compile Include="Security\Identity\HttpContextExtensions.cs" />
     <Compile Include="Security\Identity\IAppUserStore.cs" />
     <Compile Include="Security\Identity\IPasswordValidator.cs" />
     <Compile Include="Security\Identity\IUserValidator.cs" />
@@ -378,6 +380,7 @@
     <Compile Include="Transactions\ITransactionProvider.cs" />
     <Compile Include="Transactions\IUnitOfWork.cs" />
     <Compile Include="Transactions\IUnitOfWorkListener.cs" />
+    <Compile Include="Transactions\IUnitOfWorkProvider.cs" />
     <Compile Include="Transactions\UnitOfWork.cs" />
     <Compile Include="Transactions\UnitOfWorkTransaction.cs" />
     <Compile Include="Web\AntiForgeryConsts.cs" />

@@ -69,6 +69,10 @@
       <HintPath>..\..\packages\xunit.extensibility.execution.2.2.0\lib\net452\xunit.execution.desktop.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Z.EntityFramework.Plus.EF6, Version=1.4.47.0, Culture=neutral, PublicKeyToken=59b66d028979105b, processorArchitecture=MSIL">
+      <HintPath>..\..\..\GTServiceDesk\packages\Z.EntityFramework.Plus.EF6.1.4.47\lib\net45\Z.EntityFramework.Plus.EF6.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />

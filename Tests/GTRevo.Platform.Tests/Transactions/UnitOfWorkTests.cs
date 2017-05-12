@@ -12,7 +12,7 @@ namespace GTRevo.Platform.Tests.Transactions
 {
     public class UnitOfWorkTests
     {
-        private readonly List<ITransactionProvider> transactionProviders = new List<ITransactionProvider>();
+        private readonly List<IUnitOfWorkProvider> transactionProviders = new List<IUnitOfWorkProvider>();
         private readonly List<Tuple<ITransactionProvider, ITransaction>> transactions = new List<Tuple<ITransactionProvider, ITransaction>>();
         private readonly List<IUnitOfWorkListener> unitOfWorkListeners = new List<IUnitOfWorkListener>();
         private readonly IUnitOfWork sut;
@@ -56,8 +56,8 @@ namespace GTRevo.Platform.Tests.Transactions
         {
             using (var tx = sut.CreateTransaction())
             {
-                unitOfWorkListeners[0].Received(1).OnTransactionBeginned(tx);
-                unitOfWorkListeners[1].Received(1).OnTransactionBeginned(tx);
+                unitOfWorkListeners[0].Received(1).OnTransactionBegin(tx);
+                unitOfWorkListeners[1].Received(1).OnTransactionBegin(tx);
             }
         }
 
@@ -73,9 +73,9 @@ namespace GTRevo.Platform.Tests.Transactions
             }
         }
 
-        private ITransactionProvider CreateTransactionProvider()
+        private IUnitOfWorkProvider CreateTransactionProvider()
         {
-            var txProvider = Substitute.For<ITransactionProvider>();
+            var txProvider = Substitute.For<IUnitOfWorkProvider>();
             txProvider.CreateTransaction().Returns(callInfo => CreateTransaction(txProvider));
 
             transactionProviders.Add(txProvider);

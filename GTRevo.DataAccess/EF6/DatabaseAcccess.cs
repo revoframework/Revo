@@ -9,20 +9,14 @@ namespace GTRevo.DataAccess.EF6
 {
     public class DatabaseAccess : IDatabaseAccess
     {
-        private DbContext dbContext;
+        private readonly DbContext dbContext;
 
-        public DatabaseAccess(DbContext dbContext)
+        public DatabaseAccess(IDbContextFactory dbContextFactory)
         {
-            this.dbContext = dbContext;
+            this.dbContext = dbContextFactory.CreateContext("Default");
         }
 
-        public Database Database
-        {
-            get
-            {
-                return dbContext.Database;
-            }
-        }
+        public Database Database => dbContext.Database;
 
         public void ExecuteProcedure(string procedureCommand, params object[] sqlParams)
         {

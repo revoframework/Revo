@@ -5,10 +5,10 @@ namespace GTRevo.Platform.Transactions
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly ITransactionProvider[] transactionProviders;
+        private readonly IUnitOfWorkProvider[] transactionProviders;
         private readonly IUnitOfWorkListener[] unitOfWorkListeners;
 
-        public UnitOfWork(ITransactionProvider[] transactionProviders,
+        public UnitOfWork(IUnitOfWorkProvider[] transactionProviders,
             IUnitOfWorkListener[] unitOfWorkListeners)
         {
             this.transactionProviders = transactionProviders;
@@ -25,7 +25,7 @@ namespace GTRevo.Platform.Transactions
 
             foreach (var listener in unitOfWorkListeners)
             {
-                listener.OnTransactionBeginned(tx);
+                listener.OnTransactionBegin(tx);
             }
 
             return tx;

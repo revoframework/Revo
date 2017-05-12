@@ -27,7 +27,7 @@ namespace GTRevo.Platform.Security
 
             Bind<IAuthenticationManager>()
                 .ToMethod(ctx =>
-                    HttpContext.Current.GetOwinContext().Authentication);
+                    HttpContext.Current?.TryGetOwinContext()?.Authentication);
 
             Bind<IUserContext>()
                 .To<DefaultUserContext>()

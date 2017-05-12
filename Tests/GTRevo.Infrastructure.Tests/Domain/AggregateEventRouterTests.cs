@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GTRevo.Infrastructure.Domain;
+using GTRevo.Infrastructure.Domain.Events;
 using NSubstitute;
 using Xunit;
 
@@ -18,7 +19,6 @@ namespace GTRevo.Infrastructure.Tests.Domain
         {
             aggregate = Substitute.For<IAggregateRoot>();
             aggregate.Id.Returns(Guid.NewGuid());
-            aggregate.ClassId.Returns(Guid.NewGuid());
 
             sut = new AggregateEventRouter(aggregate);
         }
@@ -38,12 +38,11 @@ namespace GTRevo.Infrastructure.Tests.Domain
         }
 
         [Fact]
-        public void ApplyEvent_SetsAggregateIdAndClassId()
+        public void ApplyEvent_SetsAggregateId()
         {
             sut.ApplyEvent(new Event1());
             
             Assert.Equal(aggregate.Id, sut.UncommitedEvents.ElementAt(0).AggregateId);
-            Assert.Equal(aggregate.ClassId, sut.UncommitedEvents.ElementAt(0).AggregateClassId);
         }
         
         [Fact]

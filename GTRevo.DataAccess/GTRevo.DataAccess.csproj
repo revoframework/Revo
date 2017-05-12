@@ -111,24 +111,38 @@
       <HintPath>..\..\GTServiceDesk\packages\WebGrease.1.5.2\lib\WebGrease.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Z.EntityFramework.Plus.EF6, Version=1.4.47.0, Culture=neutral, PublicKeyToken=59b66d028979105b, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\Z.EntityFramework.Plus.EF6.1.4.47\lib\net45\Z.EntityFramework.Plus.EF6.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataAccessModule.cs" />
+    <Compile Include="EF6\ChildCollection.cs" />
     <Compile Include="EF6\CustomStoreConvention.cs" />
+    <Compile Include="EF6\DbContextFactory.cs" />
     <Compile Include="EF6\EF6DataAccessModule.cs" />
     <Compile Include="EF6\DatabaseAcccess.cs" />
+    <Compile Include="EF6\DatabaseEntityAttribute.cs" />
     <Compile Include="EF6\EntityContext.cs" />
+    <Compile Include="EF6\EntityTypeDiscovery.cs" />
     <Compile Include="EF6\IDatabaseAccess.cs" />
+    <Compile Include="EF6\IDbContextFactory.cs" />
     <Compile Include="EF6\IModelDefinition.cs" />
     <Compile Include="EF6\IModelMetadataExplorer.cs" />
     <Compile Include="EF6\InheritedColumnNameAnnotation.cs" />
-    <Compile Include="EF6\IRepository.cs" />
+    <Compile Include="EF6\IReadRepository.cs" />
+    <Compile Include="EF6\ICrudRepository.cs" />
+    <Compile Include="EF6\IRowVersioned.cs" />
     <Compile Include="EF6\ModelDefinitionDiscovery.cs" />
     <Compile Include="EF6\ModelMetadataExplorer.cs" />
     <Compile Include="EF6\PrimitivePropertyConfigurationExtensions.cs" />
-    <Compile Include="EF6\Repository.cs" />
+    <Compile Include="EF6\CrudRepository.cs" />
+    <Compile Include="EF6\PrivateCollectionMapping.cs" />
+    <Compile Include="EF6\QueryableDecompiledExtensions.cs" />
     <Compile Include="EF6\RepositoryHelpers.cs" />
     <Compile Include="EF6\RepositoryTransaction.cs" />
+    <Compile Include="EF6\SchemaSpaceDbModelBuilder.cs" />
     <Compile Include="EF6\TablePrefixAttribute.cs" />
     <Compile Include="Sequences\ContextSequence.cs" />
     <Compile Include="Sequences\IContextSequence.cs" />
