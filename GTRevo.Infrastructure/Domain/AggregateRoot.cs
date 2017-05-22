@@ -41,6 +41,7 @@ namespace GTRevo.Infrastructure.Domain
 
         protected virtual void ApplyEvent<T>(T evt) where T : DomainAggregateEvent
         {
+            EventRouter.ApplyEvent(evt);
         }
     }
 }

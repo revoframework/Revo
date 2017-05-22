@@ -30,20 +30,20 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AutoMapper, Version=5.2.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <HintPath>..\..\GTServiceDesk\packages\AutoMapper.5.2.0\lib\net45\AutoMapper.dll</HintPath>
+    <Reference Include="AutoMapper, Version=6.0.2.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\AutoMapper.6.0.2\lib\net45\AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="AutoMapper.EF6, Version=0.5.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\GTServiceDesk\packages\AutoMapper.EF6.0.5.0\lib\net45\AutoMapper.EF6.dll</HintPath>
+    <Reference Include="AutoMapper.EF6, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\AutoMapper.EF6.1.0.0\lib\net45\AutoMapper.EF6.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="DelegateDecompiler, Version=1.0.0.0, Culture=neutral, PublicKeyToken=93b26a10a04705bd, processorArchitecture=MSIL">
-      <HintPath>..\..\GTServiceDesk\packages\DelegateDecompiler.0.18.1\lib\net40-Client\DelegateDecompiler.dll</HintPath>
+      <HintPath>..\..\GTServiceDesk\packages\DelegateDecompiler.0.23.0\lib\net40-client\DelegateDecompiler.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="DelegateDecompiler.EntityFramework, Version=1.0.0.0, Culture=neutral, PublicKeyToken=93b26a10a04705bd, processorArchitecture=MSIL">
-      <HintPath>..\..\GTServiceDesk\packages\DelegateDecompiler.EntityFramework.0.18.1\lib\net45\DelegateDecompiler.EntityFramework.dll</HintPath>
+      <HintPath>..\..\GTServiceDesk\packages\DelegateDecompiler.EntityFramework.0.23.0\lib\net45\DelegateDecompiler.EntityFramework.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
@@ -94,8 +94,8 @@
       <HintPath>..\..\GTServiceDesk\packages\Microsoft.Owin.Host.SystemWeb.3.0.1\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Mono.Reflection, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
-      <HintPath>..\..\GTServiceDesk\packages\Mono.Reflection.1.0.0.0\lib\Mono.Reflection.dll</HintPath>
+    <Reference Include="Mono.Reflection, Version=1.1.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\Mono.Reflection.1.1.0.0\lib\Mono.Reflection.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MoreLinq, Version=2.0.20029.0, Culture=neutral, PublicKeyToken=384d532d7e88985d, processorArchitecture=MSIL">
@@ -134,8 +134,23 @@
     <Compile Include="Domain\Basic\BasicClassEntity.cs" />
     <Compile Include="Domain\Basic\BasicDomainModelDefinition.cs" />
     <Compile Include="Domain\Basic\BasicEntity.cs" />
+    <Compile Include="History\ChangeTracking\ChangeTracker.cs" />
+    <Compile Include="History\ChangeTracking\ChangeData.cs" />
+    <Compile Include="History\ChangeTracking\ChangeDataTypeCache.cs" />
+    <Compile Include="History\ChangeTracking\EntityAttributeChangeBatch.cs" />
+    <Compile Include="History\ChangeTracking\EntityAttributeChangeLogger.cs" />
+    <Compile Include="History\ChangeTracking\HistoryAutoMapperDefinition.cs" />
+    <Compile Include="History\ChangeTracking\HistoryModule.cs" />
+    <Compile Include="History\ChangeTracking\IChangeDataTypeCache.cs" />
+    <Compile Include="History\ChangeTracking\IEntityAttributeChangeLogger.cs" />
+    <Compile Include="History\ChangeTracking\ITrackedChangeRecordConverter.cs" />
+    <Compile Include="History\ChangeTracking\Model\EntityAttributeData.cs" />
+    <Compile Include="History\ChangeTracking\Model\TrackedChangeRecord.cs" />
+    <Compile Include="History\ChangeTracking\TrackedChange.cs" />
+    <Compile Include="History\ChangeTracking\TrackedChangeRecordConverter.cs" />
     <Compile Include="ReadModel\ClassEntityView.cs" />
     <Compile Include="ReadModel\EntityView.cs" />
+    <Compile Include="ReadModel\ReadModelBase.cs" />
     <Compile Include="ReadModel\ReadModelDefinition.cs" />
     <Compile Include="Domain\Basic\DataType.cs" />
     <Compile Include="Domain\Basic\Dto\ClassEntityDto.cs" />
@@ -148,8 +163,8 @@
     <Compile Include="Domain\IQueryableEntity.cs" />
     <Compile Include="EventSourcing\Events\AggregateCreated.cs" />
     <Compile Include="EventSourcing\Events\AggregateDeleted.cs" />
-    <Compile Include="History\EntityAttributeChange.cs" />
-    <Compile Include="History\IChangeTracker.cs" />
+    <Compile Include="History\ChangeTracking\Changes\EntityAttributeChangeData.cs" />
+    <Compile Include="History\ChangeTracking\IChangeTracker.cs" />
     <Compile Include="ReadModel\ClassEntityReadModel.cs" />
     <Compile Include="ReadModel\EntityReadModel.cs" />
     <Compile Include="ReadModel\ReadModelForEntityAttribute.cs" />
@@ -240,7 +255,9 @@
   <ItemGroup>
     <Content Include="database\01_REV_CREATE.sql" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="History\Auditing\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

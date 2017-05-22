@@ -95,6 +95,10 @@ namespace GTRevo.Platform.Core
             Bind<IEventQueue>()
                 .To<EventQueue>()
                 .InRequestOrJobScope();
+
+            Bind<AutoMapperDefinitionDiscovery>()
+                .ToSelf()
+                .InSingletonScope();
         }
     }
 }

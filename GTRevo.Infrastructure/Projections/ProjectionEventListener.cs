@@ -64,10 +64,19 @@ namespace GTRevo.Infrastructure.Projections
                 IEventSourcedAggregateRoot entity = await eventSourcedRepository
                     .GetAsync(entityEvents.Key);
 
-                foreach (var projector in aggregateTypesToEntityEventProjectors[entityType])
+                while (entityType != null)
                 {
-                    await projector.ProjectEventsAsync(entity, events);
-                    usedProjectors.Add(projector);
+                    IReadOnlyCollection<IEntityEventProjector> projectors;
+                    if (aggregateTypesToEntityEventProjectors.TryGetValue(entityType, out projectors))
+                    {
+                        foreach (var projector in projectors)
+                        {
+                            await projector.ProjectEventsAsync(entity, events);
+                            usedProjectors.Add(projector);
+                        }
+                    }
+
+                    entityType = entityType.BaseType;
                 }
             }
 

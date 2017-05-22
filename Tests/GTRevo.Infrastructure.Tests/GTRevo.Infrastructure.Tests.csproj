@@ -33,8 +33,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AutoMapper, Version=6.0.2.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\..\..\GTServiceDesk\packages\AutoMapper.6.0.2\lib\net45\AutoMapper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="MediatR, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\..\GTServiceDesk\packages\MediatR.3.0.0\lib\net45\MediatR.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\GTServiceDesk\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -75,6 +83,10 @@
     <Compile Include="Domain\ConventionEventApplyRegistratorTests.cs" />
     <Compile Include="Domain\Projections\ProjectionEventListenerTests.cs" />
     <Compile Include="EventSourcing\EventSourcedRepositoryTests.cs" />
+    <Compile Include="History\ChangeTracking\ChangeTrackerTests.cs" />
+    <Compile Include="History\ChangeTracking\EntityAttributeChangeBatchTests.cs" />
+    <Compile Include="History\ChangeTracking\EntityAttributeChangeLoggerTests.cs" />
+    <Compile Include="History\ChangeTracking\TrackedChangeRecordConverterTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\RepositoryTests.cs" />
   </ItemGroup>
@@ -83,6 +95,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\GTRevo.DataAccess\GTRevo.DataAccess.csproj">
+      <Project>{FA942FE7-71FD-4CF5-8959-309583FE7903}</Project>
+      <Name>GTRevo.DataAccess</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\GTRevo.Infrastructure\GTRevo.Infrastructure.csproj">
       <Project>{6f893b4e-8119-41f8-b1c9-28eea56946a9}</Project>
       <Name>GTRevo.Infrastructure</Name>
@@ -91,9 +107,16 @@
       <Project>{42cdfad0-cb40-433e-ac6e-874f3f58e77d}</Project>
       <Name>GTRevo.Platform</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\GTRevo.Testing\GTRevo.Testing.csproj">
+      <Project>{a95bfbad-e0f3-4631-a873-bc03b66182da}</Project>
+      <Name>GTRevo.Testing</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="History\Auditing\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

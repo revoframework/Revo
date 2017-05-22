@@ -7,8 +7,6 @@ namespace GTRevo.Infrastructure.EventSourcing
 {
     public abstract class EventSourcedAggregateRoot : AggregateRoot, IEventSourcedAggregateRoot
     {
-
-
         public EventSourcedAggregateRoot(Guid id) : base(id)
         {
             new ConventionEventApplyRegistrator().RegisterEvents(this, EventRouter);
@@ -24,7 +22,6 @@ namespace GTRevo.Infrastructure.EventSourcing
         protected override void ApplyEvent<T>(T evt)
         {
             base.ApplyEvent(evt);
-            EventRouter.ApplyEvent(evt);
         }
 
         protected void Delete()

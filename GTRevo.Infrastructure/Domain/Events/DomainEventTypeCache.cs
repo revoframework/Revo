@@ -10,8 +10,8 @@ namespace GTRevo.Infrastructure.Domain.Events
     public class DomainEventTypeCache : IApplicationStartListener
     {
         private readonly ITypeExplorer typeExplorer;
-        private Dictionary<Tuple<string, int>, Type> eventNamesToTypes = new Dictionary<Tuple<string, int>, Type>();
-        private Dictionary<Type, Tuple<string, int>> eventTypesToNames = new Dictionary<Type, Tuple<string, int>>();
+        private readonly Dictionary<Tuple<string, int>, Type> eventNamesToTypes = new Dictionary<Tuple<string, int>, Type>();
+        private readonly Dictionary<Type, Tuple<string, int>> eventTypesToNames = new Dictionary<Type, Tuple<string, int>>();
 
         public DomainEventTypeCache(ITypeExplorer typeExplorer)
         {

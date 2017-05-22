@@ -71,10 +71,12 @@ namespace GTRevo.Platform.Tests.Events
 
         public class Event1 : IEvent
         {
+            public Guid Id { get; set; }
         }
 
         public class Event2 : IEvent
         {
+            public Guid Id { get; set; }
         }
     }
 }
