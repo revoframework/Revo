@@ -38,6 +38,10 @@
       <HintPath>..\..\GTServiceDesk\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.Experimental.Collections, Version=1.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\Microsoft.Experimental.Collections.1.0.3-alpha\lib\portable-net45+win8+wp8\Microsoft.Experimental.Collections.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="NSubstitute, Version=2.0.2.0, Culture=neutral, PublicKeyToken=92dd2e9066daa5ca, processorArchitecture=MSIL">
       <HintPath>..\..\GTServiceDesk\packages\NSubstitute.2.0.2\lib\net45\NSubstitute.dll</HintPath>
       <Private>True</Private>
@@ -57,6 +61,7 @@
     <Compile Include="DataAccess\LocalDbAsyncEnumerable.cs" />
     <Compile Include="DataAccess\LocalDbAsyncEnumerator.cs" />
     <Compile Include="DataAccess\LocalDbAsyncQueryProvider.cs" />
+    <Compile Include="Platform\Core\FakeClock.cs" />
     <Compile Include="SubstituteDecorator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -68,6 +73,10 @@
     <ProjectReference Include="..\GTRevo.DataAccess\GTRevo.DataAccess.csproj">
       <Project>{FA942FE7-71FD-4CF5-8959-309583FE7903}</Project>
       <Name>GTRevo.DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GTRevo.Platform\GTRevo.Platform.csproj">
+      <Project>{42CDFAD0-CB40-433E-AC6E-874F3F58E77D}</Project>
+      <Name>GTRevo.Platform</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

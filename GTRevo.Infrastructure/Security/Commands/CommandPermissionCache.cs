@@ -30,9 +30,10 @@ namespace GTRevo.Infrastructure.Security.Commands
         {
             permissionTypeIndexer.EnsureIndexed();
 
-            foreach (
-                var commandType in
-                typeExplorer.GetAllTypes().Where(x => !x.IsAbstract && typeof(ICommandBase).IsAssignableFrom(x)))
+            foreach (var commandType in typeExplorer
+                                            .GetAllTypes()
+                                            .Where(x => x.IsClass && !x.IsAbstract && !x.IsGenericTypeDefinition)
+                                            .Where(x => typeof(ICommandBase).IsAssignableFrom(x)))
             {
                 commandTypePermissions[commandType] = GetCommandTypePermissions(commandType).ToList();
             }  

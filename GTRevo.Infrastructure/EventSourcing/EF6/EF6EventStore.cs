@@ -17,15 +17,12 @@ namespace GTRevo.Infrastructure.EventSourcing.EF6
     {
         private readonly ICrudRepository repository;
         private readonly DomainEventTypeCache domainEventTypeCache;
-        private readonly IClock clock;
 
         public EF6EventStore(ICrudRepository repository,
-            DomainEventTypeCache domainEventTypeCache,
-            IClock clock)
+            DomainEventTypeCache domainEventTypeCache)
         {
             this.repository = repository;
             this.domainEventTypeCache = domainEventTypeCache;
-            this.clock = clock;
         }
 
         public Task<AggregateState> GetStateByVersionAsync(Guid aggregateId, int version)
@@ -167,7 +164,7 @@ namespace GTRevo.Infrastructure.EventSourcing.EF6
                 AggregateId = aggregateId,
                 SequenceNumber = version,
                 ActorName = events.LastOrDefault()?.ActorName,
-                DatePublished = clock.Now,
+                DatePublished = Clock.Current.Now,
                 EventsJson = eventsJson,
             };
 

@@ -59,8 +59,6 @@ namespace GTRevo.Platform.Core
 
             DependencyResolver.SetResolver(((StandardKernel)Bootstrapper.Kernel).Get<IDependencyResolver>());
             GlobalConfiguration.Configuration.DependencyResolver = ((StandardKernel)Bootstrapper.Kernel).Get<Ninject.Web.WebApi.NinjectDependencyResolver>();
-            
-            Hangfire.GlobalConfiguration.Configuration.UseNinjectActivator(kernel);
         }
 
         /// <summary>
@@ -96,6 +94,8 @@ namespace GTRevo.Platform.Core
                 kernel.Bind<Func<IKernel>>().ToMethod(ctx => () => new Bootstrapper().Kernel);
                 kernel.Bind<StandardKernel>().ToMethod(ctx => Bootstrapper.Kernel as StandardKernel);
                 kernel.Bind<IHttpModule>().To<HttpApplicationInitializationHttpModule>();
+
+                Hangfire.GlobalConfiguration.Configuration.UseNinjectActivator(kernel);
 
                 RegisterCoreServices(kernel);
 

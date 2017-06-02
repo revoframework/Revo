@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using GTRevo.Platform.Core.Lifecycle;
 using Hangfire;
+using Hangfire.MemoryStorage;
 using Owin;
 
 namespace GTRevo.Platform.Core
@@ -13,8 +14,11 @@ namespace GTRevo.Platform.Core
     {
         public void ConfigureApp(IAppBuilder app)
         {
+#if DEBUG
+            GlobalConfiguration.Configuration.UseStorage<MemoryStorage>(new MemoryStorage());
+#else
             GlobalConfiguration.Configuration.UseSqlServerStorage("EntityContext");
-            //Hangfire.GlobalConfiguration.Configuration.UseStorage<MemoryStorage>(new MemoryStorage());
+#endif
 
             app.UseHangfireDashboard();
 

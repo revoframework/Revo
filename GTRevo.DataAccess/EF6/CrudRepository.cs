@@ -94,6 +94,30 @@ namespace GTRevo.DataAccess.EF6
             return await GetDbContext(typeof(T)).Set<T>().FirstAsync(predicate);
         }
 
+        public T Find<T>(object id) where T : class
+        {
+            T t = GetDbContext(typeof(T)).Set<T>().Find(id);
+            return t;
+        }
+
+        public T Find<T>(params object[] id) where T : class
+        {
+            T t = GetDbContext(typeof(T)).Set<T>().Find(id);
+            return t;
+        }
+
+        public async Task<T> FindAsync<T>(object[] id) where T : class
+        {
+            T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(id);
+            return t;
+        }
+
+        public async Task<T> FindAsync<T>(object id) where T : class
+        {
+            T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(id);
+            return t;
+        }
+
         public IQueryable<T> FindAll<T>() where T : class
         {
             return GetDbContext(typeof(T)).Set<T>();

@@ -1,0 +1,10 @@
+﻿using System;
+
+namespace GTRevo.Infrastructure.History.ChangeTracking
+{
+    public interface IChangeDataTypeCache
+    {
+        string GetChangeDataTypeName(Type clrType);
+        Type GetClrChangeDataType(string changeDataTypeName);
+    }
+}

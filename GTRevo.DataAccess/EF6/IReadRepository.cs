@@ -20,6 +20,11 @@ namespace GTRevo.DataAccess.EF6
         Task<T> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> predicate) where T : class;
         Task<T> FirstAsync<T>(Expression<Func<T, bool>> predicate) where T : class;
 
+        T Find<T>(object[] id) where T : class;
+        T Find<T>(object id) where T : class;
+        Task<T> FindAsync<T>(params object[] id) where T : class;
+        Task<T> FindAsync<T>(object id) where T : class;
+
         IQueryable<T> FindAll<T>() where T : class;
         Task<IList<T>> FindAllAsync<T>() where T : class;
         IEnumerable<T> FindAllWithAdded<T>() where T : class;

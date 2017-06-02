@@ -49,7 +49,7 @@ namespace GTRevo.Infrastructure.Domain.Events
         {
             var eventTypes = typeExplorer.GetAllTypes()
                 .Where(x => typeof(DomainEvent).IsAssignableFrom(x))
-                .Where(x => !x.IsAbstract);
+                .Where(x => !x.IsAbstract && !x.IsGenericTypeDefinition);
 
             foreach (Type eventType in eventTypes)
             {

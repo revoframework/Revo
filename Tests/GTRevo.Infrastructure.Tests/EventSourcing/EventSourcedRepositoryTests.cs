@@ -8,6 +8,7 @@ using GTRevo.Infrastructure.Domain.Events;
 using GTRevo.Infrastructure.EventSourcing;
 using GTRevo.Platform.Core;
 using GTRevo.Platform.Events;
+using GTRevo.Testing.Platform.Core;
 using NSubstitute;
 using Xunit;
 
@@ -18,9 +19,7 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
         private readonly IEventStore eventStore;
         private readonly IActorContext actorContext;
         private readonly IEntityTypeManager entityTypeManager;
-        private readonly IClock clock;
-
-        private DateTime now = DateTime.Now;
+        
         private Guid entityId = Guid.NewGuid();
         private Guid entity2Id = Guid.NewGuid();
         private Guid entityClassId = Guid.NewGuid();
@@ -36,8 +35,7 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
 
             actorContext = Substitute.For<IActorContext>();
             actorContext.CurrentActorName.Returns("actor");
-            clock = Substitute.For<IClock>();
-            clock.Now.Returns(now);
+            FakeClock.Setup();
 
             eventStore.GetLastStateAsync(entity2Id)
                 .Returns(new AggregateState(1, new List<DomainAggregateEvent>()
@@ -60,7 +58,7 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
                 .Returns(entity2ClassId);
 
             sut = new EventSourcedRepository(eventStore, actorContext,
-                clock, entityTypeManager);
+                entityTypeManager);
         }
 
         [Fact]
@@ -134,7 +132,7 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
                 {
                     ActorName = "actor",
                     AggregateVersion = entity.Version + 1,
-                    DatePublished = now,
+                    DatePublished = FakeClock.Now,
                     Event = entity.UncommitedEvents.ElementAt(0)
                 }
             };

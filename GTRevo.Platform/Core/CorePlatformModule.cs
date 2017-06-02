@@ -81,8 +81,8 @@ namespace GTRevo.Platform.Core
                 .InSingletonScope();
 
             Bind<IClock>()
-                .To<SystemClock>()
-                .InSingletonScope();
+                .ToMethod(ctx => Clock.Current)
+                .InTransientScope();
 
             Bind<IActorContext>()
                 .To<UserActorContext>()
@@ -98,6 +98,10 @@ namespace GTRevo.Platform.Core
 
             Bind<AutoMapperDefinitionDiscovery>()
                 .ToSelf()
+                .InSingletonScope();
+
+            Bind<IOwinConfigurator>()
+                .To<HangfireOwinConfigurator>()
                 .InSingletonScope();
         }
     }

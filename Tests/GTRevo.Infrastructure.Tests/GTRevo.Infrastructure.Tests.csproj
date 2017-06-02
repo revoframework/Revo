@@ -45,6 +45,10 @@
       <HintPath>..\..\..\GTServiceDesk\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.Experimental.Collections, Version=1.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\GTServiceDesk\packages\Microsoft.Experimental.Collections.1.0.3-alpha\lib\portable-net45+win8+wp8\Microsoft.Experimental.Collections.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\..\GTServiceDesk\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -87,6 +91,13 @@
     <Compile Include="History\ChangeTracking\EntityAttributeChangeBatchTests.cs" />
     <Compile Include="History\ChangeTracking\EntityAttributeChangeLoggerTests.cs" />
     <Compile Include="History\ChangeTracking\TrackedChangeRecordConverterTests.cs" />
+    <Compile Include="Notifications\AggregatingBufferGovernorTests.cs" />
+    <Compile Include="Notifications\BufferedAdaptorNotificationChannelTests.cs" />
+    <Compile Include="Notifications\BufferedNotificationProcessJobTests.cs" />
+    <Compile Include="Notifications\BufferedNotificationStoreTests.cs" />
+    <Compile Include="Notifications\BufferingNotificationChannelTests.cs" />
+    <Compile Include="Notifications\NotificationBusTests.cs" />
+    <Compile Include="Notifications\NotificationPipelineTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\RepositoryTests.cs" />
   </ItemGroup>

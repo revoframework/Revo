@@ -114,9 +114,18 @@
       <HintPath>..\..\GTServiceDesk\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="RazorEngine, Version=3.9.3.0, Culture=neutral, PublicKeyToken=9ee697374c7e744a, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\RazorEngine.3.9.3\lib\net45\RazorEngine.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\Microsoft.AspNet.Razor.3.2.3\lib\net45\System.Web.Razor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -134,6 +143,7 @@
     <Compile Include="Domain\Basic\BasicClassEntity.cs" />
     <Compile Include="Domain\Basic\BasicDomainModelDefinition.cs" />
     <Compile Include="Domain\Basic\BasicEntity.cs" />
+    <Compile Include="History\ChangeTracking\Changes\EntityAttributeChangeData.cs" />
     <Compile Include="History\ChangeTracking\ChangeTracker.cs" />
     <Compile Include="History\ChangeTracking\ChangeData.cs" />
     <Compile Include="History\ChangeTracking\ChangeDataTypeCache.cs" />
@@ -148,6 +158,37 @@
     <Compile Include="History\ChangeTracking\Model\TrackedChangeRecord.cs" />
     <Compile Include="History\ChangeTracking\TrackedChange.cs" />
     <Compile Include="History\ChangeTracking\TrackedChangeRecordConverter.cs" />
+    <Compile Include="History\ChangeTracking\TrackedChangeAdded.cs" />
+    <Compile Include="Notifications\BufferedAdaptorNotificationChannel.cs" />
+    <Compile Include="Notifications\BufferedNotificationProcessJob.cs" />
+    <Compile Include="Notifications\BufferedNotificationStore.cs" />
+    <Compile Include="Notifications\BufferingNotificationChannel.cs" />
+    <Compile Include="Notifications\BufferedNotificationDaemon.cs" />
+    <Compile Include="Notifications\Channels\Mail\HtmlTemplateMailNotificationFormatter.cs" />
+    <Compile Include="Notifications\Channels\Mail\IMailNotificationFormatter.cs" />
+    <Compile Include="Notifications\Channels\Mail\SendSmtpMailNotificationJob.cs" />
+    <Compile Include="Notifications\Channels\Mail\SerializableMailMessage.cs" />
+    <Compile Include="Notifications\Channels\Mail\SmtpMailBufferedNotificationChannel.cs" />
+    <Compile Include="Notifications\IBufferedNotificationChannel.cs" />
+    <Compile Include="Notifications\IBufferedNotificationStore.cs" />
+    <Compile Include="Notifications\IBufferSelector.cs" />
+    <Compile Include="Notifications\IGroupedNotifications.cs" />
+    <Compile Include="Notifications\INotification.cs" />
+    <Compile Include="Notifications\INotificationBus.cs" />
+    <Compile Include="Notifications\INotificationChannel.cs" />
+    <Compile Include="Notifications\IBufferGovernor.cs" />
+    <Compile Include="Notifications\INotificationPipeline.cs" />
+    <Compile Include="Notifications\INotificationSerializer.cs" />
+    <Compile Include="Notifications\INotificationTypeCache.cs" />
+    <Compile Include="Notifications\Model\NotificationBuffer.cs" />
+    <Compile Include="Notifications\Model\BufferedNotification.cs" />
+    <Compile Include="Notifications\NotificationBus.cs" />
+    <Compile Include="Notifications\NotificationPipeline.cs" />
+    <Compile Include="Notifications\NotificationSerializer.cs" />
+    <Compile Include="Notifications\NotificationsModule.cs" />
+    <Compile Include="Notifications\NotificationTypeCache.cs" />
+    <Compile Include="Notifications\SerializedNotification.cs" />
+    <Compile Include="Notifications\AggregatingBufferGovernor.cs" />
     <Compile Include="ReadModel\ClassEntityView.cs" />
     <Compile Include="ReadModel\EntityView.cs" />
     <Compile Include="ReadModel\ReadModelBase.cs" />
@@ -163,7 +204,7 @@
     <Compile Include="Domain\IQueryableEntity.cs" />
     <Compile Include="EventSourcing\Events\AggregateCreated.cs" />
     <Compile Include="EventSourcing\Events\AggregateDeleted.cs" />
-    <Compile Include="History\ChangeTracking\Changes\EntityAttributeChangeData.cs" />
+    <Compile Include="History\ChangeTracking\Changes\EntityAttributeChangeData{}.cs" />
     <Compile Include="History\ChangeTracking\IChangeTracker.cs" />
     <Compile Include="ReadModel\ClassEntityReadModel.cs" />
     <Compile Include="ReadModel\EntityReadModel.cs" />

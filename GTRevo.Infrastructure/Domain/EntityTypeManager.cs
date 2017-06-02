@@ -30,6 +30,7 @@ namespace GTRevo.Infrastructure.Domain
         {
             var entities = typeExplorer.GetAllTypes()
                 .Where(x => typeof(IEntity).IsAssignableFrom(x))
+                .Where(x => x.IsClass && !x.IsAbstract && !x.IsGenericTypeDefinition)
                 .ToList();
 
             typesToIds = entities.ToDictionary(x => x,

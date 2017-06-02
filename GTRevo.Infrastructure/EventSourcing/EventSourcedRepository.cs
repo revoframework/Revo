@@ -16,17 +16,14 @@ namespace GTRevo.Infrastructure.EventSourcing
 
         private readonly IEventStore eventStore;
         private readonly IActorContext actorContext;
-        private readonly IClock clock;
         private readonly IEntityTypeManager entityTypeManager;
 
         public EventSourcedRepository(IEventStore eventStore,
             IActorContext actorContext,
-            IClock clock,
             IEntityTypeManager entityTypeManager)
         {
             this.eventStore = eventStore;
             this.actorContext = actorContext;
-            this.clock = clock;
             this.entityTypeManager = entityTypeManager;
         }
 
@@ -123,7 +120,7 @@ namespace GTRevo.Infrastructure.EventSourcing
         private List<DomainAggregateEventRecord> ConstructEventsRecords(IEnumerable<DomainAggregateEvent> events,
             int aggregateVersion)
         {
-            var now = clock.Now;
+            var now = Clock.Current.Now;
             var records = new List<DomainAggregateEventRecord>();
 
             foreach (DomainAggregateEvent ev in events)

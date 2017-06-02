@@ -55,7 +55,7 @@ namespace GTRevo.DataAccess.EF6
         private IEnumerable<Type> FindEntityTypes()
         {
             return typeExplorer.GetAllTypes()
-                .Where(x => x.IsClass && !x.IsAbstract
+                .Where(x => x.IsClass && !x.IsAbstract && !x.IsGenericTypeDefinition
                     && x.GetCustomAttributes(typeof(DatabaseEntityAttribute), true).Length > 0);
         }
     }

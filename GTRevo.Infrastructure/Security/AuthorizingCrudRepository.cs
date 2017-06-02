@@ -88,6 +88,26 @@ namespace GTRevo.Infrastructure.Security
             return repository.FirstAsync(predicate);
         }
 
+        public T Find<T>(object[] id) where T : class
+        {
+            return repository.Find<T>(id);
+        }
+
+        public T Find<T>(object id) where T : class
+        {
+            return repository.Find<T>(id);
+        }
+
+        public Task<T> FindAsync<T>(params object[] id) where T : class
+        {
+            return repository.FindAsync<T>(id);
+        }
+
+        public Task<T> FindAsync<T>(object id) where T : class
+        {
+            return repository.FindAsync<T>(id);
+        }
+
         public IQueryable<T> FindAll<T>() where T : class
         {
             return InjectQueryable(repository.FindAll<T>());

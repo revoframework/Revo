@@ -22,7 +22,7 @@ namespace GTRevo.Platform.Core
         {
             var modelDefinitionTypes = typeExplorer.GetAllTypes()
                 .Where(x => typeof(IAutoMapperDefinition).IsAssignableFrom(x)
-                            && !x.IsAbstract);
+                            && x.IsClass && !x.IsAbstract && !x.IsGenericTypeDefinition);
 
             RegisterDefinitions(modelDefinitionTypes);
             return GetDefinitions();

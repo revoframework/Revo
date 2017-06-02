@@ -21,7 +21,7 @@ namespace GTRevo.DataAccess.EF6
         {
             var modelDefinitionTypes = typeExplorer.GetAllTypes()
                 .Where(x => typeof(IModelDefinition).IsAssignableFrom(x)
-                            && !x.IsAbstract);
+                            && x.IsClass && !x.IsAbstract && !x.IsGenericTypeDefinition);
 
             RegisterModelDefinitions(modelDefinitionTypes);
             return GetModelDefinitions();
