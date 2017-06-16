@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using GTRevo.DataAccess.EF6;
+using GTRevo.Core;
+using GTRevo.DataAccess.EF6.Entities;
+using GTRevo.Events;
 using GTRevo.Infrastructure.History.ChangeTracking.Model;
 using GTRevo.Platform.Core;
-using GTRevo.Platform.Events;
-using GTRevo.Platform.Security;
 
 namespace GTRevo.Infrastructure.History.ChangeTracking
 {

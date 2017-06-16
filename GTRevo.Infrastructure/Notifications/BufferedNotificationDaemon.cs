@@ -1,5 +1,4 @@
-﻿using GTRevo.DataAccess.EF6;
-using GTRevo.Platform.Core.Lifecycle;
+﻿using GTRevo.Core.Lifecycle;
 using Hangfire;
 
 namespace GTRevo.Infrastructure.Notifications

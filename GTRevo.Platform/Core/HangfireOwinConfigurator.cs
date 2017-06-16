@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GTRevo.Platform.Core.Lifecycle;
+﻿using GTRevo.Platform.Core.Lifecycle;
 using Hangfire;
 using Hangfire.MemoryStorage;
 using Owin;

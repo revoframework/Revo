@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using GTRevo.Infrastructure.Domain;
-using GTRevo.Platform.Transactions;
+using GTRevo.Transactions;
 
 namespace GTRevo.Infrastructure.Repositories
 {

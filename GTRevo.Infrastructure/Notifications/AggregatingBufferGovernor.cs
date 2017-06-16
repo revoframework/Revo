@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using GTRevo.DataAccess.EF6;
+using GTRevo.Core;
+using GTRevo.DataAccess.EF6.Entities;
 using GTRevo.Infrastructure.Notifications.Model;
-using GTRevo.Platform.Core;
 
 namespace GTRevo.Infrastructure.Notifications
 {

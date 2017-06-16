@@ -98,9 +98,8 @@
       <HintPath>..\..\GTServiceDesk\packages\LowercaseDashedRouteExt.1.4\lib\net40\LowercaseDashedRouting.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="MediatR, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\GTServiceDesk\packages\MediatR.3.0.0\lib\net45\MediatR.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="MediatR, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\MediatR.3.0.1\lib\net45\MediatR.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\GTServiceDesk\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
@@ -166,9 +165,8 @@
       <HintPath>..\..\GTServiceDesk\packages\morelinq.2.2.0\lib\net35\MoreLinq.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\GTServiceDesk\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Ninject, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
       <HintPath>..\..\GTServiceDesk\packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
@@ -275,60 +273,24 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Commands\CommandHandlerPipeline.cs" />
-    <Compile Include="Commands\CommandRequest.cs" />
-    <Compile Include="Commands\CommandRequestContextData.cs" />
-    <Compile Include="Commands\EntityQuery.cs" />
-    <Compile Include="Commands\EntityQueryWithContext.cs" />
-    <Compile Include="Commands\IAsyncCommandHandler.cs" />
-    <Compile Include="Commands\IAsyncQueryHandler.cs" />
-    <Compile Include="Commands\ICommand.cs" />
-    <Compile Include="Commands\ICommandRequest.cs" />
-    <Compile Include="Commands\ICommandWithContext.cs" />
-    <Compile Include="Commands\IEntityQuery.cs" />
-    <Compile Include="Commands\IHasContext.cs" />
-    <Compile Include="Commands\ICommandFilter.cs" />
-    <Compile Include="Commands\WrappedEntityQuery.cs" />
+    <Compile Include="Core\AspNetNinjectBindingExtension.cs" />
     <Compile Include="Core\AutoMapperDefinitionDiscovery.cs" />
-    <Compile Include="Core\Clock.cs" />
     <Compile Include="Core\HangfireOwinConfigurator.cs" />
     <Compile Include="Core\IActorContext.cs" />
     <Compile Include="Core\IAutoMapperDefinition.cs" />
-    <Compile Include="Core\StringExtensions.cs" />
-    <Compile Include="Core\TypeExplorer.cs" />
     <Compile Include="Core\UserActorContext.cs" />
-    <Compile Include="Events\EventQueue.cs" />
-    <Compile Include="Events\EventQueueTransaction.cs" />
-    <Compile Include="Events\IEvent.cs" />
-    <Compile Include="Events\IEventBus.cs" />
-    <Compile Include="Events\IEventListener.cs" />
-    <Compile Include="Commands\IQuery.cs" />
-    <Compile Include="Commands\IQueryWithContext.cs" />
-    <Compile Include="Commands\IWrappedEntityQuery.cs" />
-    <Compile Include="Commands\QueryWithContext.cs" />
     <Compile Include="Core\AutoMapperInitializer.cs" />
     <Compile Include="Core\CommandBusModule.cs" />
     <Compile Include="Core\ContravariantBindingResolver.cs" />
     <Compile Include="Core\CorePlatformModule.cs" />
-    <Compile Include="Commands\ICommandBus.cs" />
-    <Compile Include="Core\SystemClock.cs" />
     <Compile Include="Core\IConfiguration.cs" />
-    <Compile Include="Core\IClock.cs" />
-    <Compile Include="Core\ITypeExplorer.cs" />
-    <Compile Include="Core\Lifecycle\IApplicationStartListener.cs" />
-    <Compile Include="Core\Lifecycle\IApplicationStopListener.cs" />
     <Compile Include="Core\Lifecycle\IHttpApplicationInitializer.cs" />
     <Compile Include="Core\Lifecycle\IOwinConfigurator.cs" />
     <Compile Include="Core\Lifecycle\IWebActivatorExHooks.cs" />
-    <Compile Include="Core\MemoryUtils.cs" />
-    <Compile Include="Commands\CommandBus.cs" />
     <Compile Include="Core\NinjectBindingExtension.cs" />
     <Compile Include="Core\NinjectWebLoader.cs" />
-    <Compile Include="Commands\CommandBindExtensions.cs" />
     <Compile Include="Core\AspNetTypeExplorer.cs" />
     <Compile Include="Core\WebConfiguration.cs" />
-    <Compile Include="Events\IEventQueue.cs" />
-    <Compile Include="Events\IEventQueueTransactionListener.cs" />
     <Compile Include="IO\BracesGuidJsonConverter.cs" />
     <Compile Include="IO\Globalization\IMessageRepository.cs" />
     <Compile Include="IO\Globalization\KnoemaLocalizedObject.cs" />
@@ -385,14 +347,6 @@
     <Compile Include="Security\SecurityAppInitializer.cs" />
     <Compile Include="Security\SecurityModule.cs" />
     <Compile Include="Security\WebApi\AuthorizePermissionsAttribute.cs" />
-    <Compile Include="Transactions\ITransaction.cs" />
-    <Compile Include="Transactions\ITransactionListener.cs" />
-    <Compile Include="Transactions\ITransactionProvider.cs" />
-    <Compile Include="Transactions\IUnitOfWork.cs" />
-    <Compile Include="Transactions\IUnitOfWorkListener.cs" />
-    <Compile Include="Transactions\IUnitOfWorkProvider.cs" />
-    <Compile Include="Transactions\UnitOfWork.cs" />
-    <Compile Include="Transactions\UnitOfWorkTransaction.cs" />
     <Compile Include="Web\AntiForgeryConsts.cs" />
     <Compile Include="Web\CandidateAction.cs" />
     <Compile Include="Web\ApiControllerTypeResolver.cs" />
@@ -422,7 +376,6 @@
     <Compile Include="Web\VirtualPath\EmbeddedResourceVirtualFile.cs" />
     <Compile Include="Web\VirtualPath\Logger.cs" />
     <Compile Include="Web\VirtualPath\EmbeddedResourceVirtualPathProvider.cs" />
-    <Compile Include="Commands\WrappedEntityQueryWithContext.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -432,6 +385,10 @@
     <ProjectReference Include="..\..\..\AutoMapper.Attributes\AutoMapper.Attributes.V5\AutoMapper.Attributes.V5.csproj">
       <Project>{6a6191b1-fea5-4a40-a01a-6497eb452d92}</Project>
       <Name>AutoMapper.Attributes.V5</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GTRevo.Core\GTRevo.Core.csproj">
+      <Project>{1015BA79-4241-4221-9D27-0DB033EA624B}</Project>
+      <Name>GTRevo.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

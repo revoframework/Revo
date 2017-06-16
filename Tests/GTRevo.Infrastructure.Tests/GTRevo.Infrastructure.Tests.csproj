@@ -37,9 +37,8 @@
       <HintPath>..\..\..\GTServiceDesk\packages\AutoMapper.6.0.2\lib\net45\AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="MediatR, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\GTServiceDesk\packages\MediatR.3.0.0\lib\net45\MediatR.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="MediatR, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\GTServiceDesk\packages\MediatR.3.0.1\lib\net45\MediatR.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\..\GTServiceDesk\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
@@ -49,9 +48,8 @@
       <HintPath>..\..\..\GTServiceDesk\packages\Microsoft.Experimental.Collections.1.0.3-alpha\lib\portable-net45+win8+wp8\Microsoft.Experimental.Collections.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\..\GTServiceDesk\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\..\GTServiceDesk\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NSubstitute, Version=2.0.2.0, Culture=neutral, PublicKeyToken=92dd2e9066daa5ca, processorArchitecture=MSIL">
       <HintPath>..\..\..\GTServiceDesk\packages\NSubstitute.2.0.2\lib\net45\NSubstitute.dll</HintPath>
@@ -106,9 +104,21 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\GTRevo.Core\GTRevo.Core.csproj">
+      <Project>{1015ba79-4241-4221-9d27-0db033ea624b}</Project>
+      <Name>GTRevo.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\GTRevo.DataAccess.EF6\GTRevo.DataAccess.EF6.csproj">
+      <Project>{A8DE2F53-E404-48DD-B11F-B6A3302CE163}</Project>
+      <Name>GTRevo.DataAccess.EF6</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\GTRevo.DataAccess\GTRevo.DataAccess.csproj">
       <Project>{FA942FE7-71FD-4CF5-8959-309583FE7903}</Project>
       <Name>GTRevo.DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\GTRevo.Infrastructure.Core\GTRevo.Infrastructure.Core.csproj">
+      <Project>{558603ae-becf-4f72-86b4-ad832d2453ab}</Project>
+      <Name>GTRevo.Infrastructure.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\GTRevo.Infrastructure\GTRevo.Infrastructure.csproj">
       <Project>{6f893b4e-8119-41f8-b1c9-28eea56946a9}</Project>

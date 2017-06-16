@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using GTRevo.Events;
 using GTRevo.Infrastructure.Domain;
 using GTRevo.Infrastructure.Domain.Events;
 using GTRevo.Infrastructure.Repositories;
-using GTRevo.Infrastructure.Tests.EventSourcing;
-using GTRevo.Platform.Events;
 using NSubstitute;
-using NSubstitute.ExceptionExtensions;
 using Xunit;
 
 namespace GTRevo.Infrastructure.Tests.Repositories

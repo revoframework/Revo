@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GTRevo.Events;
 using GTRevo.Infrastructure.History.ChangeTracking;
 using GTRevo.Infrastructure.History.ChangeTracking.Model;
 using GTRevo.Platform.Core;
-using GTRevo.Platform.Events;
-using GTRevo.Platform.Transactions;
 using GTRevo.Testing.DataAccess.EF6;
 using GTRevo.Testing.Platform.Core;
+using GTRevo.Transactions;
 using NSubstitute;
 using Xunit;
 

@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{1015BA79-4241-4221-9D27-0DB033EA624B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GTRevo</RootNamespace>
+    <AssemblyName>GTRevo.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="MediatR, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\MediatR.3.0.1\lib\net45\MediatR.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Experimental.Collections, Version=1.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\Microsoft.Experimental.Collections.1.0.3-alpha\lib\portable-net45+win8+wp8\Microsoft.Experimental.Collections.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\Microsoft.Extensions.DependencyInjection.1.0.0\lib\netstandard1.1\Microsoft.Extensions.DependencyInjection.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\Microsoft.Extensions.DependencyInjection.Abstractions.1.0.0\lib\netstandard1.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.OData.Core, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\Microsoft.OData.Core.7.0.0\lib\portable-net45+win8+wpa81\Microsoft.OData.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.OData.Edm, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\Microsoft.OData.Edm.7.0.0\lib\portable-net45+win8+wpa81\Microsoft.OData.Edm.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Spatial, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\Microsoft.Spatial.7.0.0\lib\portable-net45+win8+wpa81\Microsoft.Spatial.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Ninject, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.OData, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\Microsoft.AspNet.OData.6.0.0\lib\net45\System.Web.OData.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Commands\CommandBindExtensions.cs" />
+    <Compile Include="Commands\CommandBus.cs" />
+    <Compile Include="Commands\CommandHandlerPipeline.cs" />
+    <Compile Include="Commands\CommandRequest.cs" />
+    <Compile Include="Commands\CommandRequestContextData.cs" />
+    <Compile Include="Commands\EntityQuery.cs" />
+    <Compile Include="Commands\EntityQueryWithContext.cs" />
+    <Compile Include="Commands\IAsyncCommandHandler.cs" />
+    <Compile Include="Commands\IAsyncQueryHandler.cs" />
+    <Compile Include="Commands\ICommand.cs" />
+    <Compile Include="Commands\ICommandBus.cs" />
+    <Compile Include="Commands\ICommandFilter.cs" />
+    <Compile Include="Commands\ICommandRequest.cs" />
+    <Compile Include="Commands\ICommandWithContext.cs" />
+    <Compile Include="Commands\IEntityQuery.cs" />
+    <Compile Include="Commands\IHasContext.cs" />
+    <Compile Include="Commands\IQuery.cs" />
+    <Compile Include="Commands\IQueryWithContext.cs" />
+    <Compile Include="Commands\IWrappedEntityQuery.cs" />
+    <Compile Include="Commands\QueryWithContext.cs" />
+    <Compile Include="Commands\WrappedEntityQuery.cs" />
+    <Compile Include="Commands\WrappedEntityQueryWithContext.cs" />
+    <Compile Include="Core\Clock.cs" />
+    <Compile Include="Core\CorePlatformModule.cs" />
+    <Compile Include="Events\EventQueue.cs" />
+    <Compile Include="Events\EventQueueTransaction.cs" />
+    <Compile Include="Events\IEvent.cs" />
+    <Compile Include="Events\IEventBus.cs" />
+    <Compile Include="Events\IEventListener.cs" />
+    <Compile Include="Events\IEventQueue.cs" />
+    <Compile Include="Events\IEventQueueTransactionListener.cs" />
+    <Compile Include="Core\INinjectBindingExtension.cs" />
+    <Compile Include="Core\Lifecycle\IApplicationStartListener.cs" />
+    <Compile Include="Core\Lifecycle\IApplicationStopListener.cs" />
+    <Compile Include="Core\IClock.cs" />
+    <Compile Include="Core\ITypeExplorer.cs" />
+    <Compile Include="Core\MemoryUtils.cs" />
+    <Compile Include="Core\NinjectBindingExtensions.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Core\StringExtensions.cs" />
+    <Compile Include="Core\SystemClock.cs" />
+    <Compile Include="Transactions\ITransaction.cs" />
+    <Compile Include="Transactions\ITransactionListener.cs" />
+    <Compile Include="Transactions\ITransactionProvider.cs" />
+    <Compile Include="Transactions\IUnitOfWork.cs" />
+    <Compile Include="Transactions\IUnitOfWorkListener.cs" />
+    <Compile Include="Transactions\IUnitOfWorkProvider.cs" />
+    <Compile Include="Transactions\UnitOfWork.cs" />
+    <Compile Include="Transactions\UnitOfWorkTransaction.cs" />
+    <Compile Include="Core\TypeExplorer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using GTRevo.DataAccess.EF6;
 using GTRevo.Infrastructure.Notifications;
-using GTRevo.Infrastructure.Notifications.Model;
-using GTRevo.Testing.DataAccess.EF6;
 using GTRevo.Testing.Platform.Core;
 using NSubstitute;
 using Xunit;

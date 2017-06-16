@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Ajax.Utilities;
 
 namespace GTRevo.Platform.IO.Messages
 {

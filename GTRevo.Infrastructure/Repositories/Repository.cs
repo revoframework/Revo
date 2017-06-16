@@ -2,15 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
-using GTRevo.DataAccess.EF6;
+using GTRevo.Events;
 using GTRevo.Infrastructure.Domain;
 using GTRevo.Infrastructure.Domain.Events;
-using GTRevo.Infrastructure.EventSourcing;
-using GTRevo.Infrastructure.Repositories;
-using GTRevo.Platform.Events;
-using GTRevo.Platform.Transactions;
+using GTRevo.Transactions;
 
 namespace GTRevo.Infrastructure.Repositories
 {

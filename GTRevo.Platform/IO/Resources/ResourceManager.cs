@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Web;
+using GTRevo.Core;
 using GTRevo.Platform.Core;
 using GTRevo.Platform.Core.Lifecycle;
 

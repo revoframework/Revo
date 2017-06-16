@@ -1,6 +1,5 @@
-﻿using System;
-using System.Threading.Tasks;
-using GTRevo.Platform.Commands;
+﻿using System.Threading.Tasks;
+using GTRevo.Commands;
 
 namespace GTRevo.Infrastructure.Security.Commands
 {

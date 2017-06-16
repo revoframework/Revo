@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
-using GTRevo.DataAccess.EF6;
+using GTRevo.DataAccess.EF6.Entities;
 using GTRevo.Infrastructure.Security.Commands;
 
 namespace GTRevo.Infrastructure.Security

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
-using GTRevo.DataAccess.EF6;
+using GTRevo.DataAccess.EF6.Entities;
 using GTRevo.Infrastructure.History.ChangeTracking.Changes;
 using GTRevo.Infrastructure.History.ChangeTracking.Model;
 

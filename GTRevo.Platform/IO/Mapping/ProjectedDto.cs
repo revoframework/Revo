@@ -1,5 +1,4 @@
 ﻿using AutoMapper.Attributes;
-using Newtonsoft.Json;
 
 namespace GTRevo.Platform.IO.Mapping
 {

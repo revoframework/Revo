@@ -1,5 +1,5 @@
-﻿using GTRevo.Platform.Core;
-using GTRevo.Platform.Core.Lifecycle;
+﻿using GTRevo.Core.Lifecycle;
+using GTRevo.Platform.Core;
 using Ninject.Modules;
 
 namespace GTRevo.Infrastructure.History.ChangeTracking

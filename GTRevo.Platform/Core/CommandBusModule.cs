@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
-using GTRevo.Platform.Commands;
-using GTRevo.Platform.Events;
+using GTRevo.Commands;
+using GTRevo.Events;
 using MediatR;
 using Ninject;
 using Ninject.Modules;

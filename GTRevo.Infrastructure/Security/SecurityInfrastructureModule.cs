@@ -1,13 +1,8 @@
-﻿using GTRevo.DataAccess.EF6;
-using GTRevo.Infrastructure.Domain;
-using GTRevo.Infrastructure.EventSourcing;
+﻿using GTRevo.Commands;
+using GTRevo.Core.Lifecycle;
+using GTRevo.DataAccess.EF6.Entities;
 using GTRevo.Infrastructure.Security.Commands;
-using GTRevo.Platform.Commands;
 using GTRevo.Platform.Core;
-using GTRevo.Platform.Core.Lifecycle;
-using GTRevo.Platform.Events;
-using GTRevo.Platform.Transactions;
-using MediatR;
 using Ninject.Modules;
 
 namespace GTRevo.Infrastructure.Security

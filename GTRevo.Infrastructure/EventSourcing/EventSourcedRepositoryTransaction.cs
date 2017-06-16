@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using GTRevo.Platform.Transactions;
+using GTRevo.Transactions;
 
 namespace GTRevo.Infrastructure.EventSourcing
 {

@@ -1,7 +1,8 @@
 ﻿using System.Reflection;
 using AutoMapper;
 using AutoMapper.Attributes;
-using GTRevo.Platform.Core.Lifecycle;
+using GTRevo.Core;
+using GTRevo.Core.Lifecycle;
 
 namespace GTRevo.Platform.Core
 {

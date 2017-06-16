@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GTRevo.Infrastructure.Domain;
 using GTRevo.Infrastructure.Domain.Events;
-using GTRevo.Infrastructure.EventSourcing;
+using GTRevo.Infrastructure.Domain.EventSourcing;
 
 namespace GTRevo.Infrastructure.Projections
 {

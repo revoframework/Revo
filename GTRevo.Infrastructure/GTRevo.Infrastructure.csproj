@@ -74,9 +74,8 @@
       <HintPath>..\..\GTServiceDesk\packages\LinqKit.1.1.8.0\lib\net452\LinqKit.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="MediatR, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\GTServiceDesk\packages\MediatR.3.0.0\lib\net45\MediatR.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="MediatR, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\MediatR.3.0.1\lib\net45\MediatR.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\GTServiceDesk\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
@@ -102,9 +101,8 @@
       <HintPath>..\..\GTServiceDesk\packages\morelinq.2.2.0\lib\net35\MoreLinq.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\GTServiceDesk\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Ninject, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
       <HintPath>..\..\GTServiceDesk\packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
@@ -134,15 +132,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataAcccess\CustomStoreConventionEx.cs" />
-    <Compile Include="DataAcccess\InfrastructureDataAccessModule.cs" />
-    <Compile Include="DataAcccess\QueryableRepositoryExtensions.cs" />
-    <Compile Include="Domain\Attributes\DomainClassIdAttribute.cs" />
-    <Compile Include="Domain\Basic\BasicAggregateRoot.cs" />
-    <Compile Include="Domain\Basic\BasicClassAggregateRoot.cs" />
-    <Compile Include="Domain\Basic\BasicClassEntity.cs" />
-    <Compile Include="Domain\Basic\BasicDomainModelDefinition.cs" />
-    <Compile Include="Domain\Basic\BasicEntity.cs" />
+    <Compile Include="EventSourcing\EventSourcingInfrastructureModule.cs" />
     <Compile Include="History\ChangeTracking\Changes\EntityAttributeChangeData.cs" />
     <Compile Include="History\ChangeTracking\ChangeTracker.cs" />
     <Compile Include="History\ChangeTracking\ChangeData.cs" />
@@ -189,61 +179,15 @@
     <Compile Include="Notifications\NotificationTypeCache.cs" />
     <Compile Include="Notifications\SerializedNotification.cs" />
     <Compile Include="Notifications\AggregatingBufferGovernor.cs" />
-    <Compile Include="ReadModel\ClassEntityView.cs" />
-    <Compile Include="ReadModel\EntityView.cs" />
-    <Compile Include="ReadModel\ReadModelBase.cs" />
-    <Compile Include="ReadModel\ReadModelDefinition.cs" />
-    <Compile Include="Domain\Basic\DataType.cs" />
-    <Compile Include="Domain\Basic\Dto\ClassEntityDto.cs" />
-    <Compile Include="Domain\Basic\Dto\EntityBaseDto.cs" />
-    <Compile Include="Domain\Basic\Entity.cs" />
-    <Compile Include="Domain\Events\ConventionEventApplyRegistrator.cs" />
-    <Compile Include="Domain\Events\ConventionEventApplyRegistratorCache.cs" />
-    <Compile Include="Domain\Events\IAggregateEventRouter.cs" />
-    <Compile Include="Domain\IHasId.cs" />
-    <Compile Include="Domain\IQueryableEntity.cs" />
-    <Compile Include="EventSourcing\Events\AggregateCreated.cs" />
-    <Compile Include="EventSourcing\Events\AggregateDeleted.cs" />
     <Compile Include="History\ChangeTracking\Changes\EntityAttributeChangeData{}.cs" />
     <Compile Include="History\ChangeTracking\IChangeTracker.cs" />
-    <Compile Include="ReadModel\ClassEntityReadModel.cs" />
-    <Compile Include="ReadModel\EntityReadModel.cs" />
-    <Compile Include="ReadModel\ReadModelForEntityAttribute.cs" />
+    <Compile Include="Projections\ProjectionsInfrastructureModule.cs" />
     <Compile Include="Repositories\IRepository.cs" />
     <Compile Include="Repositories\Repository.cs" />
-    <Compile Include="EventSourcing\EF6\AggregateHistory.cs" />
-    <Compile Include="Domain\EntityTypeManager.cs" />
-    <Compile Include="Domain\Events\AggregateEventRouter.cs" />
-    <Compile Include="EventSourcing\EventSourcedComponent.cs" />
-    <Compile Include="EventSourcing\IAggregateHistory.cs" />
-    <Compile Include="EventSourcing\AggregateState.cs" />
-    <Compile Include="Domain\AggregateRoot.cs" />
-    <Compile Include="Domain\Attributes\EventVersionAttribute.cs" />
-    <Compile Include="Domain\Events\DomainAggregateEvent.cs" />
-    <Compile Include="Domain\Events\DomainEvent.cs" />
-    <Compile Include="Domain\Events\DomainAggregateEventRecord.cs" />
-    <Compile Include="Domain\Events\DomainEventTypeCache.cs" />
-    <Compile Include="EventSourcing\EF6\Model\DomainAggregateRecord.cs" />
-    <Compile Include="EventSourcing\EventSourcedAggregateRoot.cs" />
-    <Compile Include="EventSourcing\EventSourcedEntity.cs" />
     <Compile Include="EventSourcing\EventSourcedRepository.cs" />
     <Compile Include="EventSourcing\EventSourcedRepositoryTransaction.cs" />
-    <Compile Include="EventSourcing\EF6\Model\DomainEventPacket.cs" />
-    <Compile Include="EventSourcing\EF6\Model\DomainEventSerialized.cs" />
-    <Compile Include="EventSourcing\EF6\EF6EventSourcingModelDefinition.cs" />
-    <Compile Include="EventSourcing\EF6\EF6EventSourcingModule.cs" />
-    <Compile Include="EventSourcing\EF6\EF6EventStore.cs" />
-    <Compile Include="Domain\IAggregateRoot.cs" />
-    <Compile Include="Domain\IHasClassId.cs" />
-    <Compile Include="Domain\IComponent.cs" />
-    <Compile Include="Domain\Events\IEventRouterRegistrator.cs" />
-    <Compile Include="Domain\IEntityTypeManager.cs" />
-    <Compile Include="EventSourcing\IEventSourcedAggregateRoot.cs" />
     <Compile Include="EventSourcing\IEventSourcedRepository.cs" />
-    <Compile Include="Domain\IEntity.cs" />
     <Compile Include="EventSourcing\IEventStore.cs" />
-    <Compile Include="Domain\DomainInfrastructureModule.cs" />
-    <Compile Include="Domain\ISaga.cs" />
     <Compile Include="Projections\EntityEventToPocoProjector.cs" />
     <Compile Include="Projections\ICrudEntityProjector.cs" />
     <Compile Include="Projections\IEntityEventProjector.cs" />
@@ -251,9 +195,7 @@
     <Compile Include="Projections\ISubEntityEventProjector.cs" />
     <Compile Include="Projections\ProjectionEventListener.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Domain\Saga.cs" />
     <Compile Include="Repositories\DomainRepositoryModule.cs" />
-    <Compile Include="Repositories\EF6AggregateStore.cs" />
     <Compile Include="Repositories\EventSourcedAggregateStore.cs" />
     <Compile Include="Repositories\IAggregateStore.cs" />
     <Compile Include="Repositories\IQueryableAggregateStore.cs" />
@@ -284,9 +226,21 @@
       <Project>{6a6191b1-fea5-4a40-a01a-6497eb452d92}</Project>
       <Name>AutoMapper.Attributes.V5</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GTRevo.Core\GTRevo.Core.csproj">
+      <Project>{1015BA79-4241-4221-9D27-0DB033EA624B}</Project>
+      <Name>GTRevo.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GTRevo.DataAccess.EF6\GTRevo.DataAccess.EF6.csproj">
+      <Project>{a8de2f53-e404-48dd-b11f-b6a3302ce163}</Project>
+      <Name>GTRevo.DataAccess.EF6</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GTRevo.DataAccess\GTRevo.DataAccess.csproj">
       <Project>{fa942fe7-71fd-4cf5-8959-309583fe7903}</Project>
       <Name>GTRevo.DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GTRevo.Infrastructure.Core\GTRevo.Infrastructure.Core.csproj">
+      <Project>{558603AE-BECF-4F72-86B4-AD832D2453AB}</Project>
+      <Name>GTRevo.Infrastructure.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\GTRevo.Platform\GTRevo.Platform.csproj">
       <Project>{42cdfad0-cb40-433e-ac6e-874f3f58e77d}</Project>

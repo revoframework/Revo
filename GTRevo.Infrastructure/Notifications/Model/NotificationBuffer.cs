@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GTRevo.DataAccess.EF6;
+using GTRevo.DataAccess.Entities;
 using GTRevo.Infrastructure.ReadModel;
 
 namespace GTRevo.Infrastructure.Notifications.Model

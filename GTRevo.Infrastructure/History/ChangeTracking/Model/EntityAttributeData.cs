@@ -1,5 +1,5 @@
 ﻿using System;
-using GTRevo.DataAccess.EF6;
+using GTRevo.DataAccess.Entities;
 using GTRevo.Infrastructure.ReadModel;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;

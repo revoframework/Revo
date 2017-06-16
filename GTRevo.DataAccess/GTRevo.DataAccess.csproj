@@ -58,9 +58,8 @@
       <HintPath>..\..\GTServiceDesk\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="MediatR, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\GTServiceDesk\packages\MediatR.3.0.0\lib\net45\MediatR.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="MediatR, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\MediatR.3.0.1\lib\net45\MediatR.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Experimental.Collections, Version=1.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\GTServiceDesk\packages\Microsoft.Experimental.Collections.1.0.3-alpha\lib\portable-net45+win8+wp8\Microsoft.Experimental.Collections.dll</HintPath>
@@ -78,9 +77,8 @@
       <HintPath>..\..\GTServiceDesk\packages\morelinq.2.2.0\lib\net35\MoreLinq.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\GTServiceDesk\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\GTServiceDesk\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Ninject, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
       <HintPath>..\..\GTServiceDesk\packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
@@ -118,33 +116,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataAccessModule.cs" />
-    <Compile Include="EF6\ChildCollection.cs" />
-    <Compile Include="EF6\CustomStoreConvention.cs" />
-    <Compile Include="EF6\DbContextFactory.cs" />
-    <Compile Include="EF6\EF6DataAccessModule.cs" />
-    <Compile Include="EF6\DatabaseAcccess.cs" />
-    <Compile Include="EF6\DatabaseEntityAttribute.cs" />
-    <Compile Include="EF6\EntityContext.cs" />
-    <Compile Include="EF6\EntityTypeDiscovery.cs" />
-    <Compile Include="EF6\IDatabaseAccess.cs" />
-    <Compile Include="EF6\IDbContextFactory.cs" />
-    <Compile Include="EF6\IModelDefinition.cs" />
-    <Compile Include="EF6\IModelMetadataExplorer.cs" />
-    <Compile Include="EF6\InheritedColumnNameAnnotation.cs" />
-    <Compile Include="EF6\IReadRepository.cs" />
-    <Compile Include="EF6\ICrudRepository.cs" />
-    <Compile Include="EF6\IRowVersioned.cs" />
-    <Compile Include="EF6\ModelDefinitionDiscovery.cs" />
-    <Compile Include="EF6\ModelMetadataExplorer.cs" />
-    <Compile Include="EF6\PrimitivePropertyConfigurationExtensions.cs" />
-    <Compile Include="EF6\CrudRepository.cs" />
-    <Compile Include="EF6\PrivateCollectionMapping.cs" />
-    <Compile Include="EF6\QueryableDecompiledExtensions.cs" />
-    <Compile Include="EF6\RepositoryHelpers.cs" />
-    <Compile Include="EF6\RepositoryTransaction.cs" />
-    <Compile Include="EF6\SchemaSpaceDbModelBuilder.cs" />
-    <Compile Include="EF6\TablePrefixAttribute.cs" />
-    <Compile Include="Sequences\ContextSequence.cs" />
+    <Compile Include="Entities\DatabaseEntityAttribute.cs" />
+    <Compile Include="Entities\IRowVersioned.cs" />
+    <Compile Include="Entities\TablePrefixAttribute.cs" />
     <Compile Include="Sequences\IContextSequence.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

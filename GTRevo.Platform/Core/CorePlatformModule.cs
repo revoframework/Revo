@@ -1,17 +1,14 @@
-﻿using System.Web;
-using System.Web.Hosting;
+﻿using System.Web.Hosting;
+using GTRevo.Core;
+using GTRevo.Core.Lifecycle;
+using GTRevo.Events;
 using GTRevo.Platform.Core.Lifecycle;
-using GTRevo.Platform.Events;
 using GTRevo.Platform.IO.Globalization;
 using GTRevo.Platform.IO.Resources;
 using GTRevo.Platform.IO.Stache;
 using GTRevo.Platform.Security;
-using GTRevo.Platform.Security.Identity;
-using GTRevo.Platform.Transactions;
-using GTRevo.Platform.Web.JSBridge;
 using GTRevo.Platform.Web.VirtualPath;
-using Microsoft.AspNet.Identity;
-using Microsoft.Owin.Security;
+using GTRevo.Transactions;
 using Ninject.Modules;
 
 namespace GTRevo.Platform.Core
@@ -79,10 +76,6 @@ namespace GTRevo.Platform.Core
             Bind<IConfiguration>()
                 .To<WebConfiguration>()
                 .InSingletonScope();
-
-            Bind<IClock>()
-                .ToMethod(ctx => Clock.Current)
-                .InTransientScope();
 
             Bind<IActorContext>()
                 .To<UserActorContext>()

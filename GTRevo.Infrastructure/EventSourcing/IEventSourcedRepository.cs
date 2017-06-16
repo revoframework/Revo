@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GTRevo.Infrastructure.Domain;
-using GTRevo.Platform.Transactions;
+using GTRevo.Infrastructure.Domain.EventSourcing;
+using GTRevo.Transactions;
 
 namespace GTRevo.Infrastructure.EventSourcing
 {

@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GTRevo.DataAccess.EF6;
+﻿using GTRevo.Core.Lifecycle;
+using GTRevo.DataAccess.EF6.Entities;
+using GTRevo.Events;
 using GTRevo.Platform.Core;
-using GTRevo.Platform.Core.Lifecycle;
-using GTRevo.Platform.Events;
 using Ninject.Modules;
 
 namespace GTRevo.Infrastructure.Notifications

@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
-using GTRevo.Infrastructure.Security.Commands;
-using GTRevo.Platform.Commands;
+using GTRevo.Commands;
 
 namespace GTRevo.Infrastructure.Security
 {

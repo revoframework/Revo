@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using GTRevo.Infrastructure.Domain;
 using GTRevo.Infrastructure.Domain.Events;
+using GTRevo.Infrastructure.Domain.EventSourcing;
 using GTRevo.Infrastructure.EventSourcing;
 using GTRevo.Platform.Core;
-using GTRevo.Platform.Events;
 using GTRevo.Testing.Platform.Core;
 using NSubstitute;
 using Xunit;

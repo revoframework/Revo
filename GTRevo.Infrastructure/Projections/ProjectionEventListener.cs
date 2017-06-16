@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GTRevo.Events;
 using GTRevo.Infrastructure.Domain;
 using GTRevo.Infrastructure.Domain.Events;
+using GTRevo.Infrastructure.Domain.EventSourcing;
 using GTRevo.Infrastructure.EventSourcing;
-using GTRevo.Platform.Events;
-using GTRevo.Platform.Transactions;
+using GTRevo.Transactions;
 
 namespace GTRevo.Infrastructure.Projections
 {

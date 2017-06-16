@@ -1,4 +1,4 @@
-﻿using GTRevo.Platform.Core.Lifecycle;
+﻿using GTRevo.Core.Lifecycle;
 using Knoema.Localization;
 
 namespace GTRevo.Platform.IO.Globalization

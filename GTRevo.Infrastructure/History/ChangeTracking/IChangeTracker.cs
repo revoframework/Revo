@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using GTRevo.Platform.Security;
 
 namespace GTRevo.Infrastructure.History.ChangeTracking
 {
