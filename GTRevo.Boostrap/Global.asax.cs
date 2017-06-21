@@ -1,27 +1,8 @@
-﻿using System.Web.Http;
-using System.Web.Mvc;
-using System.Web.Optimization;
-using System.Web.Routing;
-using GTRevo.Platform;
-using GTRevo.Platform.Core;
-using GTRevo.Platform.Core.Lifecycle;
+﻿using GTRevo.Bootstrap.Shared.Core;
 
-namespace GTRevo.Boostrap
+namespace GTRevo.Bootstrap
 {
-    public class MvcApplication : System.Web.HttpApplication
+    public class MvcApplication : RevoHttpApplication
     {
-        protected void Application_Start()
-        {
-            AreaRegistration.RegisterAllAreas();
-            GlobalConfiguration.Configure(WebApiConfig.Register);
-            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
-            RouteConfig.RegisterRoutes(RouteTable.Routes);
-            BundleConfig.RegisterBundles(BundleTable.Bundles);
-
-            foreach (IHttpApplicationInitializer appInitializer in NinjectWebLoader.ResolveAll<IHttpApplicationInitializer>())
-            {
-                appInitializer.OnApplicationStart(this);
-            }
-        }
     }
 }
