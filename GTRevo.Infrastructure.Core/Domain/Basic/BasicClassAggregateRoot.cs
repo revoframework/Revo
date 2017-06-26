@@ -16,6 +16,6 @@ namespace GTRevo.Infrastructure.Domain.Basic
         /// Just for the convenience when storing entities in RDBMS.
         /// Should be automatically injected by the repository on the first save/load.
         /// </summary>
-        public Guid ClassId { get; private set; }
+        public virtual Guid ClassId { get; private set; }
     }
 }
