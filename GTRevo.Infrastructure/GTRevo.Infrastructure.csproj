@@ -135,6 +135,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataAccess\DataAccessModule.cs" />
+    <Compile Include="DataAccess\DatabaseInitializerDiscovery.cs" />
+    <Compile Include="DataAccess\DatabaseInitializerLoader.cs" />
+    <Compile Include="DataAccess\DatabaseInitializerStub.cs" />
+    <Compile Include="DataAccess\IDatabaseInitializer.cs" />
+    <Compile Include="DataAccess\IDatabaseInitializerDiscovery.cs" />
     <Compile Include="EventSourcing\EventSourcingInfrastructureModule.cs" />
     <Compile Include="History\ChangeTracking\Changes\EntityAttributeChangeData.cs" />
     <Compile Include="History\ChangeTracking\ChangeTracker.cs" />
@@ -255,6 +261,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="database\01_REV_CREATE.sql" />
+    <Content Include="database\03_REV_INDICES.sql" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="History\Auditing\" />

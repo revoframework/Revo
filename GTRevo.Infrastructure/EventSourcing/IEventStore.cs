@@ -14,9 +14,10 @@ namespace GTRevo.Infrastructure.EventSourcing
         Task<AggregateState> GetLastStateAsync(Guid aggregateId);
         Task<AggregateState> GetStateByVersionAsync(Guid aggregateId, int version);
 
-
+        void PushEvents(Guid aggregateId, IEnumerable<DomainAggregateEventRecord> events, int version);
         Task PushEventsAsync(Guid aggregateId, IEnumerable<DomainAggregateEventRecord> events, int version);
 
+        void CommitChanges();
         Task CommitChangesAsync();
     }
 }

@@ -142,7 +142,7 @@ namespace GTRevo.Infrastructure.EF6.EventSourcing
             repository.Add(aggregateRecord);
         }
 
-        public async Task PushEventsAsync(Guid aggregateId, IEnumerable<DomainAggregateEventRecord> events, int version)
+        public void PushEvents(Guid aggregateId, IEnumerable<DomainAggregateEventRecord> events, int version)
         {
             JArray eventsArray = new JArray();
             foreach (DomainAggregateEventRecord domainEventRecord in events)
@@ -170,6 +170,17 @@ namespace GTRevo.Infrastructure.EF6.EventSourcing
             };
 
             repository.Add(packet);
+        }
+
+        public Task PushEventsAsync(Guid aggregateId, IEnumerable<DomainAggregateEventRecord> events, int version)
+        {
+            PushEvents(aggregateId, events, version);
+            return Task.FromResult(0);
+        }
+
+        public void CommitChanges()
+        {
+            repository.SaveChanges();
         }
 
         public Task CommitChangesAsync()

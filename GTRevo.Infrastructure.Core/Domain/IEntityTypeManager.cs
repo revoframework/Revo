@@ -9,5 +9,7 @@ namespace GTRevo.Infrastructure.Domain
 
         Guid GetClassIdByClrType(Type clrType);
         Type GetClrTypeByClassId(Guid classId);
+        Guid? TryGetClassIdByClrType(Type clrType);
+        Type TryGetClrTypeByClassId(Guid classId);
     }
 }

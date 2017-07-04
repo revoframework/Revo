@@ -22,5 +22,10 @@ namespace GTRevo.Infrastructure.Domain.Events
                        && AggregateVersion == other.AggregateVersion
                        && DatePublished == other.DatePublished;
         }
+        
+        public override int GetHashCode()
+        {
+            return base.GetHashCode(); //good enough
+        }
     }
 }

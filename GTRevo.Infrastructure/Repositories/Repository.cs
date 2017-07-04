@@ -70,7 +70,25 @@ namespace GTRevo.Infrastructure.Repositories
 
         public void SaveChanges()
         {
-            throw new NotImplementedException();
+            foreach (var aggregateStore in aggregateStores)
+            {
+                var storeAggregates = aggregateStore.GetTrackedAggregates();
+
+                aggregateStore.SaveChanges();
+
+                foreach (var aggregate in storeAggregates)
+                {
+                    if (aggregate.UncommitedEvents.Any())
+                    {
+                        foreach (DomainAggregateEvent domainEvent in aggregate.UncommitedEvents)
+                        {
+                            eventQueue.PushEvent(domainEvent);
+                        }
+
+                        aggregate.Commit();
+                    }
+                }
+            }
         }
 
         public async Task SaveChangesAsync()

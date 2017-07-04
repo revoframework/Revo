@@ -94,7 +94,24 @@ namespace GTRevo.Infrastructure.EventSourcing
 
         public void SaveChanges()
         {
-            throw new NotImplementedException();
+            bool anyEvents = false;
+            foreach (var aggregate in aggregates.Values)
+            {
+                if (aggregate.UncommitedEvents.Any())
+                {
+                    int newAggregateVersion = aggregate.Version + 1;
+                    var eventRecords = ConstructEventsRecords(aggregate.UncommitedEvents, newAggregateVersion);
+
+                    CheckEvents(aggregate, aggregate.UncommitedEvents);
+                    eventStore.PushEvents(aggregate.Id, eventRecords, newAggregateVersion);
+                    anyEvents = true;
+                }
+            }
+
+            if (anyEvents)
+            {
+                eventStore.CommitChanges();
+            }
         }
 
         public async Task SaveChangesAsync()

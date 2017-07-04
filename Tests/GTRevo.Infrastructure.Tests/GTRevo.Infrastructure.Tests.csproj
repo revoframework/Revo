@@ -73,6 +73,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataAccess\DatabaseInitializerLoaderTests.cs" />
     <Compile Include="Domain\AggregateEventRouterTests.cs" />
     <Compile Include="Domain\ConventionEventApplyRegistratorTests.cs" />
     <Compile Include="Domain\Projections\ProjectionEventListenerTests.cs" />

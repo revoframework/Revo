@@ -18,29 +18,31 @@ namespace GTRevo.Infrastructure.Domain
             this.typeExplorer = typeExplorer;
         }
 
-        public IEnumerable<Type> DomainEntities
-        {
-            get
-            {
-                return typesToIds.Keys;
-            }
-        }
+        public IEnumerable<Type> DomainEntities => typesToIds.Keys;
 
         public virtual void OnApplicationStarted()
         {
-            var entities = typeExplorer.GetAllTypes()
-                .Where(x => typeof(IEntity).IsAssignableFrom(x))
-                .Where(x => x.IsClass && !x.IsAbstract && !x.IsGenericTypeDefinition)
-                .ToList();
+            EnsureLoaded();
+        }
 
-            typesToIds = entities.ToDictionary(x => x,
-                x =>
-                    ((DomainClassIdAttribute)
-                        x.GetCustomAttributes(typeof(DomainClassIdAttribute), false).FirstOrDefault())?.ClassId);
+        protected virtual void EnsureLoaded()
+        {
+            if (typesToIds == null)
+            {
+                var entities = typeExplorer.GetAllTypes()
+                    .Where(x => typeof(IEntity).IsAssignableFrom(x))
+                    .Where(x => x.IsClass && !x.IsAbstract && !x.IsGenericTypeDefinition)
+                    .ToList();
 
-            idsToTypes = typesToIds
-                .Where(x => x.Value.HasValue)
-                .ToDictionary(x => x.Value.Value, x => x.Key);
+                typesToIds = entities.ToDictionary(x => x,
+                    x =>
+                        ((DomainClassIdAttribute)
+                            x.GetCustomAttributes(typeof(DomainClassIdAttribute), false).FirstOrDefault())?.ClassId);
+
+                idsToTypes = typesToIds
+                    .Where(x => x.Value.HasValue)
+                    .ToDictionary(x => x.Value.Value, x => x.Key);
+            }
         }
 
         public virtual Guid GetClassIdByClrType(Type clrType)
@@ -65,15 +67,17 @@ namespace GTRevo.Infrastructure.Domain
             return clrType;
         }
         
-        protected Guid? TryGetClassIdByClrType(Type clrType)
+        public Guid? TryGetClassIdByClrType(Type clrType)
         {
+            EnsureLoaded();
             Guid? classId = null;
             typesToIds.TryGetValue(clrType, out classId);
             return classId;
         }
 
-        protected Type TryGetClrTypeByClassId(Guid classId)
+        public Type TryGetClrTypeByClassId(Guid classId)
         {
+            EnsureLoaded();
             Type clrType = null;
             idsToTypes.TryGetValue(classId, out clrType);
             return clrType;
