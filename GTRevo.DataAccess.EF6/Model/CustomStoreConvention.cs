@@ -91,7 +91,23 @@ namespace GTRevo.DataAccess.EF6.Model
                 else if (existingTypeSchema != CurrentSchemaSpace)
                 {
                     var existingTypeConfiguration = entityTypeConfigurations[existingType];
-                    existingTypeConfiguration.Ignore();
+
+                    //existingTypeConfiguration.Ignore();
+                    //fugly hack, something's probably changed in EF
+
+                    object entityTypeConfigurationFieldVal = existingTypeConfiguration.GetType()
+                        .GetField("_entityTypeConfiguration", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(existingTypeConfiguration);
+                    object complexTypeConfigurationFieldVal = existingTypeConfiguration.GetType()
+                        .GetField("_complexTypeConfiguration", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(existingTypeConfiguration);
+
+                    //if (entityTypeConfigurationFieldVal == null && complexTypeConfigurationFieldVal == null)
+                    //{
+                        /*ModelConfiguration*/ object modelConfigurationFieldVal = existingTypeConfiguration.GetType()
+                            .GetField("_modelConfiguration", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(existingTypeConfiguration);
+                        modelConfigurationFieldVal.GetType().GetMethod("Ignore")
+                            .Invoke(modelConfigurationFieldVal, new[] {existingType});
+                    //}
+
                     entityTypeConfigurations.Remove(existingType);
                     configuredEntityTypes.Remove(mapping.TableName.ToLowerInvariant());
                 }
