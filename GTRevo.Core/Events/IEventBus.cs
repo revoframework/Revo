@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace GTRevo.Events
+namespace GTRevo.Core.Events
 {
     public interface IEventBus : IMediator
     {

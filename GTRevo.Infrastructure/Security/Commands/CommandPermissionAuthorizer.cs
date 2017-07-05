@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using GTRevo.Commands;
+using GTRevo.Core.Commands;
 using GTRevo.Platform.Security;
 using GTRevo.Platform.Security.Identity;
 

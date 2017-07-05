@@ -1,8 +1,8 @@
-﻿using GTRevo.Core.Lifecycle;
-using GTRevo.Infrastructure.Domain.Events;
+﻿using GTRevo.Core.Core.Lifecycle;
+using GTRevo.Infrastructure.Core.Domain.Events;
 using Ninject.Modules;
 
-namespace GTRevo.Infrastructure.Domain
+namespace GTRevo.Infrastructure.Core.Domain
 {
     public class DomainInfrastructureModule : NinjectModule
     {

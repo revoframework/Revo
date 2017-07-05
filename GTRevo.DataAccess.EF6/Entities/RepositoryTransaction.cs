@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using GTRevo.Transactions;
+using GTRevo.Core.Transactions;
 
 namespace GTRevo.DataAccess.EF6.Entities
 {

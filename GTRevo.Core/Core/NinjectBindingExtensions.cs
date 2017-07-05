@@ -1,7 +1,6 @@
-﻿using System;
-using Ninject.Syntax;
+﻿using Ninject.Syntax;
 
-namespace GTRevo.Core
+namespace GTRevo.Core.Core
 {
     public static class NinjectBindingExtensions
     {

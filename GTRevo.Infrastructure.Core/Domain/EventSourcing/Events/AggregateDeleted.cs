@@ -1,6 +1,6 @@
-﻿using GTRevo.Infrastructure.Domain.Events;
+﻿using GTRevo.Infrastructure.Core.Domain.Events;
 
-namespace GTRevo.Infrastructure.Domain.EventSourcing.Events
+namespace GTRevo.Infrastructure.Core.Domain.EventSourcing.Events
 {
     public class AggregateDeleted : DomainAggregateEvent
     {

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using GTRevo.Core;
+using GTRevo.Core.Core;
 using Hangfire;
 using Ninject.Syntax;
 using Ninject.Web.Common;

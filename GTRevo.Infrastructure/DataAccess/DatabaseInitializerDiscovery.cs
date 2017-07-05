@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GTRevo.Core;
+using GTRevo.Core.Core;
 using Ninject;
 
 namespace GTRevo.Infrastructure.DataAccess

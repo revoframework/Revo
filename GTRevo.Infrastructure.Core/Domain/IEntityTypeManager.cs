@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GTRevo.Infrastructure.Domain
+namespace GTRevo.Infrastructure.Core.Domain
 {
     public interface IEntityTypeManager
     {

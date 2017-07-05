@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using GTRevo.Core;
-using GTRevo.Core.Lifecycle;
-using GTRevo.Infrastructure.Domain.Attributes;
+using GTRevo.Core.Core;
+using GTRevo.Core.Core.Lifecycle;
 
-namespace GTRevo.Infrastructure.Domain
+namespace GTRevo.Infrastructure.Core.Domain
 {
     public class EntityTypeManager : IEntityTypeManager, IApplicationStartListener
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using GTRevo.DataAccess.EF6.Model;
-using GTRevo.Infrastructure.ReadModel;
+using GTRevo.Infrastructure.Core.ReadModel;
 
 namespace GTRevo.Infrastructure.EF6.DataAcccess
 {

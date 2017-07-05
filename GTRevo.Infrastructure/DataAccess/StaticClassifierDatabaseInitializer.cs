@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using GTRevo.Infrastructure.Domain;
+using GTRevo.Infrastructure.Core.Domain;
 using GTRevo.Infrastructure.Repositories;
 using Ninject;
 

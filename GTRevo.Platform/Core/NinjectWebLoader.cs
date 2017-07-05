@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Web;
 using System.Web.Mvc;
 using GTRevo.Core;
+using GTRevo.Core.Core;
 using Hangfire;
 using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 using Ninject;

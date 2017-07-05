@@ -1,7 +1,7 @@
 ﻿using System;
 using AutoMapper.Attributes;
 
-namespace GTRevo.Infrastructure.Domain.Basic.Dto
+namespace GTRevo.Infrastructure.Core.Domain.Basic.Dto
 {
     [MapsFrom(typeof(BasicClassEntity))]
     public abstract class ClassEntityDto : EntityBaseDto

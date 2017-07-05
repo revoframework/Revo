@@ -1,4 +1,5 @@
 ﻿using GTRevo.Core;
+using GTRevo.Core.Core;
 using GTRevo.DataAccess.EF6.Entities;
 using GTRevo.Infrastructure.EventSourcing;
 using Ninject.Modules;

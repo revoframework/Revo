@@ -1,4 +1,4 @@
-﻿namespace GTRevo.Core.Lifecycle
+﻿namespace GTRevo.Core.Core.Lifecycle
 {
     public interface IApplicationStartListener
     {

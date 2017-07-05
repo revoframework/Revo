@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using GTRevo.Core;
-using GTRevo.Core.Lifecycle;
+using GTRevo.Core.Core;
+using GTRevo.Core.Core.Lifecycle;
 
 namespace GTRevo.Infrastructure.Notifications
 {

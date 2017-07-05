@@ -1,4 +1,4 @@
-﻿namespace GTRevo.Infrastructure.Domain.EventSourcing
+﻿namespace GTRevo.Infrastructure.Core.Domain.EventSourcing
 {
     public interface IEventSourcedAggregateRoot : IAggregateRoot
     {

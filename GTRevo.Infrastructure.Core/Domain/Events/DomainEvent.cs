@@ -1,8 +1,8 @@
 ﻿using System;
-using GTRevo.Events;
+using GTRevo.Core.Events;
 using Newtonsoft.Json;
 
-namespace GTRevo.Infrastructure.Domain.Events
+namespace GTRevo.Infrastructure.Core.Domain.Events
 {
     public abstract class DomainEvent : IEvent
     {

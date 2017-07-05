@@ -1,6 +1,6 @@
 ﻿using System.Data.Entity;
 using GTRevo.DataAccess.EF6.Model;
-using GTRevo.Infrastructure.Domain.Basic;
+using GTRevo.Infrastructure.Core.Domain.Basic;
 
 namespace GTRevo.Infrastructure.EF6.Domain
 {

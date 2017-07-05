@@ -1,7 +1,7 @@
 ﻿using System;
 using GTRevo.DataAccess.Entities;
 
-namespace GTRevo.Infrastructure.Domain.Basic
+namespace GTRevo.Infrastructure.Core.Domain.Basic
 {
     /// <summary>
     /// Aggregate root that is typically persisted to a RDBMS store using an ORM.

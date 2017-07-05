@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using GTRevo.Core;
+using GTRevo.Core.Core;
 using MediatR;
 using Ninject.Syntax;
 
-namespace GTRevo.Commands
+namespace GTRevo.Core.Commands
 {
     public static class CommandBindExtensions
     {

@@ -1,6 +1,6 @@
 ﻿using System.Web.OData.Query;
 
-namespace GTRevo.Commands
+namespace GTRevo.Core.Commands
 {
     public interface IWrappedEntityQuery<TEntity, TWrapper> : IQuery<TWrapper>
     {

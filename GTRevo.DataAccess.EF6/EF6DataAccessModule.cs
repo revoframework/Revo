@@ -1,9 +1,9 @@
 ﻿using System.Data.Entity;
-using GTRevo.Core.Lifecycle;
+using GTRevo.Core.Core.Lifecycle;
+using GTRevo.Core.Transactions;
 using GTRevo.DataAccess.EF6.Entities;
 using GTRevo.DataAccess.EF6.Model;
 using GTRevo.Platform.Core;
-using GTRevo.Transactions;
 using Ninject.Modules;
 
 namespace GTRevo.DataAccess.EF6

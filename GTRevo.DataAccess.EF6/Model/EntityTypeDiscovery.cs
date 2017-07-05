@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GTRevo.Core;
+using GTRevo.Core.Core;
 using GTRevo.DataAccess.Entities;
 
 namespace GTRevo.DataAccess.EF6.Model

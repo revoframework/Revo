@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace GTRevo.Transactions
+namespace GTRevo.Core.Transactions
 {
     public class UnitOfWork : IUnitOfWork
     {

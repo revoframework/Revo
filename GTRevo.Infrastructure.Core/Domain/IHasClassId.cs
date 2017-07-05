@@ -1,4 +1,4 @@
-﻿namespace GTRevo.Infrastructure.Domain
+﻿namespace GTRevo.Infrastructure.Core.Domain
 {
     public interface IHasClassId<TClassId>
     {

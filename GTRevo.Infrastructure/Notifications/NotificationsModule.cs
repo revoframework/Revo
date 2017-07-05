@@ -1,6 +1,6 @@
-﻿using GTRevo.Core.Lifecycle;
+﻿using GTRevo.Core.Core.Lifecycle;
+using GTRevo.Core.Events;
 using GTRevo.DataAccess.EF6.Entities;
-using GTRevo.Events;
 using GTRevo.Platform.Core;
 using Ninject.Modules;
 

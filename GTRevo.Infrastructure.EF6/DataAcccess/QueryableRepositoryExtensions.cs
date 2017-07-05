@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using GTRevo.DataAccess.EF6.Entities;
-using GTRevo.Infrastructure.Domain;
+using GTRevo.Infrastructure.Core.Domain;
 
 namespace GTRevo.Infrastructure.EF6.DataAcccess
 {

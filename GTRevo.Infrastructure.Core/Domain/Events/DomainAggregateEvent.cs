@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GTRevo.Infrastructure.Domain.Events
+namespace GTRevo.Infrastructure.Core.Domain.Events
 {
     public abstract class DomainAggregateEvent : DomainEvent
     {

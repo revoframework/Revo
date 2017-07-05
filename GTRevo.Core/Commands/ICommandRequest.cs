@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GTRevo.Commands
+namespace GTRevo.Core.Commands
 {
     public interface ICommandRequest
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GTRevo.Core
+namespace GTRevo.Core.Core
 {
     public static class Clock
     {

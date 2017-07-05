@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GTRevo.Infrastructure.Domain;
-using GTRevo.Infrastructure.Domain.Events;
-using GTRevo.Infrastructure.Domain.EventSourcing;
+using GTRevo.Infrastructure.Core.Domain;
+using GTRevo.Infrastructure.Core.Domain.Events;
+using GTRevo.Infrastructure.Core.Domain.EventSourcing;
 using GTRevo.Infrastructure.EventSourcing;
 using GTRevo.Platform.Core;
 using GTRevo.Testing.Platform.Core;

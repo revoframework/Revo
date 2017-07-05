@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GTRevo.Transactions;
+using GTRevo.Core.Transactions;
 using NSubstitute;
 using Xunit;
 

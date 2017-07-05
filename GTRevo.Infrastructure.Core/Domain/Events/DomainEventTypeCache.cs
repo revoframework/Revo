@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using GTRevo.Core;
-using GTRevo.Core.Lifecycle;
-using GTRevo.Infrastructure.Domain.Attributes;
+using GTRevo.Core.Core;
+using GTRevo.Core.Core.Lifecycle;
+using GTRevo.Infrastructure.Core.Domain.Attributes;
 
-namespace GTRevo.Infrastructure.Domain.Events
+namespace GTRevo.Infrastructure.Core.Domain.Events
 {
     public class DomainEventTypeCache : IApplicationStartListener
     {

@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GTRevo.Infrastructure.Domain.Attributes;
+using GTRevo.Infrastructure.Core.Domain.Attributes;
 
-namespace GTRevo.Infrastructure.Domain
+namespace GTRevo.Infrastructure.Core.Domain
 {
     public static class EntityClassUtils
     {

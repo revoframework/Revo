@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace GTRevo.Transactions
+namespace GTRevo.Core.Transactions
 {
     public interface ITransactionListener
     {

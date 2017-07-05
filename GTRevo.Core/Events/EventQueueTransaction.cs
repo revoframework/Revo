@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GTRevo.Transactions;
+using GTRevo.Core.Transactions;
 
-namespace GTRevo.Events
+namespace GTRevo.Core.Events
 {
     public class EventQueueTransaction : ITransaction
     {

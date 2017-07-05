@@ -1,5 +1,5 @@
 ﻿using System;
-using GTRevo.Events;
+using GTRevo.Core.Events;
 
 namespace GTRevo.Infrastructure.History.ChangeTracking
 {

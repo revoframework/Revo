@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GTRevo.Infrastructure.ReadModel
+namespace GTRevo.Infrastructure.Core.ReadModel
 {
     public abstract class ClassEntityReadModel : EntityReadModel
     {

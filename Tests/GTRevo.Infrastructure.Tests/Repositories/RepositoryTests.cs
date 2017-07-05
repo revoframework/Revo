@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GTRevo.Events;
-using GTRevo.Infrastructure.Domain;
-using GTRevo.Infrastructure.Domain.Events;
+using GTRevo.Core.Events;
+using GTRevo.Infrastructure.Core.Domain;
+using GTRevo.Infrastructure.Core.Domain.Events;
 using GTRevo.Infrastructure.Repositories;
 using NSubstitute;
 using Xunit;

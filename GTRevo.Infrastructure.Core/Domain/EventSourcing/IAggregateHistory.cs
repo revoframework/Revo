@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GTRevo.Infrastructure.Domain.Events;
+using GTRevo.Infrastructure.Core.Domain.Events;
 
-namespace GTRevo.Infrastructure.Domain.EventSourcing
+namespace GTRevo.Infrastructure.Core.Domain.EventSourcing
 {
     public interface IAggregateHistory
     {

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using GTRevo.Core.Transactions;
 using GTRevo.Infrastructure.Notifications;
 using GTRevo.Infrastructure.Notifications.Model;
 using GTRevo.Testing.DataAccess.EF6;
-using GTRevo.Transactions;
 using NSubstitute;
 using Xunit;
 

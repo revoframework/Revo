@@ -4,11 +4,12 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using GTRevo.Core;
-using GTRevo.Infrastructure.Domain;
-using GTRevo.Infrastructure.Domain.Events;
-using GTRevo.Infrastructure.Domain.EventSourcing;
+using GTRevo.Core.Core;
+using GTRevo.Core.Transactions;
+using GTRevo.Infrastructure.Core.Domain;
+using GTRevo.Infrastructure.Core.Domain.Events;
+using GTRevo.Infrastructure.Core.Domain.EventSourcing;
 using GTRevo.Platform.Core;
-using GTRevo.Transactions;
 
 namespace GTRevo.Infrastructure.EventSourcing
 {

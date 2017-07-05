@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using GTRevo.Commands;
 using GTRevo.Core;
-using GTRevo.Core.Lifecycle;
+using GTRevo.Core.Commands;
+using GTRevo.Core.Core;
+using GTRevo.Core.Core.Lifecycle;
 using GTRevo.Platform.Security;
 
 namespace GTRevo.Infrastructure.Security.Commands

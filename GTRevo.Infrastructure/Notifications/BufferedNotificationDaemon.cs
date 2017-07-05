@@ -1,4 +1,4 @@
-﻿using GTRevo.Core.Lifecycle;
+﻿using GTRevo.Core.Core.Lifecycle;
 using Hangfire;
 
 namespace GTRevo.Infrastructure.Notifications

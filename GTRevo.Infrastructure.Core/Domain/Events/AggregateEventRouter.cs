@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GTRevo.Infrastructure.Domain.Events
+namespace GTRevo.Infrastructure.Core.Domain.Events
 {
     public class AggregateEventRouter : IAggregateEventRouter
     {

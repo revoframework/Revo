@@ -1,14 +1,15 @@
 ﻿using System.Web.Hosting;
 using GTRevo.Core;
-using GTRevo.Core.Lifecycle;
-using GTRevo.Events;
+using GTRevo.Core.Core;
+using GTRevo.Core.Core.Lifecycle;
+using GTRevo.Core.Events;
+using GTRevo.Core.Transactions;
 using GTRevo.Platform.Core.Lifecycle;
 using GTRevo.Platform.IO.Globalization;
 using GTRevo.Platform.IO.Resources;
 using GTRevo.Platform.IO.Stache;
 using GTRevo.Platform.Security;
 using GTRevo.Platform.Web.VirtualPath;
-using GTRevo.Transactions;
 using Ninject.Modules;
 
 namespace GTRevo.Platform.Core

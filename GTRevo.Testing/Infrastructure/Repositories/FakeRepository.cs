@@ -4,10 +4,10 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
-using GTRevo.Infrastructure.Domain;
-using GTRevo.Infrastructure.Domain.Events;
+using GTRevo.Core.Transactions;
+using GTRevo.Infrastructure.Core.Domain;
+using GTRevo.Infrastructure.Core.Domain.Events;
 using GTRevo.Infrastructure.Repositories;
-using GTRevo.Transactions;
 
 namespace GTRevo.Testing.Infrastructure.Repositories
 {

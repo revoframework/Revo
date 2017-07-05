@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
+using GTRevo.Core.Events;
+using GTRevo.Core.Transactions;
 using GTRevo.DataAccess.EF6.Entities;
-using GTRevo.Events;
 using GTRevo.Infrastructure.Notifications.Model;
-using GTRevo.Transactions;
 
 namespace GTRevo.Infrastructure.Notifications
 {

@@ -4,8 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GTRevo.Core;
+using GTRevo.Core.Core;
+using GTRevo.Core.Events;
 using GTRevo.DataAccess.EF6.Entities;
-using GTRevo.Events;
 using GTRevo.Infrastructure.History.ChangeTracking.Model;
 using GTRevo.Platform.Core;
 

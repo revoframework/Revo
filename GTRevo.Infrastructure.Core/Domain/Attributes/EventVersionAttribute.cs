@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GTRevo.Infrastructure.Domain.Attributes
+namespace GTRevo.Infrastructure.Core.Domain.Attributes
 {
     public class EventVersionAttribute : Attribute
     {

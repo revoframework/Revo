@@ -1,5 +1,5 @@
-﻿using GTRevo.Platform.Core;
-using GTRevo.Transactions;
+﻿using GTRevo.Core.Transactions;
+using GTRevo.Platform.Core;
 using Ninject.Modules;
 
 namespace GTRevo.Infrastructure.EventSourcing

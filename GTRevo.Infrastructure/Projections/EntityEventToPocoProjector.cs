@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using GTRevo.Infrastructure.Domain.Events;
-using GTRevo.Infrastructure.Domain.EventSourcing;
+using GTRevo.Infrastructure.Core.Domain.Events;
+using GTRevo.Infrastructure.Core.Domain.EventSourcing;
 
 namespace GTRevo.Infrastructure.Projections
 {

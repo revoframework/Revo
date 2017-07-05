@@ -4,9 +4,10 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using GTRevo.Core;
-using GTRevo.Core.Lifecycle;
+using GTRevo.Core.Core;
+using GTRevo.Core.Core.Lifecycle;
 
-namespace GTRevo.Infrastructure.Domain.Events
+namespace GTRevo.Infrastructure.Core.Domain.Events
 {
     public class ConventionEventApplyRegistratorCache : IApplicationStartListener
     {

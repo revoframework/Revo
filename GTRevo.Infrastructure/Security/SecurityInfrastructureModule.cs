@@ -1,5 +1,5 @@
-﻿using GTRevo.Commands;
-using GTRevo.Core.Lifecycle;
+﻿using GTRevo.Core.Commands;
+using GTRevo.Core.Core.Lifecycle;
 using GTRevo.DataAccess.EF6.Entities;
 using GTRevo.Infrastructure.Security.Commands;
 using GTRevo.Platform.Core;

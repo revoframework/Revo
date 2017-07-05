@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using GTRevo.Commands;
+using GTRevo.Core.Commands;
 
 namespace GTRevo.Infrastructure.Security.Commands
 {

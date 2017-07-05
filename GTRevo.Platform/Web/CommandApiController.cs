@@ -1,5 +1,5 @@
 ﻿using System.Web.Http;
-using GTRevo.Commands;
+using GTRevo.Core.Commands;
 using Ninject;
 
 namespace GTRevo.Platform.Web

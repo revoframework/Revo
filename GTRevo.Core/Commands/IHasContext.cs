@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GTRevo.Commands
+namespace GTRevo.Core.Commands
 {
     public interface IHasContext : ICommandBase
     {

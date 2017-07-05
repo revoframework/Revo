@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace GTRevo.Core
+namespace GTRevo.Core.Core
 {
     public static class MemoryUtils
     {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using GTRevo.Commands;
+using GTRevo.Core.Commands;
 
 namespace GTRevo.Infrastructure.Validation
 {

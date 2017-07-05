@@ -1,8 +1,8 @@
 ﻿using System;
 using GTRevo.DataAccess.Entities;
-using GTRevo.Infrastructure.Domain;
+using GTRevo.Infrastructure.Core.Domain;
 
-namespace GTRevo.Infrastructure.ReadModel
+namespace GTRevo.Infrastructure.Core.ReadModel
 {
     public abstract class EntityReadModel : ReadModelBase, IHasId<Guid>, IRowVersioned
     {

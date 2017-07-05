@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using GTRevo.Infrastructure.Domain;
-using GTRevo.Transactions;
+using GTRevo.Core.Transactions;
+using GTRevo.Infrastructure.Core.Domain;
 
 namespace GTRevo.Infrastructure.Repositories
 {

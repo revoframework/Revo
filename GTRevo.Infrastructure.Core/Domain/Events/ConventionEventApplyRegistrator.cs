@@ -1,4 +1,4 @@
-﻿namespace GTRevo.Infrastructure.Domain.Events
+﻿namespace GTRevo.Infrastructure.Core.Domain.Events
 {
     public class ConventionEventApplyRegistrator : IEventRouterRegistrator
     {

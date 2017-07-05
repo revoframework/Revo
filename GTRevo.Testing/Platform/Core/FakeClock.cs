@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using GTRevo.Core;
+using GTRevo.Core.Core;
 using GTRevo.Platform.Core;
 
 namespace GTRevo.Testing.Platform.Core
@@ -27,7 +28,7 @@ namespace GTRevo.Testing.Platform.Core
 
         public static void Setup()
         {
-            GTRevo.Core.Clock.SetClock(() => Clock.Value);
+            GTRevo.Core.Core.Clock.SetClock(() => Clock.Value);
             Now = DateTime.Now;
             UtcNow = Now.ToUniversalTime();
         }

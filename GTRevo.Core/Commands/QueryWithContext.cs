@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GTRevo.Commands
+namespace GTRevo.Core.Commands
 {
     public class QueryWithContext<T> : IQueryWithContext<T>
     {

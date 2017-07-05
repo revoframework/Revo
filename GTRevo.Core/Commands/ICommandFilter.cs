@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace GTRevo.Commands
+namespace GTRevo.Core.Commands
 {
     public interface ICommandFilter<in T>
         where T : ICommandBase

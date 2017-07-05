@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using GTRevo.Infrastructure.Domain.Events;
+using GTRevo.Infrastructure.Core.Domain.Events;
 
-namespace GTRevo.Infrastructure.Domain.EventSourcing
+namespace GTRevo.Infrastructure.Core.Domain.EventSourcing
 {
     public class AggregateState
     {

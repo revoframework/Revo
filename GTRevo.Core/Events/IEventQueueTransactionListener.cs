@@ -1,6 +1,6 @@
-﻿using GTRevo.Transactions;
+﻿using GTRevo.Core.Transactions;
 
-namespace GTRevo.Events
+namespace GTRevo.Core.Events
 {
     public interface IEventQueueTransactionListener : ITransactionListener
     {

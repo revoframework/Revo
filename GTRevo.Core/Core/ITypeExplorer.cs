@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace GTRevo.Core
+namespace GTRevo.Core.Core
 {
     public interface ITypeExplorer
     {

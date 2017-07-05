@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using GTRevo.Infrastructure.Domain;
+using GTRevo.Infrastructure.Core.Domain;
 
 namespace GTRevo.Infrastructure.Projections
 {

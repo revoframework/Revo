@@ -5,7 +5,7 @@ using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Linq;
-using GTRevo.Core.Lifecycle;
+using GTRevo.Core.Core.Lifecycle;
 using GTRevo.DataAccess.EF6.Model;
 
 namespace GTRevo.DataAccess.EF6.Entities

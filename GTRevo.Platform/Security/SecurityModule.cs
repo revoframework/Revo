@@ -1,5 +1,5 @@
 ﻿using System.Web;
-using GTRevo.Core.Lifecycle;
+using GTRevo.Core.Core.Lifecycle;
 using GTRevo.Platform.Core;
 using GTRevo.Platform.Security.Identity;
 using Microsoft.AspNet.Identity;

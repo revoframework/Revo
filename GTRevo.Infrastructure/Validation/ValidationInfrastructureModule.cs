@@ -1,4 +1,4 @@
-﻿using GTRevo.Commands;
+﻿using GTRevo.Core.Commands;
 using Ninject.Modules;
 
 namespace GTRevo.Infrastructure.Validation

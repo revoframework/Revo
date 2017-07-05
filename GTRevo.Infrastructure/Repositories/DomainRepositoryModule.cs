@@ -1,6 +1,6 @@
-﻿using GTRevo.DataAccess.EF6.Entities;
+﻿using GTRevo.Core.Transactions;
+using GTRevo.DataAccess.EF6.Entities;
 using GTRevo.Platform.Core;
-using GTRevo.Transactions;
 using Ninject.Modules;
 
 namespace GTRevo.Infrastructure.Repositories

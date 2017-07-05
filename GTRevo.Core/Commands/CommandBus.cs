@@ -1,7 +1,7 @@
-﻿using GTRevo.Events;
+﻿using GTRevo.Core.Events;
 using MediatR;
 
-namespace GTRevo.Commands
+namespace GTRevo.Core.Commands
 {
     public class CommandBus : Mediator, ICommandBus, IEventBus
     {

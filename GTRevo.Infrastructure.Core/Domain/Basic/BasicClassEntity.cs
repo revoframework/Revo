@@ -1,6 +1,6 @@
 using System;
 
-namespace GTRevo.Infrastructure.Domain.Basic
+namespace GTRevo.Infrastructure.Core.Domain.Basic
 {
     public abstract class BasicClassEntity : BasicEntity, IHasClassId<Guid>
     {

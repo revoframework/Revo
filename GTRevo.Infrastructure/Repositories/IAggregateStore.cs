@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GTRevo.Infrastructure.Domain;
+using GTRevo.Infrastructure.Core.Domain;
 
 namespace GTRevo.Infrastructure.Repositories
 {

@@ -1,6 +1,6 @@
 ﻿using Ninject.Modules;
 
-namespace GTRevo.Core
+namespace GTRevo.Core.Core
 {
     public class CorePlatformModule : NinjectModule
     {

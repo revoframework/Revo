@@ -5,9 +5,9 @@ using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using GTRevo.Core.Transactions;
 using GTRevo.DataAccess.EF6.Model;
 using GTRevo.DataAccess.Entities;
-using GTRevo.Transactions;
 
 namespace GTRevo.DataAccess.EF6.Entities
 {

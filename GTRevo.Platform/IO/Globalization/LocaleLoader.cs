@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using GTRevo.Core.Lifecycle;
+using GTRevo.Core.Core.Lifecycle;
 using GTRevo.Platform.IO.Messages;
 using GTRevo.Platform.IO.Resources;
 

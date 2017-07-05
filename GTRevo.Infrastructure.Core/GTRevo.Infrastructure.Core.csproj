@@ -7,7 +7,7 @@
     <ProjectGuid>{558603AE-BECF-4F72-86B4-AD832D2453AB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GTRevo.Infrastructure</RootNamespace>
+    <RootNamespace>GTRevo.Infrastructure.Core</RootNamespace>
     <AssemblyName>GTRevo.Infrastructure.Core</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

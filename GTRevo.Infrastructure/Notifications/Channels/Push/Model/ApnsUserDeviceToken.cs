@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GTRevo.DataAccess.Entities;
-using GTRevo.Infrastructure.Domain.Basic;
+using GTRevo.Infrastructure.Core.Domain.Basic;
 using GTRevo.Platform.Security;
 
 namespace GTRevo.Infrastructure.Notifications.Channels.Push.Model

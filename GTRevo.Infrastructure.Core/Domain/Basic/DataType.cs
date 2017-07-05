@@ -1,4 +1,4 @@
-namespace GTRevo.Infrastructure.Domain.Basic
+namespace GTRevo.Infrastructure.Core.Domain.Basic
 {
     public enum DataType
     {

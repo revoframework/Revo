@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace GTRevo.Commands
+namespace GTRevo.Core.Commands
 {
     public class CommandHandlerPipeline<T> : IAsyncCommandHandler<T>
          where T : ICommand
