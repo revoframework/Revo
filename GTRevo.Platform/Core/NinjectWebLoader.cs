@@ -20,7 +20,7 @@ namespace GTRevo.Platform.Core
 {
     public static class NinjectWebLoader
     {
-        private static readonly List<Assembly> loadedAssemblies = new List<Assembly>();
+        private static readonly List<Assembly> LoadedAssemblies = new List<Assembly>();
 
         public static Bootstrapper Bootstrapper { get; private set; } = new Bootstrapper();
 
@@ -87,7 +87,7 @@ namespace GTRevo.Platform.Core
         private static IKernel CreateKernel()
         {
             var kernel = new StandardKernel();
-            loadedAssemblies.Clear();
+            LoadedAssemblies.Clear();
 
             try
             {
@@ -121,8 +121,8 @@ namespace GTRevo.Platform.Core
                    .Where(a => !a.IsDynamic)
                    .ToList();
 
-            assemblies = assemblies.Except(loadedAssemblies).ToList();
-            loadedAssemblies.AddRange(assemblies);
+            assemblies = assemblies.Except(LoadedAssemblies).ToList();
+            LoadedAssemblies.AddRange(assemblies);
 
             kernel.Load(assemblies);
         }
@@ -137,8 +137,8 @@ namespace GTRevo.Platform.Core
                    .Where(a => !a.IsDynamic)
                    .ToList();
 
-            assemblies = assemblies.Except(loadedAssemblies).ToList();
-            loadedAssemblies.AddRange(assemblies);
+            assemblies = assemblies.Except(LoadedAssemblies).ToList();
+            LoadedAssemblies.AddRange(assemblies);
 
             kernel.Load(assemblies);
         }

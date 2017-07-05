@@ -4,11 +4,14 @@ using System.Linq;
 using GTRevo.Core;
 using GTRevo.Core.Core;
 using Ninject;
+using NLog;
 
 namespace GTRevo.DataAccess.EF6.Model
 {
     public class ModelDefinitionDiscovery
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         private readonly ITypeExplorer typeExplorer;
         private readonly StandardKernel kernel;
 
@@ -25,7 +28,10 @@ namespace GTRevo.DataAccess.EF6.Model
                             && x.IsClass && !x.IsAbstract && !x.IsGenericTypeDefinition);
 
             RegisterModelDefinitions(modelDefinitionTypes);
-            return GetModelDefinitions();
+
+            List<IModelDefinition> modelDefinitions = GetModelDefinitions();
+            Logger.Debug($"Found {modelDefinitions.Count} EF6 model definitions: {string.Join(", ", modelDefinitions.Select(x => x.GetType().FullName))}");
+            return modelDefinitions;
         }
 
         private void RegisterModelDefinitions(IEnumerable<Type> modelDefinitionTypes)
