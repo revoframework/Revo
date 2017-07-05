@@ -35,9 +35,7 @@ namespace GTRevo.Infrastructure.Domain
                     .ToList();
 
                 typesToIds = entities.ToDictionary(x => x,
-                    x =>
-                        ((DomainClassIdAttribute)
-                            x.GetCustomAttributes(typeof(DomainClassIdAttribute), false).FirstOrDefault())?.ClassId);
+                    x => EntityClassUtils.TryGetEntityClassId(x));
 
                 idsToTypes = typesToIds
                     .Where(x => x.Value.HasValue)

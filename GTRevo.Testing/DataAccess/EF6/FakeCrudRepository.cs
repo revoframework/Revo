@@ -181,11 +181,11 @@ namespace GTRevo.Testing.DataAccess.EF6
         {
             foreach (EntityEntry entry in entities.ToList())
             {
-                if ((entry.State & EntityState.Added) != 0)
+                if ((entry.State & EntityState.Added) != 0 || (entry.State & EntityState.Modified) != 0)
                 {
                     entry.State = EntityState.Unchanged;
                 }
-                else if ((entry.State & EntityState.Deleted) != 0 || (entry.State & EntityState.Modified) != 0)
+                else if ((entry.State & EntityState.Deleted) != 0)
                 {
                     entities.Remove(entry);
                 }
@@ -213,7 +213,7 @@ namespace GTRevo.Testing.DataAccess.EF6
             return entityId.Equals(id);
         }
 
-        protected class EntityEntry
+        public class EntityEntry
         {
             public EntityEntry(object instance, EntityState state)
             {

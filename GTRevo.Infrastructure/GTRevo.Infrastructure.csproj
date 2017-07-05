@@ -141,6 +141,7 @@
     <Compile Include="DataAccess\DatabaseInitializerStub.cs" />
     <Compile Include="DataAccess\IDatabaseInitializer.cs" />
     <Compile Include="DataAccess\IDatabaseInitializerDiscovery.cs" />
+    <Compile Include="DataAccess\StaticClassifierDatabaseInitializer.cs" />
     <Compile Include="EventSourcing\EventSourcingInfrastructureModule.cs" />
     <Compile Include="History\ChangeTracking\Changes\EntityAttributeChangeData.cs" />
     <Compile Include="History\ChangeTracking\ChangeTracker.cs" />

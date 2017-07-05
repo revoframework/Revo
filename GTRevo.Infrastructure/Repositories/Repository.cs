@@ -13,7 +13,6 @@ namespace GTRevo.Infrastructure.Repositories
     public class Repository : IRepository
     {
         private readonly IAggregateStore[] aggregateStores;
-            
         private readonly IEventQueue eventQueue; 
 
         public Repository(IAggregateStore[] aggregateStores, IEventQueue eventQueue)

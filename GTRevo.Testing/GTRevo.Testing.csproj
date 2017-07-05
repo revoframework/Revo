@@ -63,6 +63,7 @@
     <Compile Include="DataAccess\LocalDbAsyncEnumerable.cs" />
     <Compile Include="DataAccess\LocalDbAsyncEnumerator.cs" />
     <Compile Include="DataAccess\LocalDbAsyncQueryProvider.cs" />
+    <Compile Include="Infrastructure\Repositories\FakeRepository.cs" />
     <Compile Include="Platform\Core\FakeClock.cs" />
     <Compile Include="SubstituteDecorator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -83,6 +84,14 @@
     <ProjectReference Include="..\GTRevo.DataAccess\GTRevo.DataAccess.csproj">
       <Project>{FA942FE7-71FD-4CF5-8959-309583FE7903}</Project>
       <Name>GTRevo.DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GTRevo.Infrastructure.Core\GTRevo.Infrastructure.Core.csproj">
+      <Project>{558603AE-BECF-4F72-86B4-AD832D2453AB}</Project>
+      <Name>GTRevo.Infrastructure.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GTRevo.Infrastructure\GTRevo.Infrastructure.csproj">
+      <Project>{6F893B4E-8119-41F8-B1C9-28EEA56946A9}</Project>
+      <Name>GTRevo.Infrastructure</Name>
     </ProjectReference>
     <ProjectReference Include="..\GTRevo.Platform\GTRevo.Platform.csproj">
       <Project>{42CDFAD0-CB40-433E-AC6E-874F3F58E77D}</Project>
