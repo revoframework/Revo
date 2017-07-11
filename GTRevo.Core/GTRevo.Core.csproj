@@ -87,9 +87,11 @@
   <ItemGroup>
     <Compile Include="Commands\CommandBindExtensions.cs" />
     <Compile Include="Commands\CommandBus.cs" />
+    <Compile Include="Commands\CommandHandlerDiscovery.cs" />
     <Compile Include="Commands\CommandHandlerPipeline.cs" />
     <Compile Include="Commands\CommandRequest.cs" />
     <Compile Include="Commands\CommandRequestContextData.cs" />
+    <Compile Include="Commands\CommandsModule.cs" />
     <Compile Include="Commands\EntityQuery.cs" />
     <Compile Include="Commands\EntityQueryWithContext.cs" />
     <Compile Include="Commands\IAsyncCommandHandler.cs" />

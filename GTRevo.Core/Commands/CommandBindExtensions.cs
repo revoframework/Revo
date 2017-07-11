@@ -24,22 +24,45 @@ namespace GTRevo.Core.Commands
             }
 
             return bindingRoot
-                .Bind(handlerInterfaces.Concat(services).ToArray())
+                .Bind(handlerInterfaces.Concat(services).Concat(new[] {typeof(T)}).ToArray())
                 .To<T>()
                 //.When(x => x.Target?.Type.Name.StartsWith("CommandHandlerPipeline") ?? false);
-            .WhenInjectedInto(decoratorTypes.Values.ToArray());
+                .WhenInjectedInto(decoratorTypes.Values.ToArray());
         }
-        
-        private static IEnumerable<Type> GetInterfaces(Type handlerType)
+
+        public static IBindingInNamedWithOrOnSyntax<object> BindCommandHandler(
+            BindingRoot bindingRoot, Type commandHandlerType, params Type[] services)
         {
-            var intfs = (IEnumerable<Type>)handlerType.GetInterfaces();
-            var nestedIntfs = intfs.SelectMany(x => x.GetInterfaces().Length > 0 ? GetInterfaces(x) : new Type[] { });
-            if (nestedIntfs.Count() > 0)
+            var handlerInterfaces = GetCommandHandlerInterfaces(commandHandlerType);
+            var decoratorTypes = GetPipelineDecoratorTypes(handlerInterfaces);
+
+            foreach (var decoratorTypePair in decoratorTypes)
             {
-                intfs = intfs.Concat(nestedIntfs.ToList());
+                bindingRoot
+                    .Bind(decoratorTypePair.Key)
+                    .To(decoratorTypePair.Value)
+                    .InRequestOrJobScope();
             }
 
-            return intfs;
+            return bindingRoot
+                .Bind(handlerInterfaces.Concat(services).Concat(new[] {commandHandlerType}).ToArray())
+                .To(commandHandlerType)
+                //.When(x => x.Target?.Type.Name.StartsWith("CommandHandlerPipeline") ?? false);
+                .WhenInjectedInto(decoratorTypes.Values.ToArray());
+        }
+
+        public static Type[] GetCommandHandlerInterfaces(Type requestHandlerType)
+        {
+            var intfs = GetInterfaces(requestHandlerType);
+
+            intfs = intfs
+                .Where(x => x.IsGenericType
+                            && new Type[] { typeof(IAsyncCommandHandler<>), typeof(IAsyncCommandHandler<,>), typeof(IAsyncQueryHandler<,>),
+                                    typeof(IAsyncRequestHandler<>), typeof(IAsyncRequestHandler<,>),
+                                    typeof(IRequestHandler<>), typeof(IRequestHandler<,>) }
+                                .Contains(x.GetGenericTypeDefinition())); //TODO: inherited?!
+
+            return intfs.Distinct().ToArray();
         }
 
         private static Dictionary<Type, Type> GetPipelineDecoratorTypes(Type[] handlerInterfaces)
@@ -60,18 +83,16 @@ namespace GTRevo.Core.Commands
                 });
         }
 
-        private static Type[] GetCommandHandlerInterfaces(Type requestHandlerType)
+        private static IEnumerable<Type> GetInterfaces(Type handlerType)
         {
-            var intfs = GetInterfaces(requestHandlerType);
+            var intfs = (IEnumerable<Type>)handlerType.GetInterfaces();
+            var nestedIntfs = intfs.SelectMany(x => x.GetInterfaces().Length > 0 ? GetInterfaces(x) : new Type[] { });
+            if (nestedIntfs.Count() > 0)
+            {
+                intfs = intfs.Concat(nestedIntfs.ToList());
+            }
 
-            intfs = intfs
-                .Where(x => x.IsGenericType
-                    && new Type[] { typeof(IAsyncCommandHandler<>), typeof(IAsyncCommandHandler<,>), typeof(IAsyncQueryHandler<,>),
-                                    typeof(IAsyncRequestHandler<>), typeof(IAsyncRequestHandler<,>),
-                                    typeof(IRequestHandler<>), typeof(IRequestHandler<,>) }
-                            .Contains(x.GetGenericTypeDefinition())); //TODO: inherited?!
-
-            return intfs.Distinct().ToArray();
+            return intfs;
         }
     }
 }
