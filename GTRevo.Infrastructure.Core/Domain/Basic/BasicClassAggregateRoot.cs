@@ -2,7 +2,7 @@
 
 namespace GTRevo.Infrastructure.Core.Domain.Basic
 {
-    public abstract class BasicClassAggregateRoot : BasicAggregateRoot, IHasClassId<Guid>
+    public abstract class BasicClassAggregateRoot : BasicAggregateRoot, IBasicClassIdEntity, IHasClassId<Guid>
     {
         public BasicClassAggregateRoot(Guid id) : base(id)
         {
@@ -17,5 +17,11 @@ namespace GTRevo.Infrastructure.Core.Domain.Basic
         /// Should be automatically injected by the repository on the first save/load.
         /// </summary>
         public virtual Guid ClassId { get; private set; }
+
+        Guid IBasicClassIdEntity.ClassId
+        {
+            get => ClassId;
+            set => ClassId = value;
+        }
     }
 }

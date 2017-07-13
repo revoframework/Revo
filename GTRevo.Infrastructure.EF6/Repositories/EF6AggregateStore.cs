@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using GTRevo.DataAccess.EF6.Entities;
 using GTRevo.DataAccess.EF6.Model;
 using GTRevo.Infrastructure.Core.Domain;
+using GTRevo.Infrastructure.Core.Domain.Basic;
 using GTRevo.Infrastructure.Repositories;
 
 namespace GTRevo.Infrastructure.EF6.Repositories
@@ -14,12 +16,15 @@ namespace GTRevo.Infrastructure.EF6.Repositories
     {
         private readonly ICrudRepository crudRepository;
         private readonly IModelMetadataExplorer modelMetadataExplorer;
+        private readonly IEntityTypeManager entityTypeManager;
 
         public EF6AggregateStore(ICrudRepository crudRepository,
-            IModelMetadataExplorer modelMetadataExplorer)
+            IModelMetadataExplorer modelMetadataExplorer,
+            IEntityTypeManager entityTypeManager)
         {
             this.crudRepository = crudRepository;
             this.modelMetadataExplorer = modelMetadataExplorer;
+            this.entityTypeManager = entityTypeManager;
         }
 
         public void Add<T>(T aggregate) where T : class, IAggregateRoot
@@ -39,24 +44,12 @@ namespace GTRevo.Infrastructure.EF6.Repositories
 
         public IEnumerable<IAggregateRoot> GetTrackedAggregates()
         {
-            return crudRepository.Entries()
-                .Select(x => x.Entity)
-                .OfType<IAggregateRoot>();
+            return crudRepository.GetEntities<IAggregateRoot>();
         }
 
         public bool CanHandleAggregateType(Type aggregateType)
         {
             return modelMetadataExplorer.IsTypeMapped(aggregateType);
-        }
-
-        public void SaveChanges()
-        {
-            crudRepository.SaveChanges();
-        }
-
-        public Task SaveChangesAsync()
-        {
-            return crudRepository.SaveChangesAsync();
         }
 
         public T FirstOrDefault<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
@@ -97,6 +90,32 @@ namespace GTRevo.Infrastructure.EF6.Repositories
         public void Remove<T>(T aggregate) where T : class, IAggregateRoot
         {
             crudRepository.Remove(aggregate);
+        }
+
+        public void SaveChanges()
+        {
+            InjectClassIds();
+            crudRepository.SaveChanges();
+        }
+
+        public Task SaveChangesAsync()
+        {
+            InjectClassIds();
+            return crudRepository.SaveChangesAsync();
+        }
+
+        private void InjectClassIds()
+        {
+            var addedClassEntitites =
+                crudRepository.GetEntities<IBasicClassIdEntity>(EntityState.Added, EntityState.Modified);
+
+            foreach (IBasicClassIdEntity entity in addedClassEntitites)
+            {
+                if (entity.ClassId == Guid.Empty)
+                {
+                    entity.ClassId = entityTypeManager.GetClassIdByClrType(entity.GetType());
+                }
+            }
         }
     }
 }

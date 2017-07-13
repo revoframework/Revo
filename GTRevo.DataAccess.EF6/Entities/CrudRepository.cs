@@ -77,7 +77,7 @@ namespace GTRevo.DataAccess.EF6.Entities
 
         public T FirstOrDefault<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            return GetDbContext(typeof(T)).Set<T>().First(predicate);
+            return GetDbContext(typeof(T)).Set<T>().FirstOrDefault(predicate);
         }
 
         public T First<T>(Expression<Func<T, bool>> predicate) where T : class
@@ -161,6 +161,27 @@ namespace GTRevo.DataAccess.EF6.Entities
 
             return GetDbContext(typeof(T)).Set<T>().Where(predicate).ToList()
                 .Union(addedEntities);
+        }
+
+        public EntityState GetEntityState<T>(T entity) where T : class
+        {
+            return GetDbContext(typeof(T)).Entry(entity).State;
+        }
+
+        public void SetEntityState<T>(T entity, EntityState state) where T : class
+        {
+            GetDbContext(typeof(T)).Entry(entity).State = state;
+        }
+
+        public IEnumerable<T> GetEntities<T>(params EntityState[] entityStates) where T : class
+        {
+            var entries = GetDbContext(typeof(T)).ChangeTracker.Entries<T>();
+            if (entityStates?.Length > 0)
+            {
+                entries = entries.Where(x => entityStates.Any(s => (s & x.State) == s));
+            }
+
+            return entries.Select(x => x.Entity);
         }
 
         public bool IsAttached<T>(T entity) where T : class

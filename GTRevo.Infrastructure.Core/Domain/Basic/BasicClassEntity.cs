@@ -2,7 +2,7 @@ using System;
 
 namespace GTRevo.Infrastructure.Core.Domain.Basic
 {
-    public abstract class BasicClassEntity : BasicEntity, IHasClassId<Guid>
+    public abstract class BasicClassEntity : BasicEntity, IBasicClassIdEntity, IHasClassId<Guid>
     {
         public BasicClassEntity(Guid id)
             : base(id)
@@ -18,5 +18,11 @@ namespace GTRevo.Infrastructure.Core.Domain.Basic
         /// Should be automatically injected by the repository on the first save/load.
         /// </summary>
         public Guid ClassId { get; private set; }
+
+        Guid IBasicClassIdEntity.ClassId
+        {
+            get => ClassId;
+            set => ClassId = value;
+        }
     }
 }

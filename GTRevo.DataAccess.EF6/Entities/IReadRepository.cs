@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Linq.Expressions;
@@ -34,6 +35,10 @@ namespace GTRevo.DataAccess.EF6.Entities
         IEnumerable<DbEntityEntry> Entries();
         DbEntityEntry Entry(object entity);
         DbEntityEntry<T> Entry<T>(T entity) where T : class;
+
+        IEnumerable<T> GetEntities<T>(params EntityState[] entityStates) where T : class;
+        EntityState GetEntityState<T>(T entity) where T : class;
+        void SetEntityState<T>(T entity, EntityState state) where T : class;
         bool IsAttached<T>(T entity) where T : class;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Linq.Expressions;
@@ -149,6 +150,21 @@ namespace GTRevo.Infrastructure.Security
         public DbEntityEntry<T> Entry<T>(T entity) where T : class
         {
             return repository.Entry(entity);
+        }
+
+        public IEnumerable<T> GetEntities<T>(params EntityState[] entityStates) where T : class
+        {
+            return repository.GetEntities<T>(entityStates);
+        }
+
+        public EntityState GetEntityState<T>(T entity) where T : class
+        {
+            return repository.GetEntityState<T>(entity);
+        }
+
+        public void SetEntityState<T>(T entity, EntityState state) where T : class
+        {
+            repository.SetEntityState<T>(entity, state);
         }
 
         public bool IsAttached<T>(T entity) where T : class
