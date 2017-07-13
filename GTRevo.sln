@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.12
+VisualStudioVersion = 15.0.26430.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GTRevo.Platform", "GTRevo.Platform\GTRevo.Platform.csproj", "{42CDFAD0-CB40-433E-AC6E-874F3F58E77D}"
 EndProject
@@ -35,6 +35,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuGet", "NuGet", "{FA35F569
 	ProjectSection(SolutionItems) = preProject
 		NuGet.config = NuGet.config
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GTRevo.Infrastructure.EF6.Tests", "Tests\GTRevo.Infrastructure.EF6.Tests\GTRevo.Infrastructure.EF6.Tests.csproj", "{1CB9CCB8-144D-40E1-87B4-3474625D5CD2}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -94,6 +96,10 @@ Global
 		{A95BFBAD-E0F3-4631-A873-BC03B66182DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A95BFBAD-E0F3-4631-A873-BC03B66182DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A95BFBAD-E0F3-4631-A873-BC03B66182DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CB9CCB8-144D-40E1-87B4-3474625D5CD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CB9CCB8-144D-40E1-87B4-3474625D5CD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CB9CCB8-144D-40E1-87B4-3474625D5CD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CB9CCB8-144D-40E1-87B4-3474625D5CD2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -102,5 +108,6 @@ Global
 		{0CEEB2F8-0B3C-4E8A-A4A1-0842F680CB99} = {25A48354-8863-4FC8-B85D-EDE6E2974EE5}
 		{CA3FCE6B-2D81-4C42-A960-A976E06051DC} = {25A48354-8863-4FC8-B85D-EDE6E2974EE5}
 		{368BF029-76E0-43C9-930B-70915DC2B11A} = {25A48354-8863-4FC8-B85D-EDE6E2974EE5}
+		{1CB9CCB8-144D-40E1-87B4-3474625D5CD2} = {25A48354-8863-4FC8-B85D-EDE6E2974EE5}
 	EndGlobalSection
 EndGlobal
