@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using GTRevo.Infrastructure.Core.Domain;
@@ -12,7 +13,15 @@ namespace GTRevo.Infrastructure.DataAccess
     public abstract class StaticClassifierDatabaseInitializer<T> : IDatabaseInitializer
         where T : class, IAggregateRoot, IQueryableEntity
     {
-        public abstract IEnumerable<T> All { get; }
+        public virtual IEnumerable<T> All
+        {
+            get
+            {
+                return this.GetType().GetFields(BindingFlags.Public | BindingFlags.Static)
+                    .Where(x => (x.IsLiteral || x.IsInitOnly)
+                                && x.FieldType == typeof(T)).Select(x => (T)x.GetValue(null));
+            }
+        }
 
         [Inject] // exceptionally not using constructor injection to make usage easier
         public IRepository Repository { get; set; }

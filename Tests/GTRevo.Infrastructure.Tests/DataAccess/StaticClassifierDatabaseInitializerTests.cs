@@ -25,6 +25,13 @@ namespace GTRevo.Infrastructure.Tests.DataAccess
         }
 
         [Fact]
+        public void All_ReturnsAllEntities()
+        {
+            Assert.True(sut.All.Contains(TestClassifierDatabaseInitializer.First));
+            Assert.True(sut.All.Contains(TestClassifierDatabaseInitializer.Second));
+        }
+
+        [Fact]
         public void Initialize_AddsMissingEntities()
         {
             repository.Add(TestClassifierDatabaseInitializer.First);
@@ -59,8 +66,6 @@ namespace GTRevo.Infrastructure.Tests.DataAccess
 
             public static readonly TestClassifier Second =
                 new TestClassifier(Guid.Parse("{E98D82FB-3E97-46D0-B0EC-F89850279F02}"), "Second");
-
-            public override IEnumerable<TestClassifier> All => new[] { First, Second };
         }
 
     }
