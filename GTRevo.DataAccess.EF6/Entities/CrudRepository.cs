@@ -175,13 +175,14 @@ namespace GTRevo.DataAccess.EF6.Entities
 
         public IEnumerable<T> GetEntities<T>(params EntityState[] entityStates) where T : class
         {
-            var entries = GetDbContext(typeof(T)).ChangeTracker.Entries<T>();
+            var entries = dbContexts.Values.SelectMany(x => x.ChangeTracker.Entries());
             if (entityStates?.Length > 0)
             {
                 entries = entries.Where(x => entityStates.Any(s => (s & x.State) == s));
             }
 
-            return entries.Select(x => x.Entity);
+            return entries.Select(x => x.Entity)
+                .OfType<T>();
         }
 
         public bool IsAttached<T>(T entity) where T : class
