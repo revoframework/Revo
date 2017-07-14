@@ -215,6 +215,7 @@
     <Compile Include="Repositories\EventSourcedAggregateStore.cs" />
     <Compile Include="Repositories\IAggregateStore.cs" />
     <Compile Include="Repositories\IQueryableAggregateStore.cs" />
+    <Compile Include="Repositories\RepositoryExtensions.cs" />
     <Compile Include="Security\AuthorizingQueryProvider.cs" />
     <Compile Include="Security\AuthorizingCrudRepository.cs" />
     <Compile Include="Security\Commands\AuthorizePermissionsAttribute.cs" />
