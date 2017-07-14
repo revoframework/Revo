@@ -24,8 +24,8 @@ namespace GTRevo.Infrastructure.EF6.DataAcccess
                 entityName = entityName.Substring(0, entityName.Length - "View".Length);
             }
 
-            bool isReadModel = entityName.EndsWith("ReadModel");
-            if (isReadModel)
+            bool isReadModel = clrType.Name.EndsWith("ReadModel");
+            if (isReadModel && clrType == mappedType && entityName.EndsWith("ReadModel"))
             {
                 entityName = entityName.Substring(0, entityName.Length - "ReadModel".Length);
             }
@@ -46,7 +46,13 @@ namespace GTRevo.Infrastructure.EF6.DataAcccess
             {
                 tableName = "VW_" + tableName;
             }
-            
+
+            bool isReadModel = clrType.Name.EndsWith("ReadModel");
+            if (isReadModel && clrType != mappedType && !tableName.EndsWith("_READ_MODEL"))
+            {
+                tableName += "_READ_MODEL";
+            }
+
             if (namespacePrefix != null)
             {
                 tableName = namespacePrefix + "_" + tableName;

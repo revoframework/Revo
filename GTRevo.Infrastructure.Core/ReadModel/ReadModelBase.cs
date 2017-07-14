@@ -2,7 +2,7 @@
 
 namespace GTRevo.Infrastructure.Core.ReadModel
 {
-    [DatabaseEntity(SchemaSpace = "ReadModel")]
+    [DatabaseEntity]
     public abstract class ReadModelBase
     {
     }

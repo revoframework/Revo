@@ -4,7 +4,7 @@ using GTRevo.Infrastructure.Core.Domain;
 
 namespace GTRevo.Infrastructure.Core.ReadModel
 {
-    [DatabaseEntity(SchemaSpace = "ReadModel")]
+    [DatabaseEntity]
     public abstract class EntityView : IHasId<Guid>
     {
         public Guid Id { get; set; }
