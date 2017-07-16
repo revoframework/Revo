@@ -5,6 +5,7 @@ using System.Web.Http.Dispatcher;
 using System.Web.OData.Extensions;
 using GTRevo.Platform.IO;
 using GTRevo.Platform.Web;
+using Microsoft.Owin.Security.OAuth;
 
 namespace GTRevo.Platform
 {
@@ -20,6 +21,9 @@ namespace GTRevo.Platform
                 defaults: new { id = RouteParameter.Optional }
             );
 
+            config.SuppressDefaultHostAuthentication();
+            config.Filters.Add(new HostAuthenticationFilter(OAuthDefaults.AuthenticationType));
+
             config.AddODataQueryFilter();
             config.EnableDependencyInjection();
             config.Select().Expand().Filter().OrderBy().MaxTop(null).Count(); //enable common OData options
@@ -33,7 +37,7 @@ namespace GTRevo.Platform
             config.Services.Replace(typeof(IHttpControllerTypeResolver), new ApiControllerTypeResolver());
 
             config.Filters.Add(new ValidateApiActionModelFilterAttribute());
-            config.Filters.Add(new ValidateHttpAntiForgeryTokenAttribute());
+            //config.Filters.Add(new ValidateHttpAntiForgeryTokenAttribute());
 
             AntiForgeryConfig.CookieName = AntiForgeryConsts.CookieTokenName;
         }

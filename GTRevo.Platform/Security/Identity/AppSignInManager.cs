@@ -15,7 +15,7 @@ namespace GTRevo.Platform.Security.Identity
 
         public override Task<ClaimsIdentity> CreateUserIdentityAsync(IUser user)
         {
-            return user.GenerateUserIdentityAsync((AppUserManager)UserManager);
+            return user.GenerateUserIdentityAsync((AppUserManager)UserManager, Microsoft.AspNet.Identity.DefaultAuthenticationTypes.ApplicationCookie);
         }
     }
 }

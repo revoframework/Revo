@@ -10,20 +10,12 @@ namespace GTRevo.Platform.Security
 {
     public class ScryptPasswordHasher : IPasswordHasher
     {
-        public struct HashParameters
-        {
-            public int BlockSize;
-            public int CostFactor;
-            public int ParallelizationFactor;
-            public int HashSize;
-        }
+        private const string Base64Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        private const string BsdBase64Alphabet = "./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        private static readonly char[] BsdBase64ToBase64 = Enumerable.Repeat('_', 128).ToArray();
+        private static readonly char[] Base64ToBsdBase64 = Enumerable.Repeat('_', 128).ToArray();
 
-        private const string BASE64_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-        private const string BSD_BASE64_ALPHABET = "./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        private static readonly char[] BSD_BASE64_TO_BASE64 = Enumerable.Repeat('_', 128).ToArray();
-        private static readonly char[] BASE64_TO_BSD_BASE64 = Enumerable.Repeat('_', 128).ToArray();
-
-        private static readonly int[] BSD_BASE64_DECODE_TABLE = new int[]
+        private static readonly int[] BsdBase64DecodeTable = new int[]
         {
 			/*  0:*/ - 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  // ________________
 			/* 16:*/ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  // ________________
@@ -37,18 +29,18 @@ namespace GTRevo.Platform.Security
 
         static ScryptPasswordHasher()
         {
-            for (int i = 0; i < BSD_BASE64_ALPHABET.Length; i++)
+            for (int i = 0; i < BsdBase64Alphabet.Length; i++)
             {
-                char bsdBase64 = BSD_BASE64_ALPHABET[i];
-                char base64 = BASE64_ALPHABET[i];
-                BSD_BASE64_TO_BASE64[bsdBase64] = base64;
+                char bsdBase64 = BsdBase64Alphabet[i];
+                char base64 = Base64Alphabet[i];
+                BsdBase64ToBase64[bsdBase64] = base64;
             }
 
-            for (int i = 0; i < BASE64_ALPHABET.Length; i++)
+            for (int i = 0; i < Base64Alphabet.Length; i++)
             {
-                char bsdBase64 = BSD_BASE64_ALPHABET[i];
-                char base64 = BASE64_ALPHABET[i];
-                BASE64_TO_BSD_BASE64[base64] = bsdBase64;
+                char bsdBase64 = BsdBase64Alphabet[i];
+                char base64 = Base64Alphabet[i];
+                Base64ToBsdBase64[base64] = bsdBase64;
             }
         }
 
@@ -102,7 +94,7 @@ namespace GTRevo.Platform.Security
                 Encoding.UTF8.GetBytes(password),
                 salt,
                 Parameters.BlockSize,
-                2 << Parameters.CostFactor,
+                Parameters.CostFactor,
                 Parameters.ParallelizationFactor,
                 null,
                 Parameters.HashSize);
@@ -223,12 +215,12 @@ namespace GTRevo.Platform.Security
 
         private int Char64(char c)
         {
-            if (c > BSD_BASE64_DECODE_TABLE.Length)
+            if (c > BsdBase64DecodeTable.Length)
             {
                 return -1;
             }
 
-            return BSD_BASE64_DECODE_TABLE[c];
+            return BsdBase64DecodeTable[c];
         }
 
         private byte[] BsdBase64Decode(string base64)
@@ -328,9 +320,9 @@ namespace GTRevo.Platform.Security
             {
                 char c = base64[i];
 
-                if (c < BASE64_TO_BSD_BASE64.Length)
+                if (c < Base64ToBsdBase64.Length)
                 {
-                    sb.Append(BASE64_TO_BSD_BASE64[c]);
+                    sb.Append(Base64ToBsdBase64[c]);
                 }
             }
 
@@ -345,6 +337,14 @@ namespace GTRevo.Platform.Security
                 rng.GetBytes(tokenData);
                 return tokenData;
             }
+        }
+
+        public struct HashParameters
+        {
+            public int BlockSize;
+            public int CostFactor;
+            public int ParallelizationFactor;
+            public int HashSize;
         }
     }
 }

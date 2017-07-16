@@ -7,6 +7,7 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.DataProtection;
+using Microsoft.Owin.Security.OAuth;
 using Ninject;
 using Owin;
 
@@ -14,12 +15,15 @@ namespace GTRevo.Platform.Security
 {
     public class SecurityAppInitializer : IOwinConfigurator
     {
-        public StandardKernel kernel;
+        private readonly StandardKernel kernel;
 
         public SecurityAppInitializer(StandardKernel kernel)
         {
             this.kernel = kernel;
         }
+
+        public static OAuthAuthorizationServerOptions OAuthOptions { get; private set; }
+        public static string PublicClientId { get; private set; }
 
         public void ConfigureApp(IAppBuilder app)
         {
@@ -38,24 +42,38 @@ namespace GTRevo.Platform.Security
             {
                 AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
                 LoginPath = new PathString("/login"),
+                CookieHttpOnly = true,
                 Provider = new CookieAuthenticationProvider
                 {
                     // Enables the application to validate the security stamp when the user logs in.
                     // This is a security feature which is used when you change a password or add an external login to your account.  
                     OnValidateIdentity = SecurityStampValidator.OnValidateIdentity<AppUserManager, IUser, Guid>(
-                        validateInterval: TimeSpan.FromMinutes(30),
-                        regenerateIdentityCallback: (manager, user) => user.GenerateUserIdentityAsync(manager),
+                        validateInterval: TimeSpan.FromMinutes(15),
+                        regenerateIdentityCallback: (manager, user) => user.GenerateUserIdentityAsync(manager, Microsoft.AspNet.Identity.DefaultAuthenticationTypes.ApplicationCookie),
                         getUserIdCallback: claimsIdentity => Guid.Parse(claimsIdentity.GetUserId<string>())),
 
                     OnApplyRedirect = ctx =>
                     {
-                        if (!IsApiRequest(ctx.Request))
-                        {
-                            ctx.Response.Redirect(ctx.RedirectUri);
-                        }
+                        ctx.Response.Redirect(ctx.RedirectUri);
                     }
-                }
+                },
+                SlidingExpiration = true,
+                ExpireTimeSpan = TimeSpan.FromMinutes(60)
             });
+
+            PublicClientId = "self";
+            OAuthOptions = new OAuthAuthorizationServerOptions
+            {
+                TokenEndpointPath = new PathString("/api/token"),
+                Provider = new ApplicationOAuthProvider(PublicClientId),
+                //AuthorizeEndpointPath = new PathString("/api/Account/ExternalLogin"),
+                AccessTokenExpireTimeSpan = TimeSpan.FromDays(14),
+#if DEBUG
+                AllowInsecureHttp = true
+#endif
+            };
+
+            app.UseOAuthBearerTokens(OAuthOptions);
 
             /*
             app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
@@ -87,14 +105,6 @@ namespace GTRevo.Platform.Security
             //    ClientId = "",
             //    ClientSecret = ""
             //});
-        }
-
-        private bool IsApiRequest(IOwinRequest request)
-        {
-            return request.Query?["X-Requested-With"] == "XMLHttpRequest"
-                || request.Headers?["X-Requested-With"] == "XMLHttpRequest"
-                || request.Accept.Contains("application/json")
-                || request.ContentType == "application/json";
         }
     }
 }

@@ -10,6 +10,6 @@ namespace GTRevo.Platform.Security
     {
         string PasswordHash { get; set; }
 
-        Task<ClaimsIdentity> GenerateUserIdentityAsync(AppUserManager manager);
+        Task<ClaimsIdentity> GenerateUserIdentityAsync(AppUserManager manager, string authenticationType);
     }
 }

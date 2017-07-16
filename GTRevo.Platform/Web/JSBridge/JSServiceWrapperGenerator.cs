@@ -72,20 +72,19 @@ $@"  function {GetServiceName(apiDescription.Key)}($http) {{");
 
                 sb.AppendLine(
 $@"    this.{GetMethodName(method)} = function({(parameterNames.Length > 0 ? "parameters" : "")}) {{
-      return $http({{");
+      var oauthAccessToken = sessionStorage.getItem('oauthAccessToken');
+      // TODO if (!oauthAccessToken) ...
 
-                if (!method.HttpMethod.IsSafe())
-                {
-                    sb.AppendLine(
-$@"        'xsrfCookieName': '{AntiForgeryConsts.CookieFormTokenName}',
-        'xsrfHeaderName': '{AntiForgeryConsts.HeaderTokenName}', ");
-                }
+      return $http({{
+        headers: {{
+            'Authorization': 'Bearer ' + oauthAccessToken
+        }},");
 
                 if (parameterNames.Length > 0)
                 {
                     if (method.HttpMethod.HasBody())
                     {
-                        sb.AppendLine("        'data': parameters,");
+                        sb.AppendLine("        data: parameters,");
                     }
                     else
                     {
@@ -96,11 +95,11 @@ $@"        'xsrfCookieName': '{AntiForgeryConsts.CookieFormTokenName}',
                                     && !method.ParameterDescriptions[0].ParameterDescriptor.ParameterType.IsEnum)
                             && (!method.ParameterDescriptions[0].ParameterDescriptor.ParameterType.AssemblyQualifiedName?.StartsWith("System.") ?? true))
                         {
-                            sb.AppendLine("        'params': parameters,");
+                            sb.AppendLine("        params: parameters,");
                         }
                         else
                         {
-                            sb.AppendLine("        'params': {");
+                            sb.AppendLine("        params: {");
 
                             for (int i = 0; i < parameterNames.Length; i++)
                             {
@@ -116,8 +115,8 @@ $@"        'xsrfCookieName': '{AntiForgeryConsts.CookieFormTokenName}',
                 }
 
                 sb.AppendLine(
-$@"        'method': '{method.HttpMethod}',
-        'url': '{method.ActionDescriptor.ControllerDescriptor.Configuration.VirtualPathRoot}{SanitizeUrl(method.RelativePath)}'
+$@"        method: '{method.HttpMethod}',
+        url: '{method.ActionDescriptor.ControllerDescriptor.Configuration.VirtualPathRoot}{SanitizeUrl(method.RelativePath)}'
       }}).then(function (response) {{
         return response.data;
       }});
