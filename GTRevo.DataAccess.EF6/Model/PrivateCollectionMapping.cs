@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -12,11 +13,11 @@ namespace GTRevo.DataAccess.EF6.Model
     {
         public void MapPrivateCollections(DbModelBuilder modelBuilder)
         {
-            modelBuilder.Types().Configure(x => MapPrivateCollections(modelBuilder, x.ClrType));
+            modelBuilder.Types().Configure(x => MapPrivateCollections(modelBuilder, x.ClrType, x.ClrType));
         }
 
         private void MapPrivateCollections(DbModelBuilder modelBuilder,
-            Type entityType)
+            Type entityType, Type concreteType)
         {
             var entityMethod = modelBuilder.GetType().GetMethod("Entity");
 
@@ -32,12 +33,22 @@ namespace GTRevo.DataAccess.EF6.Model
 
                 foreach (var collectionProp in collectionProps)
                 {
-                    var entityConf = entityMethod.MakeGenericMethod(entityType)
+                    var entityConf = entityMethod.MakeGenericMethod(concreteType)
                         .Invoke(modelBuilder, new object[] {});
+                    var entityTypeConf = entityConf.GetType().GetField("_entityTypeConfiguration",
+                        BindingFlags.Instance | BindingFlags.NonPublic).GetValue(entityConf);
+                    IDictionary navigationPropertyConfigurations = (IDictionary) entityTypeConf.GetType().GetField(
+                        "_navigationPropertyConfigurations",
+                        BindingFlags.Instance | BindingFlags.NonPublic).GetValue(entityTypeConf);
+
+                    if (navigationPropertyConfigurations.Contains(collectionProp))
+                    {
+                        continue;
+                    }
 
                     var childType = collectionProp.PropertyType.GenericTypeArguments[0];
                     
-                    ParameterExpression xParameterExpression = Expression.Parameter(entityType, "x");
+                    ParameterExpression xParameterExpression = Expression.Parameter(concreteType, "x");
                     Expression collectionPropertyExpression = Expression.Property(xParameterExpression, collectionProp);
                     Type collectionType = typeof(ICollection<>).MakeGenericType(childType);
                     Expression icollectionCastExpression = Expression.Convert(collectionPropertyExpression, collectionType);
@@ -46,6 +57,12 @@ namespace GTRevo.DataAccess.EF6.Model
                     var hasMany = entityConf.GetType().GetMethod("HasMany")
                         .MakeGenericMethod(childType)
                         .Invoke(entityConf, new object[] { memberLambda });
+                }
+                
+                if (entityType.BaseType != null &&
+                    (entityType.BaseType.IsConstructedGenericType))
+                {
+                    //MapPrivateCollections(modelBuilder, entityType.BaseType, concreteType);
                 }
             }
         }
