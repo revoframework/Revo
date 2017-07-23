@@ -131,6 +131,38 @@ namespace GTRevo.Testing.DataAccess.EF6
             throw new NotImplementedException();
         }
 
+        public IEnumerable<T> GetEntities<T>(params EntityState[] entityStates) where T : class
+        {
+            IEnumerable<EntityEntry> entries = entities;
+            if (entityStates?.Length > 0)
+            {
+                entries = entries.Where(x => entityStates.Any(s => (s & x.State) == s));
+            }
+
+            return entries
+                .Select(x => x.Instance)
+                .OfType<T>();
+        }
+
+        public EntityState GetEntityState<T>(T entity) where T : class
+        {
+            return entities.FirstOrDefault(x => x.Instance == entity)
+                       ?.State ?? EntityState.Detached;
+        }
+
+        public void SetEntityState<T>(T entity, EntityState state) where T : class
+        {
+            EntityEntry entry = entities.FirstOrDefault(x => x.Instance == entity);
+            if (entry == null)
+            {
+                entities.Add(new EntityEntry(entity, state));
+            }
+            else
+            {
+                entry.State = state;
+            }
+        }
+
         public bool IsAttached<T>(T entity) where T : class
         {
             return entities.Any(x => x.Instance == entity && (x.State & EntityState.Detached) != 0);

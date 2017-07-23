@@ -45,9 +45,8 @@
       <HintPath>..\..\..\Packages\Microsoft.Experimental.Collections.1.0.3-alpha\lib\portable-net45+win8+wp8\Microsoft.Experimental.Collections.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="MoreLinq">
-      <HintPath>..\..\..\Packages\morelinq.2.5.0\lib\net40\MoreLinq.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="MoreLinq, Version=2.6.20831.0, Culture=neutral, PublicKeyToken=384d532d7e88985d, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Packages\morelinq.2.6.0\lib\net40\MoreLinq.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\..\Packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>

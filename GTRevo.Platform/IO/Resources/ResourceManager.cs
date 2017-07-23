@@ -13,7 +13,7 @@ namespace GTRevo.Platform.IO.Resources
 {
     public class ResourceManager : IResourceManager, IWebActivatorExHooks
     {
-        public const string CONFIGURATION_SECTION_NAME = "resourceManager";
+        public const string ConfigurationSectionName = "resourceManager";
 
         private readonly ResourcePathRegistration[] resourcePathRegistrations;
         private readonly IConfiguration configuration;
@@ -47,7 +47,7 @@ namespace GTRevo.Platform.IO.Resources
         {
             var assemblies = typeExplorer.GetAllReferencedAssemblies();
 
-            var configSection = configuration.GetSection<ResourceManagerConfigurationSection>(CONFIGURATION_SECTION_NAME);
+            var configSection = configuration.GetSection<ResourceManagerConfigurationSection>(ConfigurationSectionName);
 
             for (int i = 0; i < configSection.PathConfiguration.Count; i++)
             {

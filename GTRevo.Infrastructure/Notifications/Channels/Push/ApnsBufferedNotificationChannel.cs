@@ -10,28 +10,28 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Push
     public class ApnsBufferedNotificationChannel : IBufferedNotificationChannel
     {
         private readonly IApnsNotificationFormatter[] pushNotificationFormatters;
-        private readonly ApnsServiceBroker apnsServiceBroker;
+        private readonly IApnsBrokerDispatcher apnsBrokerDispatcher;
 
         public ApnsBufferedNotificationChannel(
             IApnsNotificationFormatter[] pushNotificationFormatters,
-            ApnsServiceBroker apnsServiceBroker)
+            IApnsBrokerDispatcher apnsBrokerDispatcher)
         {
             this.pushNotificationFormatters = pushNotificationFormatters;
-            this.apnsServiceBroker = apnsServiceBroker;
+            this.apnsBrokerDispatcher = apnsBrokerDispatcher;
         }
 
         public async Task SendNotificationsAsync(IEnumerable<INotification> notifications)
         {
+            IEnumerable<ApnsNotification> apnsNotifications = null;
             foreach (IApnsNotificationFormatter formatter in pushNotificationFormatters)
             {
                 IEnumerable<ApnsNotification> pushNotifications = await formatter.FormatPushNotification(notifications);
-                foreach (ApnsNotification pushNotification in pushNotifications)
-                {
-                    lock (apnsServiceBroker)
-                    {
-                        apnsServiceBroker.QueueNotification(pushNotification);
-                    }
-                }
+                apnsNotifications = apnsNotifications?.Concat(pushNotifications) ?? pushNotifications;
+            }
+
+            if (apnsNotifications != null)
+            {
+                apnsBrokerDispatcher.QueueNotifications(apnsNotifications);
             }
         }
     }
