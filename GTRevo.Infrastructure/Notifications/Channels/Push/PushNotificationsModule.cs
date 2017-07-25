@@ -28,7 +28,7 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Push
                         config.GetSection<ApnsServiceConfigurationSection>(ApnsServiceConfigurationSection
                             .ConfigurationSectionName);
 
-                    return configSection != null
+                    return configSection?.CertificateFilePath.Length > 0 
                         ? new ApnsConfiguration(configSection.IsSandboxEnvironment
                                 ? ApnsConfiguration.ApnsServerEnvironment.Sandbox
                                 : ApnsConfiguration.ApnsServerEnvironment.Production,
