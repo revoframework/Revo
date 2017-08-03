@@ -117,7 +117,7 @@ namespace GTRevo.Platform.Core
             var assemblies = AppDomain.CurrentDomain.GetAssemblies()
                    .Where(a => a.GetName().Name.StartsWith("System") == false)
                    .Where(a => a.GetName().Name.StartsWith("Ninject") == false)
-                   .Where(a => a.GetName().Name.StartsWith("MediatR") == false)
+                   .Where(a => a.GetName().Name.StartsWith("MediatR") == false)                   
                    .Where(a => !a.IsDynamic)
                    .ToList();
 
@@ -133,7 +133,7 @@ namespace GTRevo.Platform.Core
                    .Cast<Assembly>()
                    .Where(a => a.GetName().Name.StartsWith("System") == false)
                    .Where(a => a.GetName().Name.StartsWith("Ninject") == false)
-                   .Where(a => a.GetName().Name.StartsWith("MediatR") == false)
+                   .Where(a => a.GetName().Name.StartsWith("MediatR") == false)                   
                    .Where(a => !a.IsDynamic)
                    .ToList();
 

@@ -269,10 +269,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\AutoMapper.Attributes\AutoMapper.Attributes.V5\AutoMapper.Attributes.V5.csproj">
-      <Project>{6a6191b1-fea5-4a40-a01a-6497eb452d92}</Project>
-      <Name>AutoMapper.Attributes.V5</Name>
-    </ProjectReference>
     <ProjectReference Include="..\GTRevo.Core\GTRevo.Core.csproj">
       <Project>{1015BA79-4241-4221-9D27-0DB033EA624B}</Project>
       <Name>GTRevo.Core</Name>

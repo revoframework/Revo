@@ -85,6 +85,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\DoubleDictionary.cs" />
+    <Compile Include="Collections\IDoubleDictionary.cs" />
     <Compile Include="Commands\CommandBindExtensions.cs" />
     <Compile Include="Commands\CommandBus.cs" />
     <Compile Include="Commands\CommandHandlerDiscovery.cs" />

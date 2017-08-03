@@ -69,6 +69,7 @@
     <Compile Include="DataAccess\LocalDbAsyncEnumerable.cs" />
     <Compile Include="DataAccess\LocalDbAsyncEnumerator.cs" />
     <Compile Include="DataAccess\LocalDbAsyncQueryProvider.cs" />
+    <Compile Include="Extensions\XunitExtensions.cs" />
     <Compile Include="Infrastructure\Repositories\FakeRepository.cs" />
     <Compile Include="Platform\Core\FakeClock.cs" />
     <Compile Include="Security\FakeUserContext.cs" />

@@ -61,6 +61,7 @@
     <Compile Include="Domain\Basic\BasicAggregateRoot.cs" />
     <Compile Include="Domain\Basic\BasicClassAggregateRoot.cs" />
     <Compile Include="Domain\Basic\BasicClassEntity.cs" />
+    <Compile Include="Domain\Basic\BasicClassifier.cs" />
     <Compile Include="Domain\Basic\BasicEntity.cs" />
     <Compile Include="Domain\Basic\DataType.cs" />
     <Compile Include="Domain\Basic\Dto\ClassEntityDto.cs" />
@@ -88,6 +89,7 @@
     <Compile Include="Domain\Events\IAggregateEventRouter.cs" />
     <Compile Include="Domain\Events\IEventRouterRegistrator.cs" />
     <Compile Include="Domain\IAggregateRoot.cs" />
+    <Compile Include="Domain\IClassifier.cs" />
     <Compile Include="Domain\IComponent.cs" />
     <Compile Include="Domain\IEntity.cs" />
     <Compile Include="Domain\IEntityTypeManager.cs" />
@@ -105,7 +107,7 @@
     <Compile Include="ReadModel\ReadModelForEntityAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\AutoMapper.Attributes\AutoMapper.Attributes.V5\AutoMapper.Attributes.V5.csproj">
+    <ProjectReference Include="..\..\AutoMapper.Attributes\AutoMapper.Attributes.V5\AutoMapper.Attributes.V5.csproj">
       <Project>{6a6191b1-fea5-4a40-a01a-6497eb452d92}</Project>
       <Name>AutoMapper.Attributes.V5</Name>
     </ProjectReference>
