@@ -34,5 +34,15 @@ namespace GTRevo.Infrastructure.Core.Domain
 
             return classId.Value;
         }
+
+        /// <summary>
+        /// Gets  domain classid (GTClassId) for type.
+        /// </summary>
+        /// <param name="type">Examined type.</param>
+        /// <returns>Domain classid.</returns>
+        public static Guid GetClassId(this Type type)
+        {
+            return GetEntityClassId(type);
+        }
     }
 }

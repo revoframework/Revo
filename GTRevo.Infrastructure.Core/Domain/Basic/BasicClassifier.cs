@@ -2,12 +2,18 @@
 
 namespace GTRevo.Infrastructure.Core.Domain.Basic
 {
-    public class BasicClassifier : BasicAggregateRoot, IClassifier
+    public abstract class BasicClassifier : BasicAggregateRoot, IClassifier
     {
-        public BasicClassifier(Guid id, string code): base(id)
+        protected BasicClassifier(Guid id, string code): base(id)
         {
             Code = code;
         }
+
+        protected BasicClassifier()
+        {
+            
+        }
+
         public string Code { get; private set; }
     }
 }
