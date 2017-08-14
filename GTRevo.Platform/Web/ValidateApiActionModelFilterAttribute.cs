@@ -12,9 +12,11 @@ namespace GTRevo.Platform.Web
         {
             base.OnActionExecuting(actionContext);
 
-            if(actionContext.ActionArguments.Any(kv => kv.Value == null)) // TODO allow for nullable value types?
+            var missingArgument = actionContext.ActionArguments.FirstOrDefault(kv => kv.Value == null); // TODO allow for nullable value types?
+            if (missingArgument.Key != null) 
             { 
-                actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Service method parameter cannot be null");
+                actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.BadRequest,
+                    $"Service method parameter cannot be null: {missingArgument.Key}");
             }
             else if (!actionContext.ModelState.IsValid)
             {

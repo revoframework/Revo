@@ -1,23 +1,25 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
-using GTRevo.DataAccess.EF6.Entities;
+using GTRevo.DataAccess.Entities;
 
 namespace GTRevo.Testing.DataAccess.EF6
 {
     public class FakeCrudRepository : ICrudRepository
     {
         private readonly List<EntityEntry> entities = new List<EntityEntry>();
+        private readonly List<IRepositoryFilter> filters = new List<IRepositoryFilter>();
 
         public FakeCrudRepository()
         {
         }
+
+        public IEnumerable<IRepositoryFilter> DefaultFilters => filters;
 
         public T Get<T>(object[] id) where T : class
         {
@@ -115,7 +117,7 @@ namespace GTRevo.Testing.DataAccess.EF6
         {
             return FindAllWithAdded<T>().Where(predicate.Compile());
         }
-
+       
         public IEnumerable<DbEntityEntry> Entries()
         {
             throw new NotImplementedException();
@@ -144,7 +146,7 @@ namespace GTRevo.Testing.DataAccess.EF6
                 .OfType<T>();
         }
 
-        public EntityState GetEntityState<T>(T entity) where T : class
+        public GTRevo.DataAccess.Entities.EntityState GetEntityState<T>(T entity) where T : class
         {
             return entities.FirstOrDefault(x => x.Instance == entity)
                        ?.State ?? EntityState.Detached;
@@ -166,6 +168,21 @@ namespace GTRevo.Testing.DataAccess.EF6
         public bool IsAttached<T>(T entity) where T : class
         {
             return entities.Any(x => x.Instance == entity && (x.State & EntityState.Detached) != 0);
+        }
+
+        public IReadRepository IncludeFilters(params IRepositoryFilter[] repositoryFilters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IReadRepository ExcludeFilter(params IRepositoryFilter[] repositoryFilters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IReadRepository ExcludeFilters<TRepositoryFilter>() where TRepositoryFilter : IRepositoryFilter
+        {
+            throw new NotImplementedException();
         }
 
         public void Attach<T>(T entity) where T : class

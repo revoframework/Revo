@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace GTRevo.DataAccess.EF6.Entities
+namespace GTRevo.DataAccess.Entities
 {
     public interface IReadRepository : IDisposable
     {
+        IEnumerable<IRepositoryFilter> DefaultFilters { get; }
+
         T Get<T>(object[] id) where T : class;
         T Get<T>(object id) where T : class;
         Task<T> GetAsync<T>(params object[] id) where T : class;
@@ -31,11 +31,7 @@ namespace GTRevo.DataAccess.EF6.Entities
 
         IQueryable<T> Where<T>(Expression<Func<T, bool>> predicate) where T : class;
         IEnumerable<T> WhereWithAdded<T>(Expression<Func<T, bool>> predicate) where T : class;
-
-        IEnumerable<DbEntityEntry> Entries();
-        DbEntityEntry Entry(object entity);
-        DbEntityEntry<T> Entry<T>(T entity) where T : class;
-
+        
         IEnumerable<T> GetEntities<T>(params EntityState[] entityStates) where T : class;
         EntityState GetEntityState<T>(T entity) where T : class;
         void SetEntityState<T>(T entity, EntityState state) where T : class;

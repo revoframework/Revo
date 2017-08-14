@@ -1,6 +1,6 @@
 ﻿using GTRevo.Core.Commands;
 using GTRevo.Core.Core.Lifecycle;
-using GTRevo.DataAccess.EF6.Entities;
+using GTRevo.DataAccess.Entities;
 using GTRevo.Infrastructure.Security.Commands;
 using GTRevo.Platform.Core;
 using Ninject.Modules;
@@ -11,14 +11,9 @@ namespace GTRevo.Infrastructure.Security
     {
         public override void Load()
         {
-            Rebind<ICrudRepository>()
-                .To<CrudRepository>()
-                .WhenInjectedInto<AuthorizingCrudRepository>()
+            Bind<IRepositoryFilter>()
+                .To<AuthorizingCrudRepositoryFilter>()
                 .InTransientScope();
-
-            Bind<ICrudRepository, IAuthorizingCrudRepository>()
-                .To<AuthorizingCrudRepository>()
-                .InRequestOrJobScope();
 
             Bind<IEntityQueryAuthorizer>()
                 .To<EntityQueryAuthorizer>()

@@ -1,7 +1,9 @@
-﻿using GTRevo.Core.Core.Lifecycle;
+﻿using System;
+using GTRevo.Core.Core.Lifecycle;
 using GTRevo.Core.Events;
-using GTRevo.DataAccess.EF6.Entities;
+using GTRevo.DataAccess.Entities;
 using GTRevo.Platform.Core;
+using Ninject.Extensions.ContextPreservation;
 using Ninject.Modules;
 
 namespace GTRevo.Infrastructure.Notifications
@@ -35,7 +37,8 @@ namespace GTRevo.Infrastructure.Notifications
                 .InRequestOrJobScope();
 
             Bind<ICrudRepository>()
-                .To<CrudRepository>()
+                //.To<CrudRepository>()
+                .ToMethod(ctx => ctx.ContextPreservingGet<Func<ICrudRepository>>()())
                 .WhenInjectedInto<BufferedNotificationStore>()
                 .InTransientScope();
         }

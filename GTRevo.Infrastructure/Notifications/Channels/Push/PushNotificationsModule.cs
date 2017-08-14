@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GTRevo.Core.Core.Lifecycle;
+﻿using GTRevo.Core.Core.Lifecycle;
 using GTRevo.Platform.Core;
 using Ninject;
 using Ninject.Modules;
@@ -22,7 +17,7 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Push
             Bind<ApnsConfiguration>()
                 .ToMethod(ctx =>
                 {
-                    StandardKernel kernel = (StandardKernel) ctx.Kernel;
+                    IKernel kernel = ctx.Kernel;
                     var config = kernel.Get<IConfiguration>();
                     var configSection =
                         config.GetSection<ApnsServiceConfigurationSection>(ApnsServiceConfigurationSection

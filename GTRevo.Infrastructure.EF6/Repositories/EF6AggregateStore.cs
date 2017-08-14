@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using GTRevo.DataAccess.EF6.Entities;
 using GTRevo.DataAccess.EF6.Model;
+using GTRevo.DataAccess.Entities;
 using GTRevo.Infrastructure.Core.Domain;
 using GTRevo.Infrastructure.Core.Domain.Basic;
 using GTRevo.Infrastructure.Repositories;
+using EntityState = System.Data.Entity.EntityState;
 
 namespace GTRevo.Infrastructure.EF6.Repositories
 {
@@ -107,7 +108,7 @@ namespace GTRevo.Infrastructure.EF6.Repositories
         private void InjectClassIds()
         {
             var addedClassEntitites =
-                crudRepository.GetEntities<IBasicClassIdEntity>(EntityState.Added, EntityState.Modified);
+                crudRepository.GetEntities<IBasicClassIdEntity>(GTRevo.DataAccess.Entities.EntityState.Added, GTRevo.DataAccess.Entities.EntityState.Modified);
 
             foreach (IBasicClassIdEntity entity in addedClassEntitites)
             {

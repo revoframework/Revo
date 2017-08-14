@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using GTRevo.Core;
 using GTRevo.Core.Core;
 using GTRevo.Core.Transactions;
 using GTRevo.Infrastructure.Core.Domain;

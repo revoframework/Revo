@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GTRevo.Core;
 using GTRevo.Core.Core;
 
 namespace GTRevo.Infrastructure.Notifications

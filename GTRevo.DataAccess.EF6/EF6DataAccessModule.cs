@@ -3,6 +3,7 @@ using GTRevo.Core.Core.Lifecycle;
 using GTRevo.Core.Transactions;
 using GTRevo.DataAccess.EF6.Entities;
 using GTRevo.DataAccess.EF6.Model;
+using GTRevo.DataAccess.Entities;
 using GTRevo.Platform.Core;
 using Ninject.Modules;
 
@@ -16,7 +17,9 @@ namespace GTRevo.DataAccess.EF6
                  .InTransientScope()
                  .WithConstructorArgument("connectionName", "EntityContext");
 
-            Bind<ICrudRepository, IReadRepository, ITransactionProvider>().To<CrudRepository>()
+            Bind(typeof(ICrudRepository), typeof(IReadRepository), typeof(IEF6CrudRepository),
+                    typeof(IEF6ReadRepository), typeof(ITransactionProvider))
+                .To<EF6CrudRepository>()
                 .InRequestOrJobScope();
 
             Bind<IDatabaseAccess>().To<DatabaseAccess>()
