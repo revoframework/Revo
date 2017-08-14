@@ -2,6 +2,6 @@
 {
     public interface IBreadcrumbNavigationItem
     {
-        Breadcrumb[] Navigation { get; }
+        Breadcrumb[] Navigation { get; set; }
     }
 }
