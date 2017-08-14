@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GTRevo.Core;
 using GTRevo.Core.Core;
 using GTRevo.DataAccess.EF6.Entities;
+using GTRevo.DataAccess.Entities;
 using GTRevo.Infrastructure.Core.Domain.Events;
 using GTRevo.Infrastructure.Core.Domain.EventSourcing;
 using GTRevo.Infrastructure.EF6.EventSourcing.Model;

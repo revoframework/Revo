@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using GTRevo.Core.Events;
 using GTRevo.Core.Transactions;
-using GTRevo.DataAccess.EF6.Entities;
+using GTRevo.DataAccess.Entities;
 using GTRevo.Infrastructure.Notifications.Model;
 
 namespace GTRevo.Infrastructure.Notifications

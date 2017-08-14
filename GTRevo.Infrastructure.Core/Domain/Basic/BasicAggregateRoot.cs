@@ -13,7 +13,7 @@ namespace GTRevo.Infrastructure.Core.Domain.Basic
         {
         }
 
-        public BasicAggregateRoot()
+        protected BasicAggregateRoot()
         {
         }
     }

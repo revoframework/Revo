@@ -5,9 +5,9 @@ namespace GTRevo.DataAccess.EF6.Entities
 {
     public class RepositoryTransaction : ITransaction
     {
-        private readonly CrudRepository repository;
+        private readonly EF6CrudRepository repository;
 
-        public RepositoryTransaction(CrudRepository repository)
+        public RepositoryTransaction(EF6CrudRepository repository)
         {
             this.repository = repository;
         }

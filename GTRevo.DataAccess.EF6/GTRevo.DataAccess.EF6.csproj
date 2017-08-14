@@ -72,20 +72,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\ChildCollection.cs" />
-    <Compile Include="Entities\CrudRepository.cs" />
+    <Compile Include="Entities\EF6CrudRepository.cs" />
     <Compile Include="Model\CustomStoreConvention.cs" />
     <Compile Include="Entities\DatabaseAcccess.cs" />
     <Compile Include="Entities\DbContextFactory.cs" />
     <Compile Include="EF6DataAccessModule.cs" />
     <Compile Include="Entities\EntityContext.cs" />
     <Compile Include="Model\EntityTypeDiscovery.cs" />
-    <Compile Include="Entities\ICrudRepository.cs" />
+    <Compile Include="Entities\IEF6CrudRepository.cs" />
     <Compile Include="Entities\IDatabaseAccess.cs" />
     <Compile Include="Entities\IDbContextFactory.cs" />
     <Compile Include="Model\IModelDefinition.cs" />
     <Compile Include="Model\IModelMetadataExplorer.cs" />
     <Compile Include="Model\InheritedColumnNameAnnotation.cs" />
-    <Compile Include="Entities\IReadRepository.cs" />
+    <Compile Include="Entities\IEF6ReadRepository.cs" />
     <Compile Include="Model\ModelDefinitionDiscovery.cs" />
     <Compile Include="Model\ModelMetadataExplorer.cs" />
     <Compile Include="Model\PrimitivePropertyConfigurationExtensions.cs" />

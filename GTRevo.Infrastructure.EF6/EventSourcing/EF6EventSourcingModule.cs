@@ -1,6 +1,7 @@
 ﻿using GTRevo.Core;
 using GTRevo.Core.Core;
 using GTRevo.DataAccess.EF6.Entities;
+using GTRevo.DataAccess.Entities;
 using GTRevo.Infrastructure.EventSourcing;
 using Ninject.Modules;
 
@@ -15,7 +16,7 @@ namespace GTRevo.Infrastructure.EF6.EventSourcing
                 .InRequestOrJobScope();
 
             Bind<ICrudRepository>()
-                .To<CrudRepository>()
+                .To<EF6CrudRepository>()
                 .WhenInjectedInto<EF6EventStore>()
                 .InTransientScope();
         }

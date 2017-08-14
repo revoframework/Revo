@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using GTRevo.Core.Commands;
 using GTRevo.Infrastructure.Notifications.Channels.Push.Commands;
 using GTRevo.Infrastructure.Notifications.Channels.Push.Model;
 using GTRevo.Infrastructure.Repositories;
-using GTRevo.Platform.Security;
 using NLog;
 using PushSharp.Apple;
 

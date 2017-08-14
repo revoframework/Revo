@@ -90,6 +90,9 @@
     <Reference Include="Ninject, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
       <HintPath>..\..\Packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
     </Reference>
+    <Reference Include="Ninject.Extensions.ContextPreservation, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\..\Packages\Ninject.Extensions.ContextPreservation.3.2.0.0\lib\net45-full\Ninject.Extensions.ContextPreservation.dll</HintPath>
+    </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\..\Packages\NLog.4.4.11\lib\net45\NLog.dll</HintPath>
     </Reference>
@@ -246,8 +249,8 @@
     <Compile Include="Repositories\IQueryableAggregateStore.cs" />
     <Compile Include="Repositories\RepositoryExtensions.cs" />
     <Compile Include="Repositories\RepositoryFactory.cs" />
+    <Compile Include="Security\AuthorizingCrudRepositoryFilter.cs" />
     <Compile Include="Security\AuthorizingQueryProvider.cs" />
-    <Compile Include="Security\AuthorizingCrudRepository.cs" />
     <Compile Include="Security\Commands\AuthorizePermissionsAttribute.cs" />
     <Compile Include="Security\Commands\CommandPermissionAuthorizer.cs" />
     <Compile Include="Security\Commands\CommandPermissionCache.cs" />
@@ -259,7 +262,6 @@
     <Compile Include="Security\Commands\IEntityQueryFilterFactory.cs" />
     <Compile Include="Security\SecurityInfrastructureModule.cs" />
     <Compile Include="Security\AuthorizationQueryableExtensions.cs" />
-    <Compile Include="Security\IAuthorizingCrudRepository.cs" />
     <Compile Include="Validation\CommandAttributeValidationFilter.cs" />
     <Compile Include="Validation\CommandValidationException.cs" />
     <Compile Include="Validation\ValidationInfrastructureModule.cs" />
@@ -269,17 +271,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\AutoMapper.Attributes\AutoMapper.Attributes.V5\AutoMapper.Attributes.V5.csproj">
+    <ProjectReference Include="..\..\GTAutoMapperAttributes\AutoMapper.Attributes.V5\AutoMapper.Attributes.V5.csproj">
       <Project>{6a6191b1-fea5-4a40-a01a-6497eb452d92}</Project>
       <Name>AutoMapper.Attributes.V5</Name>
     </ProjectReference>
     <ProjectReference Include="..\GTRevo.Core\GTRevo.Core.csproj">
       <Project>{1015BA79-4241-4221-9D27-0DB033EA624B}</Project>
       <Name>GTRevo.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GTRevo.DataAccess.EF6\GTRevo.DataAccess.EF6.csproj">
-      <Project>{a8de2f53-e404-48dd-b11f-b6a3302ce163}</Project>
-      <Name>GTRevo.DataAccess.EF6</Name>
     </ProjectReference>
     <ProjectReference Include="..\GTRevo.DataAccess\GTRevo.DataAccess.csproj">
       <Project>{fa942fe7-71fd-4cf5-8959-309583fe7903}</Project>
