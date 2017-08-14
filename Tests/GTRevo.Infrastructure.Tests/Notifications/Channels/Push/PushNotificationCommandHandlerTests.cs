@@ -18,6 +18,8 @@ namespace GTRevo.Infrastructure.Tests.Notifications.Channels.Push
 {
     public class PushNotificationCommandHandlerTests
     {
+        private const string DeviceToken1 = "da8820921cdf472887f458abb67e1db1da8820921cdf472887f458abb67e1db1";
+
         private readonly FakeUserContext userContext;
         private readonly FakeRepository repository;
         private readonly PushNotificationCommandHandler sut;
@@ -35,7 +37,7 @@ namespace GTRevo.Infrastructure.Tests.Notifications.Channels.Push
         [Fact]
         public async Task Handle_RegisterApnsDeviceCommand_SavesToken()
         {
-            string deviceToken = Guid.NewGuid().ToString();
+            string deviceToken = "da8820921cdf472887f458abb67e1db1da8820921cdf472887f458abb67e1db1";
             await sut.Handle(new RegisterApnsDeviceCommand()
             {
                 AppId = "My.AppId",
@@ -53,8 +55,8 @@ namespace GTRevo.Infrastructure.Tests.Notifications.Channels.Push
         [Fact]
         public async Task Handle_RegisterApnsDeviceCommand_SavesToken_SpacesInToken()
         {
-            string deviceToken = "da882092 1cdf 4728 87f4 58abb67e1db1";
-            string deviceTokenNormalized = "da8820921cdf472887f458abb67e1db1";
+            string deviceToken = "da882092 1cdf 4728 87f4 58abb67e1db1 da882092 1cdf 4728 87f4 58abb67e1db1";
+            string deviceTokenNormalized = "da8820921cdf472887f458abb67e1db1da8820921cdf472887f458abb67e1db1";
             await sut.Handle(new RegisterApnsDeviceCommand()
             {
                 AppId = "My.AppId",
@@ -74,7 +76,7 @@ namespace GTRevo.Infrastructure.Tests.Notifications.Channels.Push
         {
             IUser userTwo = Substitute.For<IUser>();
             userTwo.Id.Returns(Guid.NewGuid());
-            var oldToken = new ApnsUserDeviceToken(Guid.NewGuid(), userTwo, Guid.NewGuid().ToString(), "My.AppId");
+            var oldToken = new ApnsUserDeviceToken(Guid.NewGuid(), userTwo, DeviceToken1, "My.AppId");
 
             repository.Aggregates.Add(
                 new FakeRepository.EntityEntry(
@@ -98,7 +100,7 @@ namespace GTRevo.Infrastructure.Tests.Notifications.Channels.Push
         [Fact]
         public async Task Handle_RegisterApnsDeviceCommand_DoesntInsertTwice()
         {
-            var oldToken = new ApnsUserDeviceToken(Guid.NewGuid(), userContext.FakeUser, Guid.NewGuid().ToString(), "My.AppId");
+            var oldToken = new ApnsUserDeviceToken(Guid.NewGuid(), userContext.FakeUser, DeviceToken1, "My.AppId");
 
             repository.Aggregates.Add(
                 new FakeRepository.EntityEntry(
@@ -123,7 +125,7 @@ namespace GTRevo.Infrastructure.Tests.Notifications.Channels.Push
         [Fact]
         public async Task Handle_DeregisterApnsDeviceCommand_RemovesToken()
         {
-            var oldToken = new ApnsUserDeviceToken(Guid.NewGuid(), userContext.FakeUser, Guid.NewGuid().ToString(), "My.AppId");
+            var oldToken = new ApnsUserDeviceToken(Guid.NewGuid(), userContext.FakeUser, DeviceToken1, "My.AppId");
 
             repository.Aggregates.Add(
                 new FakeRepository.EntityEntry(
