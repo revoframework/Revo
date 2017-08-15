@@ -41,7 +41,7 @@ namespace GTRevo.Platform.Web
                     actionDescriptor] =
                     actionDescriptor.ActionBinding.ParameterBindings
                                  .Where(b => !b.Descriptor.IsOptional && b.Descriptor.ParameterType.UnderlyingSystemType.IsPrimitive)
-                                 .Select(b => b.Descriptor.Prefix ?? b.Descriptor.ParameterName).ToArray();
+                                 .Select(b => b.Descriptor.ParameterName).ToArray();
             }
 
             IEnumerable<ReflectedHttpActionDescriptor> actionsFoundSoFar;
@@ -96,7 +96,10 @@ namespace GTRevo.Platform.Web
                     }
                 }
 
-                actionsFound = actionsFound.Where(descriptor => _actionParams[descriptor].All(combinedParameterNames.Contains));
+                // exact parameters match - compare parameters from request with action parameters
+                // sufficient - subset parameters match - compare action parameters with parameters from request
+                actionsFound = actionsFound.Where(descriptor => _actionParams[descriptor].All(combinedParameterNames.Contains));                
+                //actionsFound = actionsFound.Where(descriptor => IsSubset(_actionParams[descriptor], combinedParameterNames));
 
                 if (actionsFound.Count() > 1)
                 {
@@ -112,6 +115,18 @@ namespace GTRevo.Platform.Web
             }
 
             return actionsFound;
+        }
+
+        private static bool IsSubset(string[] actionParameters, HashSet<string> routeAndQueryParameters)
+        {
+            foreach (string actionParameter in actionParameters)
+            {
+                if (!routeAndQueryParameters.Contains(actionParameter))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         private static bool IsValidActionMethod(MethodInfo methodInfo)

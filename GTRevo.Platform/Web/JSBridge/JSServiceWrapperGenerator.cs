@@ -24,7 +24,12 @@ namespace GTRevo.Platform.Web.JSBridge
             sb.Append(
 @"(function () {
   'use strict';
-  var module = angular.module('bc.bridge.wrapperServices', []);
+  var module = angular.module('bc.bridge.wrapperServices', [], ['$provide',
+    function wrapperServicesModule($provide) {
+      $provide.provider({
+        httpParamSerializerWithQO: httpParamSerializerWithQOProvider
+      });
+  }]);
 
 ");
 
@@ -49,6 +54,22 @@ $@"  module.service('{serviceName}', {serviceName});");
 
             sb.AppendLine(
                 @"
+  function httpParamSerializerWithQOProvider() { 
+    this.$get = ['$httpParamSerializer', function ($httpParamSerializer) {
+      return function httpParamSerializerWithQO(params) {        
+        if (!params) return '';
+        var qoName = 'queryOptions',
+          qoValue = params[qoName];
+        if (qoValue === undefined) {
+          return $httpParamSerializer(params);          
+        }        
+        var paramsWithOutQO = angular.copy(params);
+        delete paramsWithOutQO[qoName];          
+        var qString = $httpParamSerializer(paramsWithOutQO);
+        return (qString) ? qString + '&' + qoValue : qoValue;
+      };
+    }];
+  }
 })();");
 
             return sb.ToString();
@@ -71,13 +92,13 @@ $@"  function {GetServiceName(apiDescription.Key)}($http) {{");
                 string[] parameterNames = GetMethodParameterNames(method);
 
                 sb.AppendLine(
-$@"    this.{GetMethodName(method)} = function({(parameterNames.Length > 0 ? "parameters" : "")}) {{
+$@"    this.{GetMethodName(method)} = function({(((parameterNames.Length > 0) || IsIQueryable(method)) ? "parameters" : "")}) {{
       var oauthAccessToken = sessionStorage.getItem('oauthAccessToken');
       // TODO if (!oauthAccessToken) ...
 
       return $http({{
         headers: {{
-            'Authorization': 'Bearer ' + oauthAccessToken
+          'Authorization': 'Bearer ' + oauthAccessToken
         }},");
 
                 if (parameterNames.Length > 0)
@@ -108,14 +129,18 @@ $@"    this.{GetMethodName(method)} = function({(parameterNames.Length > 0 ? "pa
                                         ? ","
                                         : "")}");
                             }
-
+                            TryAppendODataQueryOptionParameter(method, sb);
                             sb.AppendLine("        },");
                         }
                     }
+                } else
+                {
+                    TryAppendODataQueryOptionParameter(method, sb);
                 }
 
                 sb.AppendLine(
 $@"        method: '{method.HttpMethod}',
+        paramSerializer: 'httpParamSerializerWithQO',
         url: '{method.ActionDescriptor.ControllerDescriptor.Configuration.VirtualPathRoot}{SanitizeUrl(method.RelativePath)}'
       }}).then(function (response) {{
         return response.data;
@@ -125,6 +150,36 @@ $@"        method: '{method.HttpMethod}',
 
             sb.AppendLine(@"  }");
         }
+
+        private bool IsIQueryable(ApiDescription apiDescription)
+        {
+            return apiDescription.ActionDescriptor.ReturnType?.GetInterfaces()?.Contains(typeof(IQueryable)) ?? false;
+        }
+
+        private void TryAppendODataQueryOptionParameter(ApiDescription apiDescription, StringBuilder sb)
+        {            
+            if (IsIQueryable(apiDescription))
+            {
+                var parameters = apiDescription.ActionDescriptor.GetParameters();
+                if (parameters.Where(x => typeof(ODataQueryOptions).IsAssignableFrom(x.ParameterType)).Any())
+                {
+                    return;
+                }
+                string oDataParam = $@"          'queryOptions': parameters.queryOptions";
+                if (parameters.Count > 0)
+                {
+                    sb.Insert(sb.Length - 2, ',');
+                    sb.AppendLine(oDataParam);
+                } else
+                {
+                    sb.AppendLine(
+$@"        params: {{ 
+{oDataParam}
+         }},");
+                }
+                
+            }
+        }      
 
         private string SanitizeUrl(string url)
         {
@@ -147,7 +202,7 @@ $@"        method: '{method.HttpMethod}',
         {
             var parameters = apiDescription.ActionDescriptor.GetParameters();
             return parameters
-                .Where(x => !typeof(ODataQueryOptions).IsAssignableFrom(x.ParameterType))
+                //.Where(x => !typeof(ODataQueryOptions).IsAssignableFrom(x.ParameterType))
                 .Select(x => ConvertPascalToCamelCase(x.ParameterName))
                 .ToArray();
         }

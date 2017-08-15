@@ -33,8 +33,8 @@
     <Reference Include="Antlr3.Runtime, Version=3.5.0.2, Culture=neutral, PublicKeyToken=eb42632606e9261f, processorArchitecture=MSIL">
       <HintPath>..\..\Packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
     </Reference>
-    <Reference Include="AutoMapper, Version=6.1.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <HintPath>..\..\Packages\AutoMapper.6.1.1\lib\net45\AutoMapper.dll</HintPath>
+    <Reference Include="AutoMapper, Version=6.1.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\..\Packages\AutoMapper.6.1.0\lib\net45\AutoMapper.dll</HintPath>
     </Reference>
     <Reference Include="AutoMapper.EF6, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\Packages\AutoMapper.EF6.1.0.0\lib\net45\AutoMapper.EF6.dll</HintPath>
@@ -312,6 +312,7 @@
     <Compile Include="Web\CandidateAction.cs" />
     <Compile Include="Web\ApiControllerTypeResolver.cs" />
     <Compile Include="Web\CommandApiController.cs" />
+    <Compile Include="Web\CommandODataController.cs" />
     <Compile Include="Web\DictionaryExtensions.cs" />
     <Compile Include="Web\HttpControllerTypeCache.cs" />
     <Compile Include="Web\HttpMethodHelpers.cs" />
