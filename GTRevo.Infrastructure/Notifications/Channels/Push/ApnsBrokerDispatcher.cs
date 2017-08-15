@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using GTRevo.Core.Core.Lifecycle;
-using Ninject;
 using NLog;
 using PushSharp.Apple;
 

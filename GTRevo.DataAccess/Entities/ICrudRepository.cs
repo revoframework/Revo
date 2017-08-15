@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace GTRevo.DataAccess.EF6.Entities
+namespace GTRevo.DataAccess.Entities
 {
     public interface ICrudRepository : IReadRepository
     {

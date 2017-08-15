@@ -1,10 +1,12 @@
 ﻿using System;
+using AutoMapper.Attributes;
 using GTRevo.DataAccess.Entities;
 using GTRevo.Infrastructure.Core.ReadModel;
 
 namespace GTRevo.Infrastructure.History.ChangeTracking.Model
 {
     [TablePrefix(NamespacePrefix = "REV", ColumnPrefix = "TCH")]
+    [MapsTo(typeof(TrackedChange))]
     public class TrackedChangeRecord : ReadModelBase
     {
         public Guid Id { get; set; }

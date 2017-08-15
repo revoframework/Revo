@@ -1,6 +1,4 @@
-﻿using System;
-using GTRevo.Core.Transactions;
-using GTRevo.DataAccess.EF6.Entities;
+﻿using GTRevo.Core.Transactions;
 using GTRevo.Platform.Core;
 using Ninject.Modules;
 
