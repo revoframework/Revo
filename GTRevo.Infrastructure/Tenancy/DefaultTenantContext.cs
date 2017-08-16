@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web;
+using GTRevo.Infrastructure.Core.Tenancy;
 
 namespace GTRevo.Infrastructure.Tenancy
 {
@@ -7,18 +8,18 @@ namespace GTRevo.Infrastructure.Tenancy
     {
         private readonly ITenantContextResolver tenantContextResolver;
         private readonly HttpContext httpContext;
-        private readonly Lazy<Guid?> tenantIdLazy;
+        private readonly Lazy<ITenant> tenantIdLazy;
 
         public DefaultTenantContext(ITenantContextResolver tenantContextResolver, HttpContext httpContext)
         {
             this.tenantContextResolver = tenantContextResolver;
             this.httpContext = httpContext;
-            this.tenantIdLazy = new Lazy<Guid?>(() =>
+            this.tenantIdLazy = new Lazy<ITenant>(() =>
             {
-                return tenantContextResolver.ResolveTenantId(httpContext);
+                return tenantContextResolver.ResolveTenant(httpContext);
             });
         }
 
-        public Guid? TenantId => tenantIdLazy.Value;
+        public ITenant Tenant => tenantIdLazy.Value;
     }
 }

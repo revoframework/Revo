@@ -7,7 +7,7 @@ using GTRevo.Infrastructure.Core.ReadModel;
 
 namespace GTRevo.Infrastructure.Core.Tenancy
 {
-    public class TenantClassEntityReadModel : ClassEntityReadModel, ITenantOwned
+    public abstract class TenantClassEntityReadModel : ClassEntityReadModel, ITenantOwned
     {
         public Guid? TenantId { get; set; }
     }

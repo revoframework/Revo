@@ -24,6 +24,10 @@ namespace GTRevo.Infrastructure.Tenancy
             Bind<IRepositoryFilter>()
                 .To<TenantRepositoryFilter>()
                 .InTransientScope();
+
+            Bind<ITenantManager>()
+                .To<DefaultTenantManager>()
+                .InTransientScope();
         }
     }
 }

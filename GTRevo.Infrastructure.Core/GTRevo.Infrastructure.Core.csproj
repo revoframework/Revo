@@ -105,6 +105,7 @@
     <Compile Include="ReadModel\EntityView.cs" />
     <Compile Include="ReadModel\ReadModelBase.cs" />
     <Compile Include="ReadModel\ReadModelForEntityAttribute.cs" />
+    <Compile Include="Tenancy\ITenant.cs" />
     <Compile Include="Tenancy\ITenantOwned.cs" />
     <Compile Include="Tenancy\TenantBasicAggregateRoot.cs" />
     <Compile Include="Tenancy\TenantBasicClassAggregateRoot.cs" />

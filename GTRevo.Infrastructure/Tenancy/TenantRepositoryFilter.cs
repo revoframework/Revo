@@ -32,7 +32,7 @@ namespace GTRevo.Infrastructure.Tenancy
             ITenantOwned tenantOwned = result as ITenantOwned;
             if (tenantOwned != null)
             {
-                Guid? tenantId = tenantContext.TenantId;
+                Guid? tenantId = tenantContext.Tenant?.Id;
                 if (tenantOwned.TenantId != null && tenantId != null
                     && tenantOwned.TenantId != tenantId)
                 {
@@ -48,7 +48,7 @@ namespace GTRevo.Infrastructure.Tenancy
             ITenantOwned tenantOwned = added as ITenantOwned;
             if (tenantOwned != null)
             {
-                Guid? tenantId = tenantContext.TenantId;
+                Guid? tenantId = tenantContext.Tenant?.Id;
                 if (tenantOwned.TenantId != null && tenantId != null
                     && tenantOwned.TenantId != tenantId)
                 {
@@ -63,7 +63,7 @@ namespace GTRevo.Infrastructure.Tenancy
             ITenantOwned tenantOwned = deleted as ITenantOwned;
             if (tenantOwned != null)
             {
-                Guid? tenantId = tenantContext.TenantId;
+                Guid? tenantId = tenantContext.Tenant?.Id;
                 if (tenantOwned.TenantId != null && tenantId != null
                     && tenantOwned.TenantId != tenantId)
                 {
@@ -78,7 +78,7 @@ namespace GTRevo.Infrastructure.Tenancy
             ITenantOwned tenantOwned = modified as ITenantOwned;
             if (tenantOwned != null)
             {
-                Guid? tenantId = tenantContext.TenantId;
+                Guid? tenantId = tenantContext.Tenant?.Id;
                 if (tenantOwned.TenantId != null && tenantId != null
                     && tenantOwned.TenantId != tenantId)
                 {
@@ -90,7 +90,7 @@ namespace GTRevo.Infrastructure.Tenancy
 
         private IQueryable<T> DoFilterResults<T>(IQueryable<T> results) where T : class, ITenantOwned
         {
-            Guid? tenantId = tenantContext.TenantId;
+            Guid? tenantId = tenantContext.Tenant?.Id;
             if (tenantId == null)
             {
                 return results;

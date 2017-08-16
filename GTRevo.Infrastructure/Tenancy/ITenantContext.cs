@@ -1,9 +1,10 @@
 ﻿using System;
+using GTRevo.Infrastructure.Core.Tenancy;
 
 namespace GTRevo.Infrastructure.Tenancy
 {
     public interface ITenantContext
     {
-        Guid? TenantId { get; }
+        ITenant Tenant { get; }
     }
 }

@@ -265,8 +265,10 @@
     <Compile Include="Security\SecurityInfrastructureModule.cs" />
     <Compile Include="Security\AuthorizationQueryableExtensions.cs" />
     <Compile Include="Tenancy\DefaultTenantContext.cs" />
+    <Compile Include="Tenancy\DefaultTenantManager.cs" />
     <Compile Include="Tenancy\ITenantContext.cs" />
     <Compile Include="Tenancy\ITenantContextResolver.cs" />
+    <Compile Include="Tenancy\ITenantManager.cs" />
     <Compile Include="Tenancy\NullTenantContextResolver.cs" />
     <Compile Include="Tenancy\SingleTenantContextResolver.cs" />
     <Compile Include="Tenancy\TenancyModule.cs" />

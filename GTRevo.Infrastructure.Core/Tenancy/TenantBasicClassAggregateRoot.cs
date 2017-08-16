@@ -3,11 +3,11 @@ using GTRevo.Infrastructure.Core.Domain.Basic;
 
 namespace GTRevo.Infrastructure.Core.Tenancy
 {
-    public class TenantBasicClassAggregateRoot : BasicClassAggregateRoot, ITenantOwned
+    public abstract class TenantBasicClassAggregateRoot : BasicClassAggregateRoot, ITenantOwned
     {
-        protected TenantBasicClassAggregateRoot(Guid id, Guid? tenantId) : base(id)
+        protected TenantBasicClassAggregateRoot(Guid id, ITenant tenant) : base(id)
         {
-            TenantId = tenantId;
+            TenantId = tenant?.Id;
         }
 
         protected TenantBasicClassAggregateRoot()

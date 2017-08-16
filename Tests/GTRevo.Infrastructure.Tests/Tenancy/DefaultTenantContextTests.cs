@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using GTRevo.Infrastructure.Core.Tenancy;
 using GTRevo.Infrastructure.Tenancy;
 using NSubstitute;
 using Xunit;
@@ -29,10 +30,11 @@ namespace GTRevo.Infrastructure.Tests.Tenancy
         [Fact]
         public void TenantId_ResolvesTenant()
         {
-            Guid tenantId = Guid.NewGuid();
-            tenantContextResolver.ResolveTenantId(httpContext).Returns(tenantId);
+            ITenant tenant = Substitute.For<ITenant>();
+            tenant.Id.Returns(Guid.NewGuid());
+            tenantContextResolver.ResolveTenant(httpContext).Returns(tenant);
 
-            Assert.Equal(tenantId, sut.TenantId);
+            Assert.Equal(tenant, sut.Tenant);
         }
     }
 }

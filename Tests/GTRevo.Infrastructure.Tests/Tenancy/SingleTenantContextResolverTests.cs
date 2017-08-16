@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GTRevo.Infrastructure.Core.Tenancy;
 using GTRevo.Infrastructure.Tenancy;
+using NSubstitute;
 using Xunit;
 
 namespace GTRevo.Infrastructure.Tests.Tenancy
@@ -11,17 +13,22 @@ namespace GTRevo.Infrastructure.Tests.Tenancy
     public class SingleTenantContextResolverTests
     {
         private readonly SingleTenantContextResolver sut;
-        private readonly Guid tenantId = Guid.NewGuid();
+        private readonly ITenantManager tenantManager;
+        private readonly ITenant tenant;
 
         public SingleTenantContextResolverTests()
         {
-            sut = new SingleTenantContextResolver(tenantId);
+            tenantManager = Substitute.For<ITenantManager>();
+            tenant = Substitute.For<ITenant>();
+            tenantManager.GetTenant(tenant.Id).Returns(tenant);
+
+            sut = new SingleTenantContextResolver(tenant.Id, tenantManager);
         }
 
         [Fact]
-        public void TenantId_ReturnsCorrectId()
+        public void Tenant_ReturnsCorrectTenant()
         {
-            Assert.Equal(tenantId, sut.TenantId);
+            Assert.Equal(tenant, sut.Tenant);
         }
     }
 }

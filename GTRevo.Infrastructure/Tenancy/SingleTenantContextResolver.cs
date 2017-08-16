@@ -4,21 +4,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using GTRevo.Infrastructure.Core.Tenancy;
 
 namespace GTRevo.Infrastructure.Tenancy
 {
     public class SingleTenantContextResolver : ITenantContextResolver
     {
-        public SingleTenantContextResolver(Guid tenantId)
+        private readonly ITenantManager tenantManager;
+
+        public SingleTenantContextResolver(Guid tenantId, ITenantManager tenantManager)
         {
-            TenantId = tenantId;
+            this.tenantManager = tenantManager;
+            Tenant = tenantManager.GetTenant(tenantId);
         }
 
-        public Guid TenantId { get; private set; }
+        public ITenant Tenant { get; private set; }
 
-        public Guid? ResolveTenantId(HttpContext httpContext)
+        public ITenant ResolveTenant(HttpContext httpContext)
         {
-            return TenantId;
+            return Tenant;
         }
     }
 }
