@@ -12,7 +12,7 @@ namespace GTRevo.Infrastructure.Tenancy
     {
         private readonly ITenantManager tenantManager;
 
-        public SingleTenantContextResolver(Guid tenantId, ITenantManager tenantManager)
+        public SingleTenantContextResolver(ITenantManager tenantManager, Guid tenantId)
         {
             this.tenantManager = tenantManager;
             Tenant = tenantManager.GetTenant(tenantId);
