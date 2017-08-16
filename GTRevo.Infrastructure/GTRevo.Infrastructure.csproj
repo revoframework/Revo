@@ -265,6 +265,13 @@
     <Compile Include="Security\Commands\IEntityQueryFilterFactory.cs" />
     <Compile Include="Security\SecurityInfrastructureModule.cs" />
     <Compile Include="Security\AuthorizationQueryableExtensions.cs" />
+    <Compile Include="Tenancy\DefaultTenantContext.cs" />
+    <Compile Include="Tenancy\ITenantContext.cs" />
+    <Compile Include="Tenancy\ITenantContextResolver.cs" />
+    <Compile Include="Tenancy\NullTenantContextResolver.cs" />
+    <Compile Include="Tenancy\SingleTenantContextResolver.cs" />
+    <Compile Include="Tenancy\TenancyModule.cs" />
+    <Compile Include="Tenancy\TenantRepositoryFilter.cs" />
     <Compile Include="Validation\CommandAttributeValidationFilter.cs" />
     <Compile Include="Validation\CommandValidationException.cs" />
     <Compile Include="Validation\ValidationInfrastructureModule.cs" />

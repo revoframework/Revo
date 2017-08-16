@@ -19,9 +19,9 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Push
                 {
                     IKernel kernel = ctx.Kernel;
                     var config = kernel.Get<IConfiguration>();
-                    var configSection =
-                        config.GetSection<ApnsServiceConfigurationSection>(ApnsServiceConfigurationSection
-                            .ConfigurationSectionName);
+                    var configSection = LocalConfiguration.Current
+                        .GetSection<ApnsServiceConfigurationSection>(
+                            ApnsServiceConfigurationSection.ConfigurationSectionName);
 
                     return configSection?.CertificateFilePath.Length > 0 
                         ? new ApnsConfiguration(configSection.IsSandboxEnvironment
