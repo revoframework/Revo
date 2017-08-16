@@ -113,7 +113,7 @@
     <Compile Include="Tenancy\TenantEntityView.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\AutoMapper.Attributes\AutoMapper.Attributes.V5\AutoMapper.Attributes.V5.csproj">
+    <ProjectReference Include="..\..\GTAutoMapperAttributes\AutoMapper.Attributes.V5\AutoMapper.Attributes.V5.csproj">
       <Project>{6a6191b1-fea5-4a40-a01a-6497eb452d92}</Project>
       <Name>AutoMapper.Attributes.V5</Name>
     </ProjectReference>
