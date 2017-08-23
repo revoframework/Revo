@@ -50,11 +50,14 @@ namespace GTRevo.Platform.IO.Globalization
                 foreach (LocaleMessageResourceRegistration messageResourceReg
                     in localeMessageResourceRegistrations.Where(x => x.LocaleCode == locale.Code))
                 {
-                    using (Stream messageStream = resourceManager.CreateReadStream(messageResourceReg.MessageResourcePath))
-                    {
-                        YamlMessageSource messageSource = new YamlMessageSource(messageStream);
-                        messageSources.Add(messageSource);
-                    }
+                    if (messageResourceReg.Source != null)
+                        messageSources.Add(messageResourceReg.Source);
+                    else
+                        using (Stream messageStream = resourceManager.CreateReadStream(messageResourceReg.MessageResourcePath))
+                        {
+                            YamlMessageSource messageSource = new YamlMessageSource(messageStream);
+                            messageSources.Add(messageSource);
+                        }
                 }
 
                 IMessageSource compositeMessageSource = new CompositeMessageSource(messageSources);

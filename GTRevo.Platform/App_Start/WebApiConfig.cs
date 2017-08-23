@@ -3,6 +3,7 @@ using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Dispatcher;
 using System.Web.OData.Extensions;
+using GTRevo.Platform.Globalization;
 using GTRevo.Platform.IO;
 using GTRevo.Platform.Web;
 using Microsoft.Owin.Security.OAuth;
@@ -31,6 +32,7 @@ namespace GTRevo.Platform
             /*config.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             config.Formatters.JsonFormatter.UseDataContractJsonSerializer = false;*/
             config.Formatters.JsonFormatter.SerializerSettings.Converters.Add(new BracesGuidJsonConverter());
+            config.Formatters.JsonFormatter.SerializerSettings.Converters.Add(new TranslatingJsonConverter());
 
             config.Services.Replace(typeof(IHttpActionSelector), new HyphenApiControllerActionSelector());
             config.Services.Replace(typeof(IHttpControllerSelector), new ApiControllerSelector(config));

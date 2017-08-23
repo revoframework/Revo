@@ -46,6 +46,7 @@
       <HintPath>..\..\Packages\NLog.4.4.11\lib\net45\NLog.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -107,7 +108,7 @@
     <Compile Include="ReadModel\ReadModelForEntityAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\AutoMapper.Attributes\AutoMapper.Attributes.V5\AutoMapper.Attributes.V5.csproj">
+    <ProjectReference Include="..\..\GTAutoMapperAttributes\AutoMapper.Attributes.V5\AutoMapper.Attributes.V5.csproj">
       <Project>{6a6191b1-fea5-4a40-a01a-6497eb452d92}</Project>
       <Name>AutoMapper.Attributes.V5</Name>
     </ProjectReference>
@@ -118,6 +119,10 @@
     <ProjectReference Include="..\GTRevo.DataAccess\GTRevo.DataAccess.csproj">
       <Project>{fa942fe7-71fd-4cf5-8959-309583fe7903}</Project>
       <Name>GTRevo.DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GTRevo.Platform\GTRevo.Platform.csproj">
+      <Project>{42CDFAD0-CB40-433E-AC6E-874F3F58E77D}</Project>
+      <Name>GTRevo.Platform</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
