@@ -74,6 +74,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -117,6 +118,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\RepositoryExtensionsTests.cs" />
     <Compile Include="Repositories\RepositoryTests.cs" />
+    <Compile Include="Tenancy\DefaultTenantContextTests.cs" />
+    <Compile Include="Tenancy\SingleTenantContextResolverTests.cs" />
+    <Compile Include="Tenancy\TenantRepositoryFilterTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

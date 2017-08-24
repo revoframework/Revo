@@ -114,6 +114,8 @@ namespace GTRevo.Platform.Core
         {
             //kernel.BindMediatR(); //NOTE: loaded automatically
 
+            LocalConfiguration.Current = new WebConfiguration();
+
             var assemblies = AppDomain.CurrentDomain.GetAssemblies()
                    .Where(a => a.GetName().Name.StartsWith("System") == false)
                    .Where(a => a.GetName().Name.StartsWith("Ninject") == false)

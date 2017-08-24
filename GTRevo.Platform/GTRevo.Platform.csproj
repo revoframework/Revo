@@ -238,6 +238,7 @@
     <Compile Include="Core\HangfireOwinConfigurator.cs" />
     <Compile Include="Core\IActorContext.cs" />
     <Compile Include="Core\IAutoMapperDefinition.cs" />
+    <Compile Include="Core\LocalConfiguration.cs" />
     <Compile Include="Core\UserActorContext.cs" />
     <Compile Include="Core\AutoMapperInitializer.cs" />
     <Compile Include="Core\CommandBusModule.cs" />

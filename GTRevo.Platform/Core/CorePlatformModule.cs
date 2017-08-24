@@ -75,8 +75,8 @@ namespace GTRevo.Platform.Core
                 .InSingletonScope();
 
             Bind<IConfiguration>()
-                .To<WebConfiguration>()
-                .InSingletonScope();
+                .ToMethod(ctx => LocalConfiguration.Current)
+                .InTransientScope();
 
             Bind<IActorContext>()
                 .To<UserActorContext>()

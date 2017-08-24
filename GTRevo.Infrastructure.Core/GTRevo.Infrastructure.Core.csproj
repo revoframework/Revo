@@ -106,6 +106,13 @@
     <Compile Include="ReadModel\EntityView.cs" />
     <Compile Include="ReadModel\ReadModelBase.cs" />
     <Compile Include="ReadModel\ReadModelForEntityAttribute.cs" />
+    <Compile Include="Tenancy\ITenant.cs" />
+    <Compile Include="Tenancy\ITenantOwned.cs" />
+    <Compile Include="Tenancy\TenantBasicAggregateRoot.cs" />
+    <Compile Include="Tenancy\TenantBasicClassAggregateRoot.cs" />
+    <Compile Include="Tenancy\TenantClassEntityReadModel.cs" />
+    <Compile Include="Tenancy\TenantEntityReadModel.cs" />
+    <Compile Include="Tenancy\TenantEntityView.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\GTAutoMapperAttributes\AutoMapper.Attributes.V5\AutoMapper.Attributes.V5.csproj">
