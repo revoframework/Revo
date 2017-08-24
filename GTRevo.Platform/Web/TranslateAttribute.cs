@@ -37,7 +37,11 @@ namespace GTRevo.Platform.Web
         {
             base.OnActionExecuted(actionExecutedContext);
             //TODO: get actual locality from header
-            string culture = "cs-CZ";
+            string culture =
+                actionExecutedContext.Request.Headers.GetCookies()
+                    .Select(c => c["current-lang"])
+                    .FirstOrDefault()?.Value ?? "cs-CZ";
+            //string culture = "cs-CZ";
             var content = actionExecutedContext.Response.Content as ObjectContent;
             if (content != null)
             {
@@ -56,23 +60,35 @@ namespace GTRevo.Platform.Web
             PropertyInfo currentProperty = null;
             for (int i = 0; i < path.Count; i++)
             {
-                currentProperty = currentType.GetProperty(path[i].Name);
-                currentType = currentProperty.PropertyType;
-                if (path[i] is CollectionPathItem)
+                if (path[i].Name == null)
                 {
-                    var collection = (ICollection) currentProperty.GetValue(currentTarget);
-                    foreach (var item in collection)
+                    var collection = (IEnumerable)currentTarget;
+                    if (collection != null)
+                        foreach (var item in collection)
                     {
-                        InjectCulture(culture,path.Skip(i+1).ToList(), item);
+                        InjectCulture(culture, path.Skip(i + 1).ToList(), item);
                     }
                     return;
                 }
-                else
+                currentProperty = currentType.GetProperty(path[i].Name);
+                currentType = currentProperty.PropertyType;
+                if (path[i] is CollectionPathItem && currentTarget != null)
                 {
-                    currentTarget = currentProperty.GetValue(currentTarget);
+                    var collection = (IEnumerable) currentProperty.GetValue(currentTarget);
+                    if (collection != null)
+                        foreach (var item in collection)
+                        {
+                            InjectCulture(culture,path.Skip(i+1).ToList(), item);
+                        }
+                    return;
                 }
+                if (currentTarget == null)
+                {
+                    break;
+                }
+                currentTarget = currentProperty.GetValue(currentTarget);
             }
-            if (currentProperty != null)
+            if (currentProperty != null && currentTarget != null)
             {
                 currentTarget.GetType().GetProperty(nameof(ITranslatable.Culture)).SetValue(currentTarget, culture);
             }
@@ -87,6 +103,16 @@ namespace GTRevo.Platform.Web
             if (TranslatablePathCache.ContainsKey(type))
                 return TranslatablePathCache[type];
             var result = new List<List<PathItem>>();
+            if (typeof(IEnumerable).IsAssignableFrom(type) && type.IsGenericType)
+            {
+                var collectionType = type.GenericTypeArguments.First();
+                foreach (var subpath in GetPathsToTranslatables(collectionType))
+                {
+                    var newPath = new List<PathItem> { new CollectionPathItem(null) };
+                    newPath.AddRange(subpath);
+                    result.Add(newPath);
+                }
+            }
             foreach (
                 var prop in
                 type.GetProperties()
@@ -96,7 +122,7 @@ namespace GTRevo.Platform.Web
                 {
                     result.Add(new List<PathItem> { new PathItem(prop.Name)});
                 }
-                else if (typeof(ICollection).IsAssignableFrom(prop.PropertyType) && prop.PropertyType.IsGenericType)
+                else if (typeof(IEnumerable).IsAssignableFrom(prop.PropertyType) && prop.PropertyType.IsGenericType)
                 {
                     var collectionType = prop.PropertyType.GenericTypeArguments.First();
                     foreach (var subpath in GetPathsToTranslatables(collectionType))
