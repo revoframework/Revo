@@ -111,8 +111,10 @@
     <Compile Include="Tenancy\TenantBasicAggregateRoot.cs" />
     <Compile Include="Tenancy\TenantBasicClassAggregateRoot.cs" />
     <Compile Include="Tenancy\TenantClassEntityReadModel.cs" />
+    <Compile Include="Tenancy\TenantClassifier.cs" />
     <Compile Include="Tenancy\TenantEntityReadModel.cs" />
     <Compile Include="Tenancy\TenantEntityView.cs" />
+    <Compile Include="Tenancy\TenantEventSourcedAggregateRoot.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\GTAutoMapperAttributes\AutoMapper.Attributes.V5\AutoMapper.Attributes.V5.csproj">
