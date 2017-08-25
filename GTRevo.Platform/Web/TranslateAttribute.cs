@@ -66,7 +66,10 @@ namespace GTRevo.Platform.Web
                     if (collection != null)
                         foreach (var item in collection)
                     {
-                        InjectCulture(culture, path.Skip(i + 1).ToList(), item);
+                        if (i == path.Count - 1)
+                            item.GetType().GetProperty(nameof(ITranslatable.Culture)).SetValue(item, culture);
+                        else
+                            InjectCulture(culture, path.Skip(i + 1).ToList(), item);
                     }
                     return;
                 }
