@@ -14,7 +14,6 @@ namespace GTRevo.Infrastructure.Core.Domain.Basic
 
         protected BasicClassifier()
         {
-            
         }
 
         public string Code { get; private set; }

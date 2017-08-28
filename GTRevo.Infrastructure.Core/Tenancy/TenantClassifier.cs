@@ -14,10 +14,10 @@ namespace GTRevo.Infrastructure.Core.Tenancy
             TenantId = tenant?.Id;
         }
 
-        protected TenantClassifier(): base()
+        protected TenantClassifier()
         {
         }
 
-        public Guid? TenantId { get; }
+        public Guid? TenantId { get; private set; }
     }
 }
