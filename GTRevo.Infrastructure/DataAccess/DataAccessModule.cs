@@ -14,6 +14,10 @@ namespace GTRevo.Infrastructure.DataAccess
             Bind<IDatabaseInitializerDiscovery>()
                 .To<DatabaseInitializerDiscovery>()
                 .InSingletonScope();
+
+            Bind<IDatabaseInitializerComparer>()
+                .To<DatabaseInitializerDependencyComparer>()
+                .InSingletonScope();
         }
     }
 }

@@ -155,11 +155,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataAccess\DataAccessModule.cs" />
+    <Compile Include="DataAccess\DatabaseInitializerDependencyComparer.cs" />
     <Compile Include="DataAccess\DatabaseInitializerDiscovery.cs" />
     <Compile Include="DataAccess\DatabaseInitializerLoader.cs" />
     <Compile Include="DataAccess\DatabaseInitializerStub.cs" />
     <Compile Include="DataAccess\IDatabaseInitializer.cs" />
+    <Compile Include="DataAccess\IDatabaseInitializerComparer.cs" />
     <Compile Include="DataAccess\IDatabaseInitializerDiscovery.cs" />
+    <Compile Include="DataAccess\InitializeAfterAttribute.cs" />
     <Compile Include="DataAccess\StaticClassifierDatabaseInitializer.cs" />
     <Compile Include="EventSourcing\EventSourcingInfrastructureModule.cs" />
     <Compile Include="Globalization\DbMessageSource.cs" />
