@@ -25,6 +25,7 @@ namespace GTRevo.Platform
             config.SuppressDefaultHostAuthentication();
             config.Filters.Add(new HostAuthenticationFilter(OAuthDefaults.AuthenticationType));
 
+            config.Filters.Add(new ODataActionFilterAttribute());
             config.AddODataQueryFilter();
             config.EnableDependencyInjection();
             config.Select().Expand().Filter().OrderBy().MaxTop(null).Count(); //enable common OData options
