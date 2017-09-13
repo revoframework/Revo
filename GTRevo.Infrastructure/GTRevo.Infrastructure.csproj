@@ -267,8 +267,11 @@
     <Compile Include="Security\Commands\IEntityQueryAuthorizer.cs" />
     <Compile Include="Security\Commands\IEntityQueryFilter.cs" />
     <Compile Include="Security\Commands\IEntityQueryFilterFactory.cs" />
+    <Compile Include="Security\ITokenValidator.cs" />
     <Compile Include="Security\SecurityInfrastructureModule.cs" />
     <Compile Include="Security\AuthorizationQueryableExtensions.cs" />
+    <Compile Include="Security\ServiceToken.cs" />
+    <Compile Include="Security\TokenValidator.cs" />
     <Compile Include="Tenancy\DefaultTenantContext.cs" />
     <Compile Include="Tenancy\DefaultTenantManager.cs" />
     <Compile Include="Tenancy\ITenantContext.cs" />
