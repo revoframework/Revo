@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Globalization;
+using System.Text;
 
 namespace GTRevo.Core.Core
 {
@@ -38,6 +40,18 @@ namespace GTRevo.Core.Core
                 return path.Substring(0, path.Length - 1);
             }
             return path;
+        }
+
+        public static string RemoveDiacritics(this string s)
+        {
+            s = s.Normalize(NormalizationForm.FormD);
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < s.Length; i++)
+            {
+                if (CharUnicodeInfo.GetUnicodeCategory(s[i]) != UnicodeCategory.NonSpacingMark)
+                    sb.Append(s[i]);
+            }                
+            return sb.ToString();            
         }
     }
 }

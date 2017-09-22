@@ -22,6 +22,10 @@ namespace GTRevo.DataAccess.EF6
                 .To<EF6CrudRepository>()
                 .InRequestOrJobScope();
 
+            Bind<IEF6RawQueryRepository>()
+                .To<EF6RawQueryRepository>()
+                .InRequestOrJobScope();
+
             Bind<IDatabaseAccess>().To<DatabaseAccess>()
                 .InRequestOrJobScope();
 

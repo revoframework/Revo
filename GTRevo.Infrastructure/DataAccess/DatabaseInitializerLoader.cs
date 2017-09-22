@@ -19,9 +19,9 @@ namespace GTRevo.Infrastructure.DataAccess
             var initializers = databaseInitializerDiscovery.DiscoverDatabaseInitializers();
             var sortedInitializers = initializers.ToList();
             sortedInitializers.Sort(comparer);
-            foreach (IDatabaseInitializer initializer in sortedInitializers)
+            for (int i = 0; i< sortedInitializers.Count;i++)
             {
-                initializer.Initialize();
+                sortedInitializers[i].Initialize();
             }
         }
     }

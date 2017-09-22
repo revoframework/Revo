@@ -384,7 +384,7 @@ namespace GTRevo.DataAccess.EF6.Entities
             }
         }
 
-        private DbContext GetDbContext(Type entityType)
+        protected DbContext GetDbContext(Type entityType)
         {
             string schemaSpace = modelMetadataExplorer.GetEntityTypeSchemaSpace(entityType);
             return GetDbContext(schemaSpace);
