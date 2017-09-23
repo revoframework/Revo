@@ -114,6 +114,7 @@
     <Compile Include="Commands\WrappedEntityQueryWithContext.cs" />
     <Compile Include="Core\Clock.cs" />
     <Compile Include="Core\CorePlatformModule.cs" />
+    <Compile Include="Core\IActorContext.cs" />
     <Compile Include="Events\EventQueue.cs" />
     <Compile Include="Events\EventQueueTransaction.cs" />
     <Compile Include="Events\IEvent.cs" />
@@ -128,9 +129,14 @@
     <Compile Include="Core\ITypeExplorer.cs" />
     <Compile Include="Core\MemoryUtils.cs" />
     <Compile Include="Core\NinjectBindingExtensions.cs" />
+    <Compile Include="Globalization\ITranslatable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\StringExtensions.cs" />
     <Compile Include="Core\SystemClock.cs" />
+    <Compile Include="Security\IUser.cs" />
+    <Compile Include="Security\IUserContext.cs" />
+    <Compile Include="Security\Permission.cs" />
+    <Compile Include="Security\PermissionType.cs" />
     <Compile Include="Transactions\ITransaction.cs" />
     <Compile Include="Transactions\ITransactionListener.cs" />
     <Compile Include="Transactions\ITransactionProvider.cs" />

@@ -1,4 +1,6 @@
-﻿using GTRevo.Platform.Security;
+﻿using GTRevo.Core.Core;
+using GTRevo.Core.Security;
+using GTRevo.Platform.Security;
 
 namespace GTRevo.Platform.Core
 {

@@ -59,7 +59,7 @@ namespace GTRevo.Core.Events
             {
                 /* mediatr event publishing sucks and infers event type only
                  * from the generic parameter, so we actually have to use reflection
-                 * (ca't use dynamic dispatch eiter because it doesn't play well generics */
+                 * (can't use dynamic dispatch eiter because it doesn't play well with generics) */
 
                 //await eventBus.Publish((dynamic)ev, default(CancellationToken));
 

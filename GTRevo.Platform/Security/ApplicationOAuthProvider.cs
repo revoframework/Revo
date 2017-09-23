@@ -25,7 +25,7 @@ namespace GTRevo.Platform.Security
         {
             var userManager = context.OwinContext.GetUserManager<AppUserManager>();
 
-            IUser user = await userManager.FindAsync(context.UserName, context.Password);
+            IIdentityUser user = await userManager.FindAsync(context.UserName, context.Password);
 
             if (user == null)
             {

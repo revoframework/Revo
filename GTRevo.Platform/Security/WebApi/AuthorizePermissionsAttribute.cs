@@ -3,6 +3,7 @@ using System.Linq;
 using System.Security.Principal;
 using System.Web.Http;
 using System.Web.Http.Controllers;
+using GTRevo.Core.Security;
 using GTRevo.Platform.Core;
 using Ninject;
 

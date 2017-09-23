@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using GTRevo.Core.Commands;
+using GTRevo.Core.Security;
 using GTRevo.Infrastructure.Notifications.Channels.Push.Commands;
 using GTRevo.Infrastructure.Notifications.Channels.Push.Model;
 using GTRevo.Infrastructure.Repositories;

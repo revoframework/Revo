@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using GTRevo.Core.Core;
+using GTRevo.Core.Security;
 using GTRevo.DataAccess.Entities;
 using GTRevo.Infrastructure.Core.Domain.Basic;
-using GTRevo.Platform.Security;
 
 namespace GTRevo.Infrastructure.Notifications.Channels.Push.Model
 {

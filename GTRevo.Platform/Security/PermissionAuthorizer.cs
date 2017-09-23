@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
+using GTRevo.Core.Security;
 using GTRevo.Platform.Security.Identity;
 
 namespace GTRevo.Platform.Security

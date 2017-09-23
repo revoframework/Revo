@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using GTRevo.Core.Commands;
+using GTRevo.Core.Security;
 using GTRevo.Platform.Security;
 using GTRevo.Platform.Security.Identity;
 
@@ -27,7 +28,7 @@ namespace GTRevo.Infrastructure.Security.Commands
         {
             var requiredPermissions = commandPermissionCache.GetCommandPermissions(command);
             var user = await userContext.GetUserAsync();
-            var userPermissions = await appUserManager.GetUserPermissionsAsync(user);
+            var userPermissions = await appUserManager.GetUserPermissionsAsync((IIdentityUser) user);
 
             if (!permissionAuthorizer.CheckAuthorization(userPermissions, requiredPermissions))
             {

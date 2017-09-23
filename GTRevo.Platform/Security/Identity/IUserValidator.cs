@@ -2,7 +2,7 @@
 
 namespace GTRevo.Platform.Security.Identity
 {
-    public interface IUserValidator : IIdentityValidator<IUser>
+    public interface IUserValidator : IIdentityValidator<IIdentityUser>
     {
     }
 }

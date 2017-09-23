@@ -3,7 +3,7 @@ using Microsoft.AspNet.Identity;
 
 namespace GTRevo.Platform.Security.Identity
 {
-    public class DefaultUserValidator : UserValidator<IUser, Guid>, IUserValidator
+    public class DefaultUserValidator : UserValidator<IIdentityUser, Guid>, IUserValidator
     {
         public DefaultUserValidator(AppUserManager userManager) : base(userManager)
         {

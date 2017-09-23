@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Security.Claims;
+using GTRevo.Core.Security;
 
 namespace GTRevo.Platform.Security.Identity
 {

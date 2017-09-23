@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace GTRevo.Infrastructure.DataAccess
 {
-    class DatabaseInitializerDependencyComparer: IDatabaseInitializerComparer
+    public class DatabaseInitializerDependencyComparer: IDatabaseInitializerComparer
     {
         public int Compare(IDatabaseInitializer x, IDatabaseInitializer y)
         {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GTRevo.Core.Security;
 using GTRevo.Platform.Security.Identity;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
@@ -13,7 +14,7 @@ namespace GTRevo.Platform.Security
         private readonly IAuthenticationManager authenticationManager;
         private readonly AppUserManager userManager;
         private readonly Lazy<Guid?> userIdLazy;
-        private IUser user;
+        private IIdentityUser user;
         private IEnumerable<Permission> userPermissions;
 
         public DefaultUserContext([Optional] IAuthenticationManager authenticationManager,
@@ -43,14 +44,14 @@ namespace GTRevo.Platform.Security
         {
             if (userPermissions == null && IsAuthenticated)
             {
-                IUser user = await GetUserAsync();
-                userPermissions = await userManager.GetUserPermissionsAsync(user);
+                GTRevo.Core.Security.IUser user = await GetUserAsync();
+                userPermissions = await userManager.GetUserPermissionsAsync((IIdentityUser) user);
             }
 
             return userPermissions;
         }
 
-        public async Task<IUser> GetUserAsync()
+        public async Task<GTRevo.Core.Security.IUser> GetUserAsync()
         {
             if (user == null)
             {
@@ -64,7 +65,7 @@ namespace GTRevo.Platform.Security
                 }
             }
 
-            return user;
+            return (GTRevo.Core.Security.IUser) user;
         }
     }
 }
