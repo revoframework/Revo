@@ -73,9 +73,6 @@
   <ItemGroup>
     <Compile Include="Entities\ChildCollection.cs" />
     <Compile Include="Entities\EF6CrudRepository.cs" />
-    <Compile Include="Entities\EF6RawQueryRepository.cs" />
-    <Compile Include="Entities\IEF6RawQueryRepository.cs" />
-    <Compile Include="Entities\LinqExtensions.cs" />
     <Compile Include="Model\CustomStoreConvention.cs" />
     <Compile Include="Entities\DatabaseAcccess.cs" />
     <Compile Include="Entities\DbContextFactory.cs" />
