@@ -8,8 +8,10 @@ using GTRevo.DataAccess.EF6.Model;
 using GTRevo.DataAccess.Entities;
 using GTRevo.Infrastructure.Core.Domain;
 using GTRevo.Infrastructure.Core.Domain.Basic;
+using GTRevo.Infrastructure.Core.Domain.Events;
 using GTRevo.Infrastructure.Repositories;
 using EntityState = System.Data.Entity.EntityState;
+using GTRevo.Core.Events;
 
 namespace GTRevo.Infrastructure.EF6.Repositories
 {
@@ -18,14 +20,17 @@ namespace GTRevo.Infrastructure.EF6.Repositories
         private readonly ICrudRepository crudRepository;
         private readonly IModelMetadataExplorer modelMetadataExplorer;
         private readonly IEntityTypeManager entityTypeManager;
+        private readonly IEventQueue eventQueue;
 
         public EF6AggregateStore(ICrudRepository crudRepository,
             IModelMetadataExplorer modelMetadataExplorer,
-            IEntityTypeManager entityTypeManager)
+            IEntityTypeManager entityTypeManager,
+            IEventQueue eventQueue)
         {
             this.crudRepository = crudRepository;
             this.modelMetadataExplorer = modelMetadataExplorer;
             this.entityTypeManager = entityTypeManager;
+            this.eventQueue = eventQueue;
         }
 
         public void Add<T>(T aggregate) where T : class, IAggregateRoot
@@ -97,12 +102,14 @@ namespace GTRevo.Infrastructure.EF6.Repositories
         {
             InjectClassIds();
             crudRepository.SaveChanges();
+            CommitAggregates();
         }
 
-        public Task SaveChangesAsync()
+        public async Task SaveChangesAsync()
         {
             InjectClassIds();
-            return crudRepository.SaveChangesAsync();
+            await crudRepository.SaveChangesAsync();
+            CommitAggregates();
         }
 
         private void InjectClassIds()
@@ -115,6 +122,22 @@ namespace GTRevo.Infrastructure.EF6.Repositories
                 if (entity.ClassId == Guid.Empty)
                 {
                     entity.ClassId = entityTypeManager.GetClassIdByClrType(entity.GetType());
+                }
+            }
+        }
+
+        private void CommitAggregates()
+        {
+            foreach (var aggregate in GetTrackedAggregates())
+            {
+                if (aggregate.IsChanged)
+                {
+                    foreach (DomainAggregateEvent domainEvent in aggregate.UncommitedEvents)
+                    {
+                        eventQueue.PushEvent(domainEvent);
+                    }
+
+                    aggregate.Commit();
                 }
             }
         }

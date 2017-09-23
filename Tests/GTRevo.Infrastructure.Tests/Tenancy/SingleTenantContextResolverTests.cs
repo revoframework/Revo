@@ -22,7 +22,7 @@ namespace GTRevo.Infrastructure.Tests.Tenancy
             tenant = Substitute.For<ITenant>();
             tenantManager.GetTenant(tenant.Id).Returns(tenant);
 
-            sut = new SingleTenantContextResolver(tenant.Id, tenantManager);
+            sut = new SingleTenantContextResolver(tenantManager, tenant.Id);
         }
 
         [Fact]

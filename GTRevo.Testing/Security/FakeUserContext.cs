@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GTRevo.Core.Security;
 using GTRevo.Platform.Security;
 using NSubstitute;
 

@@ -77,6 +77,10 @@
     <Compile Include="ReadModel\ReadModelDefinition.cs" />
     <Compile Include="Repositories\EF6RepositoryModule.cs" />
     <Compile Include="Repositories\EF6AggregateStore.cs" />
+    <Compile Include="Sagas\EF6SagasModule.cs" />
+    <Compile Include="Sagas\Model\SagaMetadataKey.cs" />
+    <Compile Include="Sagas\Model\SagaModelDefinition.cs" />
+    <Compile Include="Sagas\EF6SagaMetadataRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GTRevo.Core\GTRevo.Core.csproj">

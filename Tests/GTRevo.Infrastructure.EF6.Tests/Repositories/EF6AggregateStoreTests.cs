@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GTRevo.Core.Events;
 using GTRevo.DataAccess.EF6.Model;
 using GTRevo.Infrastructure.Core.Domain;
 using GTRevo.Infrastructure.Core.Domain.Attributes;
 using GTRevo.Infrastructure.Core.Domain.Basic;
+using GTRevo.Infrastructure.Core.Domain.Events;
 using GTRevo.Infrastructure.EF6.Repositories;
 using GTRevo.Testing.DataAccess.EF6;
 using NSubstitute;
@@ -22,16 +24,18 @@ namespace GTRevo.Infrastructure.EF6.Tests.Repositories
         private readonly FakeCrudRepository crudRepository;
         private readonly IModelMetadataExplorer modelMetadataExplorer;
         private readonly IEntityTypeManager entityTypeManager;
+        private readonly IEventQueue eventQueue;
 
         public EF6AggregateStoreTests()
         {
             crudRepository = new FakeCrudRepository();
             modelMetadataExplorer = Substitute.For<IModelMetadataExplorer>();
             entityTypeManager = Substitute.For<IEntityTypeManager>();
+            eventQueue = Substitute.For<IEventQueue>();
 
             entityTypeManager.GetClassIdByClrType(typeof(TestAggregate)).Returns(Guid.Parse(TestAggregateClassId));
 
-            sut = new EF6AggregateStore(crudRepository, modelMetadataExplorer, entityTypeManager);
+            sut = new EF6AggregateStore(crudRepository, modelMetadataExplorer, entityTypeManager, eventQueue);
         }
 
         [Fact]
@@ -44,6 +48,39 @@ namespace GTRevo.Infrastructure.EF6.Tests.Repositories
             Assert.Equal(Guid.Parse(TestAggregateClassId), testAggregate.ClassId);
         }
 
+        [Fact]
+        public void SaveChanges_PushesEvents()
+        {
+            TestAggregate testAggregate = new TestAggregate(Guid.NewGuid());
+            sut.Add(testAggregate);
+            testAggregate.Do();
+            var event1 = testAggregate.UncommitedEvents.First();
+            sut.SaveChanges();
+
+            eventQueue.Received(1).PushEvent(event1);
+        }
+
+        [Fact]
+        public void SaveChanges_CommitsAggregates()
+        {
+            TestAggregate testAggregate = Substitute.ForPartsOf<TestAggregate>(new object[] { Guid.NewGuid() });
+            sut.Add(testAggregate);
+            testAggregate.Do();
+            sut.SaveChanges();
+
+            testAggregate.Received(1).Commit();
+        }
+        
+        [Fact]
+        public void SaveChanges_CommitsOnlyChangedAggregates()
+        {
+            TestAggregate testAggregate = Substitute.ForPartsOf<TestAggregate>(new object[] {Guid.NewGuid()});
+            sut.Add(testAggregate);
+            sut.SaveChanges();
+
+            testAggregate.Received(0).Commit();
+        }
+
         [DomainClassId(TestAggregateClassId)]
         public class TestAggregate : BasicClassAggregateRoot
         {
@@ -54,6 +91,15 @@ namespace GTRevo.Infrastructure.EF6.Tests.Repositories
             public TestAggregate()
             {
             }
+
+            public void Do()
+            {
+                ApplyEvent(new Event1());
+            }
+        }
+
+        public class Event1 : DomainAggregateEvent
+        {
         }
     }
 }

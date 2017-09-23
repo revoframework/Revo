@@ -1,6 +1,6 @@
-﻿using GTRevo.Core.Events;
+﻿using GTRevo.Core.Core;
+using GTRevo.Core.Events;
 using GTRevo.Infrastructure.Core.Domain.Events;
-using GTRevo.Platform.Core;
 using MediatR;
 using Ninject.Modules;
 

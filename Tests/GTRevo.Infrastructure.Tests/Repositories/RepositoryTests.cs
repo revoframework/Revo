@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GTRevo.Core.Events;
+using GTRevo.Core.Transactions;
 using GTRevo.Infrastructure.Core.Domain;
 using GTRevo.Infrastructure.Core.Domain.Events;
 using GTRevo.Infrastructure.Repositories;
@@ -48,41 +49,24 @@ namespace GTRevo.Infrastructure.Tests.Repositories
             var foundEntity = await sut.GetAsync<MyEntity1>(entity.Id);
             Assert.Equal(entity, foundEntity);
         }
-
+        
         [Fact]
-        public async Task SaveChangesAsync_PublishesEvents()
+        public async Task CreateTransactionAndCommitAsync_CommitsRepositoryThenEventQueueTx()
         {
-            List<IAggregateRoot> aggregateStoreRoots1 = new List<IAggregateRoot>();
-            aggregateStore1.WhenForAnyArgs(x => x.Add<MyEntity1>(null))
-                .Do(ci => aggregateStoreRoots1.Add(ci.ArgAt<IAggregateRoot>(0)));
-            aggregateStore1.GetTrackedAggregates().Returns(aggregateStoreRoots1);
+            ITransaction eventQueueTx = Substitute.For<ITransaction>();
+            eventQueue.CreateTransaction().Returns(eventQueueTx);
 
-            var entity = new MyEntity1();
-            entity.Do();
-            var ev1 = entity.UncommitedEvents.First();
+            using (var tx = sut.CreateTransaction())
+            {
+                await tx.CommitAsync();
+            }
 
-            sut.Add(entity);
-            await sut.SaveChangesAsync();
-
-            eventQueue.Received(1).PushEvent(ev1);
-        }
-
-        [Fact]
-        public async Task SaveChangesAsync_CommitsAggregateChanges()
-        {
-            List<IAggregateRoot> aggregateStoreRoots1 = new List<IAggregateRoot>();
-            aggregateStore1.WhenForAnyArgs(x => x.Add<MyEntity1>(null))
-                .Do(ci => aggregateStoreRoots1.Add(ci.ArgAt<IAggregateRoot>(0)));
-            aggregateStore1.GetTrackedAggregates().Returns(aggregateStoreRoots1);
-
-            var entity = new MyEntity1();
-            entity.Do();
-
-            sut.Add(entity);
-            await sut.SaveChangesAsync();
-
-            Assert.Equal(1, entity.Version);
-            Assert.Empty(entity.UncommitedEvents);
+            Received.InOrder(() =>
+            {
+                eventQueue.CreateTransaction();
+                sut.SaveChangesAsync();
+                eventQueueTx.CommitAsync();
+            });
         }
 
         public class MyEntity1 : AggregateRoot

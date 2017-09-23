@@ -7,7 +7,7 @@ namespace GTRevo.Infrastructure.Core.Domain.Basic
     /// Aggregate root that is typically persisted to a RDBMS store using an ORM.
     /// </summary>
     [DatabaseEntity]
-    public abstract class BasicAggregateRoot : AggregateRoot, IQueryableEntity
+    public abstract class BasicAggregateRoot : AggregateRoot, IQueryableEntity, IRowVersioned
     {
         public BasicAggregateRoot(Guid id) : base(id)
         {
@@ -15,6 +15,12 @@ namespace GTRevo.Infrastructure.Core.Domain.Basic
 
         protected BasicAggregateRoot()
         {
+        }
+
+        int IRowVersioned.Version
+        {
+            get { return base.Version; }
+            set { base.Version = value;  }
         }
     }
 }

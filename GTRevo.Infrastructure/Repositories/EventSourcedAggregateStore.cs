@@ -9,9 +9,9 @@ namespace GTRevo.Infrastructure.Repositories
 {
     public class EventSourcedAggregateStore : IAggregateStore
     {
-        private readonly IEventSourcedRepository eventSourcedRepository;
+        private readonly IEventSourcedAggregateRepository eventSourcedRepository;
 
-        public EventSourcedAggregateStore(IEventSourcedRepository eventSourcedRepository)
+        public EventSourcedAggregateStore(IEventSourcedAggregateRepository eventSourcedRepository)
         {
             this.eventSourcedRepository = eventSourcedRepository;
         }

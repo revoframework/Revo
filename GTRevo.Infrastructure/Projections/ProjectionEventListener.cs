@@ -14,7 +14,7 @@ namespace GTRevo.Infrastructure.Projections
     public class ProjectionEventListener : IEventListener<DomainAggregateEvent>,
         IEventQueueTransactionListener
     {
-        private readonly IEventSourcedRepository eventSourcedRepository;
+        private readonly IEventSourcedAggregateRepository eventSourcedRepository;
         private readonly MultiValueDictionary<Type, IEntityEventProjector> aggregateTypesToEntityEventProjectors = new MultiValueDictionary<Type, IEntityEventProjector>();
         private readonly MultiValueDictionary<Type, ICrudEntityProjector> aggregateTypesToCrudEntityProjectors = new MultiValueDictionary<Type, ICrudEntityProjector>();
         private readonly Dictionary<Guid, PublishedEntityEvents> allEvents = new Dictionary<Guid, PublishedEntityEvents>();
@@ -22,7 +22,7 @@ namespace GTRevo.Infrastructure.Projections
 
         public ProjectionEventListener(IEntityEventProjector[] entityEventProjectors,
             ICrudEntityProjector[] crudEntityProjectors,
-            IEventSourcedRepository eventSourcedRepository,
+            IEventSourcedAggregateRepository eventSourcedRepository,
             IEntityTypeManager entityTypeManager)
         {
             this.eventSourcedRepository = eventSourcedRepository;

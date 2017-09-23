@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GTRevo.Core.Security;
 using GTRevo.Infrastructure.Notifications.Channels.Push.Model;
-using GTRevo.Platform.Security;
 using NSubstitute;
 using Xunit;
 

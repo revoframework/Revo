@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using GTRevo.Infrastructure.Notifications;
-using GTRevo.Testing.Platform.Core;
+using GTRevo.Testing.Core;
 using NSubstitute;
 using Xunit;
 

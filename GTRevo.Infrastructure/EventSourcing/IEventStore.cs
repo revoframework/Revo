@@ -9,6 +9,7 @@ namespace GTRevo.Infrastructure.EventSourcing
     public interface IEventStore
     {
         void AddAggregate(Guid aggregateId, Guid aggregateClassId);
+        void RemoveAggregate(Guid aggregateId);
 
         Task<IAggregateHistory> GetAggregateHistory(Guid aggregateId);
         Task<AggregateState> GetLastStateAsync(Guid aggregateId);

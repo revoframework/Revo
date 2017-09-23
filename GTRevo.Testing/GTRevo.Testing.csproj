@@ -71,7 +71,7 @@
     <Compile Include="DataAccess\LocalDbAsyncQueryProvider.cs" />
     <Compile Include="Extensions\XunitExtensions.cs" />
     <Compile Include="Infrastructure\Repositories\FakeRepository.cs" />
-    <Compile Include="Platform\Core\FakeClock.cs" />
+    <Compile Include="Core\FakeClock.cs" />
     <Compile Include="Security\FakeUserContext.cs" />
     <Compile Include="SubstituteDecorator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -105,6 +105,9 @@
       <Project>{42CDFAD0-CB40-433E-AC6E-874F3F58E77D}</Project>
       <Name>GTRevo.Platform</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Platform\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

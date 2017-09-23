@@ -1,4 +1,5 @@
 ﻿using GTRevo.Core.Transactions;
+using GTRevo.Infrastructure.Core.Domain.EventSourcing;
 using GTRevo.Platform.Core;
 using Ninject.Modules;
 
@@ -8,8 +9,8 @@ namespace GTRevo.Infrastructure.EventSourcing
     {
         public override void Load()
         {
-            Bind<IEventSourcedRepository, ITransactionProvider>()
-                .To<EventSourcedRepository>()
+            Bind<IEventSourcedAggregateRepository, ITransactionProvider>()
+                .To<EventSourcedAggregateRepository>()
                 .InRequestOrJobScope();
         }
     }

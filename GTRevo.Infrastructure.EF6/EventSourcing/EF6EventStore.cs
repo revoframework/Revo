@@ -18,13 +18,13 @@ namespace GTRevo.Infrastructure.EF6.EventSourcing
 {
     public class EF6EventStore : IEventStore
     {
-        private readonly ICrudRepository repository;
-        private readonly DomainEventTypeCache domainEventTypeCache;
+        private readonly ICrudRepository crudRepository;
+        private readonly IDomainEventTypeCache domainEventTypeCache;
 
-        public EF6EventStore(ICrudRepository repository,
-            DomainEventTypeCache domainEventTypeCache)
+        public EF6EventStore(ICrudRepository crudRepository,
+            IDomainEventTypeCache domainEventTypeCache)
         {
-            this.repository = repository;
+            this.crudRepository = crudRepository;
             this.domainEventTypeCache = domainEventTypeCache;
         }
 
@@ -37,7 +37,7 @@ namespace GTRevo.Infrastructure.EF6.EventSourcing
         {
             // TODO might cache previously loaded aggregate (if any) and use them
             // to optimize this query
-            var record = await repository.GetAsync<DomainAggregateRecord>(aggregateId);
+            var record = await crudRepository.GetAsync<DomainAggregateRecord>(aggregateId);
             var lastPacket = await QueryAggregateEventPackets(aggregateId, true)
                 .FirstAsync();
 
@@ -76,7 +76,7 @@ namespace GTRevo.Infrastructure.EF6.EventSourcing
         private IQueryable<DomainEventPacket> QueryAggregateEventPackets(
             Guid aggregateId, bool reverseOrder = false)
         {
-            var packets = repository.FindAll<DomainEventPacket>()
+            var packets = crudRepository.FindAll<DomainEventPacket>()
                 .Where(x => x.AggregateId == aggregateId);
 
             if (!reverseOrder)
@@ -141,7 +141,12 @@ namespace GTRevo.Infrastructure.EF6.EventSourcing
                 ClassId = aggregateClassId
             };
 
-            repository.Add(aggregateRecord);
+            crudRepository.Add(aggregateRecord);
+        }
+
+        public void RemoveAggregate(Guid aggregateId)
+        {
+            
         }
 
         public void PushEvents(Guid aggregateId, IEnumerable<DomainAggregateEventRecord> events, int version)
@@ -171,7 +176,7 @@ namespace GTRevo.Infrastructure.EF6.EventSourcing
                 EventsJson = eventsJson,
             };
 
-            repository.Add(packet);
+            crudRepository.Add(packet);
         }
 
         public Task PushEventsAsync(Guid aggregateId, IEnumerable<DomainAggregateEventRecord> events, int version)
@@ -182,12 +187,12 @@ namespace GTRevo.Infrastructure.EF6.EventSourcing
 
         public void CommitChanges()
         {
-            repository.SaveChanges();
+            crudRepository.SaveChanges();
         }
 
         public Task CommitChangesAsync()
         {
-            return repository.SaveChangesAsync();
+            return crudRepository.SaveChangesAsync();
         }
     }
 }

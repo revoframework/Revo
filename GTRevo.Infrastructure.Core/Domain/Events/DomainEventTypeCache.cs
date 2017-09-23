@@ -8,7 +8,7 @@ using GTRevo.Infrastructure.Core.Domain.Attributes;
 
 namespace GTRevo.Infrastructure.Core.Domain.Events
 {
-    public class DomainEventTypeCache : IApplicationStartListener
+    public class DomainEventTypeCache : IApplicationStartListener, IDomainEventTypeCache
     {
         private readonly ITypeExplorer typeExplorer;
         private readonly Dictionary<Tuple<string, int>, Type> eventNamesToTypes = new Dictionary<Tuple<string, int>, Type>();

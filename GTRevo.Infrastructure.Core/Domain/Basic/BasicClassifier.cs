@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
-using GTRevo.Platform.Globalization;
+using GTRevo.Core.Globalization;
 using Newtonsoft.Json;
 
 namespace GTRevo.Infrastructure.Core.Domain.Basic
