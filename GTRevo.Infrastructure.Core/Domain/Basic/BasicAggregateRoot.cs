@@ -17,7 +17,7 @@ namespace GTRevo.Infrastructure.Core.Domain.Basic
         {
         }
 
-        int IRowVersioned.Version
+        public new int Version
         {
             get { return base.Version; }
             set { base.Version = value;  }
