@@ -71,22 +71,7 @@ namespace GTRevo.Infrastructure.Repositories
         {
             foreach (var aggregateStore in aggregateStores)
             {
-                var storeAggregates = aggregateStore.GetTrackedAggregates();
-
                 aggregateStore.SaveChanges();
-
-                foreach (var aggregate in storeAggregates)
-                {
-                    if (aggregate.UncommitedEvents.Any())
-                    {
-                        foreach (DomainAggregateEvent domainEvent in aggregate.UncommitedEvents)
-                        {
-                            eventQueue.PushEvent(domainEvent);
-                        }
-
-                        aggregate.Commit();
-                    }
-                }
             }
         }
 
@@ -94,22 +79,7 @@ namespace GTRevo.Infrastructure.Repositories
         {
             foreach (var aggregateStore in aggregateStores)
             {
-                var storeAggregates = aggregateStore.GetTrackedAggregates();
-
                 await aggregateStore.SaveChangesAsync();
-
-                foreach (var aggregate in storeAggregates)
-                {
-                    if (aggregate.UncommitedEvents.Any())
-                    {
-                        foreach (DomainAggregateEvent domainEvent in aggregate.UncommitedEvents)
-                        {
-                            eventQueue.PushEvent(domainEvent);
-                        }
-                        
-                        aggregate.Commit();
-                    }
-                }
             }
         }
 
@@ -221,7 +191,7 @@ namespace GTRevo.Infrastructure.Repositories
             public async Task CommitAsync()
             {
                 await repository.SaveChangesAsync();
-                await eventQueueTransaction.CommitAsync();
+                await eventQueueTransaction.CommitAsync(); // TODO should always commit the events (event when repository save fails)?
             }
 
             public void Dispose()

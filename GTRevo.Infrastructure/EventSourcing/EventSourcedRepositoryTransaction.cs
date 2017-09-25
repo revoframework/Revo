@@ -1,29 +1,31 @@
 ﻿using System.Threading.Tasks;
 using GTRevo.Core.Transactions;
+using GTRevo.Infrastructure.Core.Domain.EventSourcing;
 
 namespace GTRevo.Infrastructure.EventSourcing
 {
-    public class EventSourcedRepositoryTransaction : ITransaction
+    public class EventSourcedRepositoryTransaction<T> : ITransaction
+        where T : class, IEventSourcedAggregateRoot
     {
-        private readonly EventSourcedRepository eventSourcedRepository;
+    private readonly EventSourcedRepository<T> eventSourcedRepository;
 
-        public EventSourcedRepositoryTransaction(EventSourcedRepository eventSourcedRepository)
-        {
-            this.eventSourcedRepository = eventSourcedRepository;
-        }
+    public EventSourcedRepositoryTransaction(EventSourcedRepository<T> eventSourcedRepository)
+    {
+        this.eventSourcedRepository = eventSourcedRepository;
+    }
 
-        public void Commit()
-        {
-            eventSourcedRepository.SaveChanges();
-        }
+    public void Commit()
+    {
+        eventSourcedRepository.SaveChanges();
+    }
 
-        public Task CommitAsync()
-        {
-            return eventSourcedRepository.SaveChangesAsync();
-        }
+    public Task CommitAsync()
+    {
+        return eventSourcedRepository.SaveChangesAsync();
+    }
 
-        public void Dispose()
-        {
-        }
+    public void Dispose()
+    {
+    }
     }
 }

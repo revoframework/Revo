@@ -164,7 +164,11 @@
     <Compile Include="DataAccess\IDatabaseInitializerDiscovery.cs" />
     <Compile Include="DataAccess\InitializeAfterAttribute.cs" />
     <Compile Include="DataAccess\StaticClassifierDatabaseInitializer.cs" />
+    <Compile Include="EventSourcing\EventSourcedAggregateRepository.cs" />
+    <Compile Include="EventSourcing\EventSourcedEntityFactory.cs" />
+    <Compile Include="EventSourcing\IEventSourcedAggregateRepository.cs" />
     <Compile Include="EventSourcing\EventSourcingInfrastructureModule.cs" />
+    <Compile Include="EventSourcing\IEventSourcedEntityFactory.cs" />
     <Compile Include="Globalization\DbMessageSource.cs" />
     <Compile Include="Globalization\Dictionary.cs" />
     <Compile Include="History\ChangeTracking\Changes\EntityAttributeChangeData.cs" />
@@ -256,6 +260,23 @@
     <Compile Include="Repositories\IQueryableAggregateStore.cs" />
     <Compile Include="Repositories\RepositoryExtensions.cs" />
     <Compile Include="Repositories\RepositoryFactory.cs" />
+    <Compile Include="Sagas\ISagaConfigurator.cs" />
+    <Compile Include="Sagas\ISagaLocator.cs" />
+    <Compile Include="Sagas\ISagaMetadataRepository.cs" />
+    <Compile Include="Sagas\ISagaRegistry.cs" />
+    <Compile Include="Sagas\ISagaRepository.cs" />
+    <Compile Include="Sagas\ISagaTypeConfiguration.cs" />
+    <Compile Include="Sagas\SagaConfigurationLoader.cs" />
+    <Compile Include="Sagas\SagaConventionConfigurator.cs" />
+    <Compile Include="Sagas\SagasConfiguration.cs" />
+    <Compile Include="Sagas\SagaEventListener.cs" />
+    <Compile Include="Sagas\SagaEventRegistration.cs" />
+    <Compile Include="Sagas\SagaLocator.cs" />
+    <Compile Include="Sagas\SagaMetadata.cs" />
+    <Compile Include="Sagas\SagaRegistry.cs" />
+    <Compile Include="Sagas\SagaRepository.cs" />
+    <Compile Include="Sagas\SagasModule.cs" />
+    <Compile Include="Sagas\SagaTypeConfiguration.cs" />
     <Compile Include="Security\AuthorizingCrudRepositoryFilter.cs" />
     <Compile Include="Security\AuthorizingQueryProvider.cs" />
     <Compile Include="Security\Commands\AuthorizePermissionsAttribute.cs" />
@@ -267,11 +288,8 @@
     <Compile Include="Security\Commands\IEntityQueryAuthorizer.cs" />
     <Compile Include="Security\Commands\IEntityQueryFilter.cs" />
     <Compile Include="Security\Commands\IEntityQueryFilterFactory.cs" />
-    <Compile Include="Security\ITokenValidator.cs" />
     <Compile Include="Security\SecurityInfrastructureModule.cs" />
     <Compile Include="Security\AuthorizationQueryableExtensions.cs" />
-    <Compile Include="Security\ServiceToken.cs" />
-    <Compile Include="Security\TokenValidator.cs" />
     <Compile Include="Tenancy\DefaultTenantContext.cs" />
     <Compile Include="Tenancy\DefaultTenantManager.cs" />
     <Compile Include="Tenancy\ITenantContext.cs" />
@@ -307,7 +325,7 @@
       <Name>GTRevo.Infrastructure.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\GTRevo.Platform\GTRevo.Platform.csproj">
-      <Project>{42cdfad0-cb40-433e-ac6e-874f3f58e77d}</Project>
+      <Project>{42CDFAD0-CB40-433E-AC6E-874F3F58E77D}</Project>
       <Name>GTRevo.Platform</Name>
     </ProjectReference>
   </ItemGroup>

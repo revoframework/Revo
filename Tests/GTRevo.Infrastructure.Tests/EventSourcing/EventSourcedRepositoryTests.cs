@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GTRevo.Core.Core;
+using GTRevo.Core.Events;
 using GTRevo.Infrastructure.Core.Domain;
 using GTRevo.Infrastructure.Core.Domain.Events;
 using GTRevo.Infrastructure.Core.Domain.EventSourcing;
 using GTRevo.Infrastructure.EventSourcing;
-using GTRevo.Platform.Core;
-using GTRevo.Testing.Platform.Core;
+using GTRevo.Testing.Core;
 using NSubstitute;
 using Xunit;
 
@@ -15,6 +16,7 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
 {
     public class EventSourcedRepositoryTests
     {
+        private readonly IEventQueue eventQueue;
         private readonly IEventStore eventStore;
         private readonly IActorContext actorContext;
         private readonly IEntityTypeManager entityTypeManager;
@@ -24,10 +26,11 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
         private Guid entityClassId = Guid.NewGuid();
         private Guid entity2ClassId = Guid.NewGuid();
 
-        private readonly EventSourcedRepository sut;
+        private readonly EventSourcedAggregateRepository sut;
 
         public EventSourcedRepositoryTests()
         {
+            eventQueue = Substitute.For<IEventQueue>();
             eventStore = Substitute.For<IEventStore>();
             actorContext = Substitute.For<IActorContext>();
             entityTypeManager = Substitute.For<IEntityTypeManager>();
@@ -56,8 +59,8 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
             entityTypeManager.GetClassIdByClrType(typeof(MyEntity2))
                 .Returns(entity2ClassId);
 
-            sut = new EventSourcedRepository(eventStore, actorContext,
-                entityTypeManager);
+            sut = new EventSourcedAggregateRepository(eventStore, actorContext,
+                entityTypeManager, eventQueue);
         }
 
         [Fact]
@@ -130,7 +133,7 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
                 new DomainAggregateEventRecord()
                 {
                     ActorName = "actor",
-                    AggregateVersion = entity.Version + 1,
+                    AggregateVersion = 1,
                     DatePublished = FakeClock.Now,
                     Event = entity.UncommitedEvents.ElementAt(0)
                 }
@@ -143,12 +146,59 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
                 .PushEventsAsync(entityId,
                     Arg.Is<IEnumerable<DomainAggregateEventRecord>>(x => x.Count() == eventsRecords.Count
                         && x.Select((y, i) => new {Y = y, I = i}).All(z => eventsRecords[z.I].Equals(z.Y))),
-                    entity.Version + 1);
+                    1);
             eventStore.Received(1).CommitChangesAsync();
         }
 
-        public class EventA : DomainAggregateEvent
+        [Fact]
+        public async Task SaveChangesAsync_PushesEvents()
         {
+            var entity = new MyEntity(entityId, 5);
+            sut.Add(entity);
+
+            var event1 = new SetFooEvent()
+            {
+                AggregateId = entityId,
+                AggregateClassId = entityClassId
+            };
+
+            entity.UncommitedEvents = new List<DomainAggregateEvent>()
+            {
+                event1
+            };
+            
+            await sut.SaveChangesAsync();
+
+            eventQueue.Received(1).PushEvent(event1);
+        }
+
+        [Fact]
+        public async Task SaveChangesAsync_CommitsAggregate()
+        {
+            var entity = new MyEntity(entityId, 5);
+            sut.Add(entity);
+
+            entity.UncommitedEvents = new List<DomainAggregateEvent>()
+            {
+                new SetFooEvent()
+                {
+                    AggregateId = entityId,
+                    AggregateClassId = entityClassId
+                }
+            };
+
+            await sut.SaveChangesAsync();
+            Assert.Equal(1, entity.Version);
+        }
+
+        [Fact]
+        public async Task SaveChangesAsync_CommitsOnlyChangedAggregates()
+        {
+            var entity = new MyEntity(entityId, 5);
+            sut.Add(entity);
+
+            await sut.SaveChangesAsync();
+            Assert.Equal(0, entity.Version);
         }
 
         public class SetFooEvent : DomainAggregateEvent
@@ -174,6 +224,8 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
 
             public IEnumerable<DomainAggregateEvent> UncommitedEvents { get; set; } =
                 new List<DomainAggregateEvent>();
+
+            public bool IsChanged => UncommitedEvents.Any();
             public int Version { get; private set; }
 
             internal List<DomainAggregateEvent> LoadedEvents;

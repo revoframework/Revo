@@ -6,14 +6,14 @@ using Microsoft.AspNet.Identity;
 
 namespace GTRevo.Platform.Security.Identity
 {
-    public class AppClaimsIdentityFactory : ClaimsIdentityFactory<IUser, Guid>
+    public class AppClaimsIdentityFactory : ClaimsIdentityFactory<IIdentityUser, Guid>
     {
         internal const string IdentityProviderClaimType =
             "http://schemas.microsoft.com/accesscontrolservice/2010/07/claims/identityprovider";
 
         internal const string DefaultIdentityProviderClaimValue = "ASP.NET Identity";
 
-        public override async Task<ClaimsIdentity> CreateAsync(UserManager<IUser, Guid> manager, IUser user,
+        public override async Task<ClaimsIdentity> CreateAsync(UserManager<IIdentityUser, Guid> manager, IIdentityUser user,
             string authenticationType)
         {
             if (manager == null)

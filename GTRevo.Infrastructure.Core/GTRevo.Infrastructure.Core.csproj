@@ -59,6 +59,7 @@
     <Compile Include="Domain\AggregateRoot.cs" />
     <Compile Include="Domain\Attributes\DomainClassIdAttribute.cs" />
     <Compile Include="Domain\Attributes\EventVersionAttribute.cs" />
+    <Compile Include="Domain\Attributes\SagaEventAttribute.cs" />
     <Compile Include="Domain\Basic\BasicAggregateRoot.cs" />
     <Compile Include="Domain\Basic\BasicClassAggregateRoot.cs" />
     <Compile Include="Domain\Basic\BasicClassEntity.cs" />
@@ -88,6 +89,7 @@
     <Compile Include="Domain\Events\DomainEvent.cs" />
     <Compile Include="Domain\Events\DomainEventTypeCache.cs" />
     <Compile Include="Domain\Events\IAggregateEventRouter.cs" />
+    <Compile Include="Domain\Events\IDomainEventTypeCache.cs" />
     <Compile Include="Domain\Events\IEventRouterRegistrator.cs" />
     <Compile Include="Domain\IAggregateRoot.cs" />
     <Compile Include="Domain\IClassifier.cs" />
@@ -98,7 +100,13 @@
     <Compile Include="Domain\IHasId.cs" />
     <Compile Include="Domain\IQueryableEntity.cs" />
     <Compile Include="Domain\ISaga.cs" />
+    <Compile Include="Domain\ISagaConventionConfigurationCache.cs" />
     <Compile Include="Domain\Saga.cs" />
+    <Compile Include="Domain\SagaConfigurationException.cs" />
+    <Compile Include="Domain\SagaConventionConfigurationCache.cs" />
+    <Compile Include="Domain\SagaConventionConfigurationInfo.cs" />
+    <Compile Include="Domain\SagaConventionConfigurationScanner.cs" />
+    <Compile Include="Domain\SagaConventionEventInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReadModel\ClassEntityReadModel.cs" />
     <Compile Include="ReadModel\ClassEntityView.cs" />
@@ -129,10 +137,6 @@
     <ProjectReference Include="..\GTRevo.DataAccess\GTRevo.DataAccess.csproj">
       <Project>{fa942fe7-71fd-4cf5-8959-309583fe7903}</Project>
       <Name>GTRevo.DataAccess</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GTRevo.Platform\GTRevo.Platform.csproj">
-      <Project>{42CDFAD0-CB40-433E-AC6E-874F3F58E77D}</Project>
-      <Name>GTRevo.Platform</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -4,6 +4,7 @@ using System.Linq;
 using GTRevo.Core.Commands;
 using GTRevo.Core.Core;
 using GTRevo.Core.Core.Lifecycle;
+using GTRevo.Core.Security;
 using GTRevo.Platform.Security;
 
 namespace GTRevo.Infrastructure.Security.Commands

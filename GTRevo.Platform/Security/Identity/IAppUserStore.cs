@@ -5,10 +5,10 @@ using Microsoft.AspNet.Identity;
 
 namespace GTRevo.Platform.Security.Identity
 {
-    public interface IAppUserStore : IUserStore<IUser, Guid>, IUserPasswordStore<IUser, Guid>,
-        IUserLockoutStore<IUser, Guid>, IUserTwoFactorStore<IUser, Guid>,
-        IUserRoleStore<IUser, Guid>, IQueryableUserStore<IUser, Guid>, IUserClaimStore<IUser, Guid>
+    public interface IAppUserStore : IUserStore<IIdentityUser, Guid>, IUserPasswordStore<IIdentityUser, Guid>,
+        IUserLockoutStore<IIdentityUser, Guid>, IUserTwoFactorStore<IIdentityUser, Guid>,
+        IUserRoleStore<IIdentityUser, Guid>, IQueryableUserStore<IIdentityUser, Guid>, IUserClaimStore<IIdentityUser, Guid>
     {
-        Task<IEnumerable<PermissionData>> GetUserPermissionsAsync(IUser user);
+        Task<IEnumerable<PermissionData>> GetUserPermissionsAsync(IIdentityUser user);
     }
 }

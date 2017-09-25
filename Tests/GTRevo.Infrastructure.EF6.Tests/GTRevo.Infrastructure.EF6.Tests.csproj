@@ -30,6 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MediatR, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Packages\MediatR.3.0.1\lib\net45\MediatR.dll</HintPath>
+    </Reference>
     <Reference Include="NSubstitute, Version=2.0.3.0, Culture=neutral, PublicKeyToken=92dd2e9066daa5ca, processorArchitecture=MSIL">
       <HintPath>..\..\..\Packages\NSubstitute.2.0.3\lib\net45\NSubstitute.dll</HintPath>
     </Reference>
@@ -55,10 +58,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EventSourcing\EF6EventStoreTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\EF6AggregateStoreTests.cs" />
+    <Compile Include="Sagas\EF6SagaMetadataRepositoryTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\GTRevo.Core\GTRevo.Core.csproj">
+      <Project>{1015BA79-4241-4221-9D27-0DB033EA624B}</Project>
+      <Name>GTRevo.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\GTRevo.DataAccess.EF6\GTRevo.DataAccess.EF6.csproj">
       <Project>{A8DE2F53-E404-48DD-B11F-B6A3302CE163}</Project>
       <Name>GTRevo.DataAccess.EF6</Name>

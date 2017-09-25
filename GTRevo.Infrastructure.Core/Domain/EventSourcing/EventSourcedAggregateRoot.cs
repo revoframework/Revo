@@ -11,6 +11,12 @@ namespace GTRevo.Infrastructure.Core.Domain.EventSourcing
             //ApplyEvent(new AggregateCreated());
         }
 
+        public override void Commit()
+        {
+            base.Commit();
+            Version++;
+        }
+
         public void LoadState(AggregateState state)
         {
             EventRouter.ReplayEvents(state.Events);

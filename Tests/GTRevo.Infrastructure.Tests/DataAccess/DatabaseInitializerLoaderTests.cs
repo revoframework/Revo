@@ -13,13 +13,11 @@ namespace GTRevo.Infrastructure.Tests.DataAccess
     {
         private readonly DatabaseInitializerLoader sut;
         private readonly IDatabaseInitializerDiscovery databaseInitializerDiscovery;
-        private readonly IDatabaseInitializerComparer databaseInitializerComparer;
 
         public DatabaseInitializerLoaderTests()
         {
             databaseInitializerDiscovery = Substitute.For<IDatabaseInitializerDiscovery>();
-            databaseInitializerComparer = Substitute.For<IDatabaseInitializerComparer>();
-            sut = new DatabaseInitializerLoader(databaseInitializerDiscovery, databaseInitializerComparer);
+            sut = new DatabaseInitializerLoader(databaseInitializerDiscovery, new DatabaseInitializerDependencyComparer());
         }
 
         [Fact]

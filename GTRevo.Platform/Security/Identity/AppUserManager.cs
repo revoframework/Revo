@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GTRevo.Core.Security;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security.DataProtection;
@@ -9,7 +10,7 @@ using Ninject;
 
 namespace GTRevo.Platform.Security.Identity
 {
-    public class AppUserManager : UserManager<IUser, Guid>, IInitializable
+    public class AppUserManager : UserManager<IIdentityUser, Guid>, IInitializable
     {
         private readonly Func<AppUserManager, IPasswordValidator> passwordValidatorFunc;
         private readonly Func<AppUserManager, IUserValidator> userValidatorFunc;
@@ -52,11 +53,11 @@ namespace GTRevo.Platform.Security.Identity
             if (dataProtectionProvider != null)
             {
                 this.UserTokenProvider =
-                    new DataProtectorTokenProvider<IUser, Guid>(dataProtectionProvider.Create("ASP.NET Identity"));
+                    new DataProtectorTokenProvider<IIdentityUser, Guid>(dataProtectionProvider.Create("ASP.NET Identity"));
             }
         }
 
-        public virtual async Task<IEnumerable<Permission>> GetUserPermissionsAsync(IUser user)
+        public virtual async Task<IEnumerable<Permission>> GetUserPermissionsAsync(IIdentityUser user)
         {
             var rolePermissions = await ((IAppUserStore)Store).GetUserPermissionsAsync(user);
             return rolePermissions.Select(

@@ -17,8 +17,6 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Push
             Bind<ApnsConfiguration>()
                 .ToMethod(ctx =>
                 {
-                    IKernel kernel = ctx.Kernel;
-                    var config = kernel.Get<IConfiguration>();
                     var configSection = LocalConfiguration.Current
                         .GetSection<ApnsServiceConfigurationSection>(
                             ApnsServiceConfigurationSection.ConfigurationSectionName);

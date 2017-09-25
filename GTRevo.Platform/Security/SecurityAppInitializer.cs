@@ -47,7 +47,7 @@ namespace GTRevo.Platform.Security
                 {
                     // Enables the application to validate the security stamp when the user logs in.
                     // This is a security feature which is used when you change a password or add an external login to your account.  
-                    OnValidateIdentity = SecurityStampValidator.OnValidateIdentity<AppUserManager, IUser, Guid>(
+                    OnValidateIdentity = SecurityStampValidator.OnValidateIdentity<AppUserManager, IIdentityUser, Guid>(
                         validateInterval: TimeSpan.FromMinutes(15),
                         regenerateIdentityCallback: (manager, user) => user.GenerateUserIdentityAsync(manager, Microsoft.AspNet.Identity.DefaultAuthenticationTypes.ApplicationCookie),
                         getUserIdCallback: claimsIdentity => Guid.Parse(claimsIdentity.GetUserId<string>())),

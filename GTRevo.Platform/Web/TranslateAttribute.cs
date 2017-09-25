@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Web.Http.Filters;
+using GTRevo.Core.Globalization;
 using GTRevo.Platform.Globalization;
 using Newtonsoft.Json;
 

@@ -6,14 +6,14 @@ using Microsoft.Owin.Security;
 
 namespace GTRevo.Platform.Security.Identity
 {
-    public class AppSignInManager : SignInManager<IUser, Guid>
+    public class AppSignInManager : SignInManager<IIdentityUser, Guid>
     {
         public AppSignInManager(AppUserManager userManager, IAuthenticationManager authenticationManager)
                : base(userManager, authenticationManager)
         {
         }
 
-        public override Task<ClaimsIdentity> CreateUserIdentityAsync(IUser user)
+        public override Task<ClaimsIdentity> CreateUserIdentityAsync(IIdentityUser user)
         {
             return user.GenerateUserIdentityAsync((AppUserManager)UserManager, Microsoft.AspNet.Identity.DefaultAuthenticationTypes.ApplicationCookie);
         }

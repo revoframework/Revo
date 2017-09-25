@@ -8,12 +8,16 @@ namespace GTRevo.Infrastructure.Core.Domain
     {
         public override void Load()
         {
-            Bind<DomainEventTypeCache, IApplicationStartListener>()
+            Bind<IDomainEventTypeCache, IApplicationStartListener>()
                 .To<DomainEventTypeCache>()
                 .InSingletonScope();
 
             Bind<IApplicationStartListener>()
                 .To<ConventionEventApplyRegistratorCache>()
+                .InSingletonScope();
+
+            Bind<ISagaConventionConfigurationCache, IApplicationStartListener>()
+                .To<SagaConventionConfigurationCache>()
                 .InSingletonScope();
         }
     }

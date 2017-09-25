@@ -236,7 +236,6 @@
     <Compile Include="Core\AspNetNinjectBindingExtension.cs" />
     <Compile Include="Core\AutoMapperDefinitionDiscovery.cs" />
     <Compile Include="Core\HangfireOwinConfigurator.cs" />
-    <Compile Include="Core\IActorContext.cs" />
     <Compile Include="Core\IAutoMapperDefinition.cs" />
     <Compile Include="Core\LocalConfiguration.cs" />
     <Compile Include="Core\UserActorContext.cs" />
@@ -252,7 +251,6 @@
     <Compile Include="Core\NinjectWebLoader.cs" />
     <Compile Include="Core\AspNetTypeExplorer.cs" />
     <Compile Include="Core\WebConfiguration.cs" />
-    <Compile Include="Globalization\ITranslatable.cs" />
     <Compile Include="Globalization\TranslatingJsonSerializer.cs" />
     <Compile Include="IO\BracesGuidJsonConverter.cs" />
     <Compile Include="IO\Globalization\IMessageRepository.cs" />
@@ -295,15 +293,12 @@
     <Compile Include="Security\Identity\PermissionClaimsIdentity.cs" />
     <Compile Include="Security\IPermissionTypeRegistry.cs" />
     <Compile Include="Security\IRolePermissionResolver.cs" />
-    <Compile Include="Security\IUser.cs" />
-    <Compile Include="Security\IUserContext.cs" />
+    <Compile Include="Security\IIdentityUser.cs" />
     <Compile Include="Security\Mvc\AuthorizePermissionsAttribute.cs" />
-    <Compile Include="Security\Permission.cs" />
     <Compile Include="Security\PermissionAuthorizer.cs" />
     <Compile Include="Security\PermissionCache.cs" />
     <Compile Include="Security\PermissionData.cs" />
     <Compile Include="Security\PermissionTree.cs" />
-    <Compile Include="Security\PermissionType.cs" />
     <Compile Include="Security\PermissionTypeCatalogAttribute.cs" />
     <Compile Include="Security\PermissionTypeIndexer.cs" />
     <Compile Include="Security\PermissionTypeRegistry.cs" />

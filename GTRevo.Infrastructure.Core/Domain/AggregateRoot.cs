@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using GTRevo.Infrastructure.Core.Domain.Events;
 
 namespace GTRevo.Infrastructure.Core.Domain
@@ -23,6 +24,8 @@ namespace GTRevo.Infrastructure.Core.Domain
         public virtual Guid Id { get; private set; }
         public virtual int Version { get; protected set; }
 
+        public virtual bool IsChanged => UncommitedEvents.Any();
+
         public virtual IEnumerable<DomainAggregateEvent> UncommitedEvents
         {
             get
@@ -33,9 +36,8 @@ namespace GTRevo.Infrastructure.Core.Domain
 
         protected internal IAggregateEventRouter EventRouter { get; }
 
-        public void Commit()
+        public virtual void Commit()
         {
-            Version++;
             EventRouter.CommitEvents();
         }
 

@@ -7,18 +7,19 @@ using GTRevo.Infrastructure.Core.Domain.EventSourcing;
 
 namespace GTRevo.Infrastructure.EventSourcing
 {
-    public interface IEventSourcedRepository : ITransactionProvider
+    public interface IEventSourcedRepository<TBase> : ITransactionProvider
+        where TBase : class, IEventSourcedAggregateRoot
     {
-        void Add<T>(T aggregate) where T : class, IEventSourcedAggregateRoot;
+        void Add<T>(T aggregate) where T : class, TBase;
 
-        T Get<T>(Guid id) where T : class, IEventSourcedAggregateRoot;
-        IEventSourcedAggregateRoot Get(Guid id);
-        Task<T> GetAsync<T>(Guid id) where T : class, IEventSourcedAggregateRoot;
-        Task<IEventSourcedAggregateRoot> GetAsync(Guid id);
+        T Get<T>(Guid id) where T : class, TBase;
+        TBase Get(Guid id);
+        Task<T> GetAsync<T>(Guid id) where T : class, TBase;
+        Task<TBase> GetAsync(Guid id);
 
-        IEnumerable<IAggregateRoot> GetLoadedAggregates();
+        IEnumerable<TBase> GetLoadedAggregates();
 
-        void Remove<T>(T aggregateRoot) where T : class, IEventSourcedAggregateRoot;
+        void Remove<T>(T aggregateRoot) where T : class, TBase;
 
         /// <summary>
         /// Saves the repository changes. Not needed when using unit of work.

@@ -4,6 +4,7 @@ using System.Linq;
 using GTRevo.Core;
 using GTRevo.Core.Core;
 using GTRevo.Core.Core.Lifecycle;
+using GTRevo.Core.Security;
 
 namespace GTRevo.Platform.Security
 {
