@@ -42,7 +42,7 @@ namespace GTRevo.Platform.Web
                     .Select(c => c["current-lang"])
                     .FirstOrDefault()?.Value ?? "cs-CZ";
             //string culture = "cs-CZ";
-            var content = actionExecutedContext.Response.Content as ObjectContent;
+            var content = actionExecutedContext.Response?.Content as ObjectContent;
             if (content != null)
             {
                 var type = content.Value.GetType();
