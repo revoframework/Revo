@@ -18,7 +18,7 @@ namespace GTRevo.Infrastructure.Repositories
 
         public void Add<T>(T aggregate) where T : class, IAggregateRoot
         {
-            eventSourcedRepository.Add((dynamic)aggregate);
+            ((dynamic)eventSourcedRepository).Add<T>(aggregate);
         }
 
         public T Get<T>(Guid id) where T : class, IAggregateRoot
