@@ -30,6 +30,10 @@ namespace GTRevo.Infrastructure.Security
             Bind<ICommandFilter<ICommandBase>>()
                 .To<CommandPermissionAuthorizer>()
                 .InTransientScope();
+
+            Bind<ITokenValidator>()
+                .To<TokenValidator>()
+                .InTransientScope();
         }
     }
 }
