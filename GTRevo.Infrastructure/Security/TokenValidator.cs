@@ -17,7 +17,8 @@ namespace GTRevo.Infrastructure.Security
         {
             var token = new ServiceToken(Guid.NewGuid(), serviceName);
             repository.Add(token);
-            return token.Id;
+			repository.SaveChanges();
+			return token.Id;
         }
 
         public Task<Guid> GenerateTokenAsync(string serviceName)
