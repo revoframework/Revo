@@ -12,8 +12,12 @@ namespace GTRevo.Infrastructure.Security
             ServiceName = serviceName;
             Timestamp = DateTime.Now;
         }
-        
-        public string ServiceName { get; set; }
+
+		public ServiceToken()
+		{
+		}
+
+		public string ServiceName { get; set; }
         public DateTime Timestamp { get; set; }
     }
 }
