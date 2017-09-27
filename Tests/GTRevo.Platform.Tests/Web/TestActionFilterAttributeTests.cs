@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using GTRevo.Core.Globalization;
-using GTRevo.Platform.Globalization;
 using GTRevo.Platform.Web;
 using Xunit;
 
@@ -41,9 +37,14 @@ namespace GTRevo.Platform.Tests.Web
         public List<TestClassWithTranslatable> CollectionOfTestClassWithTranslatable { get; set; }
     }
 
+    class TestClassWithTypeField
+    {
+        public Type TypeField { get; set; }
+    }
+
     public class TestActionFilterAttributeTests
     {
-        private TranslateAttribute instance;
+        private readonly TranslateAttribute instance;
         public TestActionFilterAttributeTests()
         {
             instance = new TranslateAttribute();
@@ -52,10 +53,40 @@ namespace GTRevo.Platform.Tests.Web
         [Fact]
         public void TestPathsGetter()
         {
-            //var paths = instance.GetPathsToTranslatables(typeof(TestClassWithTranslatable));
-            var paths = instance.GetPathsToTranslatables(typeof(TestClassWithNestedTranslatable));
-            //var paths = instance.GetPathsToTranslatables(typeof(TestClassWithCollectionOfTranslatables));
-            //var paths = instance.GetPathsToTranslatables(typeof(TestClassWithCollectionOfNestedTranslatables));
+            //1
+            var paths = instance.GetPathsToTranslatables(typeof(TestClassWithTranslatable), new Stack<Type>());
+            Assert.Equal(1, paths.Count);
+        }
+
+        [Fact]
+        public void TestPathsGetter2()
+        {
+            //5
+            var paths = instance.GetPathsToTranslatables(typeof(TestClassWithNestedTranslatable), new Stack<Type>());
+            Assert.Equal(5, paths.Count);
+        }
+
+        [Fact]
+        public void TestPathsGetter3()
+        {
+            //1
+            var paths = instance.GetPathsToTranslatables(typeof(TestClassWithCollectionOfTranslatables), new Stack<Type>());
+            Assert.Equal(1, paths.Count);
+        }
+
+        [Fact]
+        public void TestPathsGetter4()
+        {
+            //1
+            var paths = instance.GetPathsToTranslatables(typeof(TestClassWithCollectionOfNestedTranslatables), new Stack<Type>());
+            Assert.Equal(1, paths.Count);
+        }
+
+        [Fact]
+        public void TestWithTypeField()
+        {
+            var paths = instance.GetPathsToTranslatables(typeof(TestClassWithTypeField), new Stack<Type>());
+            Assert.Equal(0, paths.Count);
         }
     }
 }

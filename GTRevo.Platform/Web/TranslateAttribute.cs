@@ -47,7 +47,7 @@ namespace GTRevo.Platform.Web
             if (content != null)
             {
                 var type = content.Value.GetType();
-                foreach (var path in GetPathsToTranslatables(type))
+                foreach (var path in GetPathsToTranslatables(type, new Stack<Type>()))
                 {
                     InjectCulture(culture, path, content.Value);
                 }
@@ -100,17 +100,18 @@ namespace GTRevo.Platform.Web
 
         private static readonly Dictionary<Type, List<List<PathItem>>> TranslatablePathCache = new Dictionary<Type, List<List<PathItem>>>();
         
-        internal List<List<PathItem>> GetPathsToTranslatables(Type type)
+        internal List<List<PathItem>> GetPathsToTranslatables(Type type,Stack<Type> visited)
         {
             if (typeof(ITranslatable).IsAssignableFrom(type))
                 return new List<List<PathItem>>{new List<PathItem>()};
             if (TranslatablePathCache.ContainsKey(type))
                 return TranslatablePathCache[type];
             var result = new List<List<PathItem>>();
+            visited.Push(type);
             if (typeof(IEnumerable).IsAssignableFrom(type) && type.IsGenericType)
             {
                 var collectionType = type.GenericTypeArguments.First();
-                foreach (var subpath in GetPathsToTranslatables(collectionType))
+                foreach (var subpath in GetPathsToTranslatables(collectionType,visited))
                 {
                     var newPath = new List<PathItem> { new CollectionPathItem(null) };
                     newPath.AddRange(subpath);
@@ -120,7 +121,7 @@ namespace GTRevo.Platform.Web
             foreach (
                 var prop in
                 type.GetProperties()
-                    .Where(p => !p.GetCustomAttributes<JsonIgnoreAttribute>().Any() && p.PropertyType.IsClass))
+                    .Where(p => !p.GetCustomAttributes<JsonIgnoreAttribute>().Any() && p.PropertyType.IsClass && !visited.Contains(p.PropertyType)))
             {
                 if (typeof(ITranslatable).IsAssignableFrom(prop.PropertyType))
                 {
@@ -129,7 +130,7 @@ namespace GTRevo.Platform.Web
                 else if (typeof(IEnumerable).IsAssignableFrom(prop.PropertyType) && prop.PropertyType.IsGenericType)
                 {
                     var collectionType = prop.PropertyType.GenericTypeArguments.First();
-                    foreach (var subpath in GetPathsToTranslatables(collectionType))
+                    foreach (var subpath in GetPathsToTranslatables(collectionType,visited))
                     {
                         var newPath = new List<PathItem> { new CollectionPathItem(prop.Name) };
                         newPath.AddRange(subpath);
@@ -138,7 +139,7 @@ namespace GTRevo.Platform.Web
                 }
                 else
                 {
-                    foreach (var subpath in GetPathsToTranslatables(prop.PropertyType))
+                    foreach (var subpath in GetPathsToTranslatables(prop.PropertyType,visited))
                     {
                         var newPath = new List<PathItem> {new PathItem(prop.Name)};
                         newPath.AddRange(subpath);
@@ -147,6 +148,7 @@ namespace GTRevo.Platform.Web
                 }
             }
             TranslatablePathCache.Add(type,result);
+            visited.Pop();
             return result;
         }
     }
