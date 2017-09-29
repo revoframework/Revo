@@ -115,6 +115,7 @@
     <Compile Include="Core\Clock.cs" />
     <Compile Include="Core\CorePlatformModule.cs" />
     <Compile Include="Core\IActorContext.cs" />
+    <Compile Include="Core\ParamsComparer.cs" />
     <Compile Include="Events\EventQueue.cs" />
     <Compile Include="Events\EventQueueTransaction.cs" />
     <Compile Include="Events\IEvent.cs" />
