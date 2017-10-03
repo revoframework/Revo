@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GTRevo.Core.Commands;
 using GTRevo.Core.Core;
 using GTRevo.Core.Events;
+using GTRevo.DataAccess.Entities;
 using GTRevo.Infrastructure.Core.Domain;
 using GTRevo.Infrastructure.EventSourcing;
 using GTRevo.Infrastructure.Sagas;
@@ -45,7 +46,7 @@ namespace GTRevo.Infrastructure.Tests.Sagas
                 .Returns(saga1ClassId);
 
             sut = new SagaRepository(commandBus, eventStore, actorContext,
-                entityTypeManager, eventQueue, sagaMetadataRepository);
+                entityTypeManager, eventQueue, new IRepositoryFilter[] {}, sagaMetadataRepository);
         }
 
         [Fact]

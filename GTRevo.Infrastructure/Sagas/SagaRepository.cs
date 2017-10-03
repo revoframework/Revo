@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GTRevo.Core.Commands;
 using GTRevo.Core.Core;
 using GTRevo.Core.Events;
+using GTRevo.DataAccess.Entities;
 using GTRevo.Infrastructure.Core.Domain;
 using GTRevo.Infrastructure.EventSourcing;
 using GTRevo.Platform.Core;
@@ -19,8 +20,8 @@ namespace GTRevo.Infrastructure.Sagas
 
         public SagaRepository(ICommandBus commandBus, IEventStore eventStore,
             IActorContext actorContext, IEntityTypeManager entityTypeManager,
-            IEventQueue eventQueue, ISagaMetadataRepository sagaMetadataRepository)
-            : base(eventStore, actorContext, entityTypeManager, eventQueue)
+            IEventQueue eventQueue, IRepositoryFilter[] repositoryFilters, ISagaMetadataRepository sagaMetadataRepository)
+            : base(eventStore, actorContext, entityTypeManager, eventQueue, repositoryFilters)
         {
             MetadataRepository = sagaMetadataRepository;
             this.commandBus = commandBus;

@@ -67,32 +67,32 @@ namespace GTRevo.DataAccess.EF6.Entities
         public T Get<T>(object id) where T : class
         {
             T t = GetDbContext(typeof(T)).Set<T>().Find(id);
-            RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
             t = FilterResult(t);
+            RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
             return t;
         }
 
         public T Get<T>(params object[] id) where T : class
         {
             T t = GetDbContext(typeof(T)).Set<T>().Find(id);
-            RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
             t = FilterResult(t);
+            RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
             return t;
         }
 
         public async Task<T> GetAsync<T>(object[] id) where T : class
         {
             T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(id);
-            RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
             t = FilterResult(t);
+            RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
             return t;
         }
 
         public async Task<T> GetAsync<T>(object id) where T : class
         {
             T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(id);
-            RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
             t = FilterResult(t);
+            RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
             return t;
         }
 
@@ -237,7 +237,7 @@ namespace GTRevo.DataAccess.EF6.Entities
         public IEF6CrudRepository ExcludeFilters<TRepositoryFilter>() where TRepositoryFilter : IRepositoryFilter
         {
             return new EF6CrudRepository(modelMetadataExplorer, dbContextFactory,
-                new IRepositoryFilter[] { });
+                this.repositoryFilters.Where(x => !typeof(TRepositoryFilter).IsAssignableFrom(x.GetType())).ToArray());
         }
 
         public void SaveChanges()
@@ -321,6 +321,7 @@ namespace GTRevo.DataAccess.EF6.Entities
         {
             return (DataAccess.Entities.EntityState)entityState;
         }
+
         protected System.Data.Entity.EntityState EntityStateToEF(DataAccess.Entities.EntityState entityState)
         {
             return (System.Data.Entity.EntityState)entityState;

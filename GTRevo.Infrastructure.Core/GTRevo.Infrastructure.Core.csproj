@@ -67,7 +67,7 @@
     <Compile Include="Domain\Basic\BasicEntity.cs" />
     <Compile Include="Domain\Basic\DataType.cs" />
     <Compile Include="Domain\Basic\Dto\ClassEntityDto.cs" />
-    <Compile Include="Domain\Basic\Dto\EntityBaseDto.cs" />
+    <Compile Include="Domain\Basic\Dto\EntityDto.cs" />
     <Compile Include="Domain\Basic\Entity.cs" />
     <Compile Include="Domain\Basic\IBasicClassIdEntity.cs" />
     <Compile Include="Domain\DomainInfrastructureModule.cs" />

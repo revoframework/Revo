@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GTRevo.Core.Core;
 using GTRevo.Core.Events;
 using GTRevo.Core.Transactions;
+using GTRevo.DataAccess.Entities;
 using GTRevo.Infrastructure.Core.Domain;
 using GTRevo.Infrastructure.Core.Domain.Events;
 using GTRevo.Infrastructure.Core.Domain.EventSourcing;
@@ -13,7 +14,8 @@ using MoreLinq;
 
 namespace GTRevo.Infrastructure.EventSourcing
 {
-    public class EventSourcedRepository<TBase> : IEventSourcedRepository<TBase>
+    public class EventSourcedRepository<TBase> : IEventSourcedRepository<TBase>,
+        IFilteringRepository<IEventSourcedRepository<TBase>>
         where TBase : class, IEventSourcedAggregateRoot
     {
         private readonly Dictionary<Guid, TBase> aggregates = new Dictionary<Guid, TBase>();
@@ -22,17 +24,33 @@ namespace GTRevo.Infrastructure.EventSourcing
         private readonly IActorContext actorContext;
         private readonly IEntityTypeManager entityTypeManager;
         private readonly IEventQueue eventQueue;
+        private readonly IRepositoryFilter[] repositoryFilters;
 
         public EventSourcedRepository(IEventStore eventStore,
             IActorContext actorContext,
             IEntityTypeManager entityTypeManager,
-            IEventQueue eventQueue)
+            IEventQueue eventQueue,
+            IRepositoryFilter[] repositoryFilters)
         {
             this.eventStore = eventStore;
             this.actorContext = actorContext;
             this.entityTypeManager = entityTypeManager;
             this.eventQueue = eventQueue;
+            this.repositoryFilters = repositoryFilters;
         }
+
+        private EventSourcedRepository(IEventStore eventStore,
+            IActorContext actorContext,
+            IEntityTypeManager entityTypeManager,
+            IEventQueue eventQueue,
+            IRepositoryFilter[] repositoryFilters,
+            Dictionary<Guid, TBase> aggregates)
+            : this(eventStore, actorContext, entityTypeManager, eventQueue, repositoryFilters)
+        {
+            this.aggregates = aggregates;
+        }
+
+        public IEnumerable<IRepositoryFilter> DefaultFilters => repositoryFilters;
 
         protected virtual IEventSourcedEntityFactory EntityFactory { get; } = new EventSourcedEntityFactory();
 
@@ -85,6 +103,13 @@ namespace GTRevo.Infrastructure.EventSourcing
             }
 
             aggregate = await LoadAggregateAsync(id);
+            aggregate = FilterResult(aggregate);
+
+            if (aggregate == null)
+            {
+                throw new ArgumentException($"Event sourced aggregate with ID {id} was not found");
+            }
+
             aggregates.Add(aggregate.Id, aggregate);
             return aggregate;
         }
@@ -99,24 +124,56 @@ namespace GTRevo.Infrastructure.EventSourcing
             throw new NotImplementedException();
         }
 
+        public IEventSourcedRepository<TBase> IncludeFilters(params IRepositoryFilter[] repositoryFilters)
+        {
+            return new EventSourcedRepository<TBase>(eventStore, actorContext, entityTypeManager,
+                eventQueue,
+                this.repositoryFilters.Union(repositoryFilters).ToArray(),
+                aggregates);
+        }
+
+        public IEventSourcedRepository<TBase> ExcludeFilter(params IRepositoryFilter[] repositoryFilters)
+        {
+            return new EventSourcedRepository<TBase>(eventStore, actorContext, entityTypeManager,
+                eventQueue,
+                this.repositoryFilters.Except(repositoryFilters).ToArray(),
+                aggregates);
+        }
+
+        public IEventSourcedRepository<TBase> ExcludeFilters<TRepositoryFilter>() where TRepositoryFilter : IRepositoryFilter
+        {
+            return new EventSourcedRepository<TBase>(eventStore, actorContext, entityTypeManager,
+                eventQueue,
+                this.repositoryFilters.Where(x => !typeof(TRepositoryFilter).IsAssignableFrom(x.GetType())).ToArray(),
+                aggregates);
+        }
+
         public virtual void SaveChanges()
         {
-            bool anyEvents = false;
-            foreach (var aggregate in aggregates.Values)
+            List<TBase> savedAggregates = aggregates.Values.Where(x => x.UncommitedEvents.Any()).ToList();
+            if (savedAggregates.Any())
             {
-                if (aggregate.UncommitedEvents.Any())
+                foreach (var aggregate in savedAggregates)
+                {
+                    CheckEvents(aggregate, aggregate.UncommitedEvents);
+
+                    if (aggregate.Version == 0)
+                    {
+                        FilterAdded(aggregate);
+                    }
+                    else
+                    {
+                        FilterModified(aggregate);
+                    }
+                }
+
+                foreach (var aggregate in savedAggregates)
                 {
                     int newAggregateVersion = aggregate.Version + 1;
                     var eventRecords = ConstructEventsRecords(aggregate.UncommitedEvents, newAggregateVersion);
-
-                    CheckEvents(aggregate, aggregate.UncommitedEvents);
                     eventStore.PushEvents(aggregate.Id, eventRecords, newAggregateVersion);
-                    anyEvents = true;
                 }
-            }
 
-            if (anyEvents)
-            {
                 eventStore.CommitChanges();
             }
 
@@ -125,23 +182,30 @@ namespace GTRevo.Infrastructure.EventSourcing
 
         public virtual async Task SaveChangesAsync()
         {
-            bool anyEvents = false;
-            foreach (var aggregate in aggregates.Values)
+            List<TBase> savedAggregates = aggregates.Values.Where(x => x.UncommitedEvents.Any()).ToList();
+            if (savedAggregates.Any())
             {
-                if (aggregate.UncommitedEvents.Any())
+                foreach (var aggregate in savedAggregates)
+                {
+                    CheckEvents(aggregate, aggregate.UncommitedEvents);
+
+                    if (aggregate.Version == 0)
+                    {
+                        FilterAdded(aggregate);
+                    }
+                    else
+                    {
+                        FilterModified(aggregate);
+                    }
+                }
+
+                foreach (var aggregate in savedAggregates)
                 {
                     int newAggregateVersion = aggregate.Version + 1;
                     var eventRecords = ConstructEventsRecords(aggregate.UncommitedEvents, newAggregateVersion);
-
-                    CheckEvents(aggregate, aggregate.UncommitedEvents);
                     await eventStore.PushEventsAsync(aggregate.Id, eventRecords, newAggregateVersion);
-                    anyEvents = true;
                 }
-            }
 
-
-            if (anyEvents)
-            {
                 await eventStore.CommitChangesAsync();
             }
 
@@ -185,6 +249,51 @@ namespace GTRevo.Infrastructure.EventSourcing
             return records;
         }
 
+        private T FilterResult<T>(T result) where T : class
+        {
+            if (result == null)
+            {
+                return null;
+            }
+
+            T intermed = result;
+            foreach (var repositoryFilter in repositoryFilters)
+            {
+                if (intermed == null)
+                {
+                    break;
+                }
+
+                intermed = repositoryFilter.FilterResult(intermed);
+            }
+
+            return intermed;
+        }
+
+        private void FilterAdded<T>(T inserted) where T : class
+        {
+            foreach (var repositoryFilter in repositoryFilters)
+            {
+                repositoryFilter.FilterAdded(inserted);
+            }
+        }
+
+        private void FilterDeleted<T>(T deleted) where T : class
+        {
+            foreach (var repositoryFilter in repositoryFilters)
+            {
+                repositoryFilter.FilterDeleted(deleted);
+            }
+        }
+
+        private void FilterModified<T>(T updated) where T : class
+        {
+            foreach (var repositoryFilter in repositoryFilters)
+            {
+                repositoryFilter.FilterModified(updated);
+            }
+        }
+
         private void CheckEvents(TBase aggregate, IEnumerable<DomainAggregateEvent> uncommitedEvents)
         {
             Guid aggregateClassId = entityTypeManager.GetClassIdByClrType(aggregate.GetType());
@@ -207,7 +316,7 @@ namespace GTRevo.Infrastructure.EventSourcing
             Guid classId = state.Events.First().AggregateClassId;
             Type entityType = entityTypeManager.GetClrTypeByClassId(classId);
 
-            TBase aggregate = (TBase) ConstructEntity(entityType, id);
+            TBase aggregate = (TBase)ConstructEntity(entityType, id);
             aggregate.LoadState(state);
 
             return aggregate;

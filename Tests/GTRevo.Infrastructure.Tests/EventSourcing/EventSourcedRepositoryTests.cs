@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GTRevo.Core.Core;
 using GTRevo.Core.Events;
+using GTRevo.DataAccess.Entities;
 using GTRevo.Infrastructure.Core.Domain;
 using GTRevo.Infrastructure.Core.Domain.Events;
 using GTRevo.Infrastructure.Core.Domain.EventSourcing;
@@ -20,13 +21,15 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
         private readonly IEventStore eventStore;
         private readonly IActorContext actorContext;
         private readonly IEntityTypeManager entityTypeManager;
-        
+        private readonly IRepositoryFilter repositoryFilter1;
+        private readonly IRepositoryFilter repositoryFilter2;
+
         private Guid entityId = Guid.NewGuid();
         private Guid entity2Id = Guid.NewGuid();
         private Guid entityClassId = Guid.NewGuid();
         private Guid entity2ClassId = Guid.NewGuid();
 
-        private readonly EventSourcedAggregateRepository sut;
+        private EventSourcedAggregateRepository sut;
 
         public EventSourcedRepositoryTests()
         {
@@ -34,11 +37,13 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
             eventStore = Substitute.For<IEventStore>();
             actorContext = Substitute.For<IActorContext>();
             entityTypeManager = Substitute.For<IEntityTypeManager>();
+            repositoryFilter1 = Substitute.For<IRepositoryFilter>();
+            repositoryFilter2 = Substitute.For<IRepositoryFilter>();
 
             actorContext = Substitute.For<IActorContext>();
             actorContext.CurrentActorName.Returns("actor");
             FakeClock.Setup();
-
+            
             eventStore.GetLastStateAsync(entity2Id)
                 .Returns(new AggregateState(1, new List<DomainAggregateEvent>()
                 {
@@ -60,7 +65,7 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
                 .Returns(entity2ClassId);
 
             sut = new EventSourcedAggregateRepository(eventStore, actorContext,
-                entityTypeManager, eventQueue);
+                entityTypeManager, eventQueue, new IRepositoryFilter[] {});
         }
 
         [Fact]
@@ -201,6 +206,89 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
             Assert.Equal(0, entity.Version);
         }
 
+        [Fact]
+        public async Task DefaultFilters_GetsInitialFilters()
+        {
+            sut = new EventSourcedAggregateRepository(eventStore, actorContext,
+                entityTypeManager, eventQueue, new IRepositoryFilter[] { repositoryFilter1 });
+            Assert.True(sut.DefaultFilters.SequenceEqual(new IRepositoryFilter[] {repositoryFilter1}));
+        }
+
+        [Fact]
+        public async Task GetAsync_FilterGetsCalled()
+        {
+            repositoryFilter1.FilterResult<IEventSourcedAggregateRoot>(null)
+                .ReturnsForAnyArgs(ci => ci.ArgAt<IEventSourcedAggregateRoot>(0));
+
+            sut = new EventSourcedAggregateRepository(eventStore, actorContext,
+                entityTypeManager, eventQueue, new IRepositoryFilter[] { repositoryFilter1 });
+
+            await sut.GetAsync<MyEntity2>(entity2Id);
+
+            repositoryFilter1.Received(1).FilterResult<IEventSourcedAggregateRoot>(Arg.Is<IEventSourcedAggregateRoot>(x => x.Id == entity2Id));
+        }
+
+        [Fact]
+        public async Task GetAsync_FilterReplacesReturnValue()
+        {
+            var replacementEntity = new MyEntity2(Guid.NewGuid(), 5);
+            repositoryFilter1.FilterResult<IEventSourcedAggregateRoot>(null)
+                .ReturnsForAnyArgs(replacementEntity);
+
+            sut = new EventSourcedAggregateRepository(eventStore, actorContext,
+                entityTypeManager, eventQueue, new IRepositoryFilter[] { repositoryFilter1 });
+
+            Assert.Equal(replacementEntity, await sut.GetAsync<MyEntity2>(entity2Id));
+        }
+
+        [Fact]
+        public async Task SaveChangesAsync_FiltersAdded()
+        {
+            sut = new EventSourcedAggregateRepository(eventStore, actorContext,
+                entityTypeManager, eventQueue, new IRepositoryFilter[] { repositoryFilter1 });
+
+            var entity = new MyEntity(entityId, 5);
+            sut.Add(entity);
+
+            entity.UncommitedEvents = new List<DomainAggregateEvent>()
+            {
+                new SetFooEvent()
+                {
+                    AggregateId = entityId,
+                    AggregateClassId = entityClassId
+                }
+            };
+
+            await sut.SaveChangesAsync();
+
+            repositoryFilter1.Received(1).FilterAdded(entity);
+        }
+
+        [Fact]
+        public async Task SaveChangesAsync_FiltersModified()
+        {
+            sut = new EventSourcedAggregateRepository(eventStore, actorContext,
+                entityTypeManager, eventQueue, new IRepositoryFilter[] { repositoryFilter1 });
+
+            var entity = new MyEntity(entityId, 5);
+            sut.Add(entity);
+
+            entity.UncommitedEvents = new List<DomainAggregateEvent>()
+            {
+                new SetFooEvent()
+                {
+                    AggregateId = entityId,
+                    AggregateClassId = entityClassId
+                }
+            };
+
+            entity.Version++;
+
+            await sut.SaveChangesAsync();
+
+            repositoryFilter1.Received(1).FilterModified(entity);
+        }
+
         public class SetFooEvent : DomainAggregateEvent
         {
         }
@@ -226,7 +314,7 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
                 new List<DomainAggregateEvent>();
 
             public bool IsChanged => UncommitedEvents.Any();
-            public int Version { get; private set; }
+            public int Version { get; set; }
 
             internal List<DomainAggregateEvent> LoadedEvents;
 

@@ -7,7 +7,6 @@ namespace GTRevo.Infrastructure.Repositories
 {
     public interface IAggregateStore
     {
-
         void Add<T>(T aggregate) where T : class, IAggregateRoot;
 
         bool CanHandleAggregateType(Type aggregateType);

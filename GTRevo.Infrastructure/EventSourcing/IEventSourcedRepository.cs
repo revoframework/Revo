@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GTRevo.Core.Transactions;
+using GTRevo.DataAccess.Entities;
 using GTRevo.Infrastructure.Core.Domain;
 using GTRevo.Infrastructure.Core.Domain.EventSourcing;
 
@@ -10,6 +11,8 @@ namespace GTRevo.Infrastructure.EventSourcing
     public interface IEventSourcedRepository<TBase> : ITransactionProvider
         where TBase : class, IEventSourcedAggregateRoot
     {
+        IEnumerable<IRepositoryFilter> DefaultFilters { get; }
+
         void Add<T>(T aggregate) where T : class, TBase;
 
         T Get<T>(Guid id) where T : class, TBase;
