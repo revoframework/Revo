@@ -21,6 +21,7 @@ namespace GTRevo.Infrastructure.Core.Domain
             EventRouter = new AggregateEventRouter(this);
         }
 
+        public bool IsDeleted { get; private set; }
         public virtual Guid Id { get; private set; }
         public virtual int Version { get; protected set; }
 
@@ -43,7 +44,18 @@ namespace GTRevo.Infrastructure.Core.Domain
 
         protected virtual void ApplyEvent<T>(T evt) where T : DomainAggregateEvent
         {
+            if (IsDeleted)
+            {
+                throw new InvalidOperationException(
+                    $"Cannot apply new {typeof(T).FullName} event on {GetType().FullName} aggregate because it is currently in deleted state");
+            }
+
             EventRouter.ApplyEvent(evt);
+        }
+
+        protected void MarkDeleted()
+        {
+            IsDeleted = true;
         }
     }
 }

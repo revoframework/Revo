@@ -91,6 +91,7 @@
   <ItemGroup>
     <Compile Include="DataAccessModule.cs" />
     <Compile Include="Entities\DatabaseEntityAttribute.cs" />
+    <Compile Include="Entities\EntityNotFoundException.cs" />
     <Compile Include="Entities\EntityState.cs" />
     <Compile Include="Entities\ICrudRepository.cs" />
     <Compile Include="Entities\IFilteringRepository.cs" />

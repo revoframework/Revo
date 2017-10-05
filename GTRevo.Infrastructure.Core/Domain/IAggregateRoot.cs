@@ -7,6 +7,7 @@ namespace GTRevo.Infrastructure.Core.Domain
     {
         IEnumerable<DomainAggregateEvent> UncommitedEvents { get; }
         bool IsChanged { get; }
+        bool IsDeleted { get; }
         int Version { get; }
 
         void Commit();

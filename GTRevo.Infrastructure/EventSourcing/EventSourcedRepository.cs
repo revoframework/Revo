@@ -97,17 +97,21 @@ namespace GTRevo.Infrastructure.EventSourcing
         public async Task<TBase> GetAsync(Guid id)
         {
             TBase aggregate = FindLoadedAggregate(id);
-            if (aggregate != null)
-            {
-                return aggregate;
-            }
-
-            aggregate = await LoadAggregateAsync(id);
-            aggregate = FilterResult(aggregate);
-
             if (aggregate == null)
             {
-                throw new ArgumentException($"Event sourced aggregate with ID {id} was not found");
+                aggregate = await LoadAggregateAsync(id);
+                aggregate = FilterResult(aggregate);
+
+                if (aggregate == null)
+                {
+                    throw new EntityNotFoundException($"Event sourced aggregate with ID {id} was not found");
+                }
+            }
+
+            if (aggregate.IsDeleted)
+            {
+                throw new EntityDeletedException(
+                    $"Cannot get event sourced {aggregate.GetType().FullName} aggregate with ID {id} because it has been previously deleted");
             }
 
             aggregates.Add(aggregate.Id, aggregate);

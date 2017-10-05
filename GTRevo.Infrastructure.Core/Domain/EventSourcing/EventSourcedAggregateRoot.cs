@@ -27,11 +27,5 @@ namespace GTRevo.Infrastructure.Core.Domain.EventSourcing
         {
             base.ApplyEvent(evt);
         }
-
-        protected void Delete()
-        {
-            throw new NotImplementedException();
-            //ApplyEvent(new AggregateDeleted());
-        }
     }
 }

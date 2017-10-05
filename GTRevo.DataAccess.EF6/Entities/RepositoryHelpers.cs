@@ -1,4 +1,5 @@
 ﻿using System;
+using GTRevo.DataAccess.Entities;
 
 namespace GTRevo.DataAccess.EF6.Entities
 {
@@ -8,7 +9,7 @@ namespace GTRevo.DataAccess.EF6.Entities
         {
             if (t == null)
             {
-                throw new ArgumentException($"{typeof(T).FullName} with ID '{string.Join(", ", id)}' was not found");
+                throw new EntityNotFoundException($"{typeof(T).FullName} with ID '{string.Join(", ", id)}' was not found");
             }
         }
     }

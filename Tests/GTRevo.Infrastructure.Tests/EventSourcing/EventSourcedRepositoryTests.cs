@@ -28,6 +28,7 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
         private Guid entity2Id = Guid.NewGuid();
         private Guid entityClassId = Guid.NewGuid();
         private Guid entity2ClassId = Guid.NewGuid();
+        private Guid entity3ClassId = Guid.NewGuid();
 
         private EventSourcedAggregateRepository sut;
 
@@ -58,11 +59,15 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
                 .Returns(typeof(MyEntity));
             entityTypeManager.GetClrTypeByClassId(entity2ClassId)
                 .Returns(typeof(MyEntity2));
+            entityTypeManager.GetClrTypeByClassId(entity3ClassId)
+                .Returns(typeof(MyEntity3LoadsAsDeleted));
 
             entityTypeManager.GetClassIdByClrType(typeof(MyEntity))
                 .Returns(entityClassId);
             entityTypeManager.GetClassIdByClrType(typeof(MyEntity2))
                 .Returns(entity2ClassId);
+            entityTypeManager.GetClassIdByClrType(typeof(MyEntity3LoadsAsDeleted))
+                .Returns(entity3ClassId);
 
             sut = new EventSourcedAggregateRepository(eventStore, actorContext,
                 entityTypeManager, eventQueue, new IRepositoryFilter[] {});
@@ -95,6 +100,39 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
         {
             var entity = await sut.GetAsync<MyEntity>(entity2Id);
             Assert.IsType<MyEntity2>(entity);
+        }
+
+        [Fact]
+        public async Task GetAsync_ThrowsIfDeleted()
+        {
+            Guid entityId = Guid.NewGuid();
+
+            eventStore.GetLastStateAsync(entityId)
+                .Returns(new AggregateState(1, new List<DomainAggregateEvent>()
+                {
+                    new SetFooEvent()
+                    {
+                        AggregateId = entityId,
+                        AggregateClassId = entity3ClassId
+                    }
+                }, false));
+
+            await Assert.ThrowsAsync<EntityDeletedException>(async () =>
+            {
+                await sut.GetAsync<MyEntity3LoadsAsDeleted>(entityId);
+            });
+        }
+
+        [Fact]
+        public async Task GetAsync_ThrowsIfDeletedAfterLoading()
+        {
+            var entity = await sut.GetAsync<MyEntity2>(entity2Id);
+            entity.IsDeleted = true;
+
+            await Assert.ThrowsAsync<EntityDeletedException>(async () =>
+            {
+                await sut.GetAsync<MyEntity2>(entity2Id);
+            });
         }
 
         [Fact]
@@ -309,6 +347,7 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
             }
 
             public Guid Id { get; private set; }
+            public bool IsDeleted { get; set; }
 
             public IEnumerable<DomainAggregateEvent> UncommitedEvents { get; set; } =
                 new List<DomainAggregateEvent>();
@@ -324,7 +363,7 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
                 Version++;
             }
 
-            public void LoadState(AggregateState state)
+            public virtual void LoadState(AggregateState state)
             {
                 if (LoadedEvents != null)
                 {
@@ -344,6 +383,19 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
 
             protected MyEntity2(Guid id) : base(id)
             {
+            }
+        }
+
+        public class MyEntity3LoadsAsDeleted : MyEntity
+        {
+            public MyEntity3LoadsAsDeleted(Guid id) : base(id)
+            {
+            }
+
+            public override void LoadState(AggregateState state)
+            {
+                base.LoadState(state);
+                IsDeleted = true;
             }
         }
     }

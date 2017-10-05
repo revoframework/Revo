@@ -101,6 +101,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\Domain\AggregateRootTests.cs" />
     <Compile Include="Core\Domain\SagaConventionConfigurationScannerTests.cs" />
     <Compile Include="DataAccess\DatabaseInitializerLoaderTests.cs" />
     <Compile Include="DataAccess\StaticClassifierDatabaseInitializerTests.cs" />

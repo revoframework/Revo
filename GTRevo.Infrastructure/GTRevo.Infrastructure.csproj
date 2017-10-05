@@ -164,6 +164,7 @@
     <Compile Include="DataAccess\IDatabaseInitializerDiscovery.cs" />
     <Compile Include="DataAccess\InitializeAfterAttribute.cs" />
     <Compile Include="DataAccess\StaticClassifierDatabaseInitializer.cs" />
+    <Compile Include="EventSourcing\EntityDeletedException.cs" />
     <Compile Include="EventSourcing\EventSourcedAggregateRepository.cs" />
     <Compile Include="EventSourcing\EventSourcedEntityFactory.cs" />
     <Compile Include="EventSourcing\IEventSourcedAggregateRepository.cs" />

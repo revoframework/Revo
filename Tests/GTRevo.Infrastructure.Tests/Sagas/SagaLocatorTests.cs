@@ -152,6 +152,8 @@ namespace GTRevo.Infrastructure.Tests.Sagas
             public bool IsChanged => UncommitedEvents.Any() || UncommitedCommands.Any();
             public IEnumerable<DomainAggregateEvent> UncommitedEvents { get; set; }
             public int Version { get; set; }
+            public bool IsDeleted { get; set; }
+
             public void Commit()
             {
                 Version++;
