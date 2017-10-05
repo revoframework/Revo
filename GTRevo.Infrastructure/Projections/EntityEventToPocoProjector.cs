@@ -12,7 +12,7 @@ namespace GTRevo.Infrastructure.Projections
         IEntityEventProjector<TSource>
         where TSource : class, IEventSourcedAggregateRoot
     {
-        private readonly Dictionary<Type, Func<DomainAggregateEvent, Task>> applyHandlers = new Dictionary<Type, Func<DomainAggregateEvent, Task>>();
+        private readonly MultiValueDictionary<Type, Func<DomainAggregateEvent, Task>> applyHandlers = new MultiValueDictionary<Type, Func<DomainAggregateEvent, Task>>();
 
         public EntityEventToPocoProjector()
         {
@@ -24,7 +24,12 @@ namespace GTRevo.Infrastructure.Projections
             get { return typeof(TSource); }
         }
 
+        protected TSource Aggregate { get; private set; }
+        protected TTarget Target { get; private set; }
+
         public abstract Task CommitChangesAsync();
+        protected abstract Task<TTarget> CreateProjectionTargetAsync(TSource aggregate, IEnumerable<DomainAggregateEvent> events);
+        protected abstract Task<TTarget> GetProjectionTargetAsync(TSource aggregate);
 
         public Task ProjectEventsAsync(IEventSourcedAggregateRoot aggregate, IEnumerable<DomainAggregateEvent> events)
         {
@@ -39,6 +44,12 @@ namespace GTRevo.Infrastructure.Projections
 
         public async Task ProjectEventsAsync(TSource aggregate, IEnumerable<DomainAggregateEvent> events)
         {
+            if (aggregate.Version < 1)
+            {
+                throw new ArgumentException(
+                    "Unexpected version of aggregate to project: should only project after savig its state, i.e. Version >= 1");
+            }
+
             TTarget target;
             if (aggregate.Version == 1)
             {
@@ -63,26 +74,21 @@ namespace GTRevo.Infrastructure.Projections
             }
         }
 
-        protected TSource Aggregate { get; private set; }
-        protected TTarget Target { get; private set; }
-
-        protected abstract Task<TTarget> CreateProjectionTargetAsync(TSource aggregate, IEnumerable<DomainAggregateEvent> events);
-        protected abstract Task<TTarget> GetProjectionTargetAsync(TSource aggregate);
-
         protected void AddSubProjector(ISubEntityEventProjector projector)
         {
             CreateApplyDelegates(projector.GetType(), projector);
         }
 
-        protected Task ExecuteHandler<T>(T evt) where T : DomainAggregateEvent
+        protected async Task ExecuteHandler<T>(T evt) where T : DomainAggregateEvent
         {
-            Func<DomainAggregateEvent, Task> handler;
-            if (applyHandlers.TryGetValue(evt.GetType(), out handler))
+            IReadOnlyCollection<Func<DomainAggregateEvent, Task>> handlers;
+            if (applyHandlers.TryGetValue(evt.GetType(), out handlers))
             {
-                return handler(evt);
+                foreach (var handler in handlers)
+                {
+                    await handler(evt);
+                }
             }
-
-            return Task.FromResult(0);
         }
 
         private async Task ApplyEvents(IEnumerable<DomainAggregateEvent> events)
@@ -106,8 +112,10 @@ namespace GTRevo.Infrastructure.Projections
             }
 
             var actions = projectorType
-                .GetMethods(BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.NonPublic)
+                .GetMethods(BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.Public |
+                            BindingFlags.NonPublic)
                 .Where(x => x.Name == "Apply"
+                            && x.GetBaseDefinition() == x //exclude overrides
                             && x.GetParameters().Length == 1
                             && typeof(DomainAggregateEvent).IsAssignableFrom(x.GetParameters()[0].ParameterType))
                 .Select(x => new Tuple<Type, Func<DomainAggregateEvent, Task>>(x.GetParameters()[0].ParameterType,
@@ -124,27 +132,29 @@ namespace GTRevo.Infrastructure.Projections
 
             actions = actions.Concat(
                 projectorType
-                .GetMethods(BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.NonPublic)
-                .Where(x => x.Name == "Apply"
-                            && x.GetParameters().Length == 3
-                            && typeof(DomainAggregateEvent).IsAssignableFrom(x.GetParameters()[0].ParameterType)
-                            && x.GetParameters()[1].ParameterType.IsAssignableFrom(typeof(TSource))
-                            && x.GetParameters()[2].ParameterType.IsAssignableFrom(typeof(TTarget)))
-                .Select(x => new Tuple<Type, Func<DomainAggregateEvent, Task>>(x.GetParameters()[0].ParameterType,
+                    .GetMethods(BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.Public |
+                                BindingFlags.NonPublic)
+                    .Where(x => x.Name == "Apply"
+                                && x.GetBaseDefinition() == x //exclude overrides
+                                && x.GetParameters().Length == 3
+                                && typeof(DomainAggregateEvent).IsAssignableFrom(x.GetParameters()[0].ParameterType)
+                                && x.GetParameters()[1].ParameterType.IsAssignableFrom(typeof(TSource))
+                                && x.GetParameters()[2].ParameterType.IsAssignableFrom(typeof(TTarget)))
+                    .Select(x => new Tuple<Type, Func<DomainAggregateEvent, Task>>(x.GetParameters()[0].ParameterType,
                         ev =>
                         {
-                            Task ret = x.Invoke(instance, new object[] { ev, this.Aggregate, this.Target }) as Task;
+                            Task ret = x.Invoke(instance, new object[] {ev, this.Aggregate, this.Target}) as Task;
                             if (ret != null)
                             {
                                 return ret;
                             }
 
-                            return Task.FromResult(0); 
+                            return Task.FromResult(0);
                         })));
             
             foreach (var action in actions)
             {
-                applyHandlers[action.Item1] = action.Item2;
+                applyHandlers.Add(action.Item1, action.Item2);
             }
         }
     }

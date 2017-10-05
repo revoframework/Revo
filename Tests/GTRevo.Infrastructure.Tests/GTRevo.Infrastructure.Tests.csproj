@@ -106,6 +106,7 @@
     <Compile Include="DataAccess\StaticClassifierDatabaseInitializerTests.cs" />
     <Compile Include="Core\Domain\AggregateEventRouterTests.cs" />
     <Compile Include="Core\Domain\ConventionEventApplyRegistratorTests.cs" />
+    <Compile Include="Projections\EntityEventToPocoProjectorTests.cs" />
     <Compile Include="Projections\ProjectionEventListenerTests.cs" />
     <Compile Include="EventSourcing\EventSourcedRepositoryTests.cs" />
     <Compile Include="History\ChangeTracking\ChangeTrackerTests.cs" />
