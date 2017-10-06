@@ -9,8 +9,6 @@ namespace GTRevo.Infrastructure.Core.Domain.Basic
     [DatabaseEntity]
     public abstract class BasicAggregateRoot : AggregateRoot, IQueryableEntity, IRowVersioned
     {
-        private bool isDeleted;
-
         public BasicAggregateRoot(Guid id) : base(id)
         {
         }

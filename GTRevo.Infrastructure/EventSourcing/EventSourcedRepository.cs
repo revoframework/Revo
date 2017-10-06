@@ -100,12 +100,20 @@ namespace GTRevo.Infrastructure.EventSourcing
             if (aggregate == null)
             {
                 aggregate = await LoadAggregateAsync(id);
-                aggregate = FilterResult(aggregate);
-
-                if (aggregate == null)
+                if (aggregate != null)
                 {
-                    throw new EntityNotFoundException($"Event sourced aggregate with ID {id} was not found");
+                    aggregates.Add(aggregate.Id, aggregate);
                 }
+            }
+
+            if (aggregate != null)
+            {
+                aggregate = FilterResult(aggregate);
+            }
+
+            if (aggregate == null)
+            {
+                throw new EntityNotFoundException($"Event sourced aggregate with ID {id} was not found");
             }
 
             if (aggregate.IsDeleted)
@@ -114,7 +122,6 @@ namespace GTRevo.Infrastructure.EventSourcing
                     $"Cannot get event sourced {aggregate.GetType().FullName} aggregate with ID {id} because it has been previously deleted");
             }
 
-            aggregates.Add(aggregate.Id, aggregate);
             return aggregate;
         }
 

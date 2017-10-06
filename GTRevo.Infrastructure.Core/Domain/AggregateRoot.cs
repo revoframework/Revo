@@ -7,6 +7,8 @@ namespace GTRevo.Infrastructure.Core.Domain
 {
     public abstract class AggregateRoot : IAggregateRoot
     {
+        private bool isDeleted;
+
         public AggregateRoot(Guid id) : this()
         {
             Id = id;
@@ -21,7 +23,7 @@ namespace GTRevo.Infrastructure.Core.Domain
             EventRouter = new AggregateEventRouter(this);
         }
 
-        public bool IsDeleted { get; private set; }
+        public bool IsDeleted => isDeleted;
         public virtual Guid Id { get; private set; }
         public virtual int Version { get; protected set; }
 
@@ -55,7 +57,7 @@ namespace GTRevo.Infrastructure.Core.Domain
 
         protected void MarkDeleted()
         {
-            IsDeleted = true;
+            isDeleted = true;
         }
     }
 }
