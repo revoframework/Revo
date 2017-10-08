@@ -1,4 +1,5 @@
 ﻿using System.Data.Entity;
+using GTRevo.Core.Core;
 using GTRevo.Core.Core.Lifecycle;
 using GTRevo.Core.Transactions;
 using GTRevo.DataAccess.EF6.Entities;

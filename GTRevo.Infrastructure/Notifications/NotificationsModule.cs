@@ -1,4 +1,5 @@
 ﻿using System;
+using GTRevo.Core.Core;
 using GTRevo.Core.Core.Lifecycle;
 using GTRevo.Core.Events;
 using GTRevo.DataAccess.Entities;

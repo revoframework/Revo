@@ -1,4 +1,5 @@
-﻿using GTRevo.Core.Core.Lifecycle;
+﻿using GTRevo.Core.Core;
+using GTRevo.Core.Core.Lifecycle;
 using GTRevo.Platform.Core;
 using Ninject.Modules;
 

@@ -247,7 +247,6 @@
     <Compile Include="Core\Lifecycle\IHttpApplicationInitializer.cs" />
     <Compile Include="Core\Lifecycle\IOwinConfigurator.cs" />
     <Compile Include="Core\Lifecycle\IWebActivatorExHooks.cs" />
-    <Compile Include="Core\NinjectBindingExtension.cs" />
     <Compile Include="Core\NinjectWebLoader.cs" />
     <Compile Include="Core\AspNetTypeExplorer.cs" />
     <Compile Include="Core\WebConfiguration.cs" />
