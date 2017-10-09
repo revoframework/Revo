@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GTRevo.Infrastructure.Core.Domain;
+using GTRevo.Infrastructure.Core.Domain.Events;
 using Xunit;
 
 namespace GTRevo.Infrastructure.Tests.Core.Domain
@@ -19,6 +20,18 @@ namespace GTRevo.Infrastructure.Tests.Core.Domain
             Assert.True(sut.IsDeleted);
         }
 
+        [Fact]
+        public void ApplyEvent_ThrowsIfDeleted()
+        {
+            TestAggregate sut = new TestAggregate(Guid.NewGuid());
+            sut.Delete();
+
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                sut.Do();
+            });
+        }
+
         public class TestAggregate : AggregateRoot
         {
             public TestAggregate(Guid id) : base(id)
@@ -29,6 +42,15 @@ namespace GTRevo.Infrastructure.Tests.Core.Domain
             {
                 MarkDeleted();
             }
+
+            public void Do()
+            {
+                ApplyEvent(new TestEvent());
+            }
+        }
+
+        public class TestEvent : DomainAggregateEvent
+        {
         }
     }
 }
