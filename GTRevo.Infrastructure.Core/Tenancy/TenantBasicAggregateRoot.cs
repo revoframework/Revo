@@ -5,7 +5,7 @@ namespace GTRevo.Infrastructure.Core.Tenancy
 {
     public abstract class TenantBasicAggregateRoot : BasicAggregateRoot, ITenantOwned
     {
-        protected TenantBasicAggregateRoot(Guid id, ITenant tenant) : base(id)
+        public TenantBasicAggregateRoot(Guid id, ITenant tenant) : base(id)
         {
             TenantId = tenant?.Id;
         }
@@ -14,6 +14,6 @@ namespace GTRevo.Infrastructure.Core.Tenancy
         {
         }
 
-        public Guid? TenantId { get; }
+        public Guid? TenantId { get; private set;  }
     }
 }
