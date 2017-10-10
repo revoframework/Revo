@@ -6,20 +6,12 @@ namespace GTRevo.Infrastructure.Tenancy
 {
     public class DefaultTenantContext : ITenantContext
     {
-        private readonly ITenantContextResolver tenantContextResolver;
-        private readonly HttpContext httpContext;
-        private readonly Lazy<ITenant> tenantIdLazy;
-
         public DefaultTenantContext(ITenantContextResolver tenantContextResolver, HttpContext httpContext)
         {
-            this.tenantContextResolver = tenantContextResolver;
-            this.httpContext = httpContext;
-            this.tenantIdLazy = new Lazy<ITenant>(() =>
-            {
-                return tenantContextResolver.ResolveTenant(httpContext);
-            });
+            // resolve immediately to prevent keeping HttpContext alive any longer than needed 
+            Tenant = tenantContextResolver.ResolveTenant(httpContext);
         }
 
-        public ITenant Tenant => tenantIdLazy.Value;
+        public ITenant Tenant { get; }
     }
 }
