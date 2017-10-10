@@ -166,6 +166,9 @@
       <HintPath>..\..\Packages\RazorEngine.3.10.0\lib\net45\RazorEngine.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Collections.Immutable, Version=1.2.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\Packages\System.Collections.Immutable.1.4.0\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
+    </Reference>
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
@@ -252,19 +255,6 @@
     <Compile Include="Core\WebConfiguration.cs" />
     <Compile Include="Globalization\TranslatingJsonSerializer.cs" />
     <Compile Include="IO\BracesGuidJsonConverter.cs" />
-    <Compile Include="IO\Globalization\IMessageRepository.cs" />
-    <Compile Include="IO\Globalization\KnoemaLocalizedObject.cs" />
-    <Compile Include="IO\Globalization\KnoemaLocalizationProvider.cs" />
-    <Compile Include="IO\Globalization\Locale.cs" />
-    <Compile Include="IO\Globalization\LocaleLoader.cs" />
-    <Compile Include="IO\Globalization\LocaleManager.cs" />
-    <Compile Include="IO\Globalization\LocaleMessageResourceRegistration.cs" />
-    <Compile Include="IO\Globalization\LocaleRegistration.cs" />
-    <Compile Include="IO\Globalization\LocalizationAppInitializer.cs" />
-    <Compile Include="IO\Globalization\MessageRepository.cs" />
-    <Compile Include="IO\Messages\CompositeMessageSource.cs" />
-    <Compile Include="IO\Messages\YamlMessageSource.cs" />
-    <Compile Include="IO\Messages\IMessageSource.cs" />
     <Compile Include="IO\ODataQueryableExtensions.cs" />
     <Compile Include="IO\Mapping\ProjectedDto.cs" />
     <Compile Include="IO\Resources\IResourceManager.cs" />
@@ -319,12 +309,6 @@
     <Compile Include="Web\ApiControllerSelector.cs" />
     <Compile Include="Web\CustomRazorViewEngine.cs" />
     <Compile Include="IO\Resources\EmbeddedResource.cs" />
-    <Compile Include="Web\JSBridge\JSBridgeModule.cs" />
-    <Compile Include="Web\JSBridge\JsonMessageExportCache.cs" />
-    <Compile Include="Web\JSBridge\JsonMessageExporter.cs" />
-    <Compile Include="Web\JSBridge\JSBridgeService.cs" />
-    <Compile Include="Web\JSBridge\JSServiceWrapperCache.cs" />
-    <Compile Include="Web\JSBridge\JSServiceWrapperGenerator.cs" />
     <Compile Include="Web\ODataActionFilterAttribute.cs" />
     <Compile Include="Web\ResourceApiController.cs" />
     <Compile Include="Web\RouteDataTokenKeys.cs" />

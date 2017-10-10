@@ -79,6 +79,9 @@
       <HintPath>..\..\..\Packages\PushSharp.4.0.10\lib\net45\PushSharp.Windows.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Collections.Immutable, Version=1.2.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Packages\System.Collections.Immutable.1.4.0\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
+    </Reference>
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
@@ -135,6 +138,7 @@
     <Compile Include="Tenancy\DefaultTenantContextTests.cs" />
     <Compile Include="Tenancy\SingleTenantContextResolverTests.cs" />
     <Compile Include="Tenancy\TenantRepositoryFilterTests.cs" />
+    <Compile Include="Web\JSBridge\JSMessageExporterTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -166,6 +170,7 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Globalization\" />
     <Folder Include="History\Auditing\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

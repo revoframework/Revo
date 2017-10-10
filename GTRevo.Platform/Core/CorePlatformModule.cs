@@ -5,7 +5,6 @@ using GTRevo.Core.Core.Lifecycle;
 using GTRevo.Core.Events;
 using GTRevo.Core.Transactions;
 using GTRevo.Platform.Core.Lifecycle;
-using GTRevo.Platform.IO.Globalization;
 using GTRevo.Platform.IO.Resources;
 using GTRevo.Platform.IO.Stache;
 using GTRevo.Platform.Security;
@@ -34,10 +33,6 @@ namespace GTRevo.Platform.Core
                 .To<WebStacheRenderer>()
                 .InTransientScope();
 
-            Bind<LocaleManager>()
-                .ToSelf()
-                .InSingletonScope();
-
             Bind<EmbeddedResourceVirtualPathProvider>()
                 .ToSelf()
                 .InSingletonScope();
@@ -48,22 +43,6 @@ namespace GTRevo.Platform.Core
 
             Bind<IResourceManager, IWebActivatorExHooks>()
                 .To<ResourceManager>()
-                .InSingletonScope();
-
-            Bind<LocaleLoader>()
-                .ToSelf()
-                .InSingletonScope();
-
-            Bind<IMessageRepository>()
-                .To<MessageRepository>()
-                .InSingletonScope();
-
-            Bind<IApplicationStartListener>()
-                .To<LocalizationAppInitializer>()
-                .InSingletonScope();
-
-            Bind<IApplicationStartListener>()
-                .To<LocaleLoader>()
                 .InSingletonScope();
 
             Bind<IOwinConfigurator>()
