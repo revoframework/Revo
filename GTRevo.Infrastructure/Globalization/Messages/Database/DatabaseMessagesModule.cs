@@ -23,6 +23,10 @@ namespace GTRevo.Infrastructure.Globalization.Messages.Database
                     IAsyncNotificationHandler<LocalizationMessageDeletedEvent>>()
                 .To<DbMessageLoader>()
                 .InRequestOrJobScope();
+
+            Bind<IAsyncNotificationHandler<DbMessageCacheReloadedEvent>>()
+                .To<MessageRepositoryReloader>()
+                .InRequestOrJobScope();
         }
     }
 }

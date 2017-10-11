@@ -8,15 +8,17 @@ namespace GTRevo.Infrastructure.Globalization
     {
         private readonly IResourceManager resourceManager;
 
-        public YamlLocaleMessageSourceFactory(string messageResourcePath, string localeCode,
+        public YamlLocaleMessageSourceFactory(string messageResourcePath, string localeCode, int priority,
             IResourceManager resourceManager)
         {
             LocaleCode = localeCode;
             this.resourceManager = resourceManager;
+            Priority = priority;
             Load(messageResourcePath);
         }
 
         public string LocaleCode { get; }
+        public int Priority { get; }
         public IMessageSource MessageSource { get; private set; }
 
         private void Load(string messageResourcePath)

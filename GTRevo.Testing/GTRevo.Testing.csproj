@@ -63,8 +63,12 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="xunit.assert, Version=2.2.0.3545, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\..\Packages\xunit.assert.2.2.0\lib\netstandard1.1\xunit.assert.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\AssertEx.cs" />
     <Compile Include="DataAccess\EF6\FakeCrudRepository.cs" />
     <Compile Include="DataAccess\LocalDbAsyncEnumerable.cs" />
     <Compile Include="DataAccess\LocalDbAsyncEnumerator.cs" />

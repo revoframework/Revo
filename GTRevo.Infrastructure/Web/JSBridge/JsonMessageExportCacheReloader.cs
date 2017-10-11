@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
+using GTRevo.Infrastructure.Globalization;
 using GTRevo.Infrastructure.Globalization.Messages.Database;
 using MediatR;
 
 namespace GTRevo.Infrastructure.Web.JSBridge
 {
     public class DbMessageCacheReloader :
-        IAsyncNotificationHandler<DbMessageCacheReloadedEvent>
+        IAsyncNotificationHandler<MessageRepositoryReloadedEvent>
     {
         private readonly JsonMessageExportCache jsonMessageExportCache;
 
@@ -15,7 +16,7 @@ namespace GTRevo.Infrastructure.Web.JSBridge
             this.jsonMessageExportCache = jsonMessageExportCache;
         }
 
-        public Task Handle(DbMessageCacheReloadedEvent notification)
+        public Task Handle(MessageRepositoryReloadedEvent notification)
         {
             // TODO run this in a background job
             jsonMessageExportCache.Refresh();

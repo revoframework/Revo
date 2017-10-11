@@ -110,6 +110,13 @@
     <Compile Include="DataAccess\StaticClassifierDatabaseInitializerTests.cs" />
     <Compile Include="Core\Domain\AggregateEventRouterTests.cs" />
     <Compile Include="Core\Domain\ConventionEventApplyRegistratorTests.cs" />
+    <Compile Include="Globalization\Messages\CompositeMessageSourceTests.cs" />
+    <Compile Include="Globalization\MessageRepositoryTests.cs" />
+    <Compile Include="Globalization\Messages\Database\DbMessageCacheTests.cs" />
+    <Compile Include="Globalization\Messages\Database\DbMessageLoaderTests.cs" />
+    <Compile Include="Globalization\Messages\Database\LocalizationMessageTests.cs" />
+    <Compile Include="Globalization\Messages\Database\MessageRepositoryReloaderTests.cs" />
+    <Compile Include="Globalization\Messages\YamlMessageSourceTests.cs" />
     <Compile Include="Projections\EntityEventToPocoProjectorTests.cs" />
     <Compile Include="Projections\ProjectionEventListenerTests.cs" />
     <Compile Include="EventSourcing\EventSourcedRepositoryTests.cs" />
@@ -170,7 +177,6 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Globalization\" />
     <Folder Include="History\Auditing\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

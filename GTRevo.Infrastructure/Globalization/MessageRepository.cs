@@ -1,32 +1,50 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using GTRevo.Core.Events;
 using GTRevo.Infrastructure.Globalization.Messages;
 
 namespace GTRevo.Infrastructure.Globalization
 {
     public class MessageRepository : IMessageRepository
     {
-        private readonly Dictionary<string, IMessageSource> localeSources = new Dictionary<string, IMessageSource>();
         private readonly ILocaleMessageSourceFactory[] localeMessageSourceFactories;
+        private Dictionary<string, IMessageSource> localeSources;
+        private readonly IEventBus eventBus;
 
-        public MessageRepository(ILocaleMessageSourceFactory[] localeMessageSourceFactories)
+        public MessageRepository(ILocaleMessageSourceFactory[] localeMessageSourceFactories,
+            IEventBus eventBus)
         {
             this.localeMessageSourceFactories = localeMessageSourceFactories;
+            this.eventBus = eventBus;
+            Reload();
         }
 
         public IMessageSource GetMessagesForLocale(Locale locale)
         {
-            IMessageSource messageSource = null;
-            if (!localeSources.TryGetValue(locale.Code, out messageSource))
+            if (localeSources.TryGetValue(locale.Code, out IMessageSource messageSource))
             {
-                messageSource = new CompositeMessageSource(
-                    localeMessageSourceFactories
-                        .Where(x => x.LocaleCode == locale.Code)
-                        .Select(x => x.MessageSource));
-                localeSources[locale.Code] = messageSource;
+                return messageSource;
             }
 
-            return messageSource;
+            return null;
+        }
+
+        public void Reload()
+        {
+            var newLocaleSources = new Dictionary<string, IMessageSource>();
+
+            foreach (var factoriesByLocale in localeMessageSourceFactories.GroupBy(x => x.LocaleCode))
+            {
+                var messageSource = new CompositeMessageSource(
+                    factoriesByLocale
+                        .OrderBy(x => x.Priority)
+                        .Select(x => x.MessageSource));
+                newLocaleSources[factoriesByLocale.Key] = messageSource;
+            }
+
+            localeSources = newLocaleSources;
+            eventBus.Publish(new MessageRepositoryReloadedEvent());
         }
     }
 }

@@ -37,6 +37,7 @@ namespace GTRevo.Platform.Web
         public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
         {
             base.OnActionExecuted(actionExecutedContext);
+
             //TODO: get actual locality from header
             string culture =
                 actionExecutedContext.Request.Headers.GetCookies()

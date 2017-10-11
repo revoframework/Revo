@@ -6,40 +6,22 @@ namespace GTRevo.Infrastructure.Globalization.Messages
 {
     public class CompositeMessageSource : IMessageSource
     {
-        private readonly List<IMessageSource> messageSources;
-        private readonly ImmutableDictionary<string, string> messages;
-
         public CompositeMessageSource(IEnumerable<IMessageSource> messageSources)
         {
-            this.messageSources = messageSources.ToList();
-
             var messagesBuilder = ImmutableDictionary.CreateBuilder<string, string>();
-            for (int i = 0; i < this.messageSources.Count; i++)
+            foreach (var messageSource in messageSources)
             {
-                foreach (var msg in this.messageSources[i].Messages)
+                foreach (var msg in messageSource.Messages)
                 {
-                    if (!messagesBuilder.ContainsKey(msg.Key))
-                    {
-                        messagesBuilder[msg.Key] = msg.Value;
-                    }
+                    messagesBuilder[msg.Key] = msg.Value;
                 }
             }
-
-            messages = messagesBuilder.ToImmutable();
+            
+            Messages = messagesBuilder.ToImmutable();
         }
 
-        public ImmutableDictionary<string, string> Messages => messages;
+        public ImmutableDictionary<string, string> Messages { get; }
+        public bool TryGetMessage(string key, out string message) => Messages.TryGetValue(key, out message);
 
-        public bool TryGetMessage(string key, out string message)
-        {
-            for (int i = 0; i < messageSources.Count; i++)
-            {
-                if (messageSources[i].TryGetMessage(key, out message))
-                    return true;
-            }
-
-            message = null;
-            return false;
-        }
     }
 }

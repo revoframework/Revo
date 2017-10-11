@@ -233,10 +233,12 @@
     <Compile Include="Globalization\LocaleRegistration.cs" />
     <Compile Include="Globalization\LocalizationAppInitializer.cs" />
     <Compile Include="Globalization\MessageRepository.cs" />
+    <Compile Include="Globalization\MessageRepositoryReloadedEvent.cs" />
     <Compile Include="Globalization\Messages\CompositeMessageSource.cs" />
     <Compile Include="Globalization\Messages\Database\DatabaseMessagesModule.cs" />
     <Compile Include="Globalization\Messages\Database\DbLocaleMessageSourceFactory.cs" />
     <Compile Include="Globalization\Messages\Database\DbMessageCacheReloadedEvent.cs" />
+    <Compile Include="Globalization\Messages\Database\MessageRepositoryReloader.cs" />
     <Compile Include="Web\JSBridge\JsonMessageExportCacheReloader.cs" />
     <Compile Include="Globalization\Messages\Database\IDbMessageLoader.cs" />
     <Compile Include="Globalization\Messages\Database\DbMessageCache.cs" />
