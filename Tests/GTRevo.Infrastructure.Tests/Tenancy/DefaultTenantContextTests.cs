@@ -17,6 +17,7 @@ namespace GTRevo.Infrastructure.Tests.Tenancy
         private readonly DefaultTenantContext sut;
         private readonly ITenantContextResolver tenantContextResolver;
         private readonly HttpContext httpContext;
+        private readonly ITenant tenant;
 
         public DefaultTenantContextTests()
         {
@@ -24,16 +25,16 @@ namespace GTRevo.Infrastructure.Tests.Tenancy
             httpContext = new HttpContext(new HttpRequest("index", "http://localhost/", ""),
                 new HttpResponse(new StringWriter()));
 
+            tenant = Substitute.For<ITenant>();
+            tenant.Id.Returns(Guid.NewGuid());
+            tenantContextResolver.ResolveTenant(httpContext).Returns(tenant);
+
             sut = new DefaultTenantContext(tenantContextResolver, httpContext);
         }
 
         [Fact]
         public void TenantId_ResolvesTenant()
         {
-            ITenant tenant = Substitute.For<ITenant>();
-            tenant.Id.Returns(Guid.NewGuid());
-            tenantContextResolver.ResolveTenant(httpContext).Returns(tenant);
-
             Assert.Equal(tenant, sut.Tenant);
         }
     }
