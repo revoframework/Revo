@@ -135,9 +135,9 @@ namespace GTRevo.Infrastructure.Tests.Globalization
         public void Reload_PublishesEvent()
         {
             sut = new MessageRepository(new ILocaleMessageSourceFactory[] {}, eventBus);
-            eventBus.Received(1).Publish(Arg.Any<MessageRepositoryReloadedEvent>());
+            eventBus.Received(0).Publish(Arg.Any<MessageRepositoryReloadedEvent>());
             sut.Reload();
-            eventBus.Received(2).Publish(Arg.Any<MessageRepositoryReloadedEvent>());
+            eventBus.Received(1).Publish(Arg.Any<MessageRepositoryReloadedEvent>());
         }
     }
 }

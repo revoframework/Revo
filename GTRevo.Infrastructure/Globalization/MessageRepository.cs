@@ -17,7 +17,8 @@ namespace GTRevo.Infrastructure.Globalization
         {
             this.localeMessageSourceFactories = localeMessageSourceFactories;
             this.eventBus = eventBus;
-            Reload();
+
+            DoReload();
         }
 
         public IMessageSource GetMessagesForLocale(Locale locale)
@@ -32,6 +33,12 @@ namespace GTRevo.Infrastructure.Globalization
 
         public void Reload()
         {
+            DoReload();
+            eventBus.Publish(new MessageRepositoryReloadedEvent());
+        }
+
+        private void DoReload()
+        {
             var newLocaleSources = new Dictionary<string, IMessageSource>();
 
             foreach (var factoriesByLocale in localeMessageSourceFactories.GroupBy(x => x.LocaleCode))
@@ -44,7 +51,6 @@ namespace GTRevo.Infrastructure.Globalization
             }
 
             localeSources = newLocaleSources;
-            eventBus.Publish(new MessageRepositoryReloadedEvent());
         }
     }
 }

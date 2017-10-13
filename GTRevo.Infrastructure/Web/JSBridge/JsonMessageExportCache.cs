@@ -18,12 +18,15 @@ namespace GTRevo.Infrastructure.Web.JSBridge
         {
             this.localeManager = localeManager;
             this.messageRepository = messageRepository;
-
-            Refresh();
         }
 
         public string GetExportedMessages(string localeCode)
         {
+            if (localeDictionaries == null)
+            {
+                Refresh();
+            }
+
             string dictionary;
             if (localeDictionaries.TryGetValue(localeCode, out dictionary))
             {
