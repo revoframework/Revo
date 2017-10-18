@@ -22,7 +22,7 @@ namespace GTRevo.Infrastructure.Web.JSBridge
 
         public string GetExportedMessages(string localeCode)
         {
-            if (localeDictionaries == null)
+            if ((localeDictionaries?.Count ?? 0) == 0)
             {
                 Refresh();
             }
