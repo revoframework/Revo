@@ -112,7 +112,7 @@ namespace GTRevo.Testing.Infrastructure.Repositories
             foreach (EntityEntry entry in Aggregates.ToList())
             {
                 if (entry.EntityState == EntityState.Added || entry.EntityState == EntityState.Modified
-                    || entry.Instance.UncommitedEvents.Any())
+                    || entry.Instance.UncommittedEvents.Any())
                 {
                     if (entry.EntityState == EntityState.Added)
                     {
@@ -125,7 +125,7 @@ namespace GTRevo.Testing.Infrastructure.Repositories
 
                     entry.EntityState = EntityState.Unchanged;
 
-                    foreach (DomainAggregateEvent domainEvent in entry.Instance.UncommitedEvents)
+                    foreach (DomainAggregateEvent domainEvent in entry.Instance.UncommittedEvents)
                     {
                         publishedEvents.Add(entry, domainEvent);
                     }
@@ -160,7 +160,7 @@ namespace GTRevo.Testing.Infrastructure.Repositories
         public bool HasUnsavedChanges()
         {
             return Aggregates
-                .Any(x => x.Instance.UncommitedEvents.Any() || x.EntityState != EntityState.Unchanged);
+                .Any(x => x.Instance.UncommittedEvents.Any() || x.EntityState != EntityState.Unchanged);
         }
 
         protected IEnumerable<T> GetSavedAggregates<T>() where T : class, IAggregateRoot

@@ -162,7 +162,7 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
             var entity = new MyEntity(entityId, 5);
             sut.Add(entity);
 
-            entity.UncommitedEvents = new List<DomainAggregateEvent>()
+            entity.UncommittedEvents = new List<DomainAggregateEvent>()
             {
                 new SetFooEvent()
                 {
@@ -178,7 +178,7 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
                     ActorName = "actor",
                     AggregateVersion = 1,
                     DatePublished = FakeClock.Now,
-                    Event = entity.UncommitedEvents.ElementAt(0)
+                    Event = entity.UncommittedEvents.ElementAt(0)
                 }
             };
 
@@ -205,7 +205,7 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
                 AggregateClassId = entityClassId
             };
 
-            entity.UncommitedEvents = new List<DomainAggregateEvent>()
+            entity.UncommittedEvents = new List<DomainAggregateEvent>()
             {
                 event1
             };
@@ -221,7 +221,7 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
             var entity = new MyEntity(entityId, 5);
             sut.Add(entity);
 
-            entity.UncommitedEvents = new List<DomainAggregateEvent>()
+            entity.UncommittedEvents = new List<DomainAggregateEvent>()
             {
                 new SetFooEvent()
                 {
@@ -288,7 +288,7 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
             var entity = new MyEntity(entityId, 5);
             sut.Add(entity);
 
-            entity.UncommitedEvents = new List<DomainAggregateEvent>()
+            entity.UncommittedEvents = new List<DomainAggregateEvent>()
             {
                 new SetFooEvent()
                 {
@@ -311,7 +311,7 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
             var entity = new MyEntity(entityId, 5);
             sut.Add(entity);
 
-            entity.UncommitedEvents = new List<DomainAggregateEvent>()
+            entity.UncommittedEvents = new List<DomainAggregateEvent>()
             {
                 new SetFooEvent()
                 {
@@ -349,17 +349,17 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
             public Guid Id { get; private set; }
             public bool IsDeleted { get; set; }
 
-            public IEnumerable<DomainAggregateEvent> UncommitedEvents { get; set; } =
+            public IEnumerable<DomainAggregateEvent> UncommittedEvents { get; set; } =
                 new List<DomainAggregateEvent>();
 
-            public bool IsChanged => UncommitedEvents.Any();
+            public bool IsChanged => UncommittedEvents.Any();
             public int Version { get; set; }
 
             internal List<DomainAggregateEvent> LoadedEvents;
 
             public void Commit()
             {
-                UncommitedEvents = new List<DomainAggregateEvent>();
+                UncommittedEvents = new List<DomainAggregateEvent>();
                 Version++;
             }
 

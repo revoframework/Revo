@@ -22,7 +22,7 @@ namespace GTRevo.Infrastructure.Tests.Globalization.Messages.Database
         public void SetMessage_PublishesEvent()
         {
             sut.SetMessage("goodbye");
-            Assert.Contains(sut.UncommitedEvents.OfType<LocalizationMessageModifiedEvent>(),
+            Assert.Contains(sut.UncommittedEvents.OfType<LocalizationMessageModifiedEvent>(),
                 x => x.ClassName == "cls" && x.Key == "key" && x.LocaleCode == "en-GB"
                 && x.Message == "message" && x.TenantId == null);
         }
@@ -31,7 +31,7 @@ namespace GTRevo.Infrastructure.Tests.Globalization.Messages.Database
         public void Delete_PublishesEvent()
         {
             sut.Delete();
-            Assert.Contains(sut.UncommitedEvents.OfType<LocalizationMessageDeletedEvent>(),
+            Assert.Contains(sut.UncommittedEvents.OfType<LocalizationMessageDeletedEvent>(),
                 x => true);
         }
 

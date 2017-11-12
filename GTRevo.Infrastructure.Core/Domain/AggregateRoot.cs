@@ -27,9 +27,9 @@ namespace GTRevo.Infrastructure.Core.Domain
         public virtual Guid Id { get; private set; }
         public virtual int Version { get; protected set; }
 
-        public virtual bool IsChanged => UncommitedEvents.Any();
+        public virtual bool IsChanged => UncommittedEvents.Any();
 
-        public virtual IEnumerable<DomainAggregateEvent> UncommitedEvents
+        public virtual IEnumerable<DomainAggregateEvent> UncommittedEvents
         {
             get
             {

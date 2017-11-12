@@ -5,7 +5,7 @@ namespace GTRevo.Infrastructure.Core.Domain
 {
     public interface IAggregateRoot : IEntity
     {
-        IEnumerable<DomainAggregateEvent> UncommitedEvents { get; }
+        IEnumerable<DomainAggregateEvent> UncommittedEvents { get; }
         bool IsChanged { get; }
         bool IsDeleted { get; }
         int Version { get; }

@@ -62,16 +62,16 @@ namespace GTRevo.Testing.Infrastructure
             {
                 List<DomainAggregateEvent> newEvents;
 
-                List<DomainAggregateEvent> originalEvents = aggregate.UncommitedEvents.ToList();
+                List<DomainAggregateEvent> originalEvents = aggregate.UncommittedEvents.ToList();
                 action();
 
                 if (assertAllEvents)
                 {
-                    newEvents = aggregate.UncommitedEvents.ToList();
+                    newEvents = aggregate.UncommittedEvents.ToList();
                 }
                 else
                 {
-                    newEvents = aggregate.UncommitedEvents.Except(originalEvents).ToList();
+                    newEvents = aggregate.UncommittedEvents.Except(originalEvents).ToList();
                 }
 
                 newEvents.Should().HaveSameCount(expectedEvents);

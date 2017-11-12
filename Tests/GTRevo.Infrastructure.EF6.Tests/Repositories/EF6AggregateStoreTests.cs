@@ -54,7 +54,7 @@ namespace GTRevo.Infrastructure.EF6.Tests.Repositories
             TestAggregate testAggregate = new TestAggregate(Guid.NewGuid());
             sut.Add(testAggregate);
             testAggregate.Do();
-            var event1 = testAggregate.UncommitedEvents.First();
+            var event1 = testAggregate.UncommittedEvents.First();
             sut.SaveChanges();
 
             eventQueue.Received(1).PushEvent(event1);

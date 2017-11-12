@@ -161,12 +161,12 @@ namespace GTRevo.Infrastructure.EventSourcing
 
         public virtual void SaveChanges()
         {
-            List<TBase> savedAggregates = aggregates.Values.Where(x => x.UncommitedEvents.Any()).ToList();
+            List<TBase> savedAggregates = aggregates.Values.Where(x => x.UncommittedEvents.Any()).ToList();
             if (savedAggregates.Any())
             {
                 foreach (var aggregate in savedAggregates)
                 {
-                    CheckEvents(aggregate, aggregate.UncommitedEvents);
+                    CheckEvents(aggregate, aggregate.UncommittedEvents);
 
                     if (aggregate.Version == 0)
                     {
@@ -181,7 +181,7 @@ namespace GTRevo.Infrastructure.EventSourcing
                 foreach (var aggregate in savedAggregates)
                 {
                     int newAggregateVersion = aggregate.Version + 1;
-                    var eventRecords = ConstructEventsRecords(aggregate.UncommitedEvents, newAggregateVersion);
+                    var eventRecords = ConstructEventsRecords(aggregate.UncommittedEvents, newAggregateVersion);
                     eventStore.PushEvents(aggregate.Id, eventRecords, newAggregateVersion);
                 }
 
@@ -193,12 +193,12 @@ namespace GTRevo.Infrastructure.EventSourcing
 
         public virtual async Task SaveChangesAsync()
         {
-            List<TBase> savedAggregates = aggregates.Values.Where(x => x.UncommitedEvents.Any()).ToList();
+            List<TBase> savedAggregates = aggregates.Values.Where(x => x.UncommittedEvents.Any()).ToList();
             if (savedAggregates.Any())
             {
                 foreach (var aggregate in savedAggregates)
                 {
-                    CheckEvents(aggregate, aggregate.UncommitedEvents);
+                    CheckEvents(aggregate, aggregate.UncommittedEvents);
 
                     if (aggregate.Version == 0)
                     {
@@ -213,7 +213,7 @@ namespace GTRevo.Infrastructure.EventSourcing
                 foreach (var aggregate in savedAggregates)
                 {
                     int newAggregateVersion = aggregate.Version + 1;
-                    var eventRecords = ConstructEventsRecords(aggregate.UncommitedEvents, newAggregateVersion);
+                    var eventRecords = ConstructEventsRecords(aggregate.UncommittedEvents, newAggregateVersion);
                     await eventStore.PushEventsAsync(aggregate.Id, eventRecords, newAggregateVersion);
                 }
 
@@ -234,7 +234,7 @@ namespace GTRevo.Infrastructure.EventSourcing
             {
                 if (aggregate.IsChanged)
                 {
-                    aggregate.UncommitedEvents.ForEach(eventQueue.PushEvent);
+                    aggregate.UncommittedEvents.ForEach(eventQueue.PushEvent);
                     aggregate.Commit();
                 }
             }

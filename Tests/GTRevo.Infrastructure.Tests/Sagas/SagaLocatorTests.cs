@@ -149,15 +149,15 @@ namespace GTRevo.Infrastructure.Tests.Sagas
             }
 
             public Guid Id { get; set; }
-            public bool IsChanged => UncommitedEvents.Any() || UncommitedCommands.Any();
-            public IEnumerable<DomainAggregateEvent> UncommitedEvents { get; set; }
+            public bool IsChanged => UncommittedEvents.Any() || UncommitedCommands.Any();
+            public IEnumerable<DomainAggregateEvent> UncommittedEvents { get; set; }
             public int Version { get; set; }
             public bool IsDeleted { get; set; }
 
             public void Commit()
             {
                 Version++;
-                UncommitedEvents = new List<DomainAggregateEvent>();
+                UncommittedEvents = new List<DomainAggregateEvent>();
                 UncommitedCommands = new List<ICommand>();
             }
 

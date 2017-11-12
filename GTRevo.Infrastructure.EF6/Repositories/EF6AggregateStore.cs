@@ -132,7 +132,7 @@ namespace GTRevo.Infrastructure.EF6.Repositories
             {
                 if (aggregate.IsChanged)
                 {
-                    foreach (DomainAggregateEvent domainEvent in aggregate.UncommitedEvents)
+                    foreach (DomainAggregateEvent domainEvent in aggregate.UncommittedEvents)
                     {
                         eventQueue.PushEvent(domainEvent);
                     }
