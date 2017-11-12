@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using GTRevo.Infrastructure.Core.Domain.Events;
 
 namespace GTRevo.Infrastructure.Core.Domain.EventSourcing
@@ -19,8 +20,14 @@ namespace GTRevo.Infrastructure.Core.Domain.EventSourcing
 
         public void LoadState(AggregateState state)
         {
-            EventRouter.ReplayEvents(state.Events);
+            // TODO throw if not at initial state (Version 0 and no uncommittted events?)
+            ReplayEvents(state.Events);
             Version = state.Version;
+        }
+
+        public void ReplayEvents(IEnumerable<DomainAggregateEvent> events)
+        {
+            EventRouter.ReplayEvents(events);
         }
 
         protected override void ApplyEvent<T>(T evt)

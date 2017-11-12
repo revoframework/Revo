@@ -19,10 +19,7 @@ namespace GTRevo.Infrastructure.Projections
             CreateApplyDelegates();
         }
 
-        public Type ProjectedAggregateType
-        {
-            get { return typeof(TSource); }
-        }
+        public Type ProjectedAggregateType => typeof(TSource);
 
         protected TSource Aggregate { get; private set; }
         protected TTarget Target { get; private set; }
