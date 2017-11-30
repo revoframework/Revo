@@ -124,6 +124,9 @@
     <Compile Include="Globalization\Messages\Database\MessageRepositoryReloaderTests.cs" />
     <Compile Include="Globalization\Messages\YamlMessageSourceTests.cs" />
     <Compile Include="Projections\EntityEventToPocoProjectorTests.cs" />
+    <Compile Include="Notifications\Channels\Apns\ApnsBufferedNotificationChannelTests.cs" />
+    <Compile Include="Notifications\Channels\Apns\ApnsUserDeviceTokenTests.cs" />
+    <Compile Include="Notifications\Channels\Apns\PushNotificationCommandHandlerTests.cs" />
     <Compile Include="Projections\ProjectionEventListenerTests.cs" />
     <Compile Include="EventSourcing\EventSourcedRepositoryTests.cs" />
     <Compile Include="History\ChangeTracking\ChangeTrackerTests.cs" />
@@ -135,9 +138,6 @@
     <Compile Include="Notifications\BufferedNotificationProcessJobTests.cs" />
     <Compile Include="Notifications\BufferedNotificationStoreTests.cs" />
     <Compile Include="Notifications\BufferingNotificationChannelTests.cs" />
-    <Compile Include="Notifications\Channels\Push\ApnsBufferedNotificationChannelTests.cs" />
-    <Compile Include="Notifications\Channels\Push\ApnsUserDeviceTokenTests.cs" />
-    <Compile Include="Notifications\Channels\Push\PushNotificationCommandHandlerTests.cs" />
     <Compile Include="Notifications\NotificationBusTests.cs" />
     <Compile Include="Notifications\NotificationPipelineTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -184,6 +184,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="History\Auditing\" />
+    <Folder Include="Notifications\Channels\Fcm\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
