@@ -38,10 +38,10 @@ namespace GTRevo.Infrastructure.Tests.Notifications.Channels.Apns
                 new TestNotification()
             };
 
-            var apnsNotifications = new List<ApnsNotification>()
+            var apnsNotifications = new List<WrappedApnsNotification>()
             {
-                new ApnsNotification("1cc31e97c96b274eb056a969eff7f6d783fcdf6985dc457734837bd45fb1a731", new JObject()),
-                new ApnsNotification("1da31e97c96b274eb056a969eff7f6d783fcdf6985dc457734837bd45fb1a731", new JObject())
+                new WrappedApnsNotification(new ApnsNotification("1cc31e97c96b274eb056a969eff7f6d783fcdf6985dc457734837bd45fb1a731", new JObject()), "my.appid"),
+                new WrappedApnsNotification(new ApnsNotification("1da31e97c96b274eb056a969eff7f6d783fcdf6985dc457734837bd45fb1a731", new JObject()), "my.appid")
             };
 
             pushNotificationFormatters[0].FormatPushNotification(Arg.Is<IEnumerable<INotification>>(
@@ -54,7 +54,7 @@ namespace GTRevo.Infrastructure.Tests.Notifications.Channels.Apns
             await sut.SendNotificationsAsync(notifications);
 
             //we want them to get queued efficiently, all at once
-            apnsBrokerDispatcher.Received().QueueNotifications(Arg.Is<IEnumerable<ApnsNotification>>(
+            apnsBrokerDispatcher.Received().QueueNotifications(Arg.Is<IEnumerable<WrappedApnsNotification>>(
                 x => x.Count() == apnsNotifications.Count && x.All(apnsNotifications.Contains)));
         }
 

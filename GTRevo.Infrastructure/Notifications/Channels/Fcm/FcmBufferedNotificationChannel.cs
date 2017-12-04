@@ -20,10 +20,10 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Fcm
 
         public async Task SendNotificationsAsync(IEnumerable<INotification> notifications)
         {
-            IEnumerable<GcmNotification> fcmNotifications = null;
+            IEnumerable<WrappedFcmNotification> fcmNotifications = null;
             foreach (IFcmNotificationFormatter formatter in pushNotificationFormatters)
             {
-                IEnumerable<GcmNotification> pushNotifications = await formatter.FormatPushNotification(notifications);
+                IEnumerable<WrappedFcmNotification> pushNotifications = await formatter.FormatPushNotification(notifications);
                 fcmNotifications = fcmNotifications?.Concat(pushNotifications) ?? pushNotifications;
             }
 

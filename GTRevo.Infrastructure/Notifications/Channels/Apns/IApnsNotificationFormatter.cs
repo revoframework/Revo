@@ -6,6 +6,6 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Apns
 {
     public interface IApnsNotificationFormatter
     {
-        Task<IEnumerable<ApnsNotification>> FormatPushNotification(IEnumerable<INotification> notifications);
+        Task<IEnumerable<WrappedApnsNotification>> FormatPushNotification(IEnumerable<INotification> notifications);
     }
 }

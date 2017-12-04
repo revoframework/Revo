@@ -90,12 +90,12 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Fcm.CommandHandlers
 
             fcmBrokerDispatcher.QueueNotifications(
                 tokens.Select(
-                    x => new GcmNotification()
+                    x => new WrappedFcmNotification(new GcmNotification()
                     {
                         RegistrationIds = new List<string>() { x.RegistrationId },
                         Data = message.Data,
                         Notification = message.Notification
-                    }));
+                    }, x.AppId)));
         }
     }
 }

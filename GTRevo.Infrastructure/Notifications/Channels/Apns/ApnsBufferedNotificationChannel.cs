@@ -20,10 +20,10 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Apns
 
         public async Task SendNotificationsAsync(IEnumerable<INotification> notifications)
         {
-            IEnumerable<ApnsNotification> apnsNotifications = null;
+            IEnumerable<WrappedApnsNotification> apnsNotifications = null;
             foreach (IApnsNotificationFormatter formatter in pushNotificationFormatters)
             {
-                IEnumerable<ApnsNotification> pushNotifications = await formatter.FormatPushNotification(notifications);
+                IEnumerable<WrappedApnsNotification> pushNotifications = await formatter.FormatPushNotification(notifications);
                 apnsNotifications = apnsNotifications?.Concat(pushNotifications) ?? pushNotifications;
             }
 

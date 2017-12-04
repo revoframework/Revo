@@ -84,7 +84,7 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Apns.CommandHandlers
 
             apnsBrokerDispatcher.QueueNotifications(
                 tokens.Select(
-                    x => new ApnsNotification(x.DeviceToken, message.Payload)));
+                    x => new WrappedApnsNotification(new ApnsNotification(x.DeviceToken, message.Payload), x.AppId)));
         }
     }
 }

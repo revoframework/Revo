@@ -1,4 +1,6 @@
-﻿using GTRevo.Core.Core.Lifecycle;
+﻿using System.Collections.Generic;
+using System.Linq;
+using GTRevo.Core.Core.Lifecycle;
 using GTRevo.Platform.Core;
 using Ninject.Modules;
 using PushSharp.Apple;
@@ -10,23 +12,30 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Apns
         public override void Load()
         {
             Bind<IApnsBrokerDispatcher, IApplicationStartListener>()
-                .To<ApnsBrokerDispatcher>()
-                .InSingletonScope();
-
-            Bind<ApnsConfiguration>()
                 .ToMethod(ctx =>
                 {
                     var configSection = LocalConfiguration.Current
                         .GetSection<ApnsServiceConfigurationSection>(
                             ApnsServiceConfigurationSection.ConfigurationSectionName);
+                    if (configSection == null)
+                    {
+                        return null;
+                    }
 
-                    return configSection?.CertificateFilePath.Length > 0 
-                        ? new ApnsConfiguration(configSection.IsSandboxEnvironment
-                                ? ApnsConfiguration.ApnsServerEnvironment.Sandbox
-                                : ApnsConfiguration.ApnsServerEnvironment.Production,
-                            configSection.CertificateFilePath, configSection.CertificatePassword)
-                        : null;
-                });
+                    List<ApnsAppConfiguration> configs = new List<ApnsAppConfiguration>();
+                    for (int i = 0; i < configSection.AppConfigurations.Count; i++)
+                    {
+                        var configElement = configSection.AppConfigurations[i];
+                        configs.Add(new ApnsAppConfiguration(configElement.AppId,
+                            new ApnsConfiguration(configElement.IsSandboxEnvironment
+                                    ? ApnsConfiguration.ApnsServerEnvironment.Sandbox
+                                    : ApnsConfiguration.ApnsServerEnvironment.Production,
+                                configElement.CertificateFilePath, configElement.CertificatePassword)));
+                    }
+
+                    return new ApnsBrokerDispatcher(configs);
+                })
+                .InSingletonScope();
         }
     }
 }

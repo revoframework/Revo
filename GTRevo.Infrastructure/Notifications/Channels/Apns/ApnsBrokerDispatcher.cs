@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using GTRevo.Core.Core.Lifecycle;
+using MoreLinq;
 using NLog;
 using PushSharp.Apple;
 
@@ -9,59 +12,75 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Apns
     public class ApnsBrokerDispatcher : IApnsBrokerDispatcher, IApplicationStartListener, IDisposable
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
-        private readonly ApnsConfiguration apnsConfiguration;
-        private ApnsServiceBroker apnsServiceBroker; // TODO might pool multiple instances?
-
-        public ApnsBrokerDispatcher(ApnsConfiguration apnsConfiguration)
+        
+        private readonly Dictionary<string, ApnsServiceBroker> apnsServiceBrokers; // TODO might pool multiple instances?
+        
+        public ApnsBrokerDispatcher(IEnumerable<ApnsAppConfiguration> apnsAppConfigurations)
         {
-            this.apnsConfiguration = apnsConfiguration;
+            if (apnsAppConfigurations.DistinctBy(x => x.AppId).Count() != apnsAppConfigurations.Count())
+            {
+                throw new ArgumentException("Duplicate AppIds specified for ApnsBrokerDispatcher");
+            }
+
+            apnsServiceBrokers = apnsAppConfigurations.ToDictionary(x => x.AppId,
+                x =>
+                {
+                    var broker = apnsServiceBrokers[x.AppId] = new ApnsServiceBroker(x.ApnsConfiguration);
+                    broker.OnNotificationSucceeded += ApnsServiceBrokerNotificationSucceeded;
+                    broker.OnNotificationFailed += ApnsServiceBrokeNotificationFailed;
+                    return broker;
+                });
         }
 
         public void OnApplicationStarted()
         {
-            if (apnsConfiguration != null)
+            foreach (var broker in apnsServiceBrokers)
             {
-                apnsServiceBroker = new ApnsServiceBroker(apnsConfiguration);
-                apnsServiceBroker.OnNotificationSucceeded += ApnsServiceBrokerNotificationSucceeded;
-                apnsServiceBroker.OnNotificationFailed += ApnsServiceBrokeNotificationFailed;
-                apnsServiceBroker.Start();
+                broker.Value.Start();
+            }
+
+            Logger.Info($"Started {apnsServiceBrokers.Count} APNS brokers");
+        }
+
+        public void QueueNotification(WrappedApnsNotification notification)
+        {
+            if (apnsServiceBrokers.TryGetValue(notification.AppId, out var broker))
+            {
+                lock (broker)
+                {
+                    broker.QueueNotification(notification.Notification);
+                }
             }
             else
             {
-                Logger.Info("No Apple Push Notification Service connection configured");
+                Logger.Trace($"No APNS broker set-up for AppId {notification.AppId}, message won't be sent");
             }
         }
 
-        public void QueueNotification(ApnsNotification notification)
+        public void QueueNotifications(IEnumerable<WrappedApnsNotification> notifications)
         {
-            if (apnsServiceBroker != null)
+            foreach (var perApp in notifications.GroupBy(x => x.AppId))
             {
-                lock (apnsServiceBroker)
+                if (apnsServiceBrokers.TryGetValue(perApp.Key, out var broker))
                 {
-                    apnsServiceBroker.QueueNotification(notification);
-                }
-            }
-        }
-
-        public void QueueNotifications(IEnumerable<ApnsNotification> notifications)
-        {
-            if (apnsServiceBroker != null)
-            {
-                lock (apnsServiceBroker)
-                {
-                    foreach (ApnsNotification notification in notifications)
+                    lock (broker)
                     {
-                        apnsServiceBroker.QueueNotification(notification);
+                        foreach (var notification in perApp)
+                        {
+                            broker.QueueNotification(notification.Notification);
+                        }
                     }
+                }
+                else
+                {
+                    Logger.Trace($"No APNS broker set-up for AppId {perApp.Key}, message(s) won't be sent");
                 }
             }
         }
 
         public void Dispose()
         {
-            apnsServiceBroker?.Stop();
-            apnsServiceBroker = null;
+            apnsServiceBrokers.ForEach(x => x.Value.Stop());
         }
 
         private void ApnsServiceBrokeNotificationFailed(ApnsNotification notification, AggregateException exception)

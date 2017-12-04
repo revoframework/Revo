@@ -5,7 +5,7 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Apns
 {
     public interface IApnsBrokerDispatcher
     {
-        void QueueNotification(ApnsNotification notification);
-        void QueueNotifications(IEnumerable<ApnsNotification> notifications);
+        void QueueNotification(WrappedApnsNotification notification);
+        void QueueNotifications(IEnumerable<WrappedApnsNotification> notifications);
     }
 }

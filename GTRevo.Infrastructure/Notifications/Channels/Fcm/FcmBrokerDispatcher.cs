@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using GTRevo.Core.Core.Lifecycle;
+using MoreLinq;
 using NLog;
 using PushSharp.Google;
 
@@ -10,58 +12,74 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Fcm
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly GcmConfiguration fcmConfiguration;
-        private GcmServiceBroker fcmServiceBroker; // TODO might pool multiple instances?
+        private readonly Dictionary<string, GcmServiceBroker> fcmServiceBrokers; // TODO might pool multiple instances?
 
-        public FcmBrokerDispatcher(GcmConfiguration fcmConfiguration)
+        public FcmBrokerDispatcher(IEnumerable<FcmAppConfiguration> fcmAppConfigurations)
         {
-            this.fcmConfiguration = fcmConfiguration;
+            if (fcmAppConfigurations.DistinctBy(x => x.AppId).Count() != fcmAppConfigurations.Count())
+            {
+                throw new ArgumentException("Duplicate AppIds specified for FcmBrokerDispatcher");
+            }
+
+            fcmServiceBrokers = fcmAppConfigurations.ToDictionary(x => x.AppId,
+                x =>
+                {
+                    var broker = fcmServiceBrokers[x.AppId] = new GcmServiceBroker(x.FcmConfiguration);
+                    broker.OnNotificationSucceeded += FcmServiceBrokerNotificationSucceeded;
+                    broker.OnNotificationFailed += FcmServiceBrokeNotificationFailed;
+                    return broker;
+                });
         }
 
         public void OnApplicationStarted()
         {
-            if (fcmConfiguration != null)
+            foreach (var broker in fcmServiceBrokers)
             {
-                fcmServiceBroker = new GcmServiceBroker(fcmConfiguration);
-                fcmServiceBroker.OnNotificationSucceeded += FcmServiceBrokerNotificationSucceeded;
-                fcmServiceBroker.OnNotificationFailed += FcmServiceBrokeNotificationFailed;
-                fcmServiceBroker.Start();
+                broker.Value.Start();
+            }
+
+            Logger.Info($"Started {fcmServiceBrokers.Count} FCM brokers");
+        }
+
+        public void QueueNotification(WrappedFcmNotification notification)
+        {
+            if (fcmServiceBrokers.TryGetValue(notification.AppId, out var broker))
+            {
+                lock (broker)
+                {
+                    broker.QueueNotification(notification.Notification);
+                }
             }
             else
             {
-                Logger.Info("No Google Cloud Messaging connection configured");
+                Logger.Trace($"No FCM broker set-up for AppId {notification.AppId}, message won't be sent");
             }
         }
 
-        public void QueueNotification(GcmNotification notification)
+        public void QueueNotifications(IEnumerable<WrappedFcmNotification> notifications)
         {
-            if (fcmServiceBroker != null)
+            foreach (var perApp in notifications.GroupBy(x => x.AppId))
             {
-                lock (fcmServiceBroker)
+                if (fcmServiceBrokers.TryGetValue(perApp.Key, out var broker))
                 {
-                    fcmServiceBroker.QueueNotification(notification);
-                }
-            }
-        }
-
-        public void QueueNotifications(IEnumerable<GcmNotification> notifications)
-        {
-            if (fcmServiceBroker != null)
-            {
-                lock (fcmServiceBroker)
-                {
-                    foreach (GcmNotification notification in notifications)
+                    lock (broker)
                     {
-                        fcmServiceBroker.QueueNotification(notification);
+                        foreach (var notification in perApp)
+                        {
+                            broker.QueueNotification(notification.Notification);
+                        }
                     }
+                }
+                else
+                {
+                    Logger.Trace($"No APNS broker set-up for AppId {perApp.Key}, message(s) won't be sent");
                 }
             }
         }
 
         public void Dispose()
         {
-            fcmServiceBroker?.Stop();
-            fcmServiceBroker = null;
+            fcmServiceBrokers.ForEach(x => x.Value.Stop());
         }
 
         private void FcmServiceBrokeNotificationFailed(GcmNotification notification, AggregateException exception)

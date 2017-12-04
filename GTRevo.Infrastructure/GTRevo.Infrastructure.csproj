@@ -239,6 +239,8 @@
     <Compile Include="Globalization\Messages\Database\DbLocaleMessageSourceFactory.cs" />
     <Compile Include="Globalization\Messages\Database\DbMessageCacheReloadedEvent.cs" />
     <Compile Include="Globalization\Messages\Database\MessageRepositoryReloader.cs" />
+    <Compile Include="Notifications\Channels\Apns\ApnsAppConfiguration.cs" />
+    <Compile Include="Notifications\Channels\Apns\WrappedApnsNotification.cs" />
     <Compile Include="Notifications\Channels\Fcm\CommandHandlers\ExternalFcmCommandHandler.cs" />
     <Compile Include="Notifications\Channels\Fcm\CommandHandlers\FcmNotificationCommandHandler.cs" />
     <Compile Include="Notifications\Channels\Fcm\Commands\DeregisterFcmDeviceCommand.cs" />
@@ -246,6 +248,7 @@
     <Compile Include="Notifications\Channels\Fcm\Commands\PushExternalFcmNotificationCommand.cs" />
     <Compile Include="Notifications\Channels\Fcm\Commands\RegisterFcmDeviceCommand.cs" />
     <Compile Include="Notifications\Channels\Fcm\Commands\RegisterFcmExternalUserDeviceCommand.cs" />
+    <Compile Include="Notifications\Channels\Fcm\FcmAppConfiguration.cs" />
     <Compile Include="Notifications\Channels\Fcm\FcmBrokerDispatcher.cs" />
     <Compile Include="Notifications\Channels\Fcm\FcmBufferedNotificationChannel.cs" />
     <Compile Include="Notifications\Channels\Fcm\FcmNotificationsModule.cs" />
@@ -257,6 +260,7 @@
     <Compile Include="Notifications\Channels\Fcm\Permissions.cs" />
     <Compile Include="Notifications\Channels\Fcm\Services\ExternalFcmService.cs" />
     <Compile Include="Notifications\Channels\Fcm\Services\FcmDeviceRegistrationService.cs" />
+    <Compile Include="Notifications\Channels\Fcm\WrappedFcmNotification.cs" />
     <Compile Include="Web\JSBridge\JsonMessageExportCacheReloader.cs" />
     <Compile Include="Globalization\Messages\Database\IDbMessageLoader.cs" />
     <Compile Include="Globalization\Messages\Database\DbMessageCache.cs" />
