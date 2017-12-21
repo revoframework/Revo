@@ -48,26 +48,31 @@ namespace GTRevo.Platform.IO.Resources
             var assemblies = typeExplorer.GetAllReferencedAssemblies();
 
             var configSection = configuration.GetSection<ResourceManagerConfigurationSection>(ConfigurationSectionName);
-
-            for (int i = 0; i < configSection.PathConfiguration.Count; i++)
+            if (configSection?.PathConfiguration != null)
             {
-                var pathConfig = configSection.PathConfiguration[i];
-                Assembly assembly = assemblies.FirstOrDefault(
-                    x => x.GetName().Name == pathConfig.AssemblyName);
-                if (assembly != null)
+                for (int i = 0; i < configSection.PathConfiguration.Count; i++)
                 {
-                    assembliesToProjectPaths[assembly] = pathConfig.ProjectPath;
+                    var pathConfig = configSection.PathConfiguration[i];
+                    Assembly assembly = assemblies.FirstOrDefault(
+                        x => x.GetName().Name == pathConfig.AssemblyName);
+                    if (assembly != null)
+                    {
+                        assembliesToProjectPaths[assembly] = pathConfig.ProjectPath;
+                    }
                 }
-            };
+            }
 
             foreach (var registration in resourcePathRegistrations)
             {
-                Assembly assembly = assemblies.First(x => x.GetName().Name == registration.AssemblyName);
-                string projectPath = null;
-                assembliesToProjectPaths.TryGetValue(assembly, out projectPath);
+                Assembly assembly = assemblies.FirstOrDefault(x => x.GetName().Name == registration.AssemblyName);
 
-                AddAsembly(assembly, projectPath ?? registration.ProjectSourcePath,
-                    registration.PathMappings.ToArray());
+                if (assembly != null)
+                {
+                    assembliesToProjectPaths.TryGetValue(assembly, out string projectPath);
+
+                    AddAsembly(assembly, projectPath ?? registration.ProjectSourcePath,
+                        registration.PathMappings.ToArray());
+                }
             }
         }
 

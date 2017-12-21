@@ -12,7 +12,6 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Apns
     public class ApnsBrokerDispatcher : IApnsBrokerDispatcher, IApplicationStartListener, IDisposable
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        
         private readonly Dictionary<string, ApnsServiceBroker> apnsServiceBrokers; // TODO might pool multiple instances?
         
         public ApnsBrokerDispatcher(IEnumerable<ApnsAppConfiguration> apnsAppConfigurations)
@@ -25,7 +24,7 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Apns
             apnsServiceBrokers = apnsAppConfigurations.ToDictionary(x => x.AppId,
                 x =>
                 {
-                    var broker = apnsServiceBrokers[x.AppId] = new ApnsServiceBroker(x.ApnsConfiguration);
+                    var broker = new ApnsServiceBroker(x.ApnsConfiguration);
                     broker.OnNotificationSucceeded += ApnsServiceBrokerNotificationSucceeded;
                     broker.OnNotificationFailed += ApnsServiceBrokeNotificationFailed;
                     return broker;

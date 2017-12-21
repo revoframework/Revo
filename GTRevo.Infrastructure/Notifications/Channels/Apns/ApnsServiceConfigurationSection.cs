@@ -9,13 +9,13 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Apns
         [ConfigurationProperty("appConfigurations", IsDefaultCollection = false)]
         [ConfigurationCollection(typeof(ApnsAppConfigurationCollection),
          AddItemName = "addAppConfiguration",
-         ClearItemsName = "clearLiveResourcePath",
-         RemoveItemName = "removeLiveResourcePath")]
+         ClearItemsName = "clearAppConfiguration",
+         RemoveItemName = "removeAppConfiguration")]
         public ApnsAppConfigurationCollection AppConfigurations
         {
             get
             {
-                return (ApnsAppConfigurationCollection)base["AppConfigurations"];
+                return (ApnsAppConfigurationCollection)base["appConfigurations"];
             }
         }
 

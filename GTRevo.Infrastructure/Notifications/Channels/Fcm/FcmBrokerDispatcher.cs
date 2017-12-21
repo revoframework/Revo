@@ -11,7 +11,6 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Fcm
     public class FcmBrokerDispatcher : IFcmBrokerDispatcher, IApplicationStartListener, IDisposable
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
         private readonly Dictionary<string, GcmServiceBroker> fcmServiceBrokers; // TODO might pool multiple instances?
 
         public FcmBrokerDispatcher(IEnumerable<FcmAppConfiguration> fcmAppConfigurations)
@@ -24,7 +23,7 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Fcm
             fcmServiceBrokers = fcmAppConfigurations.ToDictionary(x => x.AppId,
                 x =>
                 {
-                    var broker = fcmServiceBrokers[x.AppId] = new GcmServiceBroker(x.FcmConfiguration);
+                    var broker = new GcmServiceBroker(x.FcmConfiguration);
                     broker.OnNotificationSucceeded += FcmServiceBrokerNotificationSucceeded;
                     broker.OnNotificationFailed += FcmServiceBrokeNotificationFailed;
                     return broker;

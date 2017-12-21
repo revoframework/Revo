@@ -8,14 +8,14 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Fcm
 
         [ConfigurationProperty("appConfigurations", IsDefaultCollection = false)]
         [ConfigurationCollection(typeof(FcmAppConfigurationCollection),
-         AddItemName = "addAppConfiguration",
-         ClearItemsName = "clearLiveResourcePath",
-         RemoveItemName = "removeLiveResourcePath")]
+            AddItemName = "addAppConfiguration",
+            ClearItemsName = "clearAppConfiguration",
+            RemoveItemName = "removeAppConfiguration")]
         public FcmAppConfigurationCollection AppConfigurations
         {
             get
             {
-                return (FcmAppConfigurationCollection)base["AppConfigurations"];
+                return (FcmAppConfigurationCollection)base["appConfigurations"];
             }
         }
 
