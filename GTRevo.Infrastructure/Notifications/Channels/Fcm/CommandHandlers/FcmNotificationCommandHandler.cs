@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using GTRevo.Core.Commands;
 using GTRevo.Core.Security;
@@ -10,8 +11,8 @@ using NLog;
 namespace GTRevo.Infrastructure.Notifications.Channels.Fcm.CommandHandlers
 {
     public class FcmNotificationCommandHandler :
-        IAsyncCommandHandler<RegisterFcmDeviceCommand>,
-        IAsyncCommandHandler<DeregisterFcmDeviceCommand>
+        ICommandHandler<RegisterFcmDeviceCommand>,
+        ICommandHandler<DeregisterFcmDeviceCommand>
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -24,7 +25,7 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Fcm.CommandHandlers
             this.userContext = userContext;
         }
 
-        public async Task Handle(RegisterFcmDeviceCommand message)
+        public async Task HandleAsync(RegisterFcmDeviceCommand message, CancellationToken cancellationToken)
         {
             if (!userContext.IsAuthenticated)
             {
@@ -56,7 +57,7 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Fcm.CommandHandlers
             Logger.Debug($"Added external FCM user device registaration for user ID {userContext.UserId}");
         }
 
-        public async Task Handle(DeregisterFcmDeviceCommand message)
+        public async Task HandleAsync(DeregisterFcmDeviceCommand message, CancellationToken cancellationToken)
         {
             string normalizedDeviceToken = message.RegistrationId;
             FcmUserDeviceToken token = await repository.FirstOrDefaultAsync<FcmUserDeviceToken>(

@@ -30,9 +30,14 @@ namespace GTRevo.Infrastructure.Notifications
 
         public IEnumerable<Type> NotificationTypes { get; } = new[] {typeof(T)};
 
-        public async Task SendNotificationAsync(INotification notification)
+        public async Task PushNotificationAsync(INotification notification)
         {
             await AddNotification(notification);
+        }
+
+        public Task CommitAsync()
+        {
+            return bufferedNotificationStore.CommitAsync();
         }
 
         private async Task AddNotification(INotification notification)
@@ -41,7 +46,7 @@ namespace GTRevo.Infrastructure.Notifications
             if (tNotification == null)
             {
                 throw new ArgumentException(
-                    $"Invalid notification passed to {this.GetType().FullName}.SendNotificationAsync: {notification.GetType().FullName}");
+                    $"Invalid notification passed to {this.GetType().FullName}.PushNotificationAsync: {notification.GetType().FullName}");
             }
 
             SerializedNotification serialized = notificationSerializer.ToJson(notification);

@@ -55,7 +55,7 @@ namespace GTRevo.Infrastructure.Tests.History.ChangeTracking
         {
             TrackedChange change = new TrackedChange(Guid.NewGuid(),
                 new TestChangeData() { Foo = "bar" }, "actor", Guid.NewGuid(), Guid.NewGuid(),
-                Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), DateTime.Now);
+                Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.Now);
 
             TrackedChangeRecord record = sut.ToRecord(change);
 

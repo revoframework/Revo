@@ -6,16 +6,16 @@ namespace GTRevo.Infrastructure.Repositories
     public class RepositoryFactory : IRepositoryFactory
     {
         private readonly Func<IAggregateStore[]> aggregateStoresFunc;
-        private readonly Func<IEventQueue> eventQueueFunc;
+        private readonly Func<IPublishEventBuffer> eventQueueFunc;
 
         public RepositoryFactory(Func<IAggregateStore[]> aggregateStoresFunc,
-            Func<IEventQueue> eventQueueFunc)
+            Func<IPublishEventBuffer> eventQueueFunc)
         {
             this.aggregateStoresFunc = aggregateStoresFunc;
             this.eventQueueFunc = eventQueueFunc;
         }
 
-        public IRepository CreateRepository(IEventQueue eventQueue = null)
+        public IRepository CreateRepository(IPublishEventBuffer eventQueue = null)
         {
             return new Repository(aggregateStoresFunc(), eventQueue ?? eventQueueFunc());
         }

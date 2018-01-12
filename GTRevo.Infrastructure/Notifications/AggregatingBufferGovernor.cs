@@ -23,7 +23,7 @@ namespace GTRevo.Infrastructure.Notifications
 
         public async Task<MultiValueDictionary<NotificationBuffer, BufferedNotification>> SelectNotificationsForReleaseAsync(IReadRepository readRepository)
         {
-            DateTime maxDate = Clock.Current.Now.Subtract(minTimeDelay);
+            DateTimeOffset maxDate = Clock.Current.Now.Subtract(minTimeDelay);
             var buffers = readRepository.FindAll<NotificationBuffer>()
                 .Where(x => x.GovernorId == Id);
             var buffersWithNotifications = buffers.GroupJoin(readRepository.FindAll<BufferedNotification>(),

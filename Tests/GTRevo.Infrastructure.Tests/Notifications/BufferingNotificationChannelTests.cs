@@ -47,7 +47,7 @@ namespace GTRevo.Infrastructure.Tests.Notifications
             notificationSerializer.ToJson(n1).Returns(serializedNotification);
             bufferSelector.SelectBufferIdAsync(n1).Returns(bufferId);
 
-            await sut.SendNotificationAsync(n1);
+            await sut.PushNotificationAsync(n1);
 
             bufferedNotificationStore.Received(1)
                 .Add(serializedNotification, bufferId, FakeClock.Now, bufferGovernor.Id,

@@ -1,6 +1,11 @@
-﻿namespace GTRevo.Core.Transactions
+﻿using System.Threading.Tasks;
+
+namespace GTRevo.Core.Transactions
 {
-    public interface IUnitOfWorkListener : ITransactionListener
+    public interface IUnitOfWorkListener
     {
+        Task OnBeforeWorkCommitAsync(IUnitOfWork unitOfWork);
+        void OnWorkBegin(IUnitOfWork unitOfWork);
+        Task OnWorkSucceededAsync(IUnitOfWork unitOfWork);
     }
 }

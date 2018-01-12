@@ -10,19 +10,19 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Apns.Services
         [AcceptVerbs("POST")]
         public Task RegisterDevice(RegisterApnsExternalUserDeviceCommand parameters)
         {
-            return CommandBus.Send(parameters);
+            return CommandBus.SendAsync(parameters);
         }
 
         [AcceptVerbs("POST")]
         public Task DeregisterDevice(DeregisterApnsExternalUserDeviceCommand parameters)
         {
-            return CommandBus.Send(parameters);
+            return CommandBus.SendAsync(parameters);
         }
 
         [AcceptVerbs("POST")]
         public Task PushNotification(PushExternalApnsNotificationCommand parameters)
         {
-            return CommandBus.Send(parameters);
+            return CommandBus.SendAsync(parameters);
         }
     }
 }

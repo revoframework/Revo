@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GTRevo.Core.Events;
 using GTRevo.Infrastructure.Core.Domain;
 using GTRevo.Infrastructure.Core.Domain.Events;
 using GTRevo.Infrastructure.EventSourcing;
@@ -22,7 +23,7 @@ namespace GTRevo.Infrastructure.Sagas
             this.sagaRepository = sagaRepository;
         }
 
-        public async Task LocateAndDispatchAsync(IEnumerable<DomainEvent> domainEvents)
+        public async Task LocateAndDispatchAsync(IEnumerable<IEventMessage<DomainEvent>> domainEvents)
         {
             Dictionary<Guid, ISaga> sagas = new Dictionary<Guid, ISaga>();
             List<ISaga> newSagas = new List<ISaga>();
@@ -31,13 +32,13 @@ namespace GTRevo.Infrastructure.Sagas
 
             foreach (var domainEvent in domainEvents)
             {
-                var registrations = sagaRegistry.LookupRegistrations(domainEvent.GetType());
+                var registrations = sagaRegistry.LookupRegistrations(domainEvent.Event.GetType());
                 foreach (SagaEventRegistration registration in registrations)
                 {
                     HashSet<ISaga> matchingSagas = new HashSet<ISaga>();
                     if (!registration.IsAlwaysStarting)
                     {
-                        string sagaKeyValue = registration.EventKeyExpression(domainEvent);
+                        string sagaKeyValue = registration.EventKeyExpression(domainEvent.Event);
                         Guid[] matchingSagaIds = await sagaRepository.MetadataRepository.FindSagaIdsByKeyAsync(
                             registration.SagaKey,
                             sagaKeyValue);

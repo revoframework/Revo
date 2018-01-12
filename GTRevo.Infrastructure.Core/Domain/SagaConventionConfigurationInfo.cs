@@ -9,11 +9,11 @@ namespace GTRevo.Infrastructure.Core.Domain
 {
     public class SagaConfigurationInfo
     {
-        public SagaConfigurationInfo(ReadOnlyDictionary<Type, SagaConventionEventInfo> events)
+        public SagaConfigurationInfo(IReadOnlyDictionary<Type, SagaConventionEventInfo> events)
         {
             Events = events;
         }
 
-        public ReadOnlyDictionary<Type, SagaConventionEventInfo> Events { get; }
+        public IReadOnlyDictionary<Type, SagaConventionEventInfo> Events { get; }
     }
 }

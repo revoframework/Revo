@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GTRevo.Core.Events;
+using GTRevo.Infrastructure.Events;
 using GTRevo.Infrastructure.Globalization.Messages;
+using Nito.AsyncEx;
 
 namespace GTRevo.Infrastructure.Globalization
 {
@@ -31,10 +34,11 @@ namespace GTRevo.Infrastructure.Globalization
             return null;
         }
 
-        public void Reload()
+        public async Task ReloadAsync()
         {
             DoReload();
-            eventBus.Publish(new MessageRepositoryReloadedEvent());
+            await eventBus.PublishAsync(
+                new EventMessageDraft<MessageRepositoryReloadedEvent>(new MessageRepositoryReloadedEvent()));
         }
 
         private void DoReload()

@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using GTRevo.Infrastructure.Events;
 using GTRevo.Infrastructure.Globalization;
 using GTRevo.Infrastructure.Globalization.Messages.Database;
 using GTRevo.Testing.DataAccess.EF6;
+using GTRevo.Testing.Infrastructure;
 using NSubstitute;
 using Xunit;
 
@@ -65,9 +68,10 @@ namespace GTRevo.Infrastructure.Tests.Globalization.Messages.Database
         }
 
         [Fact]
-        public void Handle_LocalizationMessageModifiedEvent_Reloads()
+        public async Task Handle_LocalizationMessageModifiedEvent_Reloads()
         {
-            sut.Handle(new LocalizationMessageModifiedEvent(null, "hello", "is it you", "cs-CZ", null));
+            await sut.HandleAsync(
+                new LocalizationMessageModifiedEvent(null, "hello", "is it you", "cs-CZ", null).ToMessageDraft(), CancellationToken.None);
 
             dbMessageCache.Received(1).ReplaceMessages(Arg.Is<IEnumerable<LocalizationMessage>>(x =>
                 x.Count() == messages.Length
@@ -75,9 +79,10 @@ namespace GTRevo.Infrastructure.Tests.Globalization.Messages.Database
         }
 
         [Fact]
-        public void Handle_LocalizationMessageDeletedEvent_Reloads()
+        public async Task Handle_LocalizationMessageDeletedEvent_Reloads()
         {
-            sut.Handle(new LocalizationMessageDeletedEvent());
+            await sut.HandleAsync(new EventMessageDraft<LocalizationMessageDeletedEvent>(new LocalizationMessageDeletedEvent()),
+                CancellationToken.None);
 
             dbMessageCache.Received(1).ReplaceMessages(Arg.Is<IEnumerable<LocalizationMessage>>(x =>
                 x.Count() == messages.Length

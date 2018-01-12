@@ -20,7 +20,7 @@ namespace GTRevo.Infrastructure.Tests.History.ChangeTracking
         private readonly ChangeTracker sut;
         private readonly FakeCrudRepository crudRepository;
         private readonly IActorContext actorContext;
-        private readonly IEventQueue eventQueue;
+        private readonly IEventBus eventBus;
         private readonly ITrackedChangeRecordConverter trackedChangeRecordConverter;
         private readonly Guid aggregateId = Guid.NewGuid();
         private readonly Guid aggregateClassId = Guid.NewGuid();
@@ -32,14 +32,14 @@ namespace GTRevo.Infrastructure.Tests.History.ChangeTracking
             crudRepository = new FakeCrudRepository();
             actorContext = Substitute.For<IActorContext>();
             actorContext.CurrentActorName.Returns("actor");
-            eventQueue = Substitute.For<IEventQueue>();
+            eventBus = Substitute.For<IEventBus>();
             FakeClock.Setup();
             FakeClock.Now = DateTime.Today;
             trackedChangeRecordConverter = Substitute.For<ITrackedChangeRecordConverter>();
 
             Mapper.Initialize(x => new HistoryAutoMapperDefinition(trackedChangeRecordConverter).Configure(x));
 
-            sut = new ChangeTracker(crudRepository, actorContext, trackedChangeRecordConverter, eventQueue);
+            sut = new ChangeTracker(crudRepository, actorContext, trackedChangeRecordConverter, eventBus);
         }
 
         [Fact]
@@ -68,9 +68,7 @@ namespace GTRevo.Infrastructure.Tests.History.ChangeTracking
 
             TrackedChangeRecord record = new TrackedChangeRecord();
             trackedChangeRecordConverter.ToRecord(null).ReturnsForAnyArgs(record);
-
-            eventQueue.CreateTransaction().Returns(Substitute.For<ITransaction>());
-
+            
             sut.AddChange(changeData, aggregateId, aggregateClassId,
                 entityId, entityClassId);
             await sut.SaveChangesAsync();
@@ -95,32 +93,16 @@ namespace GTRevo.Infrastructure.Tests.History.ChangeTracking
                     EntityClassId = x.EntityClassId
                 };
             });
-
-            ITransaction eventQueueTx = null;
-            eventQueue.CreateTransaction().Returns(ci =>
-            {
-                eventQueueTx = Substitute.For<ITransaction>();
-                return eventQueueTx;
-            });
-            eventQueue.WhenForAnyArgs(x => x.PushEvent(null)).Do(ci =>
-            {
-                Assert.NotNull(eventQueueTx);
-            });
-
+            
             TrackedChange tc = sut.AddChange(changeData, aggregateId, aggregateClassId,
                 entityId, entityClassId);
             await sut.SaveChangesAsync();
-            
-            eventQueue.Received(1).CreateTransaction();
 
-            eventQueue.Received(1).PushEvent(Arg.Is<TrackedChangeAdded>(
-                x => x.AggregateClassId == aggregateClassId
-                     && x.AggregateId == aggregateId
-                     && x.EntityClassId == entityClassId
-                     && x.EntityId == entityId
-                     && x.TrackedChangeId == tc.Id));
-
-            eventQueueTx.Received(1).CommitAsync();
+            eventBus.Received(1).PublishAsync(Arg.Is<IEventMessage<TrackedChangeAdded>>(
+                x => x.Event.AggregateId == aggregateId
+                     && x.Event.EntityClassId == entityClassId
+                     && x.Event.EntityId == entityId
+                     && x.Event.TrackedChangeId == tc.Id));
         }
 
         [Fact]
@@ -128,7 +110,7 @@ namespace GTRevo.Infrastructure.Tests.History.ChangeTracking
         {
             TrackedChangeRecord record = new TrackedChangeRecord();
             TrackedChange change = new TrackedChange(Guid.NewGuid(), new TestChangeData(),
-                "", null, null, null, null, null, DateTime.Now);
+                "", null, null, null, null, null, DateTimeOffset.Now);
 
             trackedChangeRecordConverter.FromRecord(record).Returns(change);
             crudRepository.Attach(record);
@@ -143,7 +125,7 @@ namespace GTRevo.Infrastructure.Tests.History.ChangeTracking
         {
             TrackedChangeRecord record = new TrackedChangeRecord() { Id = Guid.NewGuid() };
             TrackedChange change = new TrackedChange(record.Id, new TestChangeData(),
-                "", null, null, null, null, null, DateTime.Now);
+                "", null, null, null, null, null, DateTimeOffset.Now);
 
             trackedChangeRecordConverter.FromRecord(record).Returns(change);
             crudRepository.Attach(record);

@@ -19,7 +19,7 @@ namespace GTRevo.DataAccess.EF6
                  .WithConstructorArgument("connectionName", "EntityContext");
 
             Bind(typeof(ICrudRepository), typeof(IReadRepository), typeof(IEF6CrudRepository),
-                    typeof(IEF6ReadRepository), typeof(ITransactionProvider))
+                    typeof(IEF6ReadRepository))
                 .To<EF6CrudRepository>()
                 .InRequestOrJobScope();
 

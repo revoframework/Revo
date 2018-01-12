@@ -27,8 +27,8 @@ namespace GTRevo.Infrastructure.Tests.Notifications
             NotificationBuffer buffer = new NotificationBuffer(Guid.NewGuid(), Guid.NewGuid(),
                 Guid.NewGuid());
             fakeCrudRepository.Attach(buffer);
-            
-            DateTime now = DateTime.Now;
+
+            DateTimeOffset now = DateTimeOffset.Now;
 
             await sut.Add(new SerializedNotification() { NotificationClassName = "Notification1", NotificationJson = "{}" },
                 buffer.Id, now, Guid.NewGuid(), Guid.NewGuid());
@@ -47,7 +47,6 @@ namespace GTRevo.Infrastructure.Tests.Notifications
         public async Task SendNotificationAsync_CreatesNewBuffer()
         {
             Guid bufferId = Guid.NewGuid();
-            DateTime now = DateTime.Now;
             Guid bufferGovernorId = Guid.NewGuid();
             Guid notificationPipelineId = Guid.NewGuid();
 
@@ -65,11 +64,11 @@ namespace GTRevo.Infrastructure.Tests.Notifications
         }
 
         [Fact]
-        public void OnTransactionSucceededAsync_SavesRepository()
+        public async Task OnTransactionSucceededAsync_SavesRepository()
         {
             sut.Add(new SerializedNotification() { NotificationClassName = "Notification1", NotificationJson = "{}" },
-                Guid.NewGuid(), DateTime.Now, Guid.NewGuid(), Guid.NewGuid());
-            sut.OnTransactionSucceededAsync(Substitute.For<ITransaction>());
+                Guid.NewGuid(), DateTimeOffset.Now, Guid.NewGuid(), Guid.NewGuid());
+            await sut.CommitAsync();
 
             fakeCrudRepository.Received(1).SaveChangesAsync();
         }

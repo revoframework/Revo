@@ -10,19 +10,19 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Fcm.Services
         [AcceptVerbs("POST")]
         public Task RegisterDevice(RegisterFcmExternalUserDeviceCommand parameters)
         {
-            return CommandBus.Send(parameters);
+            return CommandBus.SendAsync(parameters);
         }
 
         [AcceptVerbs("POST")]
         public Task DeregisterDevice(DeregisterFcmExternalUserDeviceCommand parameters)
         {
-            return CommandBus.Send(parameters);
+            return CommandBus.SendAsync(parameters);
         }
 
         [AcceptVerbs("POST")]
         public Task PushNotification(PushExternalFcmNotificationCommand parameters)
         {
-            return CommandBus.Send(parameters);
+            return CommandBus.SendAsync(parameters);
         }
     }
 }

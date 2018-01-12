@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GTRevo.Core.Core;
+using GTRevo.Core.Events;
 using GTRevo.Infrastructure.Tenancy;
-using MediatR;
 using Ninject.Modules;
 
 namespace GTRevo.Infrastructure.Globalization.Messages.Database
@@ -19,12 +19,12 @@ namespace GTRevo.Infrastructure.Globalization.Messages.Database
                 .InTenantSingletonScope();
 
             Bind<IDbMessageLoader,
-                    IAsyncNotificationHandler<LocalizationMessageModifiedEvent>,
-                    IAsyncNotificationHandler<LocalizationMessageDeletedEvent>>()
+                    IEventListener<LocalizationMessageModifiedEvent>,
+                    IEventListener<LocalizationMessageDeletedEvent>>()
                 .To<DbMessageLoader>()
                 .InRequestOrJobScope();
 
-            Bind<IAsyncNotificationHandler<DbMessageCacheReloadedEvent>>()
+            Bind<IEventListener<DbMessageCacheReloadedEvent>>()
                 .To<MessageRepositoryReloader>()
                 .InRequestOrJobScope();
         }

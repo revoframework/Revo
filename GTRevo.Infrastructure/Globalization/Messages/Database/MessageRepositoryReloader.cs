@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using GTRevo.Core.Events;
 
@@ -16,10 +17,9 @@ namespace GTRevo.Infrastructure.Globalization.Messages.Database
             this.messageRepository = messageRepository;
         }
 
-        public Task Handle(DbMessageCacheReloadedEvent notification)
+        public Task HandleAsync(IEventMessage<DbMessageCacheReloadedEvent> message, CancellationToken cancellationToken)
         {
-            messageRepository.Reload();
-            return Task.FromResult(0);
+            return messageRepository.ReloadAsync();
         }
     }
 }

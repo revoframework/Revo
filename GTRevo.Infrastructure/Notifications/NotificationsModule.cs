@@ -34,7 +34,7 @@ namespace GTRevo.Infrastructure.Notifications
                 .ToSelf()
                 .InTransientScope();
             
-            Bind<IBufferedNotificationStore, IEventQueueTransactionListener>()
+            Bind<IBufferedNotificationStore>()
                 .To<BufferedNotificationStore>()
                 .InRequestOrJobScope();
 

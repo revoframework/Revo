@@ -30,9 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MediatR, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\Packages\MediatR.3.0.1\lib\net45\MediatR.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Experimental.Collections, Version=1.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\Packages\Microsoft.Experimental.Collections.1.0.3-alpha\lib\portable-net45+win8+wp8\Microsoft.Experimental.Collections.dll</HintPath>
     </Reference>
@@ -54,13 +51,16 @@
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\Packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Ninject, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
-      <HintPath>..\..\Packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
+    <Reference Include="Ninject, Version=3.3.3.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\..\Packages\Ninject.3.3.3\lib\net45\Ninject.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\..\Packages\NLog.4.4.11\lib\net45\NLog.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Collections.Immutable, Version=1.2.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\Packages\System.Collections.Immutable.1.4.0\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
+    </Reference>
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.IO.Compression" />
@@ -70,6 +70,9 @@
     <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\Packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\Packages\System.ValueTuple.4.3.1\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\Packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
@@ -94,14 +97,14 @@
     <Compile Include="Commands\CommandHandlerPipeline.cs" />
     <Compile Include="Commands\CommandRequest.cs" />
     <Compile Include="Commands\CommandRequestContextData.cs" />
-    <Compile Include="Commands\CommandsModule.cs" />
     <Compile Include="Commands\EntityQuery.cs" />
     <Compile Include="Commands\EntityQueryWithContext.cs" />
-    <Compile Include="Commands\IAsyncCommandHandler.cs" />
-    <Compile Include="Commands\IAsyncQueryHandler.cs" />
+    <Compile Include="Commands\ICommandHandler.cs" />
+    <Compile Include="Commands\IExceptionCommandFilter.cs" />
+    <Compile Include="Commands\IQueryHandler.cs" />
     <Compile Include="Commands\ICommand.cs" />
     <Compile Include="Commands\ICommandBus.cs" />
-    <Compile Include="Commands\ICommandFilter.cs" />
+    <Compile Include="Commands\IPostCommandFilter.cs" />
     <Compile Include="Commands\ICommandRequest.cs" />
     <Compile Include="Commands\ICommandWithContext.cs" />
     <Compile Include="Commands\IEntityQuery.cs" />
@@ -110,19 +113,25 @@
     <Compile Include="Commands\IQueryWithContext.cs" />
     <Compile Include="Commands\IWrappedEntityQuery.cs" />
     <Compile Include="Commands\QueryWithContext.cs" />
+    <Compile Include="Commands\UnitOfWorkCommandFilter.cs" />
     <Compile Include="Commands\WrappedEntityQuery.cs" />
     <Compile Include="Commands\WrappedEntityQueryWithContext.cs" />
     <Compile Include="Core\Clock.cs" />
-    <Compile Include="Core\CorePlatformModule.cs" />
+    <Compile Include="Core\CoreModule.cs" />
+    <Compile Include="Core\ThreadSleep.cs" />
     <Compile Include="Core\IActorContext.cs" />
+    <Compile Include="Core\IServiceLocator.cs" />
+    <Compile Include="Core\ISleep.cs" />
     <Compile Include="Core\ParamsComparer.cs" />
-    <Compile Include="Events\EventQueue.cs" />
-    <Compile Include="Events\EventQueueTransaction.cs" />
+    <Compile Include="Core\Sleep.cs" />
+    <Compile Include="Events\EventBus.cs" />
+    <Compile Include="Events\EventMessage.cs" />
+    <Compile Include="Events\PublishEventBuffer.cs" />
+    <Compile Include="Events\IEventMessage.cs" />
     <Compile Include="Events\IEvent.cs" />
     <Compile Include="Events\IEventBus.cs" />
     <Compile Include="Events\IEventListener.cs" />
-    <Compile Include="Events\IEventQueue.cs" />
-    <Compile Include="Events\IEventQueueTransactionListener.cs" />
+    <Compile Include="Events\IPublishEventBuffer.cs" />
     <Compile Include="Core\INinjectBindingExtension.cs" />
     <Compile Include="Core\Lifecycle\IApplicationStartListener.cs" />
     <Compile Include="Core\Lifecycle\IApplicationStopListener.cs" />
@@ -130,7 +139,10 @@
     <Compile Include="Core\ITypeExplorer.cs" />
     <Compile Include="Core\MemoryUtils.cs" />
     <Compile Include="Core\NinjectBindingExtensions.cs" />
+    <Compile Include="Events\JsonMetadata.cs" />
+    <Compile Include="Events\NativeBackedMetadata.cs" />
     <Compile Include="Globalization\ITranslatable.cs" />
+    <Compile Include="Commands\IPreCommandFilter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\StringExtensions.cs" />
     <Compile Include="Core\SystemClock.cs" />
@@ -142,10 +154,11 @@
     <Compile Include="Transactions\ITransactionListener.cs" />
     <Compile Include="Transactions\ITransactionProvider.cs" />
     <Compile Include="Transactions\IUnitOfWork.cs" />
+    <Compile Include="Transactions\IUnitOfWorkFactory.cs" />
     <Compile Include="Transactions\IUnitOfWorkListener.cs" />
     <Compile Include="Transactions\IUnitOfWorkProvider.cs" />
+    <Compile Include="Transactions\UnitOfWorkFactory.cs" />
     <Compile Include="Transactions\UnitOfWork.cs" />
-    <Compile Include="Transactions\UnitOfWorkTransaction.cs" />
     <Compile Include="Core\TypeExplorer.cs" />
   </ItemGroup>
   <ItemGroup>

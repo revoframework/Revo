@@ -32,6 +32,6 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Apns.Model
         public Guid UserId { get; private set; }
         public string DeviceToken { get; private set; }
         public string AppId { get; private set; }
-        public DateTime IssuedDateTime { get; private set; }
+        public DateTimeOffset IssuedDateTime { get; private set; }
     }
 }

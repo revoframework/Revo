@@ -5,6 +5,6 @@ namespace GTRevo.Infrastructure.Core.Domain.Events
     public interface IDomainEventTypeCache
     {
         Type GetClrEventType(string eventName, int eventVersion);
-        Tuple<string, int> GetEventNameAndVersion(Type clrEventType);
+        (string eventName, int eventVersion) GetEventNameAndVersion(Type clrEventType);
     }
 }

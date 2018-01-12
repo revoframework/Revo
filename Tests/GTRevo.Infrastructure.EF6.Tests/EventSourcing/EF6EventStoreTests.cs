@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GTRevo.Infrastructure.Core.Domain.Events;
-using GTRevo.Infrastructure.EF6.EventSourcing;
+using GTRevo.Infrastructure.EF6.EventStore;
 using GTRevo.Testing.DataAccess.EF6;
 using NSubstitute;
 

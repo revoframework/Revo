@@ -60,21 +60,17 @@ namespace GTRevo.Platform.Core
             Bind<IActorContext>()
                 .To<UserActorContext>()
                 .InRequestOrJobScope();
-
-            Bind<IUnitOfWork>()
-                 .To<UnitOfWork>()
-                 .InRequestOrJobScope();
-
-            Bind<IEventQueue>()
-                .To<EventQueue>()
-                .InRequestOrJobScope();
-
+            
             Bind<AutoMapperDefinitionDiscovery>()
                 .ToSelf()
                 .InSingletonScope();
 
             Bind<IOwinConfigurator>()
                 .To<HangfireOwinConfigurator>()
+                .InSingletonScope();
+
+            Bind<IServiceLocator>()
+                .To<NinjectServiceLocator>()
                 .InSingletonScope();
         }
     }

@@ -7,7 +7,7 @@ namespace GTRevo.Infrastructure.Validation
     {
         public override void Load()
         {
-            Bind<ICommandFilter<ICommandBase>>()
+            Bind<IPreCommandFilter<ICommandBase>>()
                 .To<CommandAttributeValidationFilter>()
                 .InSingletonScope();
         }

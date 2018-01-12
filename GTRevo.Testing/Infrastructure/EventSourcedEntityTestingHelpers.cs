@@ -86,9 +86,9 @@ namespace GTRevo.Testing.Infrastructure
                         //quick fix for cases when there are no comparable properties, which causes ShouldBeEquivalentTo to fail
                         var excludedProps = new[]
                         {
-                            nameof(DomainAggregateEvent.Id),
+                            //nameof(DomainAggregateEvent.Id),
                             nameof(DomainAggregateEvent.AggregateId),
-                            nameof(DomainAggregateEvent.AggregateClassId),
+                            //nameof(DomainAggregateEvent.AggregateClassId),
                         };
 
                         if (expectedEvent.ev.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
@@ -98,9 +98,9 @@ namespace GTRevo.Testing.Infrastructure
                                 config => config
                                     //.IncludingAllRuntimeProperties()
                                     .RespectingRuntimeTypes()
-                                    .Excluding(x => x.Id)
+                                    //.Excluding(x => x.Id)
                                     .Excluding(x => x.AggregateId)
-                                    .Excluding(x => x.AggregateClassId));
+                                    /*.Excluding(x => x.AggregateClassId)*/);
                         }
                     }
                     else

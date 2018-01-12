@@ -1,10 +1,8 @@
 ﻿using System;
-using MediatR;
 
 namespace GTRevo.Core.Events
 {
-    public interface IEvent : INotification
+    public interface IEvent
     {
-        Guid Id { get; }
     }
 }

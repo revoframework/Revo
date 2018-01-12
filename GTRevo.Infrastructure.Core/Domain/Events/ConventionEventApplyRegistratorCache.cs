@@ -11,9 +11,14 @@ namespace GTRevo.Infrastructure.Core.Domain.Events
 {
     public class ConventionEventApplyRegistratorCache : IApplicationStartListener
     {
-        private static Dictionary<Type, EventTypeApplyDelegates> componentTypeDelegates;
+        private static Lazy<Dictionary<Type, EventTypeApplyDelegates>> componentTypeDelegates;
+        private static ITypeExplorer typeExplorer = new TypeExplorer();
+        private static object loadLock = new object();
 
-        private static ITypeExplorer typeExplorer;
+        static ConventionEventApplyRegistratorCache()
+        {
+            componentTypeDelegates = new Lazy<Dictionary<Type, EventTypeApplyDelegates>>(CreateAggregateEventDelegates);
+        }
 
         public ConventionEventApplyRegistratorCache(ITypeExplorer typeExplorer)
         {
@@ -22,11 +27,6 @@ namespace GTRevo.Infrastructure.Core.Domain.Events
 
         public static EventTypeApplyDelegates GetApplyDelegates(Type componentType)
         {
-            if (componentTypeDelegates == null)
-            {
-                CreateAggregateEventDelegates();
-            }
-
             if (!typeof(IComponent).IsAssignableFrom(componentType))
             {
                 throw new ArgumentException(
@@ -34,7 +34,7 @@ namespace GTRevo.Infrastructure.Core.Domain.Events
             }
 
             EventTypeApplyDelegates delegates;
-            if (!componentTypeDelegates.TryGetValue(componentType, out delegates))
+            if (!componentTypeDelegates.Value.TryGetValue(componentType, out delegates))
             {
                 throw new ArgumentException($"Unknown component type to get apply delegates for: " + componentType.FullName);
             }
@@ -44,28 +44,26 @@ namespace GTRevo.Infrastructure.Core.Domain.Events
 
         public void OnApplicationStarted()
         {
-            CreateAggregateEventDelegates();
+            componentTypeDelegates = new Lazy<Dictionary<Type, EventTypeApplyDelegates>>(CreateAggregateEventDelegates);
+            var delegates = componentTypeDelegates.Value; //explicit recreating
         }
 
-        public static void CreateAggregateEventDelegates()
+        private static Dictionary<Type, EventTypeApplyDelegates> CreateAggregateEventDelegates()
         {
-            if (typeExplorer == null)
-            {
-                typeExplorer = new TypeExplorer();
-            }
-
-            componentTypeDelegates = new Dictionary<Type, EventTypeApplyDelegates>();
+            var delegates = new Dictionary<Type, EventTypeApplyDelegates>();
 
             var componentTypes = typeExplorer.GetAllTypes()
                 .Where(x => typeof(IComponent).IsAssignableFrom(x)
-                    && !x.IsAbstract && !x.IsGenericTypeDefinition);
+                            && !x.IsAbstract && !x.IsGenericTypeDefinition);
 
             foreach (Type aggregateType in componentTypes)
             {
                 EventTypeApplyDelegates aggApplyDelegates = new EventTypeApplyDelegates();
-                componentTypeDelegates.Add(aggregateType, aggApplyDelegates);
+                delegates.Add(aggregateType, aggApplyDelegates);
                 AddTypeDelegates(aggregateType, aggApplyDelegates);
             }
+
+            return delegates;
         }
 
         private static void AddTypeDelegates(Type componentType, EventTypeApplyDelegates applyDelegates)

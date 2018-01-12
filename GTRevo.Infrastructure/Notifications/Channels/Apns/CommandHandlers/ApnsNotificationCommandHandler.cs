@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using GTRevo.Core.Commands;
 using GTRevo.Core.Security;
@@ -11,8 +12,8 @@ using NLog;
 namespace GTRevo.Infrastructure.Notifications.Channels.Apns.CommandHandlers
 {
     public class ApnsNotificationCommandHandler :
-        IAsyncCommandHandler<RegisterApnsDeviceCommand>,
-        IAsyncCommandHandler<DeregisterApnsDeviceCommand>
+        ICommandHandler<RegisterApnsDeviceCommand>,
+        ICommandHandler<DeregisterApnsDeviceCommand>
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -25,7 +26,7 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Apns.CommandHandlers
             this.userContext = userContext;
         }
 
-        public async Task Handle(RegisterApnsDeviceCommand message)
+        public async Task HandleAsync(RegisterApnsDeviceCommand message, CancellationToken cancellationToken)
         {
             if (!userContext.IsAuthenticated)
             {
@@ -57,7 +58,7 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Apns.CommandHandlers
             Logger.Debug($"Added external APNS user device token for user ID {userContext.UserId}");
         }
 
-        public async Task Handle(DeregisterApnsDeviceCommand message)
+        public async Task HandleAsync(DeregisterApnsDeviceCommand message, CancellationToken cancellationToken)
         {
             string normalizedDeviceToken = message.DeviceToken.Replace(" ", "");
             ApnsUserDeviceToken token = await repository.FirstOrDefaultAsync<ApnsUserDeviceToken>(

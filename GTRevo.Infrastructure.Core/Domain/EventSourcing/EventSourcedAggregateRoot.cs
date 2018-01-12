@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using GTRevo.Infrastructure.Core.Domain.Events;
 
 namespace GTRevo.Infrastructure.Core.Domain.EventSourcing
@@ -14,8 +15,9 @@ namespace GTRevo.Infrastructure.Core.Domain.EventSourcing
 
         public override void Commit()
         {
+            int eventCount = UncommittedEvents.Count();
             base.Commit();
-            Version++;
+            Version += eventCount;
         }
 
         public void LoadState(AggregateState state)

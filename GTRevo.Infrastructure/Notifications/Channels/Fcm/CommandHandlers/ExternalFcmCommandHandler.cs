@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GTRevo.Core.Commands;
 using GTRevo.Infrastructure.Notifications.Channels.Fcm.Commands;
@@ -13,9 +14,9 @@ using PushSharp.Google;
 namespace GTRevo.Infrastructure.Notifications.Channels.Fcm.CommandHandlers
 {
     public class ExternalFcmNotificationCommandHandler :
-        IAsyncCommandHandler<RegisterFcmExternalUserDeviceCommand>,
-        IAsyncCommandHandler<DeregisterFcmExternalUserDeviceCommand>,
-        IAsyncCommandHandler<PushExternalFcmNotificationCommand>
+        ICommandHandler<RegisterFcmExternalUserDeviceCommand>,
+        ICommandHandler<DeregisterFcmExternalUserDeviceCommand>,
+        ICommandHandler<PushExternalFcmNotificationCommand>
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -28,8 +29,8 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Fcm.CommandHandlers
             this.repository = repository;
             this.fcmBrokerDispatcher = fcmBrokerDispatcher;
         }
-
-        public async Task Handle(RegisterFcmExternalUserDeviceCommand message)
+        
+        public async Task HandleAsync(RegisterFcmExternalUserDeviceCommand message, CancellationToken cancellationToken)
         {
             string normalizedDeviceToken = message.RegistrationId;
             FcmExternalUserDeviceToken token = await repository.FirstOrDefaultAsync<FcmExternalUserDeviceToken>(
@@ -56,7 +57,7 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Fcm.CommandHandlers
             Logger.Debug($"Added external APNS external user device token for user ID {message.UserId}");
         }
 
-        public async Task Handle(DeregisterFcmExternalUserDeviceCommand message)
+        public async Task HandleAsync(DeregisterFcmExternalUserDeviceCommand message, CancellationToken cancellationToken)
         {
             string normalizedDeviceToken = message.RegistrationId;
             FcmExternalUserDeviceToken token = await repository.FirstOrDefaultAsync<FcmExternalUserDeviceToken>(
@@ -70,7 +71,7 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Fcm.CommandHandlers
             }
         }
 
-        public async Task Handle(PushExternalFcmNotificationCommand message)
+        public async Task HandleAsync(PushExternalFcmNotificationCommand message, CancellationToken cancellationToken)
         {
             if (message.Data == null && message.Notification == null)
             {

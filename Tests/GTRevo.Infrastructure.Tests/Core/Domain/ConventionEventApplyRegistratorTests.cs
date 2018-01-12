@@ -11,8 +11,6 @@ namespace GTRevo.Infrastructure.Tests.Core.Domain
         [Fact]
         public void RegisterEvents_RegistersAllHandlers()
         {
-            ConventionEventApplyRegistratorCache.CreateAggregateEventDelegates();
-
             var sut = new ConventionEventApplyRegistrator();
 
             var entity = new MyEntity();

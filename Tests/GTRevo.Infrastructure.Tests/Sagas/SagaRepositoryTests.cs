@@ -8,7 +8,9 @@ using GTRevo.Core.Core;
 using GTRevo.Core.Events;
 using GTRevo.DataAccess.Entities;
 using GTRevo.Infrastructure.Core.Domain;
+using GTRevo.Infrastructure.Events;
 using GTRevo.Infrastructure.EventSourcing;
+using GTRevo.Infrastructure.EventStore;
 using GTRevo.Infrastructure.Sagas;
 using NSubstitute;
 using Xunit;
@@ -19,10 +21,10 @@ namespace GTRevo.Infrastructure.Tests.Sagas
     {
         private readonly ICommandBus commandBus;
         private readonly ISagaMetadataRepository sagaMetadataRepository;
-        private readonly IEventQueue eventQueue;
+        private readonly IPublishEventBuffer publishEventBuffer;
         private readonly IEventStore eventStore;
-        private readonly IActorContext actorContext;
         private readonly IEntityTypeManager entityTypeManager;
+        private readonly IEventMessageFactory eventMessageFactory;
 
         private readonly SagaRepository sut;
 
@@ -30,13 +32,9 @@ namespace GTRevo.Infrastructure.Tests.Sagas
         {
             commandBus = Substitute.For<ICommandBus>();
             sagaMetadataRepository = Substitute.For<ISagaMetadataRepository>();
-            eventQueue = Substitute.For<IEventQueue>();
+            publishEventBuffer = Substitute.For<IPublishEventBuffer>();
             eventStore = Substitute.For<IEventStore>();
-            actorContext = Substitute.For<IActorContext>();
             entityTypeManager = Substitute.For<IEntityTypeManager>();
-
-            actorContext = Substitute.For<IActorContext>();
-            actorContext.CurrentActorName.Returns("actor");
 
             Guid saga1ClassId = Guid.NewGuid();
             entityTypeManager.GetClrTypeByClassId(saga1ClassId)
@@ -45,8 +43,18 @@ namespace GTRevo.Infrastructure.Tests.Sagas
             entityTypeManager.GetClassIdByClrType(typeof(Saga1))
                 .Returns(saga1ClassId);
 
-            sut = new SagaRepository(commandBus, eventStore, actorContext,
-                entityTypeManager, eventQueue, new IRepositoryFilter[] {}, sagaMetadataRepository);
+            eventMessageFactory = Substitute.For<IEventMessageFactory>();
+            eventMessageFactory.CreateMessageAsync(null).ReturnsForAnyArgs(ci =>
+            {
+                var @event = ci.ArgAt<IEvent>(0);
+                Type messageType = typeof(EventMessageDraft<>).MakeGenericType(@event.GetType());
+                IEventMessageDraft messageDraft = (IEventMessageDraft)messageType.GetConstructor(new[] { @event.GetType() }).Invoke(new[] { @event });
+                messageDraft.AddMetadata("TestKey", "TestValue");
+                return messageDraft;
+            }); // TODO something more lightweight?
+
+            sut = new SagaRepository(commandBus, eventStore, entityTypeManager,
+                publishEventBuffer, new IRepositoryFilter[] {}, eventMessageFactory, sagaMetadataRepository);
         }
 
         [Fact]
@@ -60,7 +68,7 @@ namespace GTRevo.Infrastructure.Tests.Sagas
 
             await sut.SaveChangesAsync();
 
-            commandBus.Received(1).Send(command);
+            commandBus.Received(1).SendAsync(command);
         }
 
         [Fact]

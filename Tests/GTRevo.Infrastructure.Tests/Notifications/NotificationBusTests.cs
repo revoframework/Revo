@@ -28,8 +28,8 @@ namespace GTRevo.Infrastructure.Tests.Notifications
             await sut.PushNotification(n1);
             await sut.PushNotification(n2);
 
-            notificationChannel1.Received(1).SendNotificationAsync(n1);
-            notificationChannel2.Received(1).SendNotificationAsync(n2);
+            notificationChannel1.Received(1).PushNotificationAsync(n1);
+            notificationChannel2.Received(1).PushNotificationAsync(n2);
         }
 
         [Fact]
@@ -38,8 +38,8 @@ namespace GTRevo.Infrastructure.Tests.Notifications
             Notification2Derived n2 = new Notification2Derived();
             await sut.PushNotification(n2);
 
-            notificationChannel1.ReceivedWithAnyArgs(0).SendNotificationAsync(null);
-            notificationChannel2.Received(1).SendNotificationAsync(n2);
+            notificationChannel1.ReceivedWithAnyArgs(0).PushNotificationAsync(null);
+            notificationChannel2.Received(1).PushNotificationAsync(n2);
         }
 
         [Fact]
@@ -50,9 +50,9 @@ namespace GTRevo.Infrastructure.Tests.Notifications
             Notification2 n2 = new Notification2();
             await sut.PushNotifications(new INotification[] {n1First, n2, n1Second});
 
-            notificationChannel1.Received(1).SendNotificationAsync(n1First);
-            notificationChannel1.Received(1).SendNotificationAsync(n1Second);
-            notificationChannel2.Received(1).SendNotificationAsync(n2);
+            notificationChannel1.Received(1).PushNotificationAsync(n1First);
+            notificationChannel1.Received(1).PushNotificationAsync(n1Second);
+            notificationChannel2.Received(1).PushNotificationAsync(n2);
         }
 
         [Fact]
@@ -61,8 +61,8 @@ namespace GTRevo.Infrastructure.Tests.Notifications
             Notification2Derived n2 = new Notification2Derived();
             await sut.PushNotifications(new INotification[] { n2 });
 
-            notificationChannel1.ReceivedWithAnyArgs(0).SendNotificationAsync(null);
-            notificationChannel2.Received(1).SendNotificationAsync(n2);
+            notificationChannel1.ReceivedWithAnyArgs(0).PushNotificationAsync(null);
+            notificationChannel2.Received(1).PushNotificationAsync(n2);
         }
 
         public class Notification1 : INotification

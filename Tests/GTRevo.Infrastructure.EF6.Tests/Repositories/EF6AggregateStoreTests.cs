@@ -10,7 +10,9 @@ using GTRevo.Infrastructure.Core.Domain.Attributes;
 using GTRevo.Infrastructure.Core.Domain.Basic;
 using GTRevo.Infrastructure.Core.Domain.Events;
 using GTRevo.Infrastructure.EF6.Repositories;
+using GTRevo.Infrastructure.Events;
 using GTRevo.Testing.DataAccess.EF6;
+using GTRevo.Testing.Infrastructure;
 using NSubstitute;
 using Xunit;
 
@@ -24,18 +26,30 @@ namespace GTRevo.Infrastructure.EF6.Tests.Repositories
         private readonly FakeCrudRepository crudRepository;
         private readonly IModelMetadataExplorer modelMetadataExplorer;
         private readonly IEntityTypeManager entityTypeManager;
-        private readonly IEventQueue eventQueue;
+        private readonly IPublishEventBuffer publishEventBuffer;
+        private readonly IEventMessageFactory eventMessageFactory;
 
         public EF6AggregateStoreTests()
         {
             crudRepository = new FakeCrudRepository();
             modelMetadataExplorer = Substitute.For<IModelMetadataExplorer>();
             entityTypeManager = Substitute.For<IEntityTypeManager>();
-            eventQueue = Substitute.For<IEventQueue>();
+            publishEventBuffer = Substitute.For<IPublishEventBuffer>();
 
             entityTypeManager.GetClassIdByClrType(typeof(TestAggregate)).Returns(Guid.Parse(TestAggregateClassId));
+            
+            eventMessageFactory = Substitute.For<IEventMessageFactory>();
+            eventMessageFactory.CreateMessageAsync(null).ReturnsForAnyArgs(ci =>
+            {
+                var @event = ci.ArgAt<IEvent>(0);
+                Type messageType = typeof(EventMessageDraft<>).MakeGenericType(@event.GetType());
+                IEventMessageDraft messageDraft = (IEventMessageDraft)messageType.GetConstructor(new[] { @event.GetType() }).Invoke(new[] { @event });
+                messageDraft.AddMetadata("TestKey", "TestValue");
+                return messageDraft;
+            }); // TODO something more lightweight?
 
-            sut = new EF6AggregateStore(crudRepository, modelMetadataExplorer, entityTypeManager, eventQueue);
+
+            sut = new EF6AggregateStore(crudRepository, modelMetadataExplorer, entityTypeManager, publishEventBuffer, eventMessageFactory);
         }
 
         [Fact]
@@ -49,7 +63,7 @@ namespace GTRevo.Infrastructure.EF6.Tests.Repositories
         }
 
         [Fact]
-        public void SaveChanges_PushesEvents()
+        public void SaveChanges_PushesEventsForPublishing()
         {
             TestAggregate testAggregate = new TestAggregate(Guid.NewGuid());
             sut.Add(testAggregate);
@@ -57,8 +71,10 @@ namespace GTRevo.Infrastructure.EF6.Tests.Repositories
             var event1 = testAggregate.UncommittedEvents.First();
             sut.SaveChanges();
 
-            eventQueue.Received(1).PushEvent(event1);
+            publishEventBuffer.Received(1).PushEvent(Arg.Is<IEventMessage>(x => x.Event == event1));
         }
+
+        // TODO test pushed event metadata
 
         [Fact]
         public void SaveChanges_CommitsAggregates()

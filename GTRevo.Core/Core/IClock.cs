@@ -4,7 +4,7 @@ namespace GTRevo.Core.Core
 {
     public interface IClock
     {
-        DateTime Now { get; }
-        DateTime UtcNow { get; }
+        DateTimeOffset Now { get; }
+        DateTimeOffset UtcNow { get; }
     }
 }

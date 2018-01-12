@@ -36,24 +36,27 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\..\Packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
-    <Reference Include="MediatR, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\Packages\MediatR.3.0.1\lib\net45\MediatR.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Experimental.Collections, Version=1.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\Packages\Microsoft.Experimental.Collections.1.0.3-alpha\lib\portable-net45+win8+wp8\Microsoft.Experimental.Collections.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\Packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Ninject, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
-      <HintPath>..\..\Packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
+    <Reference Include="Ninject, Version=3.3.3.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\..\Packages\Ninject.3.3.3\lib\net45\Ninject.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\..\Packages\NLog.4.4.11\lib\net45\NLog.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Collections.Immutable, Version=1.2.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\Packages\System.Collections.Immutable.1.4.0\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
+    </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ValueTuple, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\Packages\System.ValueTuple.4.3.1\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -66,13 +69,22 @@
     <Compile Include="DataAcccess\InfrastructureDataAccessModule.cs" />
     <Compile Include="DataAcccess\QueryableRepositoryExtensions.cs" />
     <Compile Include="Domain\BasicDomainModelDefinition.cs" />
-    <Compile Include="EventSourcing\AggregateHistory.cs" />
-    <Compile Include="EventSourcing\EF6EventSourcingModelDefinition.cs" />
-    <Compile Include="EventSourcing\EF6EventSourcingModule.cs" />
-    <Compile Include="EventSourcing\EF6EventStore.cs" />
-    <Compile Include="EventSourcing\Model\DomainAggregateRecord.cs" />
-    <Compile Include="EventSourcing\Model\DomainEventPacket.cs" />
-    <Compile Include="EventSourcing\Model\DomainEventSerialized.cs" />
+    <Compile Include="EventStore\EF6EventSourcingModelDefinition.cs" />
+    <Compile Include="EventStore\EF6EventSourcingModule.cs" />
+    <Compile Include="EventStore\EF6EventStore.cs" />
+    <Compile Include="EventStore\EF6EventSourceCatchUp.cs" />
+    <Compile Include="EventStore\GlobalEF6EventStreamPosition.cs" />
+    <Compile Include="EventStore\Model\BasicMessageEnveloped.cs" />
+    <Compile Include="EventStore\Model\EventStream.cs" />
+    <Compile Include="EventStore\Model\EventStreamRow.cs" />
+    <Compile Include="Events\Async\AsyncEventQueue.cs" />
+    <Compile Include="Events\Async\AsyncEventQueueManager.cs" />
+    <Compile Include="Events\Async\EF6AsyncEventsModule.cs" />
+    <Compile Include="Events\Async\EventSourceState.cs" />
+    <Compile Include="Events\Async\ExternalEventRecord.cs" />
+    <Compile Include="Events\Async\QueuedAsyncEvent.cs" />
+    <Compile Include="Projections\EF6ProjectionEventListener.cs" />
+    <Compile Include="Projections\EF6ProjectionsModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReadModel\ReadModelDefinition.cs" />
     <Compile Include="Repositories\EF6RepositoryModule.cs" />

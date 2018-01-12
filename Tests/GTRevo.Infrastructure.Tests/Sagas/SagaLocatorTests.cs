@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GTRevo.Core.Commands;
+using GTRevo.Core.Events;
 using GTRevo.Infrastructure.Core.Domain;
 using GTRevo.Infrastructure.Core.Domain.Events;
 using GTRevo.Infrastructure.Core.Domain.EventSourcing;
 using GTRevo.Infrastructure.Sagas;
+using GTRevo.Testing.Infrastructure;
 using NSubstitute;
 using Xunit;
 
@@ -35,9 +37,9 @@ namespace GTRevo.Infrastructure.Tests.Sagas
                     new SagaEventRegistration(typeof(Saga1), typeof(Event1))
                 });
             
-            var events = new List<DomainEvent>()
+            var events = new List<IEventMessage<DomainEvent>>()
             {
-                new Event1() { Foo = 5 }
+                new Event1() { Foo = 5 }.ToMessageDraft()
             };
 
             List<ISaga> addedSagas = new List<ISaga>();
@@ -63,9 +65,9 @@ namespace GTRevo.Infrastructure.Tests.Sagas
                         "foo", false)
                 });
 
-            var events = new List<DomainEvent>()
+            var events = new List<IEventMessage<DomainEvent>>()
             {
-                new Event1() { Foo = 5 }
+                new Event1() { Foo = 5 }.ToMessageDraft()
             };
 
             Saga1 saga1 = new Saga1(Guid.NewGuid());
@@ -93,9 +95,9 @@ namespace GTRevo.Infrastructure.Tests.Sagas
                         "foo", true)
                 });
 
-            var events = new List<DomainEvent>()
+            var events = new List<IEventMessage<DomainEvent>>()
             {
-                new Event1() { Foo = 5 }
+                new Event1() { Foo = 5 }.ToMessageDraft()
             };
 
             List<ISaga> addedSagas = new List<ISaga>();
@@ -121,10 +123,10 @@ namespace GTRevo.Infrastructure.Tests.Sagas
                         "foo", true)
                 });
 
-            var events = new List<DomainEvent>()
+            var events = new List<IEventMessage<DomainEvent>>()
             {
-                new Event1() { Foo = 5 },
-                new Event1() { Foo = 5 }
+                new Event1() { Foo = 5 }.ToMessageDraft(),
+                new Event1() { Foo = 5 }.ToMessageDraft()
             };
 
             List<ISaga> addedSagas = new List<ISaga>();
@@ -150,7 +152,7 @@ namespace GTRevo.Infrastructure.Tests.Sagas
 
             public Guid Id { get; set; }
             public bool IsChanged => UncommittedEvents.Any() || UncommitedCommands.Any();
-            public IEnumerable<DomainAggregateEvent> UncommittedEvents { get; set; }
+            public IReadOnlyCollection<DomainAggregateEvent> UncommittedEvents { get; set; }
             public int Version { get; set; }
             public bool IsDeleted { get; set; }
 
@@ -169,9 +171,9 @@ namespace GTRevo.Infrastructure.Tests.Sagas
             public IReadOnlyDictionary<string, string> Keys { get; set; } = new Dictionary<string, string>();
             public bool IsEnded { get; }
 
-            public List<DomainEvent> HandledEvents { get; set; } = new List<DomainEvent>();
+            public List<IEventMessage<DomainEvent>> HandledEvents { get; set; } = new List<IEventMessage<DomainEvent>>();
 
-            public virtual void HandleEvent(DomainEvent ev)
+            public virtual void HandleEvent(IEventMessage<DomainEvent> ev)
             {
                 HandledEvents.Add(ev);
             }
@@ -183,15 +185,15 @@ namespace GTRevo.Infrastructure.Tests.Sagas
             {
             }
 
-            public override void HandleEvent(DomainEvent ev)
+            public override void HandleEvent(IEventMessage<DomainEvent> ev)
             {
                 base.HandleEvent(ev);
 
-                if (ev is Event1 event1)
+                if (ev is IEventMessage<Event1> event1)
                 {
                     Keys = new Dictionary<string, string>()
                     {
-                        {"foo", event1.Foo.ToString()}
+                        {"foo", event1.Event.Foo.ToString()}
                     };
                 }
                 else

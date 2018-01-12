@@ -16,7 +16,7 @@ namespace GTRevo.Infrastructure.History.ChangeTracking.Model
         public Guid? AggregateClassId { get; set; }
         public Guid? EntityId { get; set; }
         public Guid? EntityClassId { get; set; }
-        public DateTime ChangeTime { get; set; }
+        public DateTimeOffset ChangeTime { get; set; }
         
         public string ChangeDataJson { get; set; }
         public string ChangeDataClassName { get; set; }

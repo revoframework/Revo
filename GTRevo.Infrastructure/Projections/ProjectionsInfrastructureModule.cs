@@ -1,7 +1,7 @@
 ﻿using GTRevo.Core.Core;
 using GTRevo.Core.Events;
 using GTRevo.Infrastructure.Core.Domain.Events;
-using MediatR;
+using GTRevo.Infrastructure.Events.Async;
 using Ninject.Modules;
 
 namespace GTRevo.Infrastructure.Projections
@@ -10,11 +10,6 @@ namespace GTRevo.Infrastructure.Projections
     {
         public override void Load()
         {
-            // TODO eliminate the need to double register
-            Bind<IEventListener<DomainAggregateEvent>, IAsyncNotificationHandler<DomainAggregateEvent>,
-                IEventQueueTransactionListener>()
-                .To<ProjectionEventListener>()
-                .InRequestOrJobScope();
         }
     }
 }

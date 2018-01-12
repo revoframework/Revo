@@ -10,6 +10,7 @@ using Hangfire;
 using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 using Ninject;
 using Ninject.Web.Common;
+using Ninject.Web.Common.WebHost;
 using Ninject.Web.Mvc;
 using Ninject.Web.Mvc.Filter;
 using Ninject.Web.Mvc.Validation;

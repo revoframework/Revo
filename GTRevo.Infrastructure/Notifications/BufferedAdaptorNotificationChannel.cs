@@ -15,12 +15,17 @@ namespace GTRevo.Infrastructure.Notifications
 
         public IEnumerable<Type> NotificationTypes { get; } = new[] { typeof(T) };
 
-        public async Task SendNotificationAsync(INotification notification)
+        public async Task PushNotificationAsync(INotification notification)
         {
             foreach (IBufferedNotificationChannel channel in bufferedNotificationChannels)
             {
                 await channel.SendNotificationsAsync(new[] {notification});
             }
+        }
+
+        public Task CommitAsync()
+        {
+            return Task.FromResult(0);
         }
     }
 }

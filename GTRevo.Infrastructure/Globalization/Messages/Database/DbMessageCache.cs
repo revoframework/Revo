@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GTRevo.Core.Events;
+using GTRevo.Infrastructure.Events;
 using Nito.AsyncEx;
 
 namespace GTRevo.Infrastructure.Globalization.Messages.Database
@@ -46,8 +47,11 @@ namespace GTRevo.Infrastructure.Globalization.Messages.Database
 
             messages = newMessages.ToDictionary(x => x.Key,
                 x => x.Value.ToImmutable());
-            
-            AsyncContext.Run(() => eventBus.Publish(new DbMessageCacheReloadedEvent()));
+
+            Task.Run(async () =>
+                await eventBus.PublishAsync(
+                    new EventMessageDraft<DbMessageCacheReloadedEvent>(new DbMessageCacheReloadedEvent())))
+                    .GetAwaiter().GetResult();
         }
     }
 }

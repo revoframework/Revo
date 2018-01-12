@@ -28,14 +28,7 @@ namespace GTRevo.Infrastructure.Core.Domain
         public virtual int Version { get; protected set; }
 
         public virtual bool IsChanged => UncommittedEvents.Any();
-
-        public virtual IEnumerable<DomainAggregateEvent> UncommittedEvents
-        {
-            get
-            {
-                return EventRouter.UncommitedEvents;
-            }
-        }
+        public virtual IReadOnlyCollection<DomainAggregateEvent> UncommittedEvents => EventRouter.UncommitedEvents;
 
         protected internal IAggregateEventRouter EventRouter { get; }
 

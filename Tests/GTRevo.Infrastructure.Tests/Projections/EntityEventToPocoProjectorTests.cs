@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GTRevo.Core.Events;
 using GTRevo.Infrastructure.Core.Domain.Basic;
 using GTRevo.Infrastructure.Core.Domain.Events;
 using GTRevo.Infrastructure.Core.Domain.EventSourcing;
 using GTRevo.Infrastructure.Core.ReadModel;
+using GTRevo.Infrastructure.Events;
 using GTRevo.Infrastructure.Projections;
+using GTRevo.Testing.Infrastructure;
 using NSubstitute;
 using Xunit;
 
@@ -16,84 +19,90 @@ namespace GTRevo.Infrastructure.Tests.Projections
     public class EntityEventToPocoProjectorTests
     {
         private TestEntityEventToPocoProjector sut;
+        private TestAggregate aggregate;
+        private List<IEventMessageDraft<DomainAggregateEvent>> eventMessages;
 
         public EntityEventToPocoProjectorTests()
         {
+            aggregate = new TestAggregate(Guid.NewGuid());
+            aggregate.Do1();
+            aggregate.Do2();
+            aggregate.Do3();
+
+            eventMessages = aggregate.UncommittedEvents.Select((x, i) =>
+            {
+                var message = x.ToMessageDraft();
+                message.AddMetadata(BasicEventMetadataNames.StreamSequenceNumber, (i + 1).ToString());
+                return message;
+            }).ToList();
+
+            aggregate.Commit();
         }
 
         [Fact]
         public async Task ProjectEventsAsync_CallsApplyProjections()
         {
-            TestAggregate aggregate = new TestAggregate(Guid.NewGuid());
-            aggregate.Commit();
-            List<DomainAggregateEvent> events = new List<DomainAggregateEvent>()
-            {
-                new TestEvent1(),
-                new TestEvent2()
-            };
-
             sut = new TestEntityEventToPocoProjector();
-            await sut.ProjectEventsAsync(aggregate, events);
+            await sut.ProjectEventsAsync(aggregate, eventMessages);
 
-            Assert.True(sut.AppliedEvents.SequenceEqual(new List<DomainAggregateEvent>()
+            Assert.True(sut.AppliedEvents.SequenceEqual(new List<IEventMessage<DomainAggregateEvent>>()
             {
-                events[0],
-                events[1]
+                eventMessages[0],
+                eventMessages[1]
             }));
         }
 
         [Fact]
         public async Task ProjectEventsAsync_CallsOverridesOnlyOnce()
         {
-            TestAggregate aggregate = new TestAggregate(Guid.NewGuid());
-            aggregate.Commit();
-            List<DomainAggregateEvent> events = new List<DomainAggregateEvent>()
-            {
-                new TestEvent1(),
-                new TestEvent2()
-            };
-
             sut = new TestEntityEventToPocoProjectorWithOverrides();
-            await sut.ProjectEventsAsync(aggregate, events);
+            await sut.ProjectEventsAsync(aggregate, eventMessages);
 
-            Assert.True(sut.AppliedEvents.SequenceEqual(new List<DomainAggregateEvent>()
+            Assert.True(sut.AppliedEvents.SequenceEqual(new List<IEventMessage<DomainAggregateEvent>>()
             {
-                events[0],
-                events[1],
-                events[1]
+                eventMessages[0],
+                eventMessages[1],
+                eventMessages[1]
             }));
         }
 
         [Fact]
         public async Task ProjectEventsAsync_WithSubProjector()
         {
-            TestAggregate aggregate = new TestAggregate(Guid.NewGuid());
-            aggregate.Commit();
-            List<DomainAggregateEvent> events = new List<DomainAggregateEvent>()
-            {
-                new TestEvent1(),
-                new TestEvent3()
-            };
-            
             sut = new TestEntityEventToPocoProjector();
             var subProjector = Substitute.ForPartsOf<TestSubProjector>(new object[] {sut.AppliedEvents});
             sut.AddSubProjector(subProjector);
-            await sut.ProjectEventsAsync(aggregate, events);
-
-
-            Assert.True(sut.AppliedEvents.SequenceEqual(new List<DomainAggregateEvent>()
+            await sut.ProjectEventsAsync(aggregate, eventMessages);
+            
+            Assert.True(sut.AppliedEvents.SequenceEqual(new List<IEventMessage<DomainAggregateEvent>>()
             {
-                events[0],
-                events[1]
+                eventMessages[0],
+                eventMessages[1],
+                eventMessages[2]
             }));
 
-            subProjector.Received(1).Apply((TestEvent3) events[1], aggregate, sut.LastTarget);
+            subProjector.Received(1).Apply((IEventMessage<TestEvent3>)eventMessages[2], aggregate, sut.LastTarget);
         }
 
         public class TestAggregate : EventSourcedAggregateRoot
         {
             public TestAggregate(Guid id) : base(id)
             {
+            }
+
+            public void Do1()
+            {
+                ApplyEvent(new TestEvent1());
+            }
+
+            public void Do2()
+            {
+                ApplyEvent(new TestEvent2());
+            }
+
+            public void Do3()
+            {
+                ApplyEvent(new TestEvent3());
             }
         }
 
@@ -114,13 +123,13 @@ namespace GTRevo.Infrastructure.Tests.Projections
                 base.AddSubProjector(projector);
             }
 
-            public List<DomainAggregateEvent> AppliedEvents { get; private set; } = new List<DomainAggregateEvent>();
+            public List<IEventMessage<DomainAggregateEvent>> AppliedEvents { get; private set; } = new List<IEventMessage<DomainAggregateEvent>>();
 
             public override async Task CommitChangesAsync()
             {
             }
 
-            protected override async Task<TestReadModel> CreateProjectionTargetAsync(TestAggregate aggregate, IEnumerable<DomainAggregateEvent> events)
+            protected override async Task<TestReadModel> CreateProjectionTargetAsync(TestAggregate aggregate, IEnumerable<IEventMessage<DomainAggregateEvent>> events)
             {
                 return LastTarget = new TestReadModel();
             }
@@ -130,12 +139,12 @@ namespace GTRevo.Infrastructure.Tests.Projections
                 throw new NotImplementedException();
             }
 
-            protected virtual void Apply(TestEvent1 ev)
+            protected virtual void Apply(IEventMessage<TestEvent1> ev)
             {
                 AppliedEvents.Add(ev);
             }
 
-            protected virtual void Apply(TestEvent2 ev)
+            protected virtual void Apply(IEventMessage<TestEvent2> ev)
             {
                 AppliedEvents.Add(ev);
             }
@@ -143,12 +152,12 @@ namespace GTRevo.Infrastructure.Tests.Projections
 
         public class TestEntityEventToPocoProjectorWithOverrides : TestEntityEventToPocoProjector
         {
-            protected override void Apply(TestEvent1 ev)
+            protected override void Apply(IEventMessage<TestEvent1> ev)
             {
                 base.Apply(ev);
             }
 
-            protected new virtual void Apply(TestEvent2 ev)
+            protected new virtual void Apply(IEventMessage<TestEvent2> ev)
             {
                 base.Apply(ev);
             }
@@ -156,14 +165,14 @@ namespace GTRevo.Infrastructure.Tests.Projections
 
         public class TestSubProjector : ISubEntityEventProjector
         {
-            public TestSubProjector(List<DomainAggregateEvent> appliedEvents)
+            public TestSubProjector(List<IEventMessage<DomainAggregateEvent>> appliedEvents)
             {
                 AppliedEvents = appliedEvents;
             }
 
-            public List<DomainAggregateEvent> AppliedEvents { get; private set; }
+            public List<IEventMessage<DomainAggregateEvent>> AppliedEvents { get; private set; }
 
-            public virtual void Apply(TestEvent3 ev, TestAggregate aggregate, TestReadModel target)
+            public virtual void Apply(IEventMessage<TestEvent3> ev, TestAggregate aggregate, TestReadModel target)
             {
                 AppliedEvents.Add(ev);
             }

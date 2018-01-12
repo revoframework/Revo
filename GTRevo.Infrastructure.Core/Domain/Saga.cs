@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using GTRevo.Core.Commands;
+using GTRevo.Core.Events;
 using GTRevo.Infrastructure.Core.Domain.Events;
 using GTRevo.Infrastructure.Core.Domain.EventSourcing;
 
@@ -12,7 +13,7 @@ namespace GTRevo.Infrastructure.Core.Domain
     {
         private readonly List<ICommand> uncommitedCommands = new List<ICommand>();
         private readonly Dictionary<string, string> keys = new Dictionary<string, string>();
-        private readonly ReadOnlyDictionary<Type, SagaConventionEventInfo> events;
+        private readonly IReadOnlyDictionary<Type, SagaConventionEventInfo> events;
 
         public Saga(Guid id) : base(id)
         {
@@ -27,9 +28,9 @@ namespace GTRevo.Infrastructure.Core.Domain
 
         public bool IsEnded { get; }
 
-        public void HandleEvent(DomainEvent ev)
+        public void HandleEvent(IEventMessage<DomainEvent> ev)
         {
-            if (events.TryGetValue(ev.GetType(), out SagaConventionEventInfo eventInfo))
+            if (events.TryGetValue(ev.Event.GetType(), out SagaConventionEventInfo eventInfo))
             {
                 eventInfo.HandleDelegate(this, ev);
             }

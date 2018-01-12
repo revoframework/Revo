@@ -1,55 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using GTRevo.Core.Core;
 using GTRevo.Core.Events;
 using GTRevo.Core.Transactions;
 using GTRevo.Infrastructure.Core.Domain;
 using GTRevo.Infrastructure.Core.Domain.Events;
 using GTRevo.Infrastructure.Core.Domain.EventSourcing;
+using GTRevo.Infrastructure.Events.Async;
 using GTRevo.Infrastructure.EventSourcing;
 
 namespace GTRevo.Infrastructure.Projections
 {
-    public class ProjectionEventListener : IEventListener<DomainAggregateEvent>,
-        IEventQueueTransactionListener
+    public abstract class ProjectionEventListener :
+        IAsyncEventListener<DomainAggregateEvent>
     {
         private readonly IEventSourcedAggregateRepository eventSourcedRepository;
-        private readonly MultiValueDictionary<Type, IEntityEventProjector> aggregateTypesToEntityEventProjectors = new MultiValueDictionary<Type, IEntityEventProjector>();
-        private readonly MultiValueDictionary<Type, ICrudEntityProjector> aggregateTypesToCrudEntityProjectors = new MultiValueDictionary<Type, ICrudEntityProjector>();
-        private readonly Dictionary<Guid, PublishedEntityEvents> allEvents = new Dictionary<Guid, PublishedEntityEvents>();
         private readonly IEntityTypeManager entityTypeManager;
+        private readonly IServiceLocator serviceLocator;
+        private readonly Dictionary<Guid, PublishedEntityEvents> allEvents = new Dictionary<Guid, PublishedEntityEvents>();
 
-        public ProjectionEventListener(IEntityEventProjector[] entityEventProjectors,
-            ICrudEntityProjector[] crudEntityProjectors,
-            IEventSourcedAggregateRepository eventSourcedRepository,
-            IEntityTypeManager entityTypeManager)
+        public ProjectionEventListener(IEventSourcedAggregateRepository eventSourcedRepository,
+            IEntityTypeManager entityTypeManager,
+            IServiceLocator serviceLocator)
         {
             this.eventSourcedRepository = eventSourcedRepository;
             this.entityTypeManager = entityTypeManager;
-
-            foreach (var entityEventProjector in entityEventProjectors)
-            {
-                aggregateTypesToEntityEventProjectors.Add(entityEventProjector.ProjectedAggregateType, entityEventProjector);
-            }
-
-            foreach (var crudEntityProjector in crudEntityProjectors)
-            {
-                throw new NotImplementedException("CRUD entity projectors not implemented yet");
-                aggregateTypesToCrudEntityProjectors.Add(crudEntityProjector.ProjectedAggregateType, crudEntityProjector);
-            }
+            this.serviceLocator = serviceLocator;
         }
 
-        public async Task Handle(DomainAggregateEvent notification)
+        public abstract IAsyncEventSequencer EventSequencer { get; }
+
+        public async Task HandleAsync(IEventMessage<DomainAggregateEvent> message, string sequenceName)
         {
             PublishedEntityEvents events;
-            if (!allEvents.TryGetValue(notification.AggregateId, out events))
+            if (!allEvents.TryGetValue(message.Event.AggregateId, out events))
             {
                 events = new PublishedEntityEvents();
-                allEvents[notification.AggregateId] = events;
+                allEvents[message.Event.AggregateId] = events;
             }
 
-            events.Add(notification);
+            events.Add(message);
+        }
+
+        public Task OnFinishedEventQueueAsync(string sequenceName)
+        {
+            return ExecuteProjectionsAsync();
         }
 
         public async Task ExecuteProjectionsAsync()
@@ -59,25 +57,20 @@ namespace GTRevo.Infrastructure.Projections
             foreach (var entityEvents in allEvents)
             {
                 var events = entityEvents.Value;
-                Guid classId = events.First().AggregateClassId;
+                Guid classId = events.First().Metadata.GetAggregateClassId() ?? throw new InvalidOperationException($"Cannot create projection for aggregate ID {entityEvents.Key} because event metadata don't contain aggregate class ID");
                 Type entityType = entityTypeManager.GetClrTypeByClassId(classId);
 
                 IEventSourcedAggregateRoot entity = await eventSourcedRepository
                     .GetAsync(entityEvents.Key);
 
-                while (entityType != null)
-                {
-                    IReadOnlyCollection<IEntityEventProjector> projectors;
-                    if (aggregateTypesToEntityEventProjectors.TryGetValue(entityType, out projectors))
-                    {
-                        foreach (var projector in projectors)
-                        {
-                            await projector.ProjectEventsAsync(entity, events);
-                            usedProjectors.Add(projector);
-                        }
-                    }
+                IEnumerable<IEntityEventProjector> projectors = serviceLocator.GetAll(
+                    typeof(IEntityEventProjector<>).MakeGenericType(entityType))
+                    .Cast<IEntityEventProjector>();
 
-                    entityType = entityType.BaseType;
+                foreach (var projector in projectors)
+                {
+                    await projector.ProjectEventsAsync(entity, events);
+                    usedProjectors.Add(projector);
                 }
             }
 
@@ -88,17 +81,8 @@ namespace GTRevo.Infrastructure.Projections
 
             allEvents.Clear();
         }
-
-        public void OnTransactionBegin(ITransaction transaction)
-        {
-        }
-
-        public Task OnTransactionSucceededAsync(ITransaction transaction)
-        {
-            return ExecuteProjectionsAsync();
-        }
-
-        private class PublishedEntityEvents : List<DomainAggregateEvent>
+        
+        private class PublishedEntityEvents : List<IEventMessage<DomainAggregateEvent>>
         {
         }
     }

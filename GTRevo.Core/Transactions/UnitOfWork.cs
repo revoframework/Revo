@@ -1,33 +1,87 @@
-﻿using System.Linq;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using GTRevo.Core.Events;
 
 namespace GTRevo.Core.Transactions
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly IUnitOfWorkProvider[] transactionProviders;
+        private readonly ITransaction[] innerTransactions;
         private readonly IUnitOfWorkListener[] unitOfWorkListeners;
 
-        public UnitOfWork(IUnitOfWorkProvider[] transactionProviders,
-            IUnitOfWorkListener[] unitOfWorkListeners)
+        private bool disposedValue = false; // To detect redundant calls
+
+        public UnitOfWork(ITransaction[] innerTransactions,
+            IUnitOfWorkListener[] unitOfWorkListeners,
+            IEventBus eventBus)
         {
-            this.transactionProviders = transactionProviders;
+            this.innerTransactions = innerTransactions;
             this.unitOfWorkListeners = unitOfWorkListeners;
-        }
 
-        public ITransaction CreateTransaction()
-        {
-            ITransaction[] transactions = transactionProviders
-                .Select(x => x.CreateTransaction())
-                .ToArray();
-
-            var tx = new UnitOfWorkTransaction(transactions, unitOfWorkListeners);
+            EventBuffer = new PublishEventBuffer(eventBus);
 
             foreach (var listener in unitOfWorkListeners)
             {
-                listener.OnTransactionBegin(tx);
+                listener.OnWorkBegin(this);
+            }
+        }
+        
+        public IPublishEventBuffer EventBuffer { get; }
+
+        public void Commit()
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task CommitAsync()
+        {
+            foreach (ITransaction transaction in innerTransactions)
+            {
+                await transaction.CommitAsync();
             }
 
-            return tx;
+            foreach (var listener in unitOfWorkListeners)
+            {
+                await listener.OnWorkSucceededAsync(this);
+            }
+
+            // TODO flushing events even on an exception?
+            await EventBuffer.FlushAsync(new CancellationToken()); // TODO cancellation token
         }
+
+        #region IDisposable Support
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects).
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // TODO: set large fields to null.
+
+                disposedValue = true;
+            }
+        }
+
+        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        // ~UnitOfWork() {
+        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //   Dispose(false);
+        // }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // TODO: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

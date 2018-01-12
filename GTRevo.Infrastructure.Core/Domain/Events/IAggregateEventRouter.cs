@@ -5,7 +5,7 @@ namespace GTRevo.Infrastructure.Core.Domain.Events
 {
     public interface IAggregateEventRouter
     {
-        IEnumerable<DomainAggregateEvent> UncommitedEvents { get; }
+        IReadOnlyCollection<DomainAggregateEvent> UncommitedEvents { get; }
 
         void ApplyEvent<T>(T evt) where T : DomainAggregateEvent;
         void CommitEvents();

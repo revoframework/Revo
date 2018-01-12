@@ -18,7 +18,7 @@ namespace GTRevo.Infrastructure.Core.Domain.Events
             this.aggregate = aggregate;
         }
 
-        public virtual IEnumerable<DomainAggregateEvent> UncommitedEvents => uncommittedEvents;
+        public virtual IReadOnlyCollection<DomainAggregateEvent> UncommitedEvents => uncommittedEvents;
 
         public virtual void ApplyEvent<T>(T evt) where T : DomainAggregateEvent
         {

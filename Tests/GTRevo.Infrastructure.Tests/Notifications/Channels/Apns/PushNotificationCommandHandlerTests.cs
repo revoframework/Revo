@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GTRevo.Core.Security;
 using GTRevo.Infrastructure.Notifications.Channels.Apns.CommandHandlers;
 using GTRevo.Infrastructure.Notifications.Channels.Apns.Commands;
 using GTRevo.Infrastructure.Notifications.Channels.Apns.Model;
 using GTRevo.Testing.Core;
+using GTRevo.Testing.Infrastructure;
 using GTRevo.Testing.Infrastructure.Repositories;
 using GTRevo.Testing.Security;
 using NSubstitute;
@@ -35,11 +37,11 @@ namespace GTRevo.Infrastructure.Tests.Notifications.Channels.Apns
         public async Task Handle_RegisterApnsDeviceCommand_SavesToken()
         {
             string deviceToken = "da8820921cdf472887f458abb67e1db1da8820921cdf472887f458abb67e1db1";
-            await sut.Handle(new RegisterApnsDeviceCommand()
+            await sut.HandleAsync(new RegisterApnsDeviceCommand()
             {
                 AppId = "My.AppId",
                 DeviceToken = deviceToken
-            });
+            }, CancellationToken.None);
 
             Assert.Equal(1, repository.FindAll<ApnsUserDeviceToken>().Count());
             Assert.Contains(repository.FindAll<ApnsUserDeviceToken>(),
@@ -54,11 +56,11 @@ namespace GTRevo.Infrastructure.Tests.Notifications.Channels.Apns
         {
             string deviceToken = "da882092 1cdf 4728 87f4 58abb67e1db1 da882092 1cdf 4728 87f4 58abb67e1db1";
             string deviceTokenNormalized = "da8820921cdf472887f458abb67e1db1da8820921cdf472887f458abb67e1db1";
-            await sut.Handle(new RegisterApnsDeviceCommand()
+            await sut.HandleAsync(new RegisterApnsDeviceCommand()
             {
                 AppId = "My.AppId",
                 DeviceToken = deviceToken
-            });
+            },  CancellationToken.None);
 
             Assert.Equal(1, repository.FindAll<ApnsUserDeviceToken>().Count());
             Assert.Contains(repository.FindAll<ApnsUserDeviceToken>(),
@@ -80,11 +82,11 @@ namespace GTRevo.Infrastructure.Tests.Notifications.Channels.Apns
                     oldToken,
                     FakeRepository.EntityState.Unchanged));
             
-            await sut.Handle(new RegisterApnsDeviceCommand()
+            await sut.HandleAsync(new RegisterApnsDeviceCommand()
             {
                 AppId = "My.AppId",
                 DeviceToken = oldToken.DeviceToken
-            });
+            }, CancellationToken.None);
 
             Assert.Equal(1, repository.FindAll<ApnsUserDeviceToken>().Count());
             Assert.Contains(repository.FindAll<ApnsUserDeviceToken>(),
@@ -104,11 +106,11 @@ namespace GTRevo.Infrastructure.Tests.Notifications.Channels.Apns
                     oldToken,
                     FakeRepository.EntityState.Unchanged));
 
-            await sut.Handle(new RegisterApnsDeviceCommand()
+            await sut.HandleAsync(new RegisterApnsDeviceCommand()
             {
                 AppId = "My.AppId",
                 DeviceToken = oldToken.DeviceToken
-            });
+            }, CancellationToken.None);
 
             Assert.Equal(1, repository.FindAll<ApnsUserDeviceToken>().Count());
             Assert.Contains(repository.FindAll<ApnsUserDeviceToken>(),
@@ -129,11 +131,11 @@ namespace GTRevo.Infrastructure.Tests.Notifications.Channels.Apns
                     oldToken,
                     FakeRepository.EntityState.Unchanged));
 
-            await sut.Handle(new DeregisterApnsDeviceCommand()
+            await sut.HandleAsync(new DeregisterApnsDeviceCommand()
             {
                 AppId = "My.AppId",
                 DeviceToken = oldToken.DeviceToken
-            });
+            }, CancellationToken.None);
 
             Assert.Empty(repository.FindAll<ApnsUserDeviceToken>());
         }

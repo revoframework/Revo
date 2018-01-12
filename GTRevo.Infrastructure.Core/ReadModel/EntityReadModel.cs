@@ -4,7 +4,7 @@ using GTRevo.Infrastructure.Core.Domain;
 
 namespace GTRevo.Infrastructure.Core.ReadModel
 {
-    public abstract class EntityReadModel : ReadModelBase, IHasId<Guid>, IRowVersioned
+    public abstract class EntityReadModel : ReadModelBase, IHasId<Guid>, IManuallyRowVersioned
     {
         public Guid Id { get; set; }
         public int Version { get; set; }

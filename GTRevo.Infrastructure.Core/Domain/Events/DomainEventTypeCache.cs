@@ -11,14 +11,14 @@ namespace GTRevo.Infrastructure.Core.Domain.Events
     public class DomainEventTypeCache : IApplicationStartListener, IDomainEventTypeCache
     {
         private readonly ITypeExplorer typeExplorer;
-        private readonly Dictionary<Tuple<string, int>, Type> eventNamesToTypes = new Dictionary<Tuple<string, int>, Type>();
-        private readonly Dictionary<Type, Tuple<string, int>> eventTypesToNames = new Dictionary<Type, Tuple<string, int>>();
+        private readonly Dictionary<(string eventName, int eventVersion), Type> eventNamesToTypes = new Dictionary<(string eventName, int eventVersion), Type>();
+        private readonly Dictionary<Type, (string eventName, int eventVersion)> eventTypesToNames = new Dictionary<Type, (string eventName, int eventVersion)>();
 
         public DomainEventTypeCache(ITypeExplorer typeExplorer)
         {
             this.typeExplorer = typeExplorer;
         }
-
+        
         public void OnApplicationStarted()
         {
             ExploreEventTypes();
@@ -27,7 +27,7 @@ namespace GTRevo.Infrastructure.Core.Domain.Events
         public Type GetClrEventType(string eventName, int eventVersion)
         {
             Type eventType;
-            if (!eventNamesToTypes.TryGetValue(new Tuple<string, int>(eventName, eventVersion), out eventType))
+            if (!eventNamesToTypes.TryGetValue((eventName, eventVersion), out eventType))
             {
                 throw new ArgumentException($"Could not find a domain event type named '{eventName}' (version {eventVersion})");
             }
@@ -35,10 +35,9 @@ namespace GTRevo.Infrastructure.Core.Domain.Events
             return eventType;
         }
 
-        public Tuple<string, int> GetEventNameAndVersion(Type clrEventType)
+        public (string eventName, int eventVersion) GetEventNameAndVersion(Type clrEventType)
         {
-            Tuple<string, int> eventNameAndVersion;
-            if (!eventTypesToNames.TryGetValue(clrEventType, out eventNameAndVersion))
+            if (!eventTypesToNames.TryGetValue(clrEventType, out var eventNameAndVersion))
             {
                 throw new ArgumentException($"Could not find a domain event for type name '{clrEventType.FullName}'");
             }
@@ -68,8 +67,8 @@ namespace GTRevo.Infrastructure.Core.Domain.Events
                     version = versionAttribute.Version;
                 }
 
-                eventNamesToTypes[new Tuple<string, int>(name, version)] = eventType;
-                eventTypesToNames[eventType] = new Tuple<string, int>(name, version);
+                eventNamesToTypes[(name, version)] = eventType;
+                eventTypesToNames[eventType] = (name, version);
             }
         }
 

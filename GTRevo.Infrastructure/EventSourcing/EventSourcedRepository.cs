@@ -10,6 +10,8 @@ using GTRevo.DataAccess.Entities;
 using GTRevo.Infrastructure.Core.Domain;
 using GTRevo.Infrastructure.Core.Domain.Events;
 using GTRevo.Infrastructure.Core.Domain.EventSourcing;
+using GTRevo.Infrastructure.Events;
+using GTRevo.Infrastructure.EventStore;
 using MoreLinq;
 
 namespace GTRevo.Infrastructure.EventSourcing
@@ -21,31 +23,31 @@ namespace GTRevo.Infrastructure.EventSourcing
         private readonly Dictionary<Guid, TBase> aggregates = new Dictionary<Guid, TBase>();
 
         private readonly IEventStore eventStore;
-        private readonly IActorContext actorContext;
         private readonly IEntityTypeManager entityTypeManager;
-        private readonly IEventQueue eventQueue;
+        private readonly IPublishEventBuffer publishEventBuffer;
         private readonly IRepositoryFilter[] repositoryFilters;
+        private readonly IEventMessageFactory eventMessageFactory;
 
         public EventSourcedRepository(IEventStore eventStore,
-            IActorContext actorContext,
             IEntityTypeManager entityTypeManager,
-            IEventQueue eventQueue,
-            IRepositoryFilter[] repositoryFilters)
+            IPublishEventBuffer publishEventBuffer,
+            IRepositoryFilter[] repositoryFilters,
+            IEventMessageFactory eventMessageFactory)
         {
             this.eventStore = eventStore;
-            this.actorContext = actorContext;
             this.entityTypeManager = entityTypeManager;
-            this.eventQueue = eventQueue;
+            this.publishEventBuffer = publishEventBuffer;
             this.repositoryFilters = repositoryFilters;
+            this.eventMessageFactory = eventMessageFactory;
         }
 
-        private EventSourcedRepository(IEventStore eventStore,
-            IActorContext actorContext,
+        protected EventSourcedRepository(IEventStore eventStore,
             IEntityTypeManager entityTypeManager,
-            IEventQueue eventQueue,
+            IPublishEventBuffer publishEventBuffer,
             IRepositoryFilter[] repositoryFilters,
+            IEventMessageFactory eventMessageFactory,
             Dictionary<Guid, TBase> aggregates)
-            : this(eventStore, actorContext, entityTypeManager, eventQueue, repositoryFilters)
+            : this(eventStore, entityTypeManager, publishEventBuffer, repositoryFilters, eventMessageFactory)
         {
             this.aggregates = aggregates;
         }
@@ -68,7 +70,12 @@ namespace GTRevo.Infrastructure.EventSourcing
 
             aggregates.Add(aggregate.Id, aggregate);
             var classId = entityTypeManager.GetClassIdByClrType(aggregate.GetType());
-            eventStore.AddAggregate(aggregate.Id, classId);
+            eventStore.AddStream(aggregate.Id);
+            eventStore.SetStreamMetadataAsync(aggregate.Id,
+                new Dictionary<string, string>()
+                {
+                    {AggregateEventStreamMetadataNames.ClassId, classId.ToString()}
+                });
         }
 
         public T Get<T>(Guid id) where T : class, TBase
@@ -135,60 +142,39 @@ namespace GTRevo.Infrastructure.EventSourcing
             throw new NotImplementedException();
         }
 
-        public IEventSourcedRepository<TBase> IncludeFilters(params IRepositoryFilter[] repositoryFilters)
+        public virtual IEventSourcedRepository<TBase> IncludeFilters(params IRepositoryFilter[] repositoryFilters)
         {
-            return new EventSourcedRepository<TBase>(eventStore, actorContext, entityTypeManager,
-                eventQueue,
+            return CloneWithFilters(eventStore,
+                entityTypeManager,
+                publishEventBuffer,
                 this.repositoryFilters.Union(repositoryFilters).ToArray(),
+                eventMessageFactory,
                 aggregates);
         }
 
         public IEventSourcedRepository<TBase> ExcludeFilter(params IRepositoryFilter[] repositoryFilters)
         {
-            return new EventSourcedRepository<TBase>(eventStore, actorContext, entityTypeManager,
-                eventQueue,
+            return CloneWithFilters(eventStore,
+                entityTypeManager,
+                publishEventBuffer,
                 this.repositoryFilters.Except(repositoryFilters).ToArray(),
+                eventMessageFactory,
                 aggregates);
         }
 
         public IEventSourcedRepository<TBase> ExcludeFilters<TRepositoryFilter>() where TRepositoryFilter : IRepositoryFilter
         {
-            return new EventSourcedRepository<TBase>(eventStore, actorContext, entityTypeManager,
-                eventQueue,
+            return CloneWithFilters(eventStore,
+                entityTypeManager,
+                publishEventBuffer,
                 this.repositoryFilters.Where(x => !typeof(TRepositoryFilter).IsAssignableFrom(x.GetType())).ToArray(),
+                eventMessageFactory,
                 aggregates);
         }
 
         public virtual void SaveChanges()
         {
-            List<TBase> savedAggregates = aggregates.Values.Where(x => x.UncommittedEvents.Any()).ToList();
-            if (savedAggregates.Any())
-            {
-                foreach (var aggregate in savedAggregates)
-                {
-                    CheckEvents(aggregate, aggregate.UncommittedEvents);
-
-                    if (aggregate.Version == 0)
-                    {
-                        FilterAdded(aggregate);
-                    }
-                    else
-                    {
-                        FilterModified(aggregate);
-                    }
-                }
-
-                foreach (var aggregate in savedAggregates)
-                {
-                    int newAggregateVersion = aggregate.Version + 1;
-                    var eventRecords = ConstructEventsRecords(aggregate.UncommittedEvents, newAggregateVersion);
-                    eventStore.PushEvents(aggregate.Id, eventRecords, newAggregateVersion);
-                }
-
-                eventStore.CommitChanges();
-            }
-
-            CommitAggregates();
+            throw new NotImplementedException();
         }
 
         public virtual async Task SaveChangesAsync()
@@ -210,17 +196,39 @@ namespace GTRevo.Infrastructure.EventSourcing
                     }
                 }
 
+                List<IEventMessageDraft> allEventMessages = new List<IEventMessageDraft>();
+
                 foreach (var aggregate in savedAggregates)
                 {
-                    int newAggregateVersion = aggregate.Version + 1;
-                    var eventRecords = ConstructEventsRecords(aggregate.UncommittedEvents, newAggregateVersion);
-                    await eventStore.PushEventsAsync(aggregate.Id, eventRecords, newAggregateVersion);
+                    var eventMessages = await CreateEventMessagesAsync(aggregate, aggregate.UncommittedEvents);
+                    var eventRecords = eventMessages.Select(x => new UncommitedEventStoreRecord(x.Event, x.Metadata)).ToList();
+
+                    await eventStore.PushEventsAsync(aggregate.Id, eventRecords, aggregate.Version);
+
+                    allEventMessages.AddRange(eventMessages);
                 }
 
                 await eventStore.CommitChangesAsync();
+                allEventMessages.ForEach(publishEventBuffer.PushEvent);
             }
 
             CommitAggregates();
+        }
+        
+        protected virtual EventSourcedRepository<TBase> CloneWithFilters(
+            IEventStore eventStore,
+            IEntityTypeManager entityTypeManager,
+            IPublishEventBuffer publishEventBuffer,
+            IRepositoryFilter[] repositoryFilters,
+            IEventMessageFactory eventMessageFactory,
+            Dictionary<Guid, TBase> aggregates)
+        {
+            return new EventSourcedRepository<TBase>(eventStore,
+                entityTypeManager,
+                publishEventBuffer,
+                repositoryFilters,
+                eventMessageFactory,
+                aggregates);
         }
 
         protected virtual IEntity ConstructEntity(Type entityType, Guid id)
@@ -234,30 +242,29 @@ namespace GTRevo.Infrastructure.EventSourcing
             {
                 if (aggregate.IsChanged)
                 {
-                    aggregate.UncommittedEvents.ForEach(eventQueue.PushEvent);
                     aggregate.Commit();
                 }
             }
         }
 
-        private List<DomainAggregateEventRecord> ConstructEventsRecords(IEnumerable<DomainAggregateEvent> events,
-            int aggregateVersion)
+        private async Task<List<IEventMessageDraft>> CreateEventMessagesAsync(TBase aggregate, IReadOnlyCollection<DomainAggregateEvent> events)
         {
-            var now = Clock.Current.Now;
-            var records = new List<DomainAggregateEventRecord>();
+            var messages = new List<IEventMessageDraft>();
+            Guid? aggregateClassId = entityTypeManager.TryGetClassIdByClrType(aggregate.GetType());
+
+            if (aggregateClassId == null)
+            {
+                throw new InvalidOperationException($"Cannot save event sourced aggregate of type {aggregate.GetType()}: its class ID has not been defined (but will usually be needed for running projections)");
+            }
 
             foreach (DomainAggregateEvent ev in events)
             {
-                records.Add(new DomainAggregateEventRecord()
-                {
-                    Event = ev,
-                    ActorName = actorContext.CurrentActorName,
-                    AggregateVersion = aggregateVersion,
-                    DatePublished = now
-                });
+                IEventMessageDraft message = await eventMessageFactory.CreateMessageAsync(ev);
+                message.AddMetadata(BasicEventMetadataNames.AggregateClassId, aggregateClassId.Value.ToString());
+                messages.Add(message);
             }
 
-            return records;
+            return messages;
         }
 
         private T FilterResult<T>(T result) where T : class
@@ -307,27 +314,33 @@ namespace GTRevo.Infrastructure.EventSourcing
 
         private void CheckEvents(TBase aggregate, IEnumerable<DomainAggregateEvent> uncommitedEvents)
         {
-            Guid aggregateClassId = entityTypeManager.GetClassIdByClrType(aggregate.GetType());
-
             foreach (DomainAggregateEvent _event in uncommitedEvents)
             {
                 if (_event.AggregateId != aggregate.Id)
                 {
                     throw new ArgumentException($"Domain aggregate event '{_event.GetType().FullName}' queued for saving has an invalid or empty AggregateId value: {_event.AggregateId}");
                 }
-
-                _event.AggregateClassId = aggregateClassId;
             }
         }
 
-        private async Task<TBase> LoadAggregateAsync(Guid id)
+        private async Task<TBase> LoadAggregateAsync(Guid aggregateId)
         {
-            AggregateState state = await eventStore.GetLastStateAsync(id);
+            var eventRecords = await eventStore.GetEventsAsync(aggregateId);
+            int version = (int) (eventRecords.LastOrDefault()?.StreamSequenceNumber ?? 0);
+            var events = eventRecords.Select(x => x.Event as DomainAggregateEvent
+                                                  ?? throw new InvalidOperationException(
+                                                      $"Cannot load event sourced aggregate ID {aggregateId}: event stream contains non-DomainAggregateEvent events of type {x.Event.GetType().FullName}"))
+                                                      .ToList();
 
-            Guid classId = state.Events.First().AggregateClassId;
+            AggregateState state = new AggregateState(version, events);
+
+            var eventStreamMetadata = await eventStore.GetStreamMetadataAsync(aggregateId);
+
+            Guid classId = eventStreamMetadata.GetAggregateClassId()
+                ?? throw new InvalidOperationException( $"Cannot load event sourced aggregate ID {aggregateId}: aggregate class ID not found in event stream metadata");
             Type entityType = entityTypeManager.GetClrTypeByClassId(classId);
 
-            TBase aggregate = (TBase)ConstructEntity(entityType, id);
+            TBase aggregate = (TBase) ConstructEntity(entityType, aggregateId);
             aggregate.LoadState(state);
 
             return aggregate;

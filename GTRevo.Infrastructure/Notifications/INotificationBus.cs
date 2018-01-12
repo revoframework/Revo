@@ -7,5 +7,6 @@ namespace GTRevo.Infrastructure.Notifications
     {
         Task PushNotification(INotification notification);
         Task PushNotifications(IEnumerable<INotification> notifications);
+        Task CommitAsync();
     }
 }

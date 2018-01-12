@@ -7,6 +7,7 @@ namespace GTRevo.Infrastructure.Notifications
     public interface INotificationChannel
     {
         IEnumerable<Type> NotificationTypes { get; }
-        Task SendNotificationAsync(INotification notification);
+        Task PushNotificationAsync(INotification notification);
+        Task CommitAsync();
     }
 }

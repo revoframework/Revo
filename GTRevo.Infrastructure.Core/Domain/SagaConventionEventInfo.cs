@@ -1,4 +1,5 @@
 ﻿using System;
+using GTRevo.Core.Events;
 using GTRevo.Infrastructure.Core.Domain.Events;
 
 namespace GTRevo.Infrastructure.Core.Domain
@@ -6,7 +7,7 @@ namespace GTRevo.Infrastructure.Core.Domain
     public class SagaConventionEventInfo
     {
         public SagaConventionEventInfo(Func<DomainEvent, string> eventKeyExpression,
-            string sagaKey, bool isStartingIfSagaNotFound, Action<Saga, DomainEvent> handleDelegate)
+            string sagaKey, bool isStartingIfSagaNotFound, Action<Saga, IEventMessage<DomainEvent>> handleDelegate)
         {
             HandleDelegate = handleDelegate;
             EventKeyExpression = eventKeyExpression;
@@ -15,7 +16,7 @@ namespace GTRevo.Infrastructure.Core.Domain
             IsStartingIfSagaNotFound = isStartingIfSagaNotFound;
         }
 
-        public SagaConventionEventInfo(Action<Saga, DomainEvent> handleDelegate)
+        public SagaConventionEventInfo(Action<Saga, IEventMessage<DomainEvent>> handleDelegate)
         {
             HandleDelegate = handleDelegate;
             IsAlwaysStarting = true;
@@ -26,6 +27,6 @@ namespace GTRevo.Infrastructure.Core.Domain
         public bool IsStartingIfSagaNotFound { get; }
         public string SagaKey { get; }
         public Func<DomainEvent, string> EventKeyExpression { get; }
-        public Action<Saga, DomainEvent> HandleDelegate { get; }
+        public Action<Saga, IEventMessage<DomainEvent>> HandleDelegate { get; }
     }
 }

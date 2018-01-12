@@ -8,7 +8,7 @@ namespace GTRevo.Infrastructure.Notifications.Model
     public class BufferedNotification : ReadModelBase
     {
         public BufferedNotification(Guid id, string notificationClassName,
-            string notificationJson, NotificationBuffer buffer, DateTime timeQueued)
+            string notificationJson, NotificationBuffer buffer, DateTimeOffset timeQueued)
         {
             Id = id;
             NotificationClassName = notificationClassName;
@@ -25,6 +25,6 @@ namespace GTRevo.Infrastructure.Notifications.Model
         public string NotificationClassName { get; private set; }
         public string NotificationJson { get; private set; }
         public NotificationBuffer Buffer { get; private set; }
-        public DateTime TimeQueued { get; private set; }
+        public DateTimeOffset TimeQueued { get; private set; }
     }
 }

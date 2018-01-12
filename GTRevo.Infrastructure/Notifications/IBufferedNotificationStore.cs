@@ -6,6 +6,8 @@ namespace GTRevo.Infrastructure.Notifications
     public interface IBufferedNotificationStore
     {
         Task Add(SerializedNotification serializedNotification, Guid bufferId,
-            DateTime timeQueued, Guid bufferGovernorId, Guid notificationPipelineId);
+            DateTimeOffset timeQueued, Guid bufferGovernorId, Guid notificationPipelineId);
+
+        Task CommitAsync();
     }
 }

@@ -6,6 +6,7 @@ using AutoMapper;
 using GTRevo.Core.Core;
 using GTRevo.Core.Events;
 using GTRevo.DataAccess.Entities;
+using GTRevo.Infrastructure.Events;
 using GTRevo.Infrastructure.History.ChangeTracking.Model;
 using GTRevo.Platform.Core;
 
@@ -16,18 +17,18 @@ namespace GTRevo.Infrastructure.History.ChangeTracking
         private readonly ICrudRepository crudRepository;
         private readonly IActorContext actorContext;
         private readonly ITrackedChangeRecordConverter trackedChangeRecordConverter;
-        private readonly IEventQueue eventQueue;
+        private readonly IEventBus eventBus;
         private readonly List<TrackedChangeRecord> unsavedChangeRecords = new List<TrackedChangeRecord>();
 
         public ChangeTracker(ICrudRepository crudRepository,
             IActorContext actorContext,
             ITrackedChangeRecordConverter trackedChangeRecordConverter,
-            IEventQueue eventQueue)
+            IEventBus eventBus)
         {
             this.crudRepository = crudRepository;
             this.actorContext = actorContext;
             this.trackedChangeRecordConverter = trackedChangeRecordConverter;
-            this.eventQueue = eventQueue;
+            this.eventBus = eventBus;
         }
 
         public TrackedChange AddChange<T>(T changeData, Guid? aggregateId = null, Guid? aggregateClassId = null,
@@ -71,21 +72,18 @@ namespace GTRevo.Infrastructure.History.ChangeTracking
             crudRepository.AddRange(recs);
             await crudRepository.SaveChangesAsync();
 
-            using (var tx = eventQueue.CreateTransaction())
+            foreach (TrackedChangeRecord changeRecord in recs)
             {
-                foreach (TrackedChangeRecord changeRecord in recs)
-                {
-                    eventQueue.PushEvent(new TrackedChangeAdded()
+                await eventBus.PublishAsync(new EventMessage<TrackedChangeAdded>(
+                    new TrackedChangeAdded()
                     {
                         TrackedChangeId = changeRecord.Id,
                         AggregateClassId = changeRecord.AggregateClassId,
                         AggregateId = changeRecord.AggregateId,
                         EntityClassId = changeRecord.EntityClassId,
                         EntityId = changeRecord.EntityId
-                    });
-                }
-                
-                await tx.CommitAsync();
+                    },
+                    new Dictionary<string, string>()));
             }
         }
     }

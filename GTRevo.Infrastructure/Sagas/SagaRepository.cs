@@ -8,7 +8,9 @@ using GTRevo.Core.Core;
 using GTRevo.Core.Events;
 using GTRevo.DataAccess.Entities;
 using GTRevo.Infrastructure.Core.Domain;
+using GTRevo.Infrastructure.Events;
 using GTRevo.Infrastructure.EventSourcing;
+using GTRevo.Infrastructure.EventStore;
 using GTRevo.Platform.Core;
 
 namespace GTRevo.Infrastructure.Sagas
@@ -18,10 +20,28 @@ namespace GTRevo.Infrastructure.Sagas
         private readonly ICommandBus commandBus;
         private readonly List<ICommand> bufferedCommands = new List<ICommand>();
 
-        public SagaRepository(ICommandBus commandBus, IEventStore eventStore,
-            IActorContext actorContext, IEntityTypeManager entityTypeManager,
-            IEventQueue eventQueue, IRepositoryFilter[] repositoryFilters, ISagaMetadataRepository sagaMetadataRepository)
-            : base(eventStore, actorContext, entityTypeManager, eventQueue, repositoryFilters)
+        public SagaRepository(ICommandBus commandBus,
+            IEventStore eventStore,
+            IEntityTypeManager entityTypeManager,
+            IPublishEventBuffer publishEventBuffer,
+            IRepositoryFilter[] repositoryFilters,
+            IEventMessageFactory eventMessageFactory,
+            ISagaMetadataRepository sagaMetadataRepository)
+            : base(eventStore, entityTypeManager, publishEventBuffer, repositoryFilters, eventMessageFactory)
+        {
+            MetadataRepository = sagaMetadataRepository;
+            this.commandBus = commandBus;
+        }
+
+        public SagaRepository(ICommandBus commandBus,
+            IEventStore eventStore,
+            IEntityTypeManager entityTypeManager,
+            IPublishEventBuffer publishEventBuffer,
+            IRepositoryFilter[] repositoryFilters,
+            IEventMessageFactory eventMessageFactory,
+            ISagaMetadataRepository sagaMetadataRepository,
+            Dictionary<Guid, ISaga> aggregates)
+            : base(eventStore, entityTypeManager, publishEventBuffer, repositoryFilters, eventMessageFactory, aggregates)
         {
             MetadataRepository = sagaMetadataRepository;
             this.commandBus = commandBus;
@@ -64,11 +84,29 @@ namespace GTRevo.Infrastructure.Sagas
             {
                 foreach (ICommand command in bufferedCommands)
                 {
-                    await commandBus.Send(command);
+                    await commandBus.SendAsync(command);
                 }
 
                 bufferedCommands.Clear();
             }
+        }
+
+        protected override EventSourcedRepository<ISaga> CloneWithFilters(
+            IEventStore eventStore,
+            IEntityTypeManager entityTypeManager,
+            IPublishEventBuffer publishEventBuffer,
+            IRepositoryFilter[] repositoryFilters,
+            IEventMessageFactory eventMessageFactory,
+            Dictionary<Guid, ISaga> aggregates)
+        {
+            return new SagaRepository(commandBus,
+                eventStore,
+                entityTypeManager,
+                publishEventBuffer,
+                repositoryFilters,
+                eventMessageFactory,
+                MetadataRepository,
+                aggregates);
         }
 
         protected override void CommitAggregates()

@@ -10,7 +10,7 @@ namespace GTRevo.Infrastructure.Security
         public ServiceToken(Guid id, string serviceName ): base(id)
         {
             ServiceName = serviceName;
-            Timestamp = DateTime.Now;
+            Timestamp = DateTimeOffset.Now;
         }
 
 		public ServiceToken()
@@ -18,6 +18,6 @@ namespace GTRevo.Infrastructure.Security
 		}
 
 		public string ServiceName { get; set; }
-        public DateTime Timestamp { get; set; }
+        public DateTimeOffset Timestamp { get; set; }
     }
 }

@@ -32,7 +32,7 @@ namespace GTRevo.Infrastructure.Tests.Notifications
         public async Task SendNotificationAsync_SendsToAllBufferedChannels()
         {
             Notification1 n1 = new Notification1();
-            await sut.SendNotificationAsync(n1);
+            await sut.PushNotificationAsync(n1);
 
             bufferedChannel1.Received(1).SendNotificationsAsync(
                 Arg.Is<IEnumerable<INotification>>(x => x.Count() == 1 && x.First() == n1));

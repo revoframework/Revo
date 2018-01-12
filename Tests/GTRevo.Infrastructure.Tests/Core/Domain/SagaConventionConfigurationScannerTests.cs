@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GTRevo.Core.Events;
 using GTRevo.Infrastructure.Core.Domain;
 using GTRevo.Infrastructure.Core.Domain.Attributes;
 using GTRevo.Infrastructure.Core.Domain.Events;
@@ -23,7 +24,7 @@ namespace GTRevo.Infrastructure.Tests.Core.Domain
                 out SagaConventionEventInfo eventInfo));
 
             Saga1 saga = new Saga1(Guid.NewGuid());
-            Event1 event1 = new Event1();
+            var event1 = new EventMessage<Event1>(new Event1(), new Dictionary<string, string>());
             eventInfo.HandleDelegate(saga, event1);
 
             Assert.Equal(1, saga.HandledEvents.Count);
@@ -40,7 +41,7 @@ namespace GTRevo.Infrastructure.Tests.Core.Domain
                 out SagaConventionEventInfo eventInfo));
 
             Saga1 saga = new Saga1(Guid.NewGuid());
-            Event1 event1 = new Event1();
+            var event1 = new EventMessage<Event1>(new Event1(), new Dictionary<string, string>());
             eventInfo.HandleDelegate(saga, event1);
 
             Assert.Equal(1, saga.HandledEvents.Count);
@@ -57,13 +58,13 @@ namespace GTRevo.Infrastructure.Tests.Core.Domain
                 out SagaConventionEventInfo eventInfo));
 
             Saga3 saga = new Saga3(Guid.NewGuid());
-            Event1 event1 = new Event1() {Foo = 5};
+            var event1 = new EventMessage<Event1>(new Event1() { Foo = 5 }, new Dictionary<string, string>());
             eventInfo.HandleDelegate(saga, event1);
 
             Assert.Equal(1, saga.HandledEvents.Count);
             Assert.Equal(event1, saga.HandledEvents[0]);
 
-            Assert.Equal("5", eventInfo.EventKeyExpression(event1));
+            Assert.Equal("5", eventInfo.EventKeyExpression(event1.Event));
             Assert.Equal("foo", eventInfo.SagaKey);
             Assert.True(eventInfo.IsStartingIfSagaNotFound);
         }
@@ -74,10 +75,10 @@ namespace GTRevo.Infrastructure.Tests.Core.Domain
             {
             }
 
-            public List<DomainEvent> HandledEvents { get; } = new List<DomainEvent>();
+            public List<IEventMessage<DomainEvent>> HandledEvents { get; } = new List<IEventMessage<DomainEvent>>();
 
             [SagaEvent(IsAlwaysStarting = true)]
-            private void Handle(Event1 ev)
+            private void Handle(IEventMessage<Event1> ev)
             {
                 HandledEvents.Add(ev);
             }
@@ -90,7 +91,7 @@ namespace GTRevo.Infrastructure.Tests.Core.Domain
             }
 
             [SagaEvent(IsAlwaysStarting = true)]
-            private void Handle(Event2 ev)
+            private void Handle(IEventMessage<Event2> ev)
             {
                 HandledEvents.Add(ev);
             }
@@ -102,11 +103,11 @@ namespace GTRevo.Infrastructure.Tests.Core.Domain
             {
             }
 
-            public List<DomainEvent> HandledEvents { get; } = new List<DomainEvent>();
+            public List<IEventMessage<DomainEvent>> HandledEvents { get; } = new List<IEventMessage<DomainEvent>>();
             
 
             [SagaEvent(EventKey = "Foo", SagaKey = "foo", IsStartingIfSagaNotFound = true)]
-            private void Handle(Event1 ev)
+            private void Handle(IEventMessage<Event1> ev)
             {
                 HandledEvents.Add(ev);
             }

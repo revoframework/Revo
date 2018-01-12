@@ -1,9 +1,8 @@
 ﻿using System.Web.Http.Description;
 using GTRevo.Core.Core;
+using GTRevo.Core.Events;
 using GTRevo.Infrastructure.Globalization;
-using GTRevo.Infrastructure.Globalization.Messages.Database;
 using GTRevo.Infrastructure.Tenancy;
-using MediatR;
 using Ninject.Modules;
 
 namespace GTRevo.Infrastructure.Web.JSBridge
@@ -16,7 +15,7 @@ namespace GTRevo.Infrastructure.Web.JSBridge
                 .To<JsonMessageExportCache>()
                 .InTenantSingletonScope();
             
-            Bind<IAsyncNotificationHandler<MessageRepositoryReloadedEvent>>()
+            Bind<IEventListener<MessageRepositoryReloadedEvent>>()
                 .To<DbMessageCacheReloader>()
                 .InRequestOrJobScope();
 

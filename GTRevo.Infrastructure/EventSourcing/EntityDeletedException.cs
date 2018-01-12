@@ -8,6 +8,9 @@ using GTRevo.DataAccess.Entities;
 
 namespace GTRevo.Infrastructure.EventSourcing
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class EntityDeletedException : EntityNotFoundException
     {
         public EntityDeletedException()

@@ -12,6 +12,11 @@ namespace GTRevo.Infrastructure.EF6.ReadModel
                 .Configure(x => x
                     .Property(y => y.Version)
                     .IsConcurrencyToken());
+
+            modelBuilder.Types<IManuallyRowVersioned>()
+                .Configure(x => x
+                    .Property(y => y.Version)
+                    .IsConcurrencyToken());
         }
     }
 }

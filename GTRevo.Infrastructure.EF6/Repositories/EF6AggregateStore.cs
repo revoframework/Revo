@@ -12,6 +12,7 @@ using GTRevo.Infrastructure.Core.Domain.Events;
 using GTRevo.Infrastructure.Repositories;
 using EntityState = System.Data.Entity.EntityState;
 using GTRevo.Core.Events;
+using GTRevo.Infrastructure.Events;
 
 namespace GTRevo.Infrastructure.EF6.Repositories
 {
@@ -20,17 +21,20 @@ namespace GTRevo.Infrastructure.EF6.Repositories
         private readonly ICrudRepository crudRepository;
         private readonly IModelMetadataExplorer modelMetadataExplorer;
         private readonly IEntityTypeManager entityTypeManager;
-        private readonly IEventQueue eventQueue;
+        private readonly IPublishEventBuffer publishEventBuffer;
+        private readonly IEventMessageFactory eventMessageFactory;
 
         public EF6AggregateStore(ICrudRepository crudRepository,
             IModelMetadataExplorer modelMetadataExplorer,
             IEntityTypeManager entityTypeManager,
-            IEventQueue eventQueue)
+            IPublishEventBuffer eventQueue,
+            IEventMessageFactory eventMessageFactory)
         {
             this.crudRepository = crudRepository;
             this.modelMetadataExplorer = modelMetadataExplorer;
             this.entityTypeManager = entityTypeManager;
-            this.eventQueue = eventQueue;
+            this.publishEventBuffer = eventQueue;
+            this.eventMessageFactory = eventMessageFactory;
         }
 
         public void Add<T>(T aggregate) where T : class, IAggregateRoot
@@ -109,7 +113,7 @@ namespace GTRevo.Infrastructure.EF6.Repositories
         {
             InjectClassIds();
             await crudRepository.SaveChangesAsync();
-            CommitAggregates();
+            await CommitAggregatesAsync();
         }
 
         private void InjectClassIds()
@@ -125,21 +129,49 @@ namespace GTRevo.Infrastructure.EF6.Repositories
                 }
             }
         }
-
         private void CommitAggregates()
         {
             foreach (var aggregate in GetTrackedAggregates())
             {
                 if (aggregate.IsChanged)
                 {
-                    foreach (DomainAggregateEvent domainEvent in aggregate.UncommittedEvents)
-                    {
-                        eventQueue.PushEvent(domainEvent);
-                    }
-
+                    var eventMessages = Task.Run(async () => await CreateEventMessagesAsync(aggregate, aggregate.UncommittedEvents)).Result; // TODO
+                    eventMessages.ForEach(publishEventBuffer.PushEvent);
                     aggregate.Commit();
                 }
             }
+        }
+
+        private async Task CommitAggregatesAsync()
+        {
+            foreach (var aggregate in GetTrackedAggregates())
+            {
+                if (aggregate.IsChanged)
+                {
+                    var eventMessages = await CreateEventMessagesAsync(aggregate, aggregate.UncommittedEvents);
+                    eventMessages.ForEach(publishEventBuffer.PushEvent);
+                    aggregate.Commit();
+                }
+            }
+        }
+
+        private async Task<List<IEventMessageDraft>> CreateEventMessagesAsync(IAggregateRoot aggregate, IReadOnlyCollection<DomainAggregateEvent> events)
+        {
+            var messages = new List<IEventMessageDraft>();
+            Guid? aggregateClassId = entityTypeManager.TryGetClassIdByClrType(aggregate.GetType());
+
+            foreach (DomainAggregateEvent ev in events)
+            {
+                IEventMessageDraft message = await eventMessageFactory.CreateMessageAsync(ev);
+                if (aggregateClassId != null)
+                {
+                    message.AddMetadata(BasicEventMetadataNames.AggregateClassId, aggregateClassId.Value.ToString());
+                }
+
+                messages.Add(message);
+            }
+
+            return messages;
         }
     }
 }

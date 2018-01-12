@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using GTRevo.Core.Core;
-using MediatR;
 using Ninject.Syntax;
 
 namespace GTRevo.Core.Commands
@@ -57,9 +56,7 @@ namespace GTRevo.Core.Commands
 
             intfs = intfs
                 .Where(x => x.IsGenericType
-                            && new Type[] { typeof(IAsyncCommandHandler<>), typeof(IAsyncCommandHandler<,>), typeof(IAsyncQueryHandler<,>),
-                                    typeof(IAsyncRequestHandler<>), typeof(IAsyncRequestHandler<,>),
-                                    typeof(IRequestHandler<>), typeof(IRequestHandler<,>) }
+                            && new Type[] { typeof(ICommandHandler<>), typeof(ICommandHandler<,>), typeof(IQueryHandler<,>) }
                                 .Contains(x.GetGenericTypeDefinition())); //TODO: inherited?!
 
             return intfs.Distinct().ToArray();

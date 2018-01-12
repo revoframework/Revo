@@ -7,6 +7,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using GTRevo.Core.Events;
 using GTRevo.Infrastructure.Core.Domain.Attributes;
 using GTRevo.Infrastructure.Core.Domain.Events;
 
@@ -19,7 +20,7 @@ namespace GTRevo.Infrastructure.Core.Domain
             Dictionary<Type, SagaConventionEventInfo> events = new Dictionary<Type, SagaConventionEventInfo>();
             AddEvents(sagaType, events);
 
-            return new SagaConfigurationInfo(new ReadOnlyDictionary<Type, SagaConventionEventInfo>(events));
+            return new SagaConfigurationInfo(events);
         }
 
         private static void AddEvents(Type sagaType, Dictionary<Type, SagaConventionEventInfo> events)
@@ -34,14 +35,15 @@ namespace GTRevo.Infrastructure.Core.Domain
                 .GetMethods(BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.NonPublic)
                 .Where(x => x.Name == "Handle"
                             && x.GetParameters().Length == 1
-                            && typeof(DomainEvent).IsAssignableFrom(x.GetParameters()[0].ParameterType));
+                            && typeof(IEventMessage<DomainEvent>).IsAssignableFrom(x.GetParameters()[0].ParameterType));
 
             foreach (MethodInfo handleMethod in handleMethods)
             {
-                Type eventType = handleMethod.GetParameters()[0].ParameterType;
+                Type messageType = handleMethod.GetParameters()[0].ParameterType;
+                Type eventType = handleMethod.GetParameters()[0].ParameterType.GetGenericArguments()[0];
 
                 // Create an Action<AggregateRoot, IEvent> that does (agg, evt) => ((ConcreteAggregate)agg).Handle((ConcreteEvent)evt)
-                var evtParam = Expression.Parameter(typeof(DomainEvent), "evt");
+                var evtParam = Expression.Parameter(typeof(IEventMessage<DomainEvent>), "evt");
                 var aggParam = Expression.Parameter(typeof(Saga), "agg");
 
                 var eventDelegate = Expression.Lambda(
@@ -52,11 +54,11 @@ namespace GTRevo.Infrastructure.Core.Domain
                         handleMethod,
                         Expression.Convert(
                             evtParam,
-                            eventType)),
+                            messageType)),
                     aggParam,
                     evtParam).Compile();
 
-                var handleDelegate = (Action<Saga, DomainEvent>) eventDelegate;
+                var handleDelegate = (Action<Saga, IEventMessage<DomainEvent>>) eventDelegate;
 
                 var sagaEventAttribute = handleMethod.GetCustomAttribute<SagaEventAttribute>(true);
                 if (sagaEventAttribute == null)
@@ -74,7 +76,7 @@ namespace GTRevo.Infrastructure.Core.Domain
                     PropertyInfo eventKeyProperty = eventType.GetProperty(sagaEventAttribute.EventKey);
                     if (eventKeyProperty == null)
                     {
-                        throw new SagaConfigurationException($"Invalid {sagaType.FullName} saga configuration: can't find event key property 'sagaEventAttribute.EventKey' in event {eventType.FullName}");
+                        throw new SagaConfigurationException($"Invalid {sagaType.FullName} saga configuration: can't find event key property '{sagaEventAttribute.EventKey}' in event {eventType.FullName}");
                     }
 
                     var eventParameter = Expression.Parameter(typeof(DomainEvent), "ev");

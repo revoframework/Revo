@@ -6,7 +6,7 @@ namespace GTRevo.Infrastructure.History.ChangeTracking
     {
         public TrackedChange(Guid id, ChangeData changeData, string actorName, Guid? userId,
             Guid? aggregateId, Guid? aggregateClassId, Guid? entityId, Guid? entityClassId,
-            DateTime changeTime)
+            DateTimeOffset changeTime)
         {
             Id = id;
             ActorName = actorName;
@@ -27,7 +27,7 @@ namespace GTRevo.Infrastructure.History.ChangeTracking
         public ChangeData ChangeData { get; private set; }
         public Guid? EntityId { get; private set; }
         public Guid? EntityClassId { get; private set; }
-        public DateTime ChangeTime { get; private set; }
+        public DateTimeOffset ChangeTime { get; private set; }
 
         public T ChangeDataAs<T>() where T : ChangeData
         {

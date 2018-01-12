@@ -73,7 +73,7 @@ namespace GTRevo.Infrastructure.Tests.Globalization.Messages.Database
         public void ReplaceMessages_PublishesEvent()
         {
             sut.ReplaceMessages(new LocalizationMessage[] {});
-            eventBus.Received(1).Publish(Arg.Any<DbMessageCacheReloadedEvent>());
+            eventBus.Received(1).PublishAsync(Arg.Any<IEventMessage<DbMessageCacheReloadedEvent>>());
         }
     }
 }

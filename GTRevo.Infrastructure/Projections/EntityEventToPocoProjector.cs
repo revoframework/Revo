@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using GTRevo.Core.Events;
+using GTRevo.DataAccess.Entities;
 using GTRevo.Infrastructure.Core.Domain.Events;
 using GTRevo.Infrastructure.Core.Domain.EventSourcing;
 
@@ -12,7 +14,7 @@ namespace GTRevo.Infrastructure.Projections
         IEntityEventProjector<TSource>
         where TSource : class, IEventSourcedAggregateRoot
     {
-        private readonly MultiValueDictionary<Type, Func<DomainAggregateEvent, Task>> applyHandlers = new MultiValueDictionary<Type, Func<DomainAggregateEvent, Task>>();
+        private readonly MultiValueDictionary<Type, Func<IEventMessage<DomainAggregateEvent>, Task>> applyHandlers = new MultiValueDictionary<Type, Func<IEventMessage<DomainAggregateEvent>, Task>>();
 
         public EntityEventToPocoProjector()
         {
@@ -25,10 +27,10 @@ namespace GTRevo.Infrastructure.Projections
         protected TTarget Target { get; private set; }
 
         public abstract Task CommitChangesAsync();
-        protected abstract Task<TTarget> CreateProjectionTargetAsync(TSource aggregate, IEnumerable<DomainAggregateEvent> events);
+        protected abstract Task<TTarget> CreateProjectionTargetAsync(TSource aggregate, IEnumerable<IEventMessage<DomainAggregateEvent>> events);
         protected abstract Task<TTarget> GetProjectionTargetAsync(TSource aggregate);
 
-        public Task ProjectEventsAsync(IEventSourcedAggregateRoot aggregate, IEnumerable<DomainAggregateEvent> events)
+        public Task ProjectEventsAsync(IEventSourcedAggregateRoot aggregate, IReadOnlyCollection<IEventMessage<DomainAggregateEvent>> events)
         {
             TSource source = aggregate as TSource;
             if (source == null)
@@ -39,7 +41,7 @@ namespace GTRevo.Infrastructure.Projections
             return ProjectEventsAsync(source, events);
         }
 
-        public async Task ProjectEventsAsync(TSource aggregate, IEnumerable<DomainAggregateEvent> events)
+        public async Task ProjectEventsAsync(TSource aggregate, IReadOnlyCollection<IEventMessage<DomainAggregateEvent>> events)
         {
             if (aggregate.Version < 1)
             {
@@ -47,8 +49,16 @@ namespace GTRevo.Infrastructure.Projections
                     "Unexpected version of aggregate to project: should only project after savig its state, i.e. Version >= 1");
             }
 
+            if (events.Count == 0)
+            {
+                throw new InvalidOperationException($"No events to project for aggregate with ID {aggregate.Id}");
+            }
+
             TTarget target;
-            if (aggregate.Version == 1)
+            long firstEventNumber = events.First().Metadata.GetStreamSequenceNumber()
+                                    ?? throw new InvalidOperationException(
+                                        $"Cannot project events for aggregate with ID {aggregate.Id}, unknown StreamSequenceNumber for first events");
+            if (firstEventNumber == 1)
             {
                 target = await CreateProjectionTargetAsync(aggregate, events);
             }
@@ -62,7 +72,27 @@ namespace GTRevo.Infrastructure.Projections
 
             try
             {
-                await ApplyEvents(events);
+                IEnumerable<IEventMessage<DomainAggregateEvent>> appliedEvents = events;
+
+                var targetRowVersioned = target as IManuallyRowVersioned;
+                if (targetRowVersioned != null) //refactor to derived type?
+                {
+                    appliedEvents = appliedEvents.SkipWhile(x =>
+                        targetRowVersioned.Version >= (x.Metadata.GetStreamSequenceNumber() ?? 0));
+                }
+
+                appliedEvents = appliedEvents.ToList();
+                if (appliedEvents.Any())
+                {
+                    await ApplyEvents(appliedEvents);
+
+                    if (targetRowVersioned != null)
+                    {
+                        long newVersion = appliedEvents.Last().Metadata.GetStreamSequenceNumber()
+                                          ?? targetRowVersioned.Version + appliedEvents.Count();
+                        targetRowVersioned.Version = (int)newVersion;
+                    }
+                }
             }
             finally
             {
@@ -76,10 +106,10 @@ namespace GTRevo.Infrastructure.Projections
             CreateApplyDelegates(projector.GetType(), projector);
         }
 
-        protected async Task ExecuteHandler<T>(T evt) where T : DomainAggregateEvent
+        protected async Task ExecuteHandler<T>(T evt) where T : IEventMessage<DomainAggregateEvent>
         {
-            IReadOnlyCollection<Func<DomainAggregateEvent, Task>> handlers;
-            if (applyHandlers.TryGetValue(evt.GetType(), out handlers))
+            IReadOnlyCollection<Func<IEventMessage<DomainAggregateEvent>, Task>> handlers;
+            if (applyHandlers.TryGetValue(evt.Event.GetType(), out handlers))
             {
                 foreach (var handler in handlers)
                 {
@@ -88,9 +118,9 @@ namespace GTRevo.Infrastructure.Projections
             }
         }
 
-        private async Task ApplyEvents(IEnumerable<DomainAggregateEvent> events)
+        private async Task ApplyEvents(IEnumerable<IEventMessage<DomainAggregateEvent>> events)
         {
-            foreach (DomainAggregateEvent ev in events)
+            foreach (IEventMessage<DomainAggregateEvent> ev in events)
             {
                 await ExecuteHandler(ev);
             }
@@ -114,8 +144,8 @@ namespace GTRevo.Infrastructure.Projections
                 .Where(x => x.Name == "Apply"
                             && x.GetBaseDefinition() == x //exclude overrides
                             && x.GetParameters().Length == 1
-                            && typeof(DomainAggregateEvent).IsAssignableFrom(x.GetParameters()[0].ParameterType))
-                .Select(x => new Tuple<Type, Func<DomainAggregateEvent, Task>>(x.GetParameters()[0].ParameterType,
+                            && typeof(IEventMessage<DomainAggregateEvent>).IsAssignableFrom(x.GetParameters()[0].ParameterType))
+                .Select(x => new Tuple<Type, Func<IEventMessage<DomainAggregateEvent>, Task>>(x.GetParameters()[0].ParameterType.GetGenericArguments()[0],
                     ev =>
                     {
                         Task ret = x.Invoke(instance, new object[] {ev}) as Task;
@@ -134,10 +164,10 @@ namespace GTRevo.Infrastructure.Projections
                     .Where(x => x.Name == "Apply"
                                 && x.GetBaseDefinition() == x //exclude overrides
                                 && x.GetParameters().Length == 3
-                                && typeof(DomainAggregateEvent).IsAssignableFrom(x.GetParameters()[0].ParameterType)
+                                && typeof(IEventMessage<DomainAggregateEvent>).IsAssignableFrom(x.GetParameters()[0].ParameterType)
                                 && x.GetParameters()[1].ParameterType.IsAssignableFrom(typeof(TSource))
                                 && x.GetParameters()[2].ParameterType.IsAssignableFrom(typeof(TTarget)))
-                    .Select(x => new Tuple<Type, Func<DomainAggregateEvent, Task>>(x.GetParameters()[0].ParameterType,
+                    .Select(x => new Tuple<Type, Func<IEventMessage<DomainAggregateEvent>, Task>>(x.GetParameters()[0].ParameterType.GetGenericArguments()[0],
                         ev =>
                         {
                             Task ret = x.Invoke(instance, new object[] {ev, this.Aggregate, this.Target}) as Task;

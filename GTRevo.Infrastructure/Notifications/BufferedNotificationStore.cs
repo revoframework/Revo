@@ -7,7 +7,7 @@ using GTRevo.Infrastructure.Notifications.Model;
 
 namespace GTRevo.Infrastructure.Notifications
 {
-    public class BufferedNotificationStore : IBufferedNotificationStore, IEventQueueTransactionListener
+    public class BufferedNotificationStore : IBufferedNotificationStore
     {
         private readonly ICrudRepository crudRepository;
 
@@ -15,18 +15,14 @@ namespace GTRevo.Infrastructure.Notifications
         {
             this.crudRepository = crudRepository;
         }
-
-        public void OnTransactionBegin(ITransaction transaction)
+        
+        public Task CommitAsync()
         {
-        }
-
-        public Task OnTransactionSucceededAsync(ITransaction transaction)
-        {
-                return crudRepository.SaveChangesAsync();
+            return crudRepository.SaveChangesAsync();
         }
 
         public async Task Add(SerializedNotification serializedNotification, Guid bufferId,
-            DateTime timeQueued, Guid bufferGovernorId, Guid notificationPipelineId)
+            DateTimeOffset timeQueued, Guid bufferGovernorId, Guid notificationPipelineId)
         {
             NotificationBuffer buffer = await crudRepository.FindAsync<NotificationBuffer>(bufferId);
             if (buffer == null)

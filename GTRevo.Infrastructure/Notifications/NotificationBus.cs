@@ -19,7 +19,7 @@ namespace GTRevo.Infrastructure.Notifications
                 .Where(x => x.NotificationTypes.Any(y => y.IsInstanceOfType(notification)));
             foreach (INotificationChannel channel in channels)
             {
-                await channel.SendNotificationAsync(notification);
+                await channel.PushNotificationAsync(notification);
             }
         }
 
@@ -35,9 +35,17 @@ namespace GTRevo.Infrastructure.Notifications
                 {
                     foreach (INotification notification in byType)
                     {
-                        await channel.SendNotificationAsync(notification);
+                        await channel.PushNotificationAsync(notification);
                     }
                 }
+            }
+        }
+
+        public async Task CommitAsync()
+        {
+            foreach (var notificationChannel in notificationChannels)
+            {
+                await notificationChannel.CommitAsync();
             }
         }
     }

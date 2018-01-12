@@ -13,9 +13,9 @@ namespace GTRevo.Infrastructure.Repositories
     public class Repository : IRepository
     {
         private readonly IAggregateStore[] aggregateStores;
-        private readonly IEventQueue eventQueue; 
+        private readonly IPublishEventBuffer eventQueue; 
 
-        public Repository(IAggregateStore[] aggregateStores, IEventQueue eventQueue)
+        public Repository(IAggregateStore[] aggregateStores, IPublishEventBuffer eventQueue)
         {
             this.aggregateStores = aggregateStores;
             this.eventQueue = eventQueue;
@@ -59,7 +59,7 @@ namespace GTRevo.Infrastructure.Repositories
 
         public ITransaction CreateTransaction()
         {
-            return new RepositoryTransaction(this, eventQueue.CreateTransaction());
+            return new RepositoryTransaction(this);
         }
 
         public void Dispose()
@@ -174,24 +174,20 @@ namespace GTRevo.Infrastructure.Repositories
         protected class RepositoryTransaction : ITransaction
         {
             private readonly Repository repository;
-            private readonly ITransaction eventQueueTransaction;
 
-            public RepositoryTransaction(Repository repository, ITransaction eventQueueTransaction)
+            public RepositoryTransaction(Repository repository)
             {
                 this.repository = repository;
-                this.eventQueueTransaction = eventQueueTransaction;
             }
 
             public void Commit()
             {
                 repository.SaveChanges();
-                eventQueueTransaction.Commit();
             }
 
             public async Task CommitAsync()
             {
                 await repository.SaveChangesAsync();
-                await eventQueueTransaction.CommitAsync(); // TODO should always commit the events (event when repository save fails)?
             }
 
             public void Dispose()

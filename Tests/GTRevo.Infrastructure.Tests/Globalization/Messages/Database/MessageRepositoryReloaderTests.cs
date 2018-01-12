@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using GTRevo.Infrastructure.Events;
 using GTRevo.Infrastructure.Globalization.Messages.Database;
 using Xunit;
 using GTRevo.Infrastructure.Globalization;
+using GTRevo.Testing.Infrastructure;
 using NSubstitute;
 
 namespace GTRevo.Infrastructure.Tests.Globalization.Messages.Database
@@ -22,10 +25,11 @@ namespace GTRevo.Infrastructure.Tests.Globalization.Messages.Database
         }
 
         [Fact]
-        public void Handle_DbMessageCacheReloadedEvent_ReloadsRepository()
+        public async Task Handle_DbMessageCacheReloadedEvent_ReloadsRepository()
         {
-            sut.Handle(new DbMessageCacheReloadedEvent());
-            messageRepository.Received(1).Reload();
+            await sut.HandleAsync(new DbMessageCacheReloadedEvent().ToMessageDraft(),
+                CancellationToken.None);
+            messageRepository.Received(1).ReloadAsync();
         }
     }
 }

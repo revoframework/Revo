@@ -110,7 +110,7 @@ namespace GTRevo.Infrastructure.Tests.Globalization
         }
 
         [Fact]
-        public void Reload_ReloadsMessages()
+        public async Task Reload_ReloadsMessages()
         {
             localeMessageSourceFactories[0].MessageSource.Messages.Returns(
                 ImmutableDictionary.CreateRange<string, string>(new[]
@@ -125,19 +125,19 @@ namespace GTRevo.Infrastructure.Tests.Globalization
                 {
                     new KeyValuePair<string, string>("coffee", "kava"),
                 }));
-            sut.Reload();
+            await sut.ReloadAsync();
 
             Assert.True(sut.GetMessagesForLocale(new Locale("cs-CZ")).TryGetMessage("coffee", out string message));
             Assert.Equal("kava", message);
         }
 
         [Fact]
-        public void Reload_PublishesEvent()
+        public async Task Reload_PublishesEvent()
         {
             sut = new MessageRepository(new ILocaleMessageSourceFactory[] {}, eventBus);
-            eventBus.Received(0).Publish(Arg.Any<MessageRepositoryReloadedEvent>());
-            sut.Reload();
-            eventBus.Received(1).Publish(Arg.Any<MessageRepositoryReloadedEvent>());
+            eventBus.Received(0).PublishAsync(Arg.Any<IEventMessage<MessageRepositoryReloadedEvent>>());
+            await sut.ReloadAsync();
+            eventBus.Received(1).PublishAsync(Arg.Any<IEventMessage<MessageRepositoryReloadedEvent>>());
         }
     }
 }

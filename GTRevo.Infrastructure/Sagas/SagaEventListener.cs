@@ -2,34 +2,36 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using GTRevo.Core.Events;
 using GTRevo.Core.Transactions;
 using GTRevo.Infrastructure.Core.Domain.Events;
+using GTRevo.Infrastructure.Events.Async;
 
 namespace GTRevo.Infrastructure.Sagas
 {
-    public class SagaEventListener : IEventListener<DomainEvent>,
-        IEventQueueTransactionListener
+    public class SagaEventListener :
+        IAsyncEventListener<DomainEvent>
     {
         private readonly ISagaLocator sagaLocator;
-        private readonly List<DomainEvent> bufferedEvents = new List<DomainEvent>();
+        private readonly List<IEventMessage<DomainEvent>> bufferedEvents = new List<IEventMessage<DomainEvent>>();
 
-        public SagaEventListener(ISagaLocator sagaLocator)
+        public SagaEventListener(ISagaLocator sagaLocator, SagaEventSequencer sagaEventSequencer)
         {
             this.sagaLocator = sagaLocator;
+            EventSequencer = sagaEventSequencer;
         }
 
-        public async Task Handle(DomainEvent notification)
+        public Task HandleAsync(IEventMessage<DomainEvent> message, string sequenceName)
         {
-            bufferedEvents.Add(notification);
+            bufferedEvents.Add(message);
+            return Task.FromResult(0);
         }
 
-        public void OnTransactionBegin(ITransaction transaction)
-        {
-        }
+        public IAsyncEventSequencer EventSequencer { get; }
 
-        public Task OnTransactionSucceededAsync(ITransaction transaction)
+        public Task OnFinishedEventQueueAsync(string sequenceName)
         {
             return DispatchSagaEvents();
         }
@@ -38,6 +40,25 @@ namespace GTRevo.Infrastructure.Sagas
         {
             await sagaLocator.LocateAndDispatchAsync(bufferedEvents);
             bufferedEvents.Clear();
+        }
+
+        public class SagaEventSequencer : AsyncEventSequencer<DomainEvent>
+        {
+            protected override IEnumerable<EventSequencing> GetEventSequencing(IEventMessage<DomainEvent> message)
+            {
+                yield return new EventSequencing()
+                {
+                    SequenceName = message.Event is DomainAggregateEvent domainAggregateEvent
+                        ? "SagaEventListener" + domainAggregateEvent.AggregateId.ToString()
+                        : "SagaEventListener",
+                    EventSequenceNumber = message.Metadata.GetStreamSequenceNumber()
+                };
+            }
+
+            protected override bool ShouldAttemptSynchronousDispatch(IEventMessage<DomainEvent> message)
+            {
+                return false;
+            }
         }
     }
 }

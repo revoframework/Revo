@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using GTRevo.Core.Events;
 using GTRevo.DataAccess.Entities;
@@ -39,13 +40,13 @@ namespace GTRevo.Infrastructure.Globalization.Messages.Database
             }
         }
 
-        public Task Handle(LocalizationMessageModifiedEvent notification)
+        public Task HandleAsync(IEventMessage<LocalizationMessageModifiedEvent> message, CancellationToken cancellationToken)
         {
             Invalidate();
             return Task.FromResult(0);
         }
 
-        public Task Handle(LocalizationMessageDeletedEvent notification)
+        public Task HandleAsync(IEventMessage<LocalizationMessageDeletedEvent> message, CancellationToken cancellationToken)
         {
             Invalidate();
             return Task.FromResult(0);

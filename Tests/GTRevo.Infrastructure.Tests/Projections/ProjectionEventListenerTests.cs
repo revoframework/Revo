@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using GTRevo.Core.Core;
+using GTRevo.Core.Events;
 using GTRevo.Core.Transactions;
 using GTRevo.Infrastructure.Core.Domain;
 using GTRevo.Infrastructure.Core.Domain.Events;
 using GTRevo.Infrastructure.Core.Domain.EventSourcing;
+using GTRevo.Infrastructure.Events.Async;
 using GTRevo.Infrastructure.EventSourcing;
 using GTRevo.Infrastructure.Projections;
 using NSubstitute;
@@ -16,10 +20,11 @@ namespace GTRevo.Infrastructure.Tests.Projections
     public class ProjectionEventListenerTests
     {
         private readonly ProjectionEventListener sut;
-        private readonly List<IEntityEventProjector> entityEventProjectors = new List<IEntityEventProjector>();
-        private readonly List<ICrudEntityProjector> crudEntityProjectors = new List<ICrudEntityProjector>();
+        private readonly IEntityEventProjector<MyEntity1> myEntity1Projector;
+        private readonly IEntityEventProjector<MyEntity2> myEntity2Projector;
         private readonly IEventSourcedAggregateRepository eventSourcedRepository;
         private readonly IEntityTypeManager entityTypeManager;
+        private readonly IServiceLocator serviceLocator;
 
         private readonly MyEntity1 aggregate1;
         private readonly MyEntity2 aggregate2;
@@ -37,62 +42,82 @@ namespace GTRevo.Infrastructure.Tests.Projections
             entityTypeManager.GetClrTypeByClassId(MyEntity1.ClassId).Returns(typeof(MyEntity1));
             entityTypeManager.GetClrTypeByClassId(MyEntity2.ClassId).Returns(typeof(MyEntity2));
 
-            var projector1 = Substitute.For<IEntityEventProjector>();
-            projector1.ProjectedAggregateType.Returns(typeof(MyEntity1));
-            entityEventProjectors.Add(projector1);
+            myEntity1Projector = Substitute.For<IEntityEventProjector<MyEntity1>>();
+            myEntity1Projector.ProjectedAggregateType.Returns(typeof(MyEntity1));
 
-            var projector2 = Substitute.For<IEntityEventProjector>();
-            projector2.ProjectedAggregateType.Returns(typeof(MyEntity2));
-            entityEventProjectors.Add(projector2);
+            myEntity2Projector = Substitute.For<IEntityEventProjector<MyEntity2>>();
+            myEntity2Projector.ProjectedAggregateType.Returns(typeof(MyEntity2));
 
-            sut = new ProjectionEventListener(entityEventProjectors.ToArray(), crudEntityProjectors.ToArray(),
-                eventSourcedRepository, entityTypeManager);
+            serviceLocator = Substitute.For<IServiceLocator>();
+            serviceLocator.GetAll(typeof(IEntityEventProjector<MyEntity1>)).Returns(new object[] { myEntity1Projector });
+            serviceLocator.GetAll(typeof(IEntityEventProjector<MyEntity2>)).Returns(new object[] { myEntity2Projector });
+
+            sut = new MyProjectionEventListener(eventSourcedRepository, entityTypeManager, serviceLocator);
         }
 
         [Fact]
-        public async Task OnTransactionSucceededAsync_FiresProjections()
+        public async Task OnFinishedEventQueue_FiresProjections()
         {
-            var tx = Substitute.For<ITransaction>();
-            sut.OnTransactionBegin(tx);
-
-            var ev1 = new MyEvent()
+            var ev1 = new EventMessage<DomainAggregateEvent>(new MyEvent()
             {
-                AggregateClassId = MyEntity1.ClassId,
                 AggregateId = aggregate1.Id
-            };
-
-            var ev2 = new MyEvent()
+            }, new Dictionary<string, string>()
             {
-                AggregateClassId = MyEntity2.ClassId,
+                { BasicEventMetadataNames.AggregateClassId, MyEntity1.ClassId.ToString() }
+            });
+
+            var ev2 = new EventMessage<DomainAggregateEvent>(new MyEvent()
+            {
                 AggregateId = aggregate2.Id
-            };
-
-            var ev3 = new MyEvent()
+            }, new Dictionary<string, string>()
             {
-                AggregateClassId = MyEntity1.ClassId,
+                { BasicEventMetadataNames.AggregateClassId, MyEntity2.ClassId.ToString() }
+            });
+
+            var ev3 = new EventMessage<DomainAggregateEvent>(new MyEvent()
+            {
                 AggregateId = aggregate1.Id
-            };
-
-            await sut.Handle(ev1);
-            await sut.Handle(ev2);
-            await sut.Handle(ev3);
-
-            await sut.OnTransactionSucceededAsync(tx);
-
-            var events = new List<DomainAggregateEvent>()
+            }, new Dictionary<string, string>()
             {
-                ev1,
-                ev2,
-                ev3
-            };
+                { BasicEventMetadataNames.AggregateClassId, MyEntity1.ClassId.ToString() }
+            });
+            
+            await sut.HandleAsync(ev1, "MyProjectionEventListener");
+            await sut.HandleAsync(ev2, "MyProjectionEventListener");
+            await sut.HandleAsync(ev3, "MyProjectionEventListener");
 
-            entityEventProjectors[0].Received(1)
-                    .ProjectEventsAsync(aggregate1, Arg.Is<IEnumerable<DomainAggregateEvent>>(x => x.SequenceEqual(new List<DomainAggregateEvent>() { ev1, ev3 })));
-            entityEventProjectors[0].Received(1).CommitChangesAsync();
+            await sut.OnFinishedEventQueueAsync("MyProjectionEventListener");
+            
+            myEntity1Projector.Received(1)
+                    .ProjectEventsAsync((IEventSourcedAggregateRoot) aggregate1, Arg.Is<IReadOnlyCollection<IEventMessage<DomainAggregateEvent>>>(x => x.SequenceEqual(new List<IEventMessage<DomainAggregateEvent>> () { ev1, ev3 })));
+            myEntity1Projector.Received(1).CommitChangesAsync();
 
-            entityEventProjectors[1].Received(1)
-                    .ProjectEventsAsync(aggregate2, Arg.Is<IEnumerable<DomainAggregateEvent>>(x => x.SequenceEqual(new List<DomainAggregateEvent>() { ev2 })));
-            entityEventProjectors[1].Received(1).CommitChangesAsync();
+            myEntity2Projector.Received(1)
+                    .ProjectEventsAsync((IEventSourcedAggregateRoot) aggregate2, Arg.Is<IReadOnlyCollection<IEventMessage<DomainAggregateEvent>>>(x => x.SequenceEqual(new List<IEventMessage<DomainAggregateEvent>>() { ev2 })));
+            myEntity2Projector.Received(1).CommitChangesAsync();
+        }
+
+        public class MyProjectionEventListener : ProjectionEventListener
+        {
+            public MyProjectionEventListener(IEventSourcedAggregateRepository eventSourcedRepository, IEntityTypeManager entityTypeManager,
+                IServiceLocator serviceLocator) : base(eventSourcedRepository, entityTypeManager, serviceLocator)
+            {
+            }
+
+            public override IAsyncEventSequencer EventSequencer { get; } = new MyEventSequencer();
+
+            public class MyEventSequencer : IAsyncEventSequencer<DomainAggregateEvent>
+            {
+                public IEnumerable<EventSequencing> GetEventSequencing(IEventMessage message)
+                {
+                    yield return new EventSequencing() { SequenceName = "MyProjectionEventListener", EventSequenceNumber = 1 };
+                }
+
+                public bool ShouldAttemptSynchronousDispatch(IEventMessage message)
+                {
+                    return true;
+                }
+            }
         }
 
         public class MyEntity1 : AggregateRoot, IEventSourcedAggregateRoot

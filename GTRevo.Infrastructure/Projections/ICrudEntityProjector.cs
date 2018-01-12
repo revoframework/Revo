@@ -4,7 +4,7 @@ using GTRevo.Infrastructure.Core.Domain;
 
 namespace GTRevo.Infrastructure.Projections
 {
-    public interface ICrudEntityProjector
+    /*public interface ICrudEntityProjector
     {
         Type ProjectedAggregateType { get; }
     }
@@ -13,5 +13,5 @@ namespace GTRevo.Infrastructure.Projections
         where T : IAggregateRoot
     {
         Task ProjectChangesAsync(T aggregate);
-    }
+    }*/
 }

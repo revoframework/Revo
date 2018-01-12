@@ -7,7 +7,7 @@ using GTRevo.Core.Core;
 using GTRevo.Core.Core.Lifecycle;
 using GTRevo.Core.Events;
 using GTRevo.Infrastructure.Core.Domain.Events;
-using MediatR;
+using GTRevo.Infrastructure.Events.Async;
 using Ninject.Modules;
 
 namespace GTRevo.Infrastructure.Sagas
@@ -36,8 +36,11 @@ namespace GTRevo.Infrastructure.Sagas
                 .To<SagaRepository>()
                 .InRequestOrJobScope();
 
-            Bind<IEventListener<DomainEvent>, IAsyncNotificationHandler<DomainEvent>,
-                    IEventQueueTransactionListener>()
+            Bind<IAsyncEventSequencer<DomainEvent>, SagaEventListener.SagaEventSequencer>()
+                .To<SagaEventListener.SagaEventSequencer>()
+                .InRequestOrJobScope();
+
+            Bind<IAsyncEventListener<DomainEvent>>()
                 .To<SagaEventListener>()
                 .InRequestOrJobScope();
         }
