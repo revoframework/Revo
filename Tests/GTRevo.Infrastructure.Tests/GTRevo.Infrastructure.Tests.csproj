@@ -57,6 +57,9 @@
     <Reference Include="Microsoft.Spatial, Version=7.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\..\Packages\Microsoft.Spatial.7.2.0\lib\portable-net45+win8+wpa81\Microsoft.Spatial.dll</HintPath>
     </Reference>
+    <Reference Include="MoreLinq, Version=2.9.21302.0, Culture=neutral, PublicKeyToken=384d532d7e88985d, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Packages\morelinq.2.9.0\lib\net40\MoreLinq.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\..\Packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -93,6 +96,9 @@
     <Reference Include="System.Threading.Tasks.Extensions, Version=4.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\..\..\Packages\System.Threading.Tasks.Extensions.4.3.0\lib\portable-net45+win8+wp8+wpa81\System.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -121,6 +127,16 @@
     <Compile Include="Core\Domain\AggregateEventRouterTests.cs" />
     <Compile Include="Core\Domain\ConventionEventApplyRegistratorTests.cs" />
     <Compile Include="EventSourcing\FakeEventStoreRecord.cs" />
+    <Compile Include="Events\Async\AsyncEventExecutionCatchUpTests.cs" />
+    <Compile Include="Events\Async\AsyncEventProcessorTests.cs" />
+    <Compile Include="Events\Async\AsyncEventQueueBacklogWorkerTests.cs" />
+    <Compile Include="Events\Async\AsyncEventQueueDispatcherTests.cs" />
+    <Compile Include="Events\Async\AsyncEventQueueDispatchListenerTests.cs" />
+    <Compile Include="Events\Async\AsyncEventSequencerTests.cs" />
+    <Compile Include="Events\Async\FakeAsyncEventQueueRecord.cs" />
+    <Compile Include="Events\Async\FakeAsyncEventQueueState.cs" />
+    <Compile Include="Events\Async\ProcessAsyncEventsJobHandlerTests.cs" />
+    <Compile Include="Events\EventMessageFactoryTests.cs" />
     <Compile Include="Globalization\Messages\CompositeMessageSourceTests.cs" />
     <Compile Include="Globalization\MessageRepositoryTests.cs" />
     <Compile Include="Globalization\Messages\Database\DbMessageCacheTests.cs" />
