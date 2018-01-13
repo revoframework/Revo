@@ -27,10 +27,7 @@ namespace GTRevo.Infrastructure.Events
                 var metadata = await metadataProvider.GetMetadataAsync(messageDraft);
                 foreach (var pair in metadata)
                 {
-                    if (!messageDraft.Metadata.ContainsKey(pair.key))
-                    {
-                        messageDraft.AddMetadata(pair.key, pair.value);
-                    }
+                    messageDraft.SetMetadata(pair.key, pair.value);
                 }
             }
 

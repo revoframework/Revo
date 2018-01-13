@@ -46,8 +46,7 @@ namespace GTRevo.Infrastructure.Events.Async
 
             if (dispatchResult.EnqueuedEventsAsyncProcessed.Any())
             {
-                await asyncEventProcessor.EnqueueForAsyncProcessing(dispatchResult.EnqueuedEventsAsyncProcessed, null,
-                    TimeSpan.FromMilliseconds(500));
+                await asyncEventProcessor.EnqueueForAsyncProcessingAsync(dispatchResult.EnqueuedEventsAsyncProcessed, null);
             }
 
             if (dispatchResult.EnqueuedEventsSyncProcessed.Any())

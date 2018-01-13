@@ -165,7 +165,7 @@ namespace GTRevo.Infrastructure.EF6.Repositories
                 IEventMessageDraft message = await eventMessageFactory.CreateMessageAsync(ev);
                 if (aggregateClassId != null)
                 {
-                    message.AddMetadata(BasicEventMetadataNames.AggregateClassId, aggregateClassId.Value.ToString());
+                    message.SetMetadata(BasicEventMetadataNames.AggregateClassId, aggregateClassId.Value.ToString());
                 }
 
                 messages.Add(message);

@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GTRevo.Infrastructure.Core.Domain.Events;
+﻿using GTRevo.Infrastructure.Core.Domain.Events;
 using GTRevo.Infrastructure.EF6.EventStore;
-using GTRevo.Testing.DataAccess.EF6;
+using GTRevo.Testing.DataAccess;
 using NSubstitute;
 
-namespace GTRevo.Infrastructure.EF6.Tests.EventSourcing
+namespace GTRevo.Infrastructure.EF6.Tests.EventStore
 {
     public class EF6EventStoreTests
     {

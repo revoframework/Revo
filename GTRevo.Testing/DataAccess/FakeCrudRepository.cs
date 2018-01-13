@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 using GTRevo.DataAccess.Entities;
 
-namespace GTRevo.Testing.DataAccess.EF6
+namespace GTRevo.Testing.DataAccess
 {
     public class FakeCrudRepository : ICrudRepository
     {

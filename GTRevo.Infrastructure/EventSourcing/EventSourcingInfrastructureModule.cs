@@ -15,18 +15,6 @@ namespace GTRevo.Infrastructure.EventSourcing
             Bind<IEventSourcedAggregateRepository, ITransactionProvider>()
                 .To<EventSourcedAggregateRepository>()
                 .InRequestOrJobScope();
-
-            Bind<IEventMessageFactory>()
-                .To<EventMessageFactory>()
-                .InRequestOrJobScope();
-
-            Bind<IEventMetadataProvider>()
-                .To<ActorNameEventMetadataProvider>()
-                .InTransientScope();
-
-            Bind<IEventMetadataProvider>()
-                .To<UserIdEventMetadataProvider>()
-                .InTransientScope();
         }
     }
 }

@@ -11,7 +11,7 @@ using GTRevo.Infrastructure.Core.Domain.Basic;
 using GTRevo.Infrastructure.Core.Domain.Events;
 using GTRevo.Infrastructure.EF6.Repositories;
 using GTRevo.Infrastructure.Events;
-using GTRevo.Testing.DataAccess.EF6;
+using GTRevo.Testing.DataAccess;
 using GTRevo.Testing.Infrastructure;
 using NSubstitute;
 using Xunit;
@@ -44,7 +44,7 @@ namespace GTRevo.Infrastructure.EF6.Tests.Repositories
                 var @event = ci.ArgAt<IEvent>(0);
                 Type messageType = typeof(EventMessageDraft<>).MakeGenericType(@event.GetType());
                 IEventMessageDraft messageDraft = (IEventMessageDraft)messageType.GetConstructor(new[] { @event.GetType() }).Invoke(new[] { @event });
-                messageDraft.AddMetadata("TestKey", "TestValue");
+                messageDraft.SetMetadata("TestKey", "TestValue");
                 return messageDraft;
             }); // TODO something more lightweight?
 

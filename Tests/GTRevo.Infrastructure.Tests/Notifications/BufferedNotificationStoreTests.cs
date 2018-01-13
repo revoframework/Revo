@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using GTRevo.Core.Transactions;
 using GTRevo.Infrastructure.Notifications;
 using GTRevo.Infrastructure.Notifications.Model;
-using GTRevo.Testing.DataAccess.EF6;
+using GTRevo.Testing.DataAccess;
 using NSubstitute;
 using Xunit;
 

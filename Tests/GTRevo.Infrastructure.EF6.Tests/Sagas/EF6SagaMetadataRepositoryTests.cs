@@ -7,7 +7,7 @@ using GTRevo.DataAccess.Entities;
 using GTRevo.Infrastructure.EF6.Sagas;
 using GTRevo.Infrastructure.EF6.Sagas.Model;
 using GTRevo.Infrastructure.Sagas;
-using GTRevo.Testing.DataAccess.EF6;
+using GTRevo.Testing.DataAccess;
 using Xunit;
 
 namespace GTRevo.Infrastructure.EF6.Tests.Sagas

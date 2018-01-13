@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using GTRevo.Infrastructure.History.ChangeTracking;
 using GTRevo.Infrastructure.History.ChangeTracking.Changes;
-using GTRevo.Testing.DataAccess.EF6;
+using GTRevo.Testing.DataAccess;
 using NSubstitute;
 using Xunit;
 

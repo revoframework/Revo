@@ -6,7 +6,7 @@ namespace GTRevo.Infrastructure.Events.Async
 {
     public interface IAsyncEventProcessor
     {
-        Task EnqueueForAsyncProcessing(IReadOnlyCollection<IAsyncEventQueueRecord> eventsToProcess, TimeSpan? timeDelay, TimeSpan retryTimeout);
+        Task EnqueueForAsyncProcessingAsync(IReadOnlyCollection<IAsyncEventQueueRecord> eventsToProcess, TimeSpan? timeDelay);
         Task ProcessSynchronously(IReadOnlyCollection<IAsyncEventQueueRecord> eventsToProcess);
     }
 }

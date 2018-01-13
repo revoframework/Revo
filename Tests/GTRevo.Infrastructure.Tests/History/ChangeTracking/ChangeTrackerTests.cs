@@ -9,7 +9,7 @@ using GTRevo.Core.Transactions;
 using GTRevo.Infrastructure.History.ChangeTracking;
 using GTRevo.Infrastructure.History.ChangeTracking.Model;
 using GTRevo.Testing.Core;
-using GTRevo.Testing.DataAccess.EF6;
+using GTRevo.Testing.DataAccess;
 using NSubstitute;
 using Xunit;
 

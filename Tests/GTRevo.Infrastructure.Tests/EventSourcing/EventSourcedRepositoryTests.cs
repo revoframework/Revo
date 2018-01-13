@@ -93,7 +93,7 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
                 var @event = ci.ArgAt<IEvent>(0);
                 Type messageType = typeof(EventMessageDraft<>).MakeGenericType(@event.GetType());
                 IEventMessageDraft messageDraft = (IEventMessageDraft)messageType.GetConstructor(new[] { @event.GetType() }).Invoke(new[] { @event });
-                messageDraft.AddMetadata("TestKey", "TestValue");
+                messageDraft.SetMetadata("TestKey", "TestValue");
                 return messageDraft;
             }); // TODO something more lightweight?
 

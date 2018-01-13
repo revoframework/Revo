@@ -71,7 +71,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EventSourcing\EF6EventStoreTests.cs" />
+    <Compile Include="EventStore\EF6EventStoreTests.cs" />
+    <Compile Include="Events\Async\AsyncEventQueueManagerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\EF6AggregateStoreTests.cs" />
     <Compile Include="Sagas\EF6SagaMetadataRepositoryTests.cs" />

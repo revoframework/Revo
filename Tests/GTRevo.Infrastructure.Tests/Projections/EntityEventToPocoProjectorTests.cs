@@ -32,7 +32,7 @@ namespace GTRevo.Infrastructure.Tests.Projections
             eventMessages = aggregate.UncommittedEvents.Select((x, i) =>
             {
                 var message = x.ToMessageDraft();
-                message.AddMetadata(BasicEventMetadataNames.StreamSequenceNumber, (i + 1).ToString());
+                message.SetMetadata(BasicEventMetadataNames.StreamSequenceNumber, (i + 1).ToString());
                 return message;
             }).ToList();
 

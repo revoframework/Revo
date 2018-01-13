@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using GTRevo.Core.Core;
 using GTRevo.Core.Events;
-using GTRevo.Infrastructure.Core.Domain.Events;
 using NLog;
 
 namespace GTRevo.Infrastructure.Events.Async
@@ -41,13 +40,18 @@ namespace GTRevo.Infrastructure.Events.Async
 
             bool processOnlyNonsequential = false;
 
-            var firstSequential = records.FirstOrDefault(x => x.SequenceNumber != null);
-            long? firstSequenceNumber = firstSequential?.SequenceNumber;
+            var nonSequential = records.Where(x => x.SequenceNumber == null).ToList();
+            var sequential = records.Where(x => x.SequenceNumber != null).ToList();
+            
+            long? firstSequenceNumber = sequential.FirstOrDefault()?.SequenceNumber; //records should always arrive in order, but possibly with gaps in sequence
+            long? lastSequenceNumber = sequential.LastOrDefault()?.SequenceNumber;
+
             if (firstSequenceNumber != null
                 && queue.LastSequenceNumberProcessed != null
-                && queue.LastSequenceNumberProcessed != firstSequenceNumber.Value - 1)
+                && (queue.LastSequenceNumberProcessed != firstSequenceNumber.Value - 1
+                    || queue.LastSequenceNumberProcessed.Value + sequential.Count != lastSequenceNumber))
             {
-                bool anyNonsequential = records.Any(x => x.SequenceNumber == null);
+                bool anyNonsequential = nonSequential.Any();
                 if (anyNonsequential)
                 {
                     Logger.Debug($"Processing only non-sequential async events in {queueName} queue: missing some events in sequence at #{queue.LastSequenceNumberProcessed.Value + 1}");
@@ -61,7 +65,6 @@ namespace GTRevo.Infrastructure.Events.Async
                 }
             }
 
-            var nonSequential = records.Where(x => x.SequenceNumber == null).ToList();
             if (nonSequential.Count > 0)
             {
                 await ProcessEventsAsync(nonSequential, queueName);
@@ -69,7 +72,6 @@ namespace GTRevo.Infrastructure.Events.Async
 
             if (!processOnlyNonsequential)
             {
-                var sequential = records.Where(x => x.SequenceNumber != null).ToList();
                 if (sequential.Count > 0)
                 {
                     await ProcessEventsAsync(sequential, queueName);

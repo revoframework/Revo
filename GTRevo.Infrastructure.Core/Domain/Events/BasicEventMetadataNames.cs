@@ -18,5 +18,6 @@ namespace GTRevo.Infrastructure.Core.Domain.Events
         public static readonly string StreamSequenceNumber = "StreamSequenceNumber";
         public static readonly string RequestUri = "RequestUri";
         public static readonly string AggregateClassId = "AggregateClassId";
+        public static readonly string MachineName = "MachineName";
     }
 }

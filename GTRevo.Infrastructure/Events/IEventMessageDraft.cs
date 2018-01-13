@@ -4,7 +4,7 @@ namespace GTRevo.Infrastructure.Events
 {
     public interface IEventMessageDraft : IEventMessage
     {
-        void AddMetadata(string key, string value);
+        void SetMetadata(string key, string value);
     }
 
     public interface IEventMessageDraft<out TEvent> : IEventMessageDraft, IEventMessage<TEvent>

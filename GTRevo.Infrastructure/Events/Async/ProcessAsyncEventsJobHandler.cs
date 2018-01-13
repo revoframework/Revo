@@ -47,12 +47,12 @@ namespace GTRevo.Infrastructure.Events.Async
             if (job.AttemptsLeft > 1)
             {
                 ProcessAsyncEventsJob newJob = new ProcessAsyncEventsJob(job.QueueName, job.AttemptsLeft - 1,
-                    TimeSpan.FromTicks(job.RetryTimeout.Ticks * 4));
-                await jobScheduler.EnqeueJobAsync(newJob, TimeSpan.FromSeconds(1));
+                    TimeSpan.FromTicks(job.RetryTimeout.Ticks * AsyncEventPipelineConfiguration.Current.AsyncProcessRetryTimeoutMultiplier));
+                await jobScheduler.EnqeueJobAsync(newJob, job.RetryTimeout);
             }
             else
             {
-                Logger.Error($"Not able to finish {job.QueueName} async event queue even with retries, giving up");
+                Logger.Error($"Not able to finish {job.QueueName} async event queue even with {AsyncEventPipelineConfiguration.Current.AsyncProcessAttemptCount} attempts, giving up");
             }
         }
     }

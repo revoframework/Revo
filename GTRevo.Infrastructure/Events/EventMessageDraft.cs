@@ -18,9 +18,9 @@ namespace GTRevo.Infrastructure.Events
         public TEvent Event { get; }
         public IReadOnlyDictionary<string, string> Metadata => metadata;
 
-        public void AddMetadata(string key, string value)
+        public void SetMetadata(string key, string value)
         {
-            metadata.Add(key, value);
+            metadata[key] = value;
         }
     }
 }

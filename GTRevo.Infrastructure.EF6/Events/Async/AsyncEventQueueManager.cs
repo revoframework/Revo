@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using GTRevo.Core.Events;
 using GTRevo.DataAccess.EF6.Entities;
+using GTRevo.DataAccess.Entities;
 using GTRevo.Infrastructure.Core.Domain.Events;
 using GTRevo.Infrastructure.EF6.EventStore.Model;
 using GTRevo.Infrastructure.Events.Async;
@@ -16,28 +17,28 @@ namespace GTRevo.Infrastructure.EF6.Events.Async
 {
     public class AsyncEventQueueManager : IAsyncEventQueueManager
     {
-        private readonly IEF6CrudRepository ef6CrudRepository;
+        private readonly ICrudRepository crudRepository;
         private readonly IDomainEventTypeCache domainEventTypeCache;
 
         private readonly List<(ExternalEventRecord externalEventRecord, List<QueuedAsyncEvent> queuedEvents)>
             externalEvents = new List<(ExternalEventRecord externalEventRecord, List<QueuedAsyncEvent> queuedEvents)>();
 
-        public AsyncEventQueueManager(IEF6CrudRepository ef6CrudRepository, IDomainEventTypeCache domainEventTypeCache)
+        public AsyncEventQueueManager(ICrudRepository crudRepository, IDomainEventTypeCache domainEventTypeCache)
         {
-            this.ef6CrudRepository = ef6CrudRepository;
+            this.crudRepository = crudRepository;
             this.domainEventTypeCache = domainEventTypeCache;
         }
 
         public async Task<IReadOnlyCollection<IAsyncEventQueueRecord>> FindQueuedEventsAsync(Guid[] asyncEventQueueRecordIds)
         {
-            return await ef6CrudRepository.FindAll<QueuedAsyncEvent>()
+            return await crudRepository.FindAll<QueuedAsyncEvent>()
                 .Where(x => asyncEventQueueRecordIds.Contains(x.Id))
                 .ToListAsync();
         }
 
         public async Task<IReadOnlyCollection<string>> GetNonemptyQueueNamesAsync()
         {
-            return await ef6CrudRepository.FindAll<QueuedAsyncEvent>()
+            return await crudRepository.FindAll<QueuedAsyncEvent>()
                 .Select(x => x.QueueId)
                 .Distinct()
                 .ToListAsync();
@@ -57,7 +58,7 @@ namespace GTRevo.Infrastructure.EF6.Events.Async
                 return new List<IAsyncEventQueueRecord>();
             }
 
-            var events = await ef6CrudRepository
+            var events = await crudRepository
                 .Where<QueuedAsyncEvent>(x => x.QueueId == queue.Id)
                 .OrderBy(x => x.SequenceNumber)
                 .Include(x => x.EventStreamRow)
@@ -69,10 +70,10 @@ namespace GTRevo.Infrastructure.EF6.Events.Async
 
         public async Task DequeueEventAsync(Guid asyncEventQueueRecordId)
         {
-            QueuedAsyncEvent queuedEvent = await ef6CrudRepository.FindAsync<QueuedAsyncEvent>(asyncEventQueueRecordId);
+            QueuedAsyncEvent queuedEvent = await crudRepository.FindAsync<QueuedAsyncEvent>(asyncEventQueueRecordId);
             if (queuedEvent != null)
             {
-                ef6CrudRepository.Remove(queuedEvent);
+                crudRepository.Remove(queuedEvent);
 
                 AsyncEventQueue queue = await GetOrCreateQueueAsync(queuedEvent.QueueName, null);
                 if (queuedEvent.SequenceNumber != null)
@@ -101,9 +102,9 @@ namespace GTRevo.Infrastructure.EF6.Events.Async
 
                 eventStreamRow.MarkDispatchedToAsyncQueues();
 
-                if (!ef6CrudRepository.IsAttached(eventStreamRow))
+                if (!crudRepository.IsAttached(eventStreamRow))
                 {
-                    ef6CrudRepository.Attach(eventStreamRow);
+                    crudRepository.Attach(eventStreamRow);
                 }
             }
             else
@@ -119,7 +120,7 @@ namespace GTRevo.Infrastructure.EF6.Events.Async
                 if (eventStreamRow != null)
                 {
                     QueuedAsyncEvent queuedEvent = new QueuedAsyncEvent(queue.Id, eventStreamRow, sequence.EventSequenceNumber);
-                    ef6CrudRepository.Add(queuedEvent);
+                    crudRepository.Add(queuedEvent);
                 }
                 else
                 {
@@ -140,17 +141,17 @@ namespace GTRevo.Infrastructure.EF6.Events.Async
 
         public async Task<string> GetEventSourceCheckpointAsync(string eventSourceName)
         {
-            EventSourceState eventSourceState = await ef6CrudRepository.FindAsync<EventSourceState>(eventSourceName);
+            EventSourceState eventSourceState = await crudRepository.FindAsync<EventSourceState>(eventSourceName);
             return eventSourceState?.EventEnqueueCheckpoint;
         }
 
         public async Task SetEventSourceCheckpointAsync(string eventSourceName, string opaqueCheckpoint)
         {
-            EventSourceState eventSourceState = await ef6CrudRepository.FindAsync<EventSourceState>(eventSourceName);
+            EventSourceState eventSourceState = await crudRepository.FindAsync<EventSourceState>(eventSourceName);
             if (eventSourceState == null)
             {
                 eventSourceState = new EventSourceState(eventSourceName);
-                ef6CrudRepository.Add(eventSourceState);
+                crudRepository.Add(eventSourceState);
             }
 
             eventSourceState.EventEnqueueCheckpoint = opaqueCheckpoint;
@@ -159,15 +160,15 @@ namespace GTRevo.Infrastructure.EF6.Events.Async
         public async Task<IReadOnlyCollection<IAsyncEventQueueRecord>> CommitAsync()
         {
             await ResolveExternalEvents();
-            List<QueuedAsyncEvent> queueRecords = ef6CrudRepository.GetEntities<QueuedAsyncEvent>(EntityState.Added).ToList();
-            await ef6CrudRepository.SaveChangesAsync();
+            List<QueuedAsyncEvent> queueRecords = crudRepository.GetEntities<QueuedAsyncEvent>(EntityState.Added).ToList();
+            await crudRepository.SaveChangesAsync();
             return queueRecords;
         }
 
         private async Task ResolveExternalEvents()
         {
             var externalEventIds = externalEvents.Select(x => x.externalEventRecord.Id).ToArray();
-            var existingRecordIds = await ef6CrudRepository
+            var existingRecordIds = await crudRepository
                 .Where<ExternalEventRecord>(x => externalEventIds.Contains(x.Id))
                 .Select(x => x.Id)
                 .ToListAsync();
@@ -179,7 +180,7 @@ namespace GTRevo.Infrastructure.EF6.Events.Async
                     continue;
                 }
 
-                ef6CrudRepository.AddRange(externalEventPair.queuedEvents);
+                crudRepository.AddRange(externalEventPair.queuedEvents);
             }
 
             externalEvents.Clear();
@@ -187,7 +188,7 @@ namespace GTRevo.Infrastructure.EF6.Events.Async
 
         private Task<AsyncEventQueue> GetQueueAsync(string queueName)
         {
-            return ef6CrudRepository.FindAsync<AsyncEventQueue>(queueName);
+            return crudRepository.FindAsync<AsyncEventQueue>(queueName);
         }
 
         private async Task<AsyncEventQueue> GetOrCreateQueueAsync(string queueName, long? lastSequenceNumberProcessed)
@@ -196,7 +197,7 @@ namespace GTRevo.Infrastructure.EF6.Events.Async
             if (queue == null)
             {
                 queue = new AsyncEventQueue(queueName, lastSequenceNumberProcessed);
-                ef6CrudRepository.Add(queue);
+                crudRepository.Add(queue);
             }
 
             return queue;

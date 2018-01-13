@@ -260,7 +260,7 @@ namespace GTRevo.Infrastructure.EventSourcing
             foreach (DomainAggregateEvent ev in events)
             {
                 IEventMessageDraft message = await eventMessageFactory.CreateMessageAsync(ev);
-                message.AddMetadata(BasicEventMetadataNames.AggregateClassId, aggregateClassId.Value.ToString());
+                message.SetMetadata(BasicEventMetadataNames.AggregateClassId, aggregateClassId.Value.ToString());
                 messages.Add(message);
             }
 

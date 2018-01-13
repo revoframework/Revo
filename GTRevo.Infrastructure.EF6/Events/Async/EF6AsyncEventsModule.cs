@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using GTRevo.Core.Core;
 using GTRevo.DataAccess.EF6.Entities;
+using GTRevo.DataAccess.Entities;
 using GTRevo.Infrastructure.Events.Async;
 using Ninject.Modules;
 
@@ -18,7 +19,7 @@ namespace GTRevo.Infrastructure.EF6.Events.Async
                 .To<AsyncEventQueueManager>()
                 .InRequestOrJobScope();
 
-            Bind<IEF6CrudRepository>()
+            Bind<ICrudRepository>()
                 .To<EF6CrudRepository>()
                 .WhenInjectedInto<AsyncEventQueueManager>()
                 .InTransientScope();

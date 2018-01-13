@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using GTRevo.Infrastructure.Events;
 using GTRevo.Infrastructure.Globalization;
 using GTRevo.Infrastructure.Globalization.Messages.Database;
-using GTRevo.Testing.DataAccess.EF6;
+using GTRevo.Testing.DataAccess;
 using GTRevo.Testing.Infrastructure;
 using NSubstitute;
 using Xunit;
