@@ -118,6 +118,8 @@
     <Compile Include="Commands\WrappedEntityQueryWithContext.cs" />
     <Compile Include="Core\Clock.cs" />
     <Compile Include="Core\CoreModule.cs" />
+    <Compile Include="Core\TaskContext.cs" />
+    <Compile Include="Core\TaskFactoryExtensions.cs" />
     <Compile Include="Core\ThreadSleep.cs" />
     <Compile Include="Core\IActorContext.cs" />
     <Compile Include="Core\IServiceLocator.cs" />

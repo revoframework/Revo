@@ -13,9 +13,6 @@ namespace GTRevo.Infrastructure.Events.Async
 {
     public class AsyncEventProcessor : IAsyncEventProcessor
     {
-        
-
-
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly IAsyncEventQueueBacklogWorker asyncEventQueueBacklogWorker;
@@ -81,24 +78,27 @@ namespace GTRevo.Infrastructure.Events.Async
 
         private async Task<string[]> TryRunQueues(string[] queues)
         {
-            string[] finishedQueues = await Task.WhenAll(queues.Select(async x =>
-            {
-                try
+            string[] finishedQueues = await Task.WhenAll(queues.Select(x =>
+                Task.Factory.StartNewWithContext(async () =>
                 {
-                    await asyncEventQueueBacklogWorker.RunQueueBacklogAsync(x);
-                    return x;
-                }
-                catch (AsyncEventProcessingSequenceException e)
-                {
-                    Logger.Debug(e, $"AsyncEventProcessingSequenceException occurred during synchronous queue processing");
-                    return null; //can retry
-                }
-                catch (OptimisticConcurrencyException e)
-                {
-                    Logger.Debug(e, $"OptimisticConcurrencyException occurred during synchronous queue processing");
-                    return null; //can retry
-                }
-            }));
+                    try
+                    {
+                        await asyncEventQueueBacklogWorker.RunQueueBacklogAsync(x);
+                        return x;
+                    }
+                    catch (AsyncEventProcessingSequenceException e)
+                    {
+                        Logger.Debug(e,
+                            $"AsyncEventProcessingSequenceException occurred during synchronous queue processing");
+                        return null; //can retry
+                    }
+                    catch (OptimisticConcurrencyException e)
+                    {
+                        Logger.Debug(e, $"OptimisticConcurrencyException occurred during synchronous queue processing");
+                        return null; //can retry
+                    }
+                })
+            ));
 
             return queues.Except(finishedQueues).ToArray();
         }

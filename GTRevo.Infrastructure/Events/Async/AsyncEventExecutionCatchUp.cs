@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GTRevo.Core.Core;
 using GTRevo.Core.Core.Lifecycle;
 
 namespace GTRevo.Infrastructure.Events.Async
@@ -44,10 +45,9 @@ namespace GTRevo.Infrastructure.Events.Async
         private async Task RunBackloggedQueuesAsync()
         {
             var backloggedQueueNames = await asyncEventQueueManager.GetNonemptyQueueNamesAsync();
-            foreach (string queueName in backloggedQueueNames)
-            {
-                await asyncEventQueueBacklogWorker.RunQueueBacklogAsync(queueName);
-            }
+
+            await Task.WhenAll(backloggedQueueNames.Select(queueName =>
+                Task.Factory.StartNewWithContext(() => asyncEventQueueBacklogWorker.RunQueueBacklogAsync(queueName)))); //using new Task because we want a new context (parallelization on ASP.NET 4 + fresh DI lifetime scope)
         }
     }
 }
