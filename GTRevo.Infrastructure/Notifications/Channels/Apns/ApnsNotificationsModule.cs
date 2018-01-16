@@ -17,20 +17,20 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Apns
                     var configSection = LocalConfiguration.Current
                         .GetSection<ApnsServiceConfigurationSection>(
                             ApnsServiceConfigurationSection.ConfigurationSectionName);
-                    if (configSection == null)
-                    {
-                        return null;
-                    }
 
                     List<ApnsAppConfiguration> configs = new List<ApnsAppConfiguration>();
-                    for (int i = 0; i < configSection.AppConfigurations.Count; i++)
+
+                    if (configSection != null)
                     {
-                        var configElement = configSection.AppConfigurations[i];
-                        configs.Add(new ApnsAppConfiguration(configElement.AppId,
-                            new ApnsConfiguration(configElement.IsSandboxEnvironment
-                                    ? ApnsConfiguration.ApnsServerEnvironment.Sandbox
-                                    : ApnsConfiguration.ApnsServerEnvironment.Production,
-                                configElement.CertificateFilePath, configElement.CertificatePassword)));
+                        for (int i = 0; i < configSection.AppConfigurations.Count; i++)
+                        {
+                            var configElement = configSection.AppConfigurations[i];
+                            configs.Add(new ApnsAppConfiguration(configElement.AppId,
+                                new ApnsConfiguration(configElement.IsSandboxEnvironment
+                                        ? ApnsConfiguration.ApnsServerEnvironment.Sandbox
+                                        : ApnsConfiguration.ApnsServerEnvironment.Production,
+                                    configElement.CertificateFilePath, configElement.CertificatePassword)));
+                        }
                     }
 
                     return new ApnsBrokerDispatcher(configs);

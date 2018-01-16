@@ -16,17 +16,17 @@ namespace GTRevo.Infrastructure.Notifications.Channels.Fcm
                     var configSection = LocalConfiguration.Current
                         .GetSection<FcmServiceConfigurationSection>(
                             FcmServiceConfigurationSection.ConfigurationSectionName);
-                    if (configSection == null)
-                    {
-                        return null;
-                    }
 
                     List<FcmAppConfiguration> configs = new List<FcmAppConfiguration>();
-                    for (int i = 0; i < configSection.AppConfigurations.Count; i++)
+
+                    if (configSection != null)
                     {
-                        var configElement = configSection.AppConfigurations[i];
-                        configs.Add(new FcmAppConfiguration(configElement.AppId,
-                            new GcmConfiguration(configElement.SenderAuthToken)));
+                        for (int i = 0; i < configSection.AppConfigurations.Count; i++)
+                        {
+                            var configElement = configSection.AppConfigurations[i];
+                            configs.Add(new FcmAppConfiguration(configElement.AppId,
+                                new GcmConfiguration(configElement.SenderAuthToken)));
+                        }
                     }
 
                     return new FcmBrokerDispatcher(configs);
