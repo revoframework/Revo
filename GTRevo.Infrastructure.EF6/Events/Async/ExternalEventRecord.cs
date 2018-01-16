@@ -13,7 +13,7 @@ using Newtonsoft.Json.Linq;
 
 namespace GTRevo.Infrastructure.EF6.Events.Async
 {
-    [TablePrefix(NamespacePrefix = "RAE", ColumnPrefix = "AER")]
+    [TablePrefix(NamespacePrefix = "RAE", ColumnPrefix = "EER")]
     [DatabaseEntity]
     public class ExternalEventRecord
     {

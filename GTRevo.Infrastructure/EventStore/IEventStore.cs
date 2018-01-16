@@ -32,8 +32,8 @@ namespace GTRevo.Infrastructure.EventStore
 
         Task SetStreamMetadataAsync(Guid streamId, IReadOnlyDictionary<string, string> metadata);
 
-        void PushEvents(Guid streamId, IEnumerable<IUncommittedEventStoreRecord> events, long? expectedVersion);
-        Task PushEventsAsync(Guid streamId, IEnumerable<IUncommittedEventStoreRecord> events, long? expectedVersion);
+        IReadOnlyCollection<IEventStoreRecord> PushEvents(Guid streamId, IEnumerable<IUncommittedEventStoreRecord> events, long? expectedVersion);
+        Task<IReadOnlyCollection<IEventStoreRecord>> PushEventsAsync(Guid streamId, IEnumerable<IUncommittedEventStoreRecord> events, long? expectedVersion);
 
         void CommitChanges();
         Task CommitChangesAsync();

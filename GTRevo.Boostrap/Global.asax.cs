@@ -1,4 +1,4 @@
-﻿using GTRevo.Bootstrap.Shared.Core;
+﻿using GTRevo.Platform.Core;
 
 namespace GTRevo.Bootstrap
 {

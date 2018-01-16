@@ -14,6 +14,8 @@ namespace GTRevo.Infrastructure.EF6.EventStore
 {
     public class EF6EventStore : IEventStore
     {
+        private const string EventSourceName = "EF6EventStore";
+
         private readonly ICrudRepository crudRepository;
         private readonly IDomainEventTypeCache domainEventTypeCache;
         private readonly Dictionary<Guid, StreamBuffer> streams = new Dictionary<Guid, StreamBuffer>();
@@ -73,30 +75,16 @@ namespace GTRevo.Infrastructure.EF6.EventStore
             stream.Metadata = metadata;
         }
 
-        public void PushEvents(Guid streamId, IEnumerable<IUncommittedEventStoreRecord> events, long? expectedVersion)
+        public IReadOnlyCollection<IEventStoreRecord> PushEvents(Guid streamId, IEnumerable<IUncommittedEventStoreRecord> events, long? expectedVersion)
         {
-            throw new NotImplementedException();
+            return PushEventsAtVersion(streamId, events, expectedVersion,
+                expectedVersion == null ? (long?) GetStreamVersion(streamId) : null);
         }
 
-        public async Task PushEventsAsync(Guid streamId, IEnumerable<IUncommittedEventStoreRecord> events, long? expectedVersion)
+        public async Task<IReadOnlyCollection<IEventStoreRecord>> PushEventsAsync(Guid streamId, IEnumerable<IUncommittedEventStoreRecord> events, long? expectedVersion)
         {
-            if (!streams.TryGetValue(streamId, out StreamBuffer streamBuffer))
-            {
-                streamBuffer = streams[streamId] = new StreamBuffer();
-            }
-
-            long version = expectedVersion ?? (await GetStreamVersionAsync(streamId) + streamBuffer.UncommitedRows.Count);
-            DateTimeOffset storeDate = Clock.Current.Now;
-
-            var rows = events.Select(x =>
-            {
-                Guid eventId = x.Metadata.GetEventId() ?? Guid.NewGuid();
-                return new EventStreamRow(domainEventTypeCache, eventId, x.Event, streamId,
-                    ++version, storeDate, x.Metadata);
-            }).ToList();
-
-            rows.ForEach(x => streamBuffer.UncommitedRows.Add(x.StreamSequenceNumber, x));
-            crudRepository.AddRange(rows);
+            return PushEventsAtVersion(streamId, events, expectedVersion,
+                expectedVersion == null ? (long?) await GetStreamVersionAsync(streamId) : null);
         }
 
         public void AddStream(Guid streamId)
@@ -173,7 +161,9 @@ namespace GTRevo.Infrastructure.EF6.EventStore
 
         public void CommitChanges()
         {
-            throw new NotImplementedException();
+            CheckStreamVersions();
+            crudRepository.SaveChanges();
+            ResetChanges();
         }
 
         public async Task CommitChangesAsync()
@@ -183,9 +173,38 @@ namespace GTRevo.Infrastructure.EF6.EventStore
             ResetChanges();
         }
 
+        private void CheckStreamVersion(KeyValuePair<Guid, StreamBuffer> streamPair, long streamVersion)
+        {
+            long minEventNumber = streamPair.Value.UncommitedRows.Values[0].StreamSequenceNumber;
+            long maxEventNumber = streamPair.Value.UncommitedRows.Values[streamPair.Value.UncommitedRows.Count - 1].StreamSequenceNumber;
+
+            if (minEventNumber != streamVersion + 1)
+            {
+                throw new OptimisticConcurrencyException($"Concurrency exception committing EF6EventStore events: next expected event number for stream ID {streamPair.Key} is {streamVersion + 1}, {minEventNumber} passed");
+            }
+
+            if (maxEventNumber - minEventNumber != streamPair.Value.UncommitedRows.Count - 1)
+            {
+                throw new OptimisticConcurrencyException($"Concurrency exception committing EF6EventStore events: non-sequential event numbers in stream ID {streamPair.Key}");
+            }
+        }
+
+        private void CheckStreamVersions()
+        {
+            foreach (var streamPair in streams)
+            {
+                if (streamPair.Value.UncommitedRows.Count == 0)
+                {
+                    continue;
+                }
+
+                long streamVersion = GetStreamVersion(streamPair.Key);
+                CheckStreamVersion(streamPair, streamVersion);
+            }
+        }
+
         private async Task CheckStreamVersionsAsync()
         {
-            //checking gaps
             foreach (var streamPair in streams)
             {
                 if (streamPair.Value.UncommitedRows.Count == 0)
@@ -194,19 +213,40 @@ namespace GTRevo.Infrastructure.EF6.EventStore
                 }
 
                 long streamVersion = await GetStreamVersionAsync(streamPair.Key);
-                long minEventNumber = streamPair.Value.UncommitedRows[0].StreamSequenceNumber;
-                long maxEventNumber = streamPair.Value.UncommitedRows[streamPair.Value.UncommitedRows.Count - 1].StreamSequenceNumber;
-
-                if (minEventNumber != streamVersion + 1)
-                {
-                    throw new OptimisticConcurrencyException($"Concurrency exception committing EF6EventStore events: next expected event number for stream ID {streamPair.Key} is {streamVersion + 1}, {minEventNumber} passed");
-                }
-
-                if (maxEventNumber - minEventNumber != streamPair.Value.UncommitedRows.Count - 1)
-                {
-                    throw new OptimisticConcurrencyException($"Concurrency exception committing EF6EventStore events: non-sequential event numbers in stream ID {streamPair.Key}");
-                }
+                CheckStreamVersion(streamPair, streamVersion);
             }
+        }
+
+        private IReadOnlyCollection<IEventStoreRecord> PushEventsAtVersion(Guid streamId, IEnumerable<IUncommittedEventStoreRecord> events,
+            long? expectedVersion, long? currentVersion)
+        {
+            if (!streams.TryGetValue(streamId, out StreamBuffer streamBuffer))
+            {
+                streamBuffer = streams[streamId] = new StreamBuffer();
+            }
+
+            long version = expectedVersion ?? (currentVersion.Value + streamBuffer.UncommitedRows.Count);
+            DateTimeOffset storeDate = Clock.Current.Now;
+
+            var rows = events.Select(x =>
+            {
+                Guid eventId = x.Metadata.GetEventId() ?? Guid.NewGuid();
+                var metadata = CreateRowMetadata(x.Metadata);
+                return new EventStreamRow(domainEventTypeCache, eventId, x.Event, streamId,
+                    ++version, storeDate, metadata);
+            }).ToList();
+
+            rows.ForEach(x => streamBuffer.UncommitedRows.Add(x.StreamSequenceNumber, x));
+            crudRepository.AddRange(rows);
+            return rows;
+        }
+
+        private IReadOnlyDictionary<string, string> CreateRowMetadata(IReadOnlyDictionary<string, string> metadata)
+        {
+            Dictionary<string, string> newMetadata = metadata.ToDictionary(x => x.Key, x => x.Value);
+            newMetadata.ReplaceMetadata(BasicEventMetadataNames.EventSourceName, EventSourceName);
+
+            return newMetadata;
         }
 
         private void ResetChanges()
@@ -292,6 +332,25 @@ namespace GTRevo.Infrastructure.EF6.EventStore
             }
         }
 
+        private long GetStreamVersion(Guid streamId)
+        {
+            if (streams.TryGetValue(streamId, out StreamBuffer streamBuffer)
+                && streamBuffer.StreamVersion != null)
+            {
+                return streamBuffer.StreamVersion.Value;
+            }
+
+            var lastRow = QueryStreamRows(streamId, true).FirstOrDefault();
+            if (lastRow != null)
+            {
+                return lastRow.StreamSequenceNumber;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
         private class StreamBuffer
         {
             public EventStream EventStream { get; set; }
@@ -300,3 +359,4 @@ namespace GTRevo.Infrastructure.EF6.EventStore
         }
     }
 }
+

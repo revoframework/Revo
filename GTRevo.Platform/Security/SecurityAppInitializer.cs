@@ -32,7 +32,7 @@ namespace GTRevo.Platform.Security
             // Configure the db context, user manager and signin manager to use a single instance per request
             //app.CreatePerOwinContext(ApplicationDbContext.Create);
             app.CreatePerOwinContext<AppUserManager>((options, owinContext)
-                => NinjectWebLoader.Bootstrapper.Kernel.Get<AppUserManager>());
+                => RevoHttpApplication.Current.Kernel.Get<AppUserManager>());
             //app.CreatePerOwinContext<ApplicationSignInManager>(ApplicationSignInManager.Create);
 
             // Enable the application to use a cookie to store information for the signed in user

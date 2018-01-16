@@ -1,6 +1,4 @@
-﻿using GTRevo.Core.Events;
-
-namespace GTRevo.Infrastructure.Events
+﻿namespace GTRevo.Core.Events
 {
     public interface IEventMessageDraft : IEventMessage
     {

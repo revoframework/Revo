@@ -11,6 +11,8 @@
     <AssemblyName>GTRevo.Platform</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -40,7 +42,7 @@
       <HintPath>..\..\Packages\AutoMapper.EF6.1.0.0\lib\net45\AutoMapper.EF6.dll</HintPath>
     </Reference>
     <Reference Include="Castle.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-      <HintPath>..\..\Packages\Castle.Core.4.2.0\lib\net45\Castle.Core.dll</HintPath>
+      <HintPath>..\..\Packages\Castle.Core.4.2.1\lib\net45\Castle.Core.dll</HintPath>
     </Reference>
     <Reference Include="CryptSharp, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\Packages\CryptSharpOfficial.2.1.0.0\lib\CryptSharp.dll</HintPath>
@@ -120,6 +122,15 @@
     <Reference Include="Microsoft.Spatial, Version=7.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\Packages\Microsoft.Spatial.7.2.0\lib\portable-net45+win8+wpa81\Microsoft.Spatial.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Threading.Tasks, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\Packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks.Extensions, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\Packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks.Extensions.Desktop, Version=1.0.168.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\Packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.Desktop.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\Packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
@@ -132,14 +143,17 @@
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\Packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Ninject, Version=3.3.3.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
-      <HintPath>..\..\Packages\Ninject.3.3.3\lib\net45\Ninject.dll</HintPath>
+    <Reference Include="Ninject, Version=3.3.4.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\..\Packages\Ninject.3.3.4\lib\net45\Ninject.dll</HintPath>
     </Reference>
-    <Reference Include="Ninject.Extensions.ContextPreservation, Version=3.3.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
-      <HintPath>..\..\Packages\Ninject.Extensions.ContextPreservation.3.3.0\lib\net45\Ninject.Extensions.ContextPreservation.dll</HintPath>
+    <Reference Include="Ninject.Extensions.ContextPreservation, Version=3.3.1.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\..\Packages\Ninject.Extensions.ContextPreservation.3.3.1\lib\net45\Ninject.Extensions.ContextPreservation.dll</HintPath>
     </Reference>
-    <Reference Include="Ninject.Extensions.Factory, Version=3.3.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
-      <HintPath>..\..\Packages\Ninject.Extensions.Factory.3.3.0\lib\net45\Ninject.Extensions.Factory.dll</HintPath>
+    <Reference Include="Ninject.Extensions.Factory, Version=3.3.2.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\..\Packages\Ninject.Extensions.Factory.3.3.2\lib\net45\Ninject.Extensions.Factory.dll</HintPath>
+    </Reference>
+    <Reference Include="Ninject.Extensions.NamedScope, Version=3.3.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\..\Packages\Ninject.Extensions.NamedScope.3.3.0\lib\net45\Ninject.Extensions.NamedScope.dll</HintPath>
     </Reference>
     <Reference Include="Ninject.Web.Common, Version=3.3.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
       <HintPath>..\..\Packages\Ninject.Web.Common.3.3.0\lib\net45\Ninject.Web.Common.dll</HintPath>
@@ -174,6 +188,7 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Net" />
     <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\Packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
     </Reference>
@@ -238,20 +253,20 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Core\AspNetNinjectBindingExtension.cs" />
     <Compile Include="Core\AutoMapperDefinitionDiscovery.cs" />
+    <Compile Include="Core\CommandsModule.cs" />
     <Compile Include="Core\HangfireOwinConfigurator.cs" />
     <Compile Include="Core\IAutoMapperDefinition.cs" />
     <Compile Include="Core\LocalConfiguration.cs" />
     <Compile Include="Core\NinjectServiceLocator.cs" />
+    <Compile Include="Core\RevoHttpApplication.cs" />
     <Compile Include="Core\UserActorContext.cs" />
     <Compile Include="Core\AutoMapperInitializer.cs" />
-    <Compile Include="Core\CommandBusModule.cs" />
     <Compile Include="Core\ContravariantBindingResolver.cs" />
     <Compile Include="Core\CorePlatformModule.cs" />
     <Compile Include="Core\IConfiguration.cs" />
     <Compile Include="Core\Lifecycle\IHttpApplicationInitializer.cs" />
     <Compile Include="Core\Lifecycle\IOwinConfigurator.cs" />
     <Compile Include="Core\Lifecycle\IWebActivatorExHooks.cs" />
-    <Compile Include="Core\NinjectWebLoader.cs" />
     <Compile Include="Core\AspNetTypeExplorer.cs" />
     <Compile Include="Core\WebConfiguration.cs" />
     <Compile Include="Globalization\TranslatingJsonSerializer.cs" />
@@ -337,6 +352,13 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\..\Packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\Packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\Packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\Packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

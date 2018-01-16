@@ -16,7 +16,7 @@ namespace GTRevo.Infrastructure.Projections
         Task CommitChangesAsync();
     }
 
-    public interface IEntityEventProjector<in T> : IEntityEventProjector
+    public interface IEntityEventProjector<T> : IEntityEventProjector
         where T : IEventSourcedAggregateRoot
     {
         Task ProjectEventsAsync(T aggregate, IReadOnlyCollection<IEventMessage<DomainAggregateEvent>> events);

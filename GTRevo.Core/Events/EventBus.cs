@@ -19,8 +19,8 @@ namespace GTRevo.Core.Events
 
         public async Task PublishAsync(IEventMessage message, CancellationToken cancellationToken)
         {
-            Type messageType = typeof(IEventMessage<>).MakeGenericType(message.GetType());
-            Type listenerType = typeof(IEventListener<>).MakeGenericType(messageType);
+            Type messageType = typeof(IEventMessage<>).MakeGenericType(message.Event.GetType());
+            Type listenerType = typeof(IEventListener<>).MakeGenericType(message.Event.GetType());
             var handleMethod = listenerType.GetMethod("HandleAsync", new[] { messageType, typeof(CancellationToken)});
             IEnumerable<object> listeners = serviceLocator.GetAll(listenerType);
 

@@ -1,6 +1,7 @@
 ﻿namespace GTRevo.Core.Transactions
 {
-    public interface IUnitOfWorkFactory : ITransactionProvider
+    public interface IUnitOfWorkFactory
     {
+        IUnitOfWork CreateUnitOfWork();
     }
 }

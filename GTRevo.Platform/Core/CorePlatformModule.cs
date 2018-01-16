@@ -44,7 +44,7 @@ namespace GTRevo.Platform.Core
             Bind<IResourceManager, IWebActivatorExHooks>()
                 .To<ResourceManager>()
                 .InSingletonScope();
-
+            
             Bind<IOwinConfigurator>()
                 .To<SecurityAppInitializer>()
                 .InSingletonScope();

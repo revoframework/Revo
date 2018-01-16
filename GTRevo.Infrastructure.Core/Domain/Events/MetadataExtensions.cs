@@ -37,7 +37,27 @@ namespace GTRevo.Infrastructure.Core.Domain.Events
         {
             return DateTimeOffset.Parse(GetStringValue(metadata, BasicEventMetadataNames.StoreDate), CultureInfo.InvariantCulture);
         }
-        
+
+        public static void ReplaceMetadata(this IEventMessageDraft messageDraft, string key, string newValue)
+        {
+            if (messageDraft.Metadata.TryGetValue(key, out string oldValue))
+            {
+                messageDraft.SetMetadata("Original" + key, oldValue);
+            }
+
+            messageDraft.SetMetadata(key, newValue);
+        }
+
+        public static void ReplaceMetadata(this IDictionary<string, string> metadata, string key, string newValue)
+        {
+            if (metadata.TryGetValue(key, out string oldValue))
+            {
+                metadata["Original" + key] = oldValue;
+            }
+
+            metadata[key] = newValue;
+        }
+
         private static string GetStringValue(IReadOnlyDictionary<string, string> metadata, string key)
         {
             if (metadata.TryGetValue(key, out string value))

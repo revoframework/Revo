@@ -49,7 +49,7 @@ namespace GTRevo.Infrastructure.Sagas
                 yield return new EventSequencing()
                 {
                     SequenceName = message.Event is DomainAggregateEvent domainAggregateEvent
-                        ? "SagaEventListener" + domainAggregateEvent.AggregateId.ToString()
+                        ? "SagaEventListener:" + domainAggregateEvent.AggregateId.ToString() // TODO queue per saga instance
                         : "SagaEventListener",
                     EventSequenceNumber = message.Metadata.GetStreamSequenceNumber()
                 };

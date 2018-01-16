@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using GTRevo.Core.Events;
 
 namespace GTRevo.Core.Transactions
@@ -7,23 +8,24 @@ namespace GTRevo.Core.Transactions
     {
         private readonly IUnitOfWorkProvider[] transactionProviders;
         private readonly IUnitOfWorkListener[] unitOfWorkListeners;
-        private readonly IEventBus eventBus;
+        private readonly Func<IPublishEventBuffer> publishEventBufferFunc;
 
         public UnitOfWorkFactory(IUnitOfWorkProvider[] transactionProviders,
-            IUnitOfWorkListener[] unitOfWorkListeners, IEventBus eventBus)
+            IUnitOfWorkListener[] unitOfWorkListeners,
+            Func<IPublishEventBuffer> publishEventBufferFunc)
         {
             this.transactionProviders = transactionProviders;
             this.unitOfWorkListeners = unitOfWorkListeners;
-            this.eventBus = eventBus;
+            this.publishEventBufferFunc = publishEventBufferFunc;
         }
 
-        public ITransaction CreateTransaction()
+        public IUnitOfWork CreateUnitOfWork()
         {
             ITransaction[] transactions = transactionProviders
                 .Select(x => x.CreateTransaction())
                 .ToArray();
 
-            var tx = new UnitOfWork(transactions, unitOfWorkListeners, eventBus);
+            var tx = new UnitOfWork(transactions, unitOfWorkListeners, publishEventBufferFunc());
             return tx;
         }
     }

@@ -27,11 +27,7 @@ namespace GTRevo.Infrastructure.EF6.EventStore.Model
         private IEvent @event;
         private IReadOnlyDictionary<string, string> additionalMetadata;
         private JObject additionalMetadataJsonObject;
-
-        public EventStreamRow()
-        {
-        }
-
+        
         public EventStreamRow(IDomainEventTypeCache domainEventTypeCache, Guid id,
             IEvent @event, Guid streamId, long streamSequenceNumber, DateTimeOffset storeDate,
             IReadOnlyDictionary<string, string> additionalMetadata)
@@ -44,6 +40,10 @@ namespace GTRevo.Infrastructure.EF6.EventStore.Model
             StreamSequenceNumber = streamSequenceNumber;
             StoreDate = storeDate;
             GlobalSequenceNumber = -1;
+        }
+
+        protected EventStreamRow()
+        {
         }
 
         [NotMapped]

@@ -15,10 +15,6 @@ namespace GTRevo.Core.Core
                 .ToMethod(ctx => Clock.Current)
                 .InTransientScope();
 
-            Bind<ICommandBus>()
-                .To<CommandBus>()
-                .InRequestOrJobScope();
-
             Bind<IApplicationStartListener>()
                 .To<CommandHandlerDiscovery>()
                 .InSingletonScope();
@@ -32,11 +28,11 @@ namespace GTRevo.Core.Core
                 .InRequestOrJobScope();
 
             Bind<IUnitOfWork>()
-                .ToMethod(ctx => ctx.Kernel.Get<IUnitOfWork>())
+                .ToMethod(ctx => ctx.Kernel.Get<IUnitOfWorkFactory>().CreateUnitOfWork())
                 .InRequestOrJobScope();
 
             Bind<IPublishEventBuffer>()
-                .ToMethod(ctx => ctx.Kernel.Get<IUnitOfWork>().EventBuffer)
+                .To<PublishEventBuffer>()
                 .InRequestOrJobScope();
         }
     }

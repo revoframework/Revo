@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Hangfire;
@@ -11,18 +12,34 @@ namespace GTRevo.Infrastructure.Jobs.Hangfire
     {
         public Task<string> EnqeueJobAsync(IJob job, TimeSpan? timeDelay)
         {
+            var method = GetType().GetMethod(nameof(DoEnqeueJobAsync), BindingFlags.Instance | BindingFlags.NonPublic);
+            var genericMethod = method.MakeGenericMethod(job.GetType());
+            return (Task<string>)genericMethod.Invoke(this, new object[] {job, timeDelay});
+        }
+
+        public Task<string> ScheduleJobAsync(IJob job, DateTimeOffset enqueueAt)
+        {
+            var method = GetType().GetMethod(nameof(DoScheduleJobAsync), BindingFlags.Instance | BindingFlags.NonPublic);
+            var genericMethod = method.MakeGenericMethod(job.GetType());
+            return (Task<string>)genericMethod.Invoke(this, new object[] { job, enqueueAt });
+        }
+
+        private Task<string> DoEnqeueJobAsync<TJob>(TJob job, TimeSpan? timeDelay)
+            where TJob : IJob
+        {
             string jobId = timeDelay == null
-                ? BackgroundJob.Enqueue<IJobRunner>(jobRunner => jobRunner.RunJobAsync(job))
-                : BackgroundJob.Schedule<IJobRunner>(jobRunner => jobRunner.RunJobAsync(job),
+                ? BackgroundJob.Enqueue<HangfireJobEntryPoint<TJob>>(entryPoint => entryPoint.ExecuteAsync(job))
+                : BackgroundJob.Schedule<HangfireJobEntryPoint<TJob>>(entryPoint => entryPoint.ExecuteAsync(job),
                     timeDelay.Value);
 
             return Task.FromResult(jobId);
         }
 
-        public Task<string> ScheduleJobAsync(IJob job, DateTimeOffset enqueueAt)
+        private Task<string> DoScheduleJobAsync<TJob>(TJob job, DateTimeOffset enqueueAt)
+            where TJob : IJob
         {
-            string jobId = BackgroundJob.Schedule<IJobRunner>(
-                jobRunner => jobRunner.RunJobAsync(job),
+            string jobId = BackgroundJob.Schedule<HangfireJobEntryPoint<TJob>>(
+                entryPoint => entryPoint.ExecuteAsync(job),
                 enqueueAt);
             return Task.FromResult(jobId);
         }

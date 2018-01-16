@@ -10,7 +10,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Core\ModuleLoader.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\RevoHttpApplication.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\WebActivatorExBootstrapper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Startup.cs" />
   </ItemGroup>

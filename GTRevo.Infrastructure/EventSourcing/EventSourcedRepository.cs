@@ -174,11 +174,8 @@ namespace GTRevo.Infrastructure.EventSourcing
 
         public virtual void SaveChanges()
         {
-            throw new NotImplementedException();
-        }
+            // TODO refactor with async version
 
-        public virtual async Task SaveChangesAsync()
-        {
             List<TBase> savedAggregates = aggregates.Values.Where(x => x.UncommittedEvents.Any()).ToList();
             if (savedAggregates.Any())
             {
@@ -200,10 +197,49 @@ namespace GTRevo.Infrastructure.EventSourcing
 
                 foreach (var aggregate in savedAggregates)
                 {
-                    var eventMessages = await CreateEventMessagesAsync(aggregate, aggregate.UncommittedEvents);
+                    var eventMessages = CreateEventMessages(aggregate, aggregate.UncommittedEvents);
                     var eventRecords = eventMessages.Select(x => new UncommitedEventStoreRecord(x.Event, x.Metadata)).ToList();
 
-                    await eventStore.PushEventsAsync(aggregate.Id, eventRecords, aggregate.Version);
+                    eventStore.PushEvents(aggregate.Id, eventRecords, aggregate.Version);
+
+                    allEventMessages.AddRange(eventMessages);
+                }
+
+                eventStore.CommitChanges();
+                allEventMessages.ForEach(publishEventBuffer.PushEvent);
+            }
+
+            CommitAggregates();
+        }
+
+        public virtual async Task SaveChangesAsync()
+        {
+            List<TBase> savedAggregates = aggregates.Values.Where(x => x.UncommittedEvents.Any()).ToList();
+            if (savedAggregates.Any())
+            {
+                foreach (var aggregate in savedAggregates)
+                {
+                    CheckEvents(aggregate, aggregate.UncommittedEvents);
+
+                    if (aggregate.Version == 0)
+                    {
+                        FilterAdded(aggregate);
+                    }
+                    else
+                    {
+                        FilterModified(aggregate);
+                    }
+                }
+
+                List<IEventMessage> allEventMessages = new List<IEventMessage>();
+
+                foreach (var aggregate in savedAggregates)
+                {
+                    List<IEventMessageDraft> eventMessageDrafts = await CreateEventMessagesAsync(aggregate, aggregate.UncommittedEvents);
+                    List<UncommitedEventStoreRecord> uncommittedRecords = eventMessageDrafts.Select(x => new UncommitedEventStoreRecord(x.Event, x.Metadata)).ToList();
+
+                    IReadOnlyCollection<IEventStoreRecord> eventRecords = await eventStore.PushEventsAsync(aggregate.Id, uncommittedRecords, aggregate.Version);
+                    List<IEventMessage> eventMessages = eventRecords.Select(EventStoreEventMessage.FromRecord).ToList();
 
                     allEventMessages.AddRange(eventMessages);
                 }
@@ -245,6 +281,11 @@ namespace GTRevo.Infrastructure.EventSourcing
                     aggregate.Commit();
                 }
             }
+        }
+
+        private List<IEventMessageDraft> CreateEventMessages(TBase aggregate, IReadOnlyCollection<DomainAggregateEvent> events)
+        {
+            return Task.Run(() => CreateEventMessagesAsync(aggregate, events)).GetAwaiter().GetResult(); // TODO?
         }
 
         private async Task<List<IEventMessageDraft>> CreateEventMessagesAsync(TBase aggregate, IReadOnlyCollection<DomainAggregateEvent> events)
@@ -336,8 +377,12 @@ namespace GTRevo.Infrastructure.EventSourcing
 
             var eventStreamMetadata = await eventStore.GetStreamMetadataAsync(aggregateId);
 
-            Guid classId = eventStreamMetadata.GetAggregateClassId()
-                ?? throw new InvalidOperationException( $"Cannot load event sourced aggregate ID {aggregateId}: aggregate class ID not found in event stream metadata");
+            if (!eventStreamMetadata.TryGetValue(AggregateEventStreamMetadataNames.ClassId, out string classIdString))
+            {
+                throw new InvalidOperationException($"Cannot load event sourced aggregate ID {aggregateId}: aggregate class ID not found in event stream metadata");
+            }
+
+            Guid classId = Guid.Parse(classIdString);
             Type entityType = entityTypeManager.GetClrTypeByClassId(classId);
 
             TBase aggregate = (TBase) ConstructEntity(entityType, aggregateId);

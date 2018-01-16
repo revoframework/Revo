@@ -48,10 +48,14 @@ namespace GTRevo.Infrastructure.Globalization.Messages.Database
             messages = newMessages.ToDictionary(x => x.Key,
                 x => x.Value.ToImmutable());
 
-            Task.Run(async () =>
-                await eventBus.PublishAsync(
+            eventBus.PublishAsync(
+                new EventMessageDraft<DbMessageCacheReloadedEvent>(new DbMessageCacheReloadedEvent()));
+
+            // TODO deadlocks even though it shouldn't (?)
+            /*Task.Run(() =>
+                eventBus.PublishAsync(
                     new EventMessageDraft<DbMessageCacheReloadedEvent>(new DbMessageCacheReloadedEvent())))
-                    .GetAwaiter().GetResult();
+                    .GetAwaiter().GetResult();*/
         }
     }
 }

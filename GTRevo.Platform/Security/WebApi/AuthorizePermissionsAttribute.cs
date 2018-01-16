@@ -33,7 +33,7 @@ namespace GTRevo.Platform.Security.WebApi
                 return false;
             }
 
-            IKernel kernel = NinjectWebLoader.Bootstrapper.Kernel;
+            IKernel kernel = RevoHttpApplication.Current.Kernel;
             PermissionTypeRegistry permissionCache = kernel.Get<PermissionTypeRegistry>();
 
             if (requiredPermissions == null)

@@ -14,12 +14,12 @@ namespace GTRevo.Core.Transactions
 
         public UnitOfWork(ITransaction[] innerTransactions,
             IUnitOfWorkListener[] unitOfWorkListeners,
-            IEventBus eventBus)
+            IPublishEventBuffer publishEventBuffer)
         {
             this.innerTransactions = innerTransactions;
             this.unitOfWorkListeners = unitOfWorkListeners;
 
-            EventBuffer = new PublishEventBuffer(eventBus);
+            EventBuffer = publishEventBuffer;
 
             foreach (var listener in unitOfWorkListeners)
             {
@@ -41,13 +41,13 @@ namespace GTRevo.Core.Transactions
                 await transaction.CommitAsync();
             }
 
+            // TODO flushing events even on an exception?
+            await EventBuffer.FlushAsync(new CancellationToken()); // TODO cancellation token
+
             foreach (var listener in unitOfWorkListeners)
             {
                 await listener.OnWorkSucceededAsync(this);
             }
-
-            // TODO flushing events even on an exception?
-            await EventBuffer.FlushAsync(new CancellationToken()); // TODO cancellation token
         }
 
         #region IDisposable Support

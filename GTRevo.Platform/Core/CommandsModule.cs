@@ -14,6 +14,10 @@ namespace GTRevo.Platform.Core
                 .To<CommandBus>();
 
             Kernel.Components.Add<IBindingResolver, ContravariantBindingResolver>();
+
+            Bind<IPreCommandFilter<ICommandBase>, IPostCommandFilter<ICommandBase>,
+                    IExceptionCommandFilter<ICommandBase>>()
+                .To<UnitOfWorkCommandFilter>();
         }
     }
 }

@@ -25,8 +25,8 @@ namespace GTRevo.Infrastructure.EF6.Events.Async
         public QueuedAsyncEvent(string queueId, EventStreamRow eventStreamRow, long? sequenceNumber)
         {
             QueueId = queueId;
-            EventId = eventStreamRow.Id;
             EventStreamRow = eventStreamRow;
+            EventStreamRowId = eventStreamRow.Id;
             SequenceNumber = sequenceNumber;
             Id = Guid.NewGuid();
         }
@@ -34,8 +34,8 @@ namespace GTRevo.Infrastructure.EF6.Events.Async
         public QueuedAsyncEvent(string queueId, ExternalEventRecord externalEventRecord, long? sequenceNumber)
         {
             QueueId = queueId;
-            EventId = ExternalEventRecord.Id;
             ExternalEventRecord = externalEventRecord;
+            ExternalEventRecordId = externalEventRecord.Id;
             SequenceNumber = sequenceNumber;
             Id = Guid.NewGuid();
         }
@@ -45,7 +45,7 @@ namespace GTRevo.Infrastructure.EF6.Events.Async
         }
 
         public Guid Id { get; private set; }
-        public Guid EventId { get; private set; }
+        public Guid EventId => EventStreamRowId ?? ExternalEventRecordId ?? throw new InvalidOperationException("QueuedAsyncEvent has no event id");
         public long? SequenceNumber { get; private set; }
 
         [NotMapped]

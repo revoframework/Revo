@@ -15,15 +15,15 @@ namespace GTRevo.Infrastructure.Events.Async
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly IAsyncEventQueueBacklogWorker asyncEventQueueBacklogWorker;
+        private readonly Func<IAsyncEventQueueBacklogWorker> asyncEventQueueBacklogWorkerFunc;
         private readonly IAsyncEventQueueManager asyncEventQueueManager;
         private readonly IJobScheduler jobScheduler;
 
-        public AsyncEventProcessor(IAsyncEventQueueBacklogWorker asyncEventQueueBacklogWorker,
+        public AsyncEventProcessor(Func<IAsyncEventQueueBacklogWorker> asyncEventQueueBacklogWorkerFunc,
             IAsyncEventQueueManager asyncEventQueueManager,
             IJobScheduler jobScheduler)
         {
-            this.asyncEventQueueBacklogWorker = asyncEventQueueBacklogWorker;
+            this.asyncEventQueueBacklogWorkerFunc = asyncEventQueueBacklogWorkerFunc;
             this.asyncEventQueueManager = asyncEventQueueManager;
             this.jobScheduler = jobScheduler;
         }
@@ -83,6 +83,7 @@ namespace GTRevo.Infrastructure.Events.Async
                 {
                     try
                     {
+                        var asyncEventQueueBacklogWorker = asyncEventQueueBacklogWorkerFunc();
                         await asyncEventQueueBacklogWorker.RunQueueBacklogAsync(x);
                         return x;
                     }

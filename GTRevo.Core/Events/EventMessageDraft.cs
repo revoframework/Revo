@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using GTRevo.Core.Events;
 
-namespace GTRevo.Infrastructure.Events
+namespace GTRevo.Core.Events
 {
     public class EventMessageDraft<TEvent> : IEventMessageDraft<TEvent>
         where TEvent : IEvent

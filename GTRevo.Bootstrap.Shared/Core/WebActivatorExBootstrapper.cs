@@ -1,4 +1,5 @@
-﻿using GTRevo.Boostrap.Core;
+﻿using System.Linq;
+using GTRevo.Boostrap.Core;
 using GTRevo.Core.Core.Lifecycle;
 using GTRevo.Platform.Core;
 using GTRevo.Platform.Core.Lifecycle;
@@ -12,24 +13,22 @@ namespace GTRevo.Boostrap.Core
     {
         public static void OnPreApplicationStart()
         {
-            NinjectWebLoader.Start();
-            
-            foreach (IWebActivatorExHooks appInitializer in NinjectWebLoader.ResolveAll<IWebActivatorExHooks>())
+            /*foreach (IWebActivatorExHooks appInitializer in RevoHttpApplication.Current.ResolveAll<IWebActivatorExHooks>())
             {
                 appInitializer.OnPreApplicationStart();
-            }
+            }*/
         }
 
         public static void OnPostApplicationStart()
         {
-            NinjectWebLoader.PostStart();
+            RevoHttpApplication.Current.PostStart();
 
-            foreach (IWebActivatorExHooks appInitializer in NinjectWebLoader.ResolveAll<IWebActivatorExHooks>())
+            foreach (IWebActivatorExHooks appInitializer in RevoHttpApplication.Current.ResolveAll<IWebActivatorExHooks>())
             {
                 appInitializer.OnPostApplicationStart();
             }
-
-            foreach (IApplicationStartListener startListener in NinjectWebLoader.ResolveAll<IApplicationStartListener>())
+            
+            foreach (IApplicationStartListener startListener in RevoHttpApplication.Current.ResolveAll<IApplicationStartListener>())
             {
                 startListener.OnApplicationStarted();
             }
@@ -38,17 +37,15 @@ namespace GTRevo.Boostrap.Core
         public static void OnApplicationShutdown()
         {
 
-            foreach (IApplicationStopListener stopListener in NinjectWebLoader.ResolveAll<IApplicationStopListener>())
+            foreach (IApplicationStopListener stopListener in RevoHttpApplication.Current.ResolveAll<IApplicationStopListener>())
             {
                 stopListener.OnApplicationStopping();
             }
 
-            foreach (IWebActivatorExHooks appInitializer in NinjectWebLoader.ResolveAll<IWebActivatorExHooks>())
+            foreach (IWebActivatorExHooks appInitializer in RevoHttpApplication.Current.ResolveAll<IWebActivatorExHooks>())
             {
                 appInitializer.OnApplicationShutdown();
             }
-
-            NinjectWebLoader.Stop();
         }
     }
 }

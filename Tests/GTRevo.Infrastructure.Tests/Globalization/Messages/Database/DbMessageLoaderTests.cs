@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using GTRevo.Core.Events;
 using GTRevo.Infrastructure.Events;
 using GTRevo.Infrastructure.Globalization;
 using GTRevo.Infrastructure.Globalization.Messages.Database;

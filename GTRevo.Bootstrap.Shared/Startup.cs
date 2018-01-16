@@ -11,7 +11,7 @@ namespace GTRevo.Boostrap
     {
         public void Configuration(IAppBuilder app)
         {
-            foreach (IOwinConfigurator owinConfigurator in NinjectWebLoader.ResolveAll<IOwinConfigurator>())
+            foreach (IOwinConfigurator owinConfigurator in RevoHttpApplication.Current.ResolveAll<IOwinConfigurator>())
             {
                 owinConfigurator.ConfigureApp(app);
             }

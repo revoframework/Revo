@@ -12,15 +12,15 @@ namespace GTRevo.Infrastructure.Events.Async
     {
         private readonly IEventSourceCatchUp[] eventSourceCatchUps;
         private readonly IAsyncEventQueueManager asyncEventQueueManager;
-        private readonly IAsyncEventQueueBacklogWorker asyncEventQueueBacklogWorker;
+        private readonly Func<IAsyncEventQueueBacklogWorker> asyncEventQueueBacklogWorkerFunc;
 
         public AsyncEventExecutionCatchUp(IEventSourceCatchUp[] eventSourceCatchUps,
             IAsyncEventQueueManager asyncEventQueueManager,
-            IAsyncEventQueueBacklogWorker asyncEventQueueBacklogWorker)
+            Func<IAsyncEventQueueBacklogWorker> asyncEventQueueBacklogWorkerFunc)
         {
             this.eventSourceCatchUps = eventSourceCatchUps;
             this.asyncEventQueueManager = asyncEventQueueManager;
-            this.asyncEventQueueBacklogWorker = asyncEventQueueBacklogWorker;
+            this.asyncEventQueueBacklogWorkerFunc = asyncEventQueueBacklogWorkerFunc;
         }
 
         public void OnApplicationStarted()
@@ -47,7 +47,11 @@ namespace GTRevo.Infrastructure.Events.Async
             var backloggedQueueNames = await asyncEventQueueManager.GetNonemptyQueueNamesAsync();
 
             await Task.WhenAll(backloggedQueueNames.Select(queueName =>
-                Task.Factory.StartNewWithContext(() => asyncEventQueueBacklogWorker.RunQueueBacklogAsync(queueName)))); //using new Task because we want a new context (parallelization on ASP.NET 4 + fresh DI lifetime scope)
+                Task.Factory.StartNewWithContext(() =>
+                {
+                    var asyncEventQueueBacklogWorker = asyncEventQueueBacklogWorkerFunc();
+                    return asyncEventQueueBacklogWorker.RunQueueBacklogAsync(queueName);
+                }))); //using new Task because we want a new context (parallelization on ASP.NET 4 + fresh DI lifetime scope)
         }
     }
 }

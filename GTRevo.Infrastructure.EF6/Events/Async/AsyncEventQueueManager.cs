@@ -31,7 +31,7 @@ namespace GTRevo.Infrastructure.EF6.Events.Async
 
         public async Task<IReadOnlyCollection<IAsyncEventQueueRecord>> FindQueuedEventsAsync(Guid[] asyncEventQueueRecordIds)
         {
-            return await crudRepository.FindAll<QueuedAsyncEvent>()
+            return await QueryQueuedEvents()
                 .Where(x => asyncEventQueueRecordIds.Contains(x.Id))
                 .ToListAsync();
         }
@@ -58,12 +58,21 @@ namespace GTRevo.Infrastructure.EF6.Events.Async
                 return new List<IAsyncEventQueueRecord>();
             }
 
-            var events = await crudRepository
-                .Where<QueuedAsyncEvent>(x => x.QueueId == queue.Id)
-                .OrderBy(x => x.SequenceNumber)
-                .Include(x => x.EventStreamRow)
-                .Include(x => x.ExternalEventRecord)
+            var events = await QueryQueuedEvents()
+                .Where(x => x.QueueId == queue.Id)
                 .ToListAsync();
+
+            foreach (var @event in events)
+            {
+                if (@event.EventStreamRow != null && @event.EventStreamRow.DomainEventTypeCache == null)
+                {
+                    @event.EventStreamRow.DomainEventTypeCache = domainEventTypeCache;
+                }
+                else if (@event.ExternalEventRecord != null && @event.ExternalEventRecord.DomainEventTypeCache == null)
+                {
+                    @event.ExternalEventRecord.DomainEventTypeCache = domainEventTypeCache;
+                }
+            }
 
             return events;
         }
@@ -73,21 +82,16 @@ namespace GTRevo.Infrastructure.EF6.Events.Async
             QueuedAsyncEvent queuedEvent = await crudRepository.FindAsync<QueuedAsyncEvent>(asyncEventQueueRecordId);
             if (queuedEvent != null)
             {
-                crudRepository.Remove(queuedEvent);
-
                 AsyncEventQueue queue = await GetOrCreateQueueAsync(queuedEvent.QueueName, null);
                 if (queuedEvent.SequenceNumber != null)
                 {
                     queue.LastSequenceNumberProcessed = queuedEvent.SequenceNumber;
                 }
+
+                crudRepository.Remove(queuedEvent);
             }
         }
-
-        Task<IReadOnlyCollection<IAsyncEventQueueRecord>> IAsyncEventQueueManager.EnqueueEventAsync(IEventMessage eventMessage, IEnumerable<EventSequencing> queues)
-        {
-            throw new NotImplementedException();
-        }
-
+        
         public async Task EnqueueEventAsync(IEventMessage eventMessage, IEnumerable<EventSequencing> queues)
         {
             EventStreamRow eventStreamRow = null;
@@ -105,6 +109,7 @@ namespace GTRevo.Infrastructure.EF6.Events.Async
                 if (!crudRepository.IsAttached(eventStreamRow))
                 {
                     crudRepository.Attach(eventStreamRow);
+                    crudRepository.SetEntityState(eventStreamRow, EntityState.Modified);
                 }
             }
             else
@@ -201,6 +206,15 @@ namespace GTRevo.Infrastructure.EF6.Events.Async
             }
 
             return queue;
+        }
+        
+        private IQueryable<QueuedAsyncEvent> QueryQueuedEvents()
+        {
+            return crudRepository
+                .FindAll<QueuedAsyncEvent>()
+                .OrderBy(x => x.SequenceNumber)
+                .Include(x => x.EventStreamRow)
+                .Include(x => x.ExternalEventRecord);
         }
     }
 }

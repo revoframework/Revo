@@ -14,7 +14,7 @@ namespace GTRevo.Infrastructure.Events.Async
         Task<IAsyncEventQueueState> GetQueueStateAsync(string queueName);
         Task<IReadOnlyCollection<IAsyncEventQueueRecord>> GetQueueEventsAsync(string queueName);
         Task DequeueEventAsync(Guid asyncEventQueueRecordId);
-        Task<IReadOnlyCollection<IAsyncEventQueueRecord>> EnqueueEventAsync(IEventMessage eventMessage, IEnumerable<EventSequencing> queues);
+        Task EnqueueEventAsync(IEventMessage eventMessage, IEnumerable<EventSequencing> queues);
         Task<string> GetEventSourceCheckpointAsync(string eventSourceName);
         Task SetEventSourceCheckpointAsync(string eventSourceName, string opaqueCheckpoint);
         

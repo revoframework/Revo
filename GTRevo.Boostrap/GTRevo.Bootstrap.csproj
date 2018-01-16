@@ -26,6 +26,7 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -57,9 +58,8 @@
       <HintPath>..\..\Packages\AutoMapper.EF6.1.0.0\lib\net45\AutoMapper.EF6.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Castle.Core">
-      <HintPath>..\..\Packages\Castle.Core.3.3.3\lib\net45\Castle.Core.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Castle.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <HintPath>..\..\Packages\Castle.Core.4.2.1\lib\net45\Castle.Core.dll</HintPath>
     </Reference>
     <Reference Include="DelegateDecompiler">
       <HintPath>..\..\Packages\DelegateDecompiler.0.23.0\lib\net40-client\DelegateDecompiler.dll</HintPath>
@@ -170,6 +170,15 @@
       <HintPath>..\..\Packages\Microsoft.Owin.Security.Twitter.3.1.0\lib\net45\Microsoft.Owin.Security.Twitter.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.Threading.Tasks, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\Packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks.Extensions, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\Packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks.Extensions.Desktop, Version=1.0.168.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\Packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.Desktop.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Web.Infrastructure">
       <HintPath>..\..\Packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
       <Private>True</Private>
@@ -186,13 +195,18 @@
       <HintPath>..\..\Packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Ninject">
-      <HintPath>..\..\Packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Ninject, Version=3.3.4.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\..\Packages\Ninject.3.3.4\lib\net45\Ninject.dll</HintPath>
     </Reference>
     <Reference Include="Ninject.Extensions.Factory">
       <HintPath>..\..\Packages\Ninject.Extensions.Factory.3.2.1.0\lib\net45-full\Ninject.Extensions.Factory.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="Ninject.Web.Common, Version=3.3.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\..\Packages\Ninject.Web.Common.3.3.0\lib\net45\Ninject.Web.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Ninject.Web.Common.WebHost, Version=3.3.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\..\Packages\Ninject.Web.Common.WebHost.3.3.0\lib\net45\Ninject.Web.Common.WebHost.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\..\Packages\NLog.4.4.11\lib\net45\NLog.dll</HintPath>
@@ -207,6 +221,7 @@
       <HintPath>..\..\Packages\System.Diagnostics.DiagnosticSource.4.4.0\lib\net45\System.Diagnostics.DiagnosticSource.dll</HintPath>
     </Reference>
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Net" />
     <Reference Include="System.Net.Http.Formatting">
       <HintPath>..\..\Packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
       <Private>True</Private>
@@ -344,7 +359,9 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\..\Packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.5\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\Packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.5\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
     <Error Condition="!Exists('..\..\Packages\Microsoft.Net.Compilers.2.3.1\build\Microsoft.Net.Compilers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\Packages\Microsoft.Net.Compilers.2.3.1\build\Microsoft.Net.Compilers.props'))" />
+    <Error Condition="!Exists('..\..\Packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\Packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
   </Target>
+  <Import Project="..\..\Packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\Packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
