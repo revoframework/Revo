@@ -52,6 +52,16 @@ namespace GTRevo.Infrastructure.EF6.Repositories
             return crudRepository.GetAsync<T>(id);
         }
 
+        public T Find<T>(Guid id) where T : class, IAggregateRoot
+        {
+            return crudRepository.Find<T>(id);
+        }
+
+        public Task<T> FindAsync<T>(Guid id) where T : class, IAggregateRoot
+        {
+            return crudRepository.FindAsync<T>(id);
+        }
+
         public IEnumerable<IAggregateRoot> GetTrackedAggregates()
         {
             return crudRepository.GetEntities<IAggregateRoot>();

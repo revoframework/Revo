@@ -25,7 +25,7 @@ namespace GTRevo.Platform.Security
 
             userIdLazy = new Lazy<Guid?>(() =>
             {
-                string userIdString = authenticationManager.User?.Identity?.GetUserId<string>();
+                string userIdString = authenticationManager?.User?.Identity?.GetUserId<string>();
                 return userIdString != null ? ((Guid?) Guid.Parse(userIdString)) : null;
             });
         }

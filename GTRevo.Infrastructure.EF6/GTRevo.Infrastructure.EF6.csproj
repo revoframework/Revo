@@ -22,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -102,6 +103,7 @@
     <Compile Include="Events\Async\EventSourceState.cs" />
     <Compile Include="Events\Async\ExternalEventRecord.cs" />
     <Compile Include="Events\Async\QueuedAsyncEvent.cs" />
+    <Compile Include="Projections\EF6EntityEventToPocoProjector.cs" />
     <Compile Include="Projections\EF6ProjectionEventListener.cs" />
     <Compile Include="Projections\EF6ProjectionsModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

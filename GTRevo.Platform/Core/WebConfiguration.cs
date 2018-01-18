@@ -1,4 +1,5 @@
 ﻿using System.Web.Configuration;
+using GTRevo.Core.Core;
 
 namespace GTRevo.Platform.Core
 {

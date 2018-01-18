@@ -115,6 +115,34 @@ namespace GTRevo.Infrastructure.Repositories
             return aggregate;
         }
 
+        public T Find<T>(Guid id) where T : class, IAggregateRoot
+        {
+            var aggregateStore = GetAggregateStore<T>();
+            T aggregate = aggregateStore.Find<T>(id);
+            //AddTrackedAggregate(aggregate, aggregateStore);
+            return aggregate;
+        }
+
+        public async Task<T> FindAsync<T>(Guid id) where T : class, IAggregateRoot
+        {
+            var aggregateStore = GetAggregateStore<T>();
+            T aggregate = await aggregateStore.FindAsync<T>(id);
+            //AddTrackedAggregate(aggregate, aggregateStore);
+            return aggregate;
+        }
+
+        public IQueryable<T> FindAll<T>() where T : class, IAggregateRoot, IQueryableEntity
+        {
+            var aggregateStore = GetQueyrableAggregateStore<T>();
+            return aggregateStore.FindAll<T>();
+        }
+
+        public Task<IList<T>> FindAllAsync<T>() where T : class, IAggregateRoot, IQueryableEntity
+        {
+            var aggregateStore = GetQueyrableAggregateStore<T>();
+            return aggregateStore.FindAllAsync<T>();
+        }
+
         public T Get<T>(Guid id) where T : class, IAggregateRoot
         {
             var aggregateStore = GetAggregateStore<T>();
@@ -129,18 +157,6 @@ namespace GTRevo.Infrastructure.Repositories
             T aggregate = await aggregateStore.GetAsync<T>(id);
             //AddTrackedAggregate(aggregate, aggregateStore);
             return aggregate;
-        }
-        
-        public IQueryable<T> FindAll<T>() where T : class, IAggregateRoot, IQueryableEntity
-        {
-            var aggregateStore = GetQueyrableAggregateStore<T>();
-            return aggregateStore.FindAll<T>();
-        }
-
-        public Task<IList<T>> FindAllAsync<T>() where T : class, IAggregateRoot, IQueryableEntity
-        {
-            var aggregateStore = GetQueyrableAggregateStore<T>();
-            return aggregateStore.FindAllAsync<T>();
         }
 
         public IQueryable<T> Where<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity

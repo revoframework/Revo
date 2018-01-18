@@ -4,9 +4,4 @@
     {
         void LoadState(AggregateState state);
     }
-
-    /*public interface ISnapshotAggregateRoot : IEventSourcedAggregateRoot
-    {
-        // TODO
-    }*/
 }

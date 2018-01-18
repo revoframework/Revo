@@ -8,7 +8,6 @@ using GTRevo.Core.Events;
 using GTRevo.DataAccess.Entities;
 using GTRevo.Infrastructure.Events;
 using GTRevo.Infrastructure.History.ChangeTracking.Model;
-using GTRevo.Platform.Core;
 
 namespace GTRevo.Infrastructure.History.ChangeTracking
 {

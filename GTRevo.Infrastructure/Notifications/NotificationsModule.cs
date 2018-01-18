@@ -3,7 +3,6 @@ using GTRevo.Core.Core;
 using GTRevo.Core.Core.Lifecycle;
 using GTRevo.Core.Events;
 using GTRevo.DataAccess.Entities;
-using GTRevo.Platform.Core;
 using Ninject;
 using Ninject.Extensions.ContextPreservation;
 using Ninject.Modules;

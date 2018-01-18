@@ -1,6 +1,5 @@
 ﻿using GTRevo.Core.Core;
 using GTRevo.Core.Transactions;
-using GTRevo.Platform.Core;
 using Ninject.Modules;
 
 namespace GTRevo.Infrastructure.Repositories

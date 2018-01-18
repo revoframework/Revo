@@ -3,7 +3,6 @@ using GTRevo.Core.Core;
 using GTRevo.Core.Core.Lifecycle;
 using GTRevo.DataAccess.Entities;
 using GTRevo.Infrastructure.Security.Commands;
-using GTRevo.Platform.Core;
 using Ninject.Modules;
 
 namespace GTRevo.Infrastructure.Security

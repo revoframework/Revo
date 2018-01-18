@@ -21,6 +21,16 @@ namespace GTRevo.Infrastructure.Repositories
             ((dynamic)eventSourcedRepository).Add<T>(aggregate);
         }
 
+        public T Find<T>(Guid id) where T : class, IAggregateRoot
+        {
+            return ((dynamic)eventSourcedRepository).Find<T>(id);
+        }
+
+        public Task<T> FindAsync<T>(Guid id) where T : class, IAggregateRoot
+        {
+            return ((dynamic)eventSourcedRepository).FindAsync<T>(id);
+        }
+
         public T Get<T>(Guid id) where T : class, IAggregateRoot
         {
             return ((dynamic)eventSourcedRepository).Get<T>(id);

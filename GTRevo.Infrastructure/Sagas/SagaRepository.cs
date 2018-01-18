@@ -11,7 +11,6 @@ using GTRevo.Infrastructure.Core.Domain;
 using GTRevo.Infrastructure.Events;
 using GTRevo.Infrastructure.EventSourcing;
 using GTRevo.Infrastructure.EventStore;
-using GTRevo.Platform.Core;
 
 namespace GTRevo.Infrastructure.Sagas
 {

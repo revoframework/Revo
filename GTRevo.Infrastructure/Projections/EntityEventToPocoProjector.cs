@@ -67,6 +67,11 @@ namespace GTRevo.Infrastructure.Projections
                 target = await GetProjectionTargetAsync(aggregate);
             }
 
+            if (target == null)
+            {
+                return; //skip
+            }
+
             Aggregate = aggregate;
             Target = target;
 

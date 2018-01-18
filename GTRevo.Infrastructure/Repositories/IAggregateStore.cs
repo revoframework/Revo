@@ -11,6 +11,9 @@ namespace GTRevo.Infrastructure.Repositories
 
         bool CanHandleAggregateType(Type aggregateType);
 
+        T Find<T>(Guid id) where T : class, IAggregateRoot;
+        Task<T> FindAsync<T>(Guid id) where T : class, IAggregateRoot;
+
         T Get<T>(Guid id) where T : class, IAggregateRoot;
         Task<T> GetAsync<T>(Guid id) where T : class, IAggregateRoot;
 

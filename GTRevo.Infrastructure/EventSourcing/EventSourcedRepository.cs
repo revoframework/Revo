@@ -78,6 +78,26 @@ namespace GTRevo.Infrastructure.EventSourcing
                 });
         }
 
+        public T Find<T>(Guid id) where T : class, TBase
+        {
+            throw new NotImplementedException();
+        }
+
+        public TBase Find(Guid id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<T> FindAsync<T>(Guid id) where T : class, TBase
+        {
+            return DoFindAsync<T>(id, false);
+        }
+
+        public Task<TBase> FindAsync(Guid id)
+        {
+            return DoFindAsync<TBase>(id, false);
+        }
+
         public T Get<T>(Guid id) where T : class, TBase
         {
             throw new NotImplementedException();
@@ -88,48 +108,14 @@ namespace GTRevo.Infrastructure.EventSourcing
             throw new NotImplementedException();
         }
 
-        public async Task<T> GetAsync<T>(Guid id) where T : class, TBase
+        public Task<T> GetAsync<T>(Guid id) where T : class, TBase
         {
-            var aggregate = await GetAsync(id);
-            T typedAggregate = aggregate as T;
-
-            if (typedAggregate == null)
-            {
-                throw new ArgumentException($"Aggregate root with ID '{id}' is not of requested type '{typeof(T).FullName}'");
-            }
-
-            return typedAggregate;
+            return DoFindAsync<T>(id, true);
         }
 
-        public async Task<TBase> GetAsync(Guid id)
+        public Task<TBase> GetAsync(Guid id)
         {
-            TBase aggregate = FindLoadedAggregate(id);
-            if (aggregate == null)
-            {
-                aggregate = await LoadAggregateAsync(id);
-                if (aggregate != null)
-                {
-                    aggregates.Add(aggregate.Id, aggregate);
-                }
-            }
-
-            if (aggregate != null)
-            {
-                aggregate = FilterResult(aggregate);
-            }
-
-            if (aggregate == null)
-            {
-                throw new EntityNotFoundException($"Event sourced aggregate with ID {id} was not found");
-            }
-
-            if (aggregate.IsDeleted)
-            {
-                throw new EntityDeletedException(
-                    $"Cannot get event sourced {aggregate.GetType().FullName} aggregate with ID {id} because it has been previously deleted");
-            }
-
-            return aggregate;
+            return DoFindAsync<TBase>(id, true);
         }
 
         public IEnumerable<TBase> GetLoadedAggregates()
@@ -306,6 +292,54 @@ namespace GTRevo.Infrastructure.EventSourcing
             }
 
             return messages;
+        }
+
+        private async Task<T> DoFindAsync<T>(Guid id, bool shouldThrow) where T : class, TBase
+        {
+            TBase aggregate = FindLoadedAggregate(id);
+            if (aggregate == null)
+            {
+                aggregate = await LoadAggregateAsync(id);
+                if (aggregate != null)
+                {
+                    aggregates.Add(aggregate.Id, aggregate);
+                }
+            }
+
+            if (aggregate != null)
+            {
+                aggregate = FilterResult(aggregate);
+            }
+
+            if (aggregate == null)
+            {
+                if (shouldThrow)
+                {
+                    throw new EntityNotFoundException($"Event sourced aggregate with ID {id} was not found");
+                }
+
+                return null;
+            }
+
+            if (aggregate.IsDeleted)
+            {
+                if (shouldThrow)
+                {
+                    throw new EntityDeletedException(
+                        $"Cannot get event sourced {aggregate.GetType().FullName} aggregate with ID {id} because it has been previously deleted");
+                }
+
+                return null;
+            }
+
+            T typedAggregate = aggregate as T;
+            if (typedAggregate == null)
+            {
+                //always throw
+                throw new ArgumentException($"Aggregate root with ID '{id}' is not of requested type '{typeof(T).FullName}'");
+            }
+
+            return typedAggregate;
         }
 
         private T FilterResult<T>(T result) where T : class

@@ -3,7 +3,6 @@ using GTRevo.Core.Transactions;
 using GTRevo.Infrastructure.Core.Domain.EventSourcing;
 using GTRevo.Infrastructure.Events;
 using GTRevo.Infrastructure.Events.Metadata;
-using GTRevo.Platform.Core;
 using Ninject.Modules;
 
 namespace GTRevo.Infrastructure.EventSourcing

@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using GTRevo.Core.Core;
 using GTRevo.DataAccess.Entities;
-using GTRevo.Platform.Core;
 using Ninject.Modules;
 
 namespace GTRevo.Infrastructure.Tenancy
