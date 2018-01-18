@@ -36,6 +36,11 @@ namespace GTRevo.Core.Transactions
 
         public async Task CommitAsync()
         {
+            foreach (var listener in unitOfWorkListeners)
+            {
+                await listener.OnBeforeWorkCommitAsync(this);
+            }
+
             foreach (ITransaction transaction in innerTransactions)
             {
                 await transaction.CommitAsync();

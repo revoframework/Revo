@@ -24,6 +24,8 @@ namespace GTRevo.Core.Events
             {
                 await eventBus.PublishAsync(message, cancellationToken);
             }
+
+            messages.Clear();
         }
 
         public void PushEvent(IEventMessage message)

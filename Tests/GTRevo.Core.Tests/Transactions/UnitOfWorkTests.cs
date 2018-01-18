@@ -1,97 +1,57 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using GTRevo.Core.Events;
 using GTRevo.Core.Transactions;
 using NSubstitute;
 using Xunit;
 
-namespace GTRevo.Platform.Tests.Transactions
+namespace GTRevo.Core.Tests.Transactions
 {
     public class UnitOfWorkTests
     {
-        private readonly List<IUnitOfWorkProvider> transactionProviders = new List<IUnitOfWorkProvider>();
-        private readonly List<Tuple<ITransactionProvider, ITransaction>> transactions = new List<Tuple<ITransactionProvider, ITransaction>>();
-        private readonly List<IUnitOfWorkListener> unitOfWorkListeners = new List<IUnitOfWorkListener>();
-        private readonly IUnitOfWorkFactory sut;
+        private UnitOfWork sut;
+        private ITransaction[] innerTransactions;
+        private IUnitOfWorkListener[] unitOfWorkListeners;
+        private IPublishEventBuffer publishEventBuffer;
 
         public UnitOfWorkTests()
         {
-            CreateTransactionProvider();
-            CreateTransactionProvider();
+            innerTransactions = new[] { Substitute.For<ITransaction>(), Substitute.For<ITransaction>() };
+            unitOfWorkListeners = new[] { Substitute.For<IUnitOfWorkListener>(), Substitute.For<IUnitOfWorkListener>() };
+            publishEventBuffer = Substitute.For<IPublishEventBuffer>();
 
-            CreateUnitOfWorkListener();
-            CreateUnitOfWorkListener();
-
-            sut = new UnitOfWorkFactory(transactionProviders.ToArray(), unitOfWorkListeners.ToArray());
+            sut = new UnitOfWork(innerTransactions, unitOfWorkListeners, publishEventBuffer);
         }
 
         [Fact]
-        public void CreateTransaction_CreatesAllSubtransactions()
+        public void Constructor_BeginsWork()
         {
-            using (var tx = sut.CreateTransaction())
-            {
-                Assert.Equal(2, transactions.Count);
-                Assert.Equal(transactionProviders[0], transactions[0].Item1);
-                Assert.Equal(transactionProviders[1], transactions[1].Item1);
-            }
+            unitOfWorkListeners[0].Received(1).OnWorkBegin(sut);
+            unitOfWorkListeners[1].Received(1).OnWorkBegin(sut);
         }
 
         [Fact]
-        public async Task CreateTransaction_CommitAsync_CommitsAllSubtransactions()
+        public async Task CommitAsync_CommitsTxsFlushesEventsAndNotifies()
         {
-            using (var tx = sut.CreateTransaction())
+            await sut.CommitAsync();
+
+            Received.InOrder(() =>
             {
-                await tx.CommitAsync();
+                unitOfWorkListeners[0].OnBeforeWorkCommitAsync(sut);
+                unitOfWorkListeners[1].OnBeforeWorkCommitAsync(sut);
 
-                transactions[0].Item2.Received(1).CommitAsync();
-                transactions[1].Item2.Received(1).CommitAsync();
-            }
-        }
+                innerTransactions[0].CommitAsync();
+                innerTransactions[1].CommitAsync();
 
-        [Fact]
-        public void CreateTransaction_NotifiesListeners()
-        {
-            using (var tx = sut.CreateTransaction())
-            {
-                unitOfWorkListeners[0].Received(1).OnTransactionBegin(tx);
-                unitOfWorkListeners[1].Received(1).OnTransactionBegin(tx);
-            }
-        }
+                publishEventBuffer.FlushAsync(Arg.Any<CancellationToken>());
 
-        [Fact]
-        public async Task CreateTransaction_CommitAsync_NotifiesListeners()
-        {
-            using (var tx = sut.CreateTransaction())
-            {
-                await tx.CommitAsync();
-
-                unitOfWorkListeners[0].Received(1).OnTransactionSucceededAsync(tx);
-                unitOfWorkListeners[1].Received(1).OnTransactionSucceededAsync(tx);
-            }
-        }
-
-        private IUnitOfWorkProvider CreateTransactionProvider()
-        {
-            var txProvider = Substitute.For<IUnitOfWorkProvider>();
-            txProvider.CreateTransaction().Returns(callInfo => CreateTransaction(txProvider));
-
-            transactionProviders.Add(txProvider);
-
-            return txProvider;
-        }
-
-        private ITransaction CreateTransaction(ITransactionProvider transactionProvider)
-        {
-            var tx = Substitute.For<ITransaction>();
-            transactions.Add(new Tuple<ITransactionProvider, ITransaction>(transactionProvider, tx));
-            return tx;
-        }
-
-        private IUnitOfWorkListener CreateUnitOfWorkListener()
-        {
-            var listener = Substitute.For<IUnitOfWorkListener>();
-            unitOfWorkListeners.Add(listener);
-            return listener;
+                unitOfWorkListeners[0].OnWorkSucceededAsync(sut);
+                unitOfWorkListeners[1].OnWorkSucceededAsync(sut);
+            });
         }
     }
 }
