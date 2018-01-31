@@ -16,8 +16,7 @@ namespace GTRevo.Infrastructure.Repositories
         T First<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity;
         Task<T> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity;
         Task<T> FirstAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity;
-
-
+        
         T Find<T>(Guid id) where T : class, IAggregateRoot;
         Task<T> FindAsync<T>(Guid id) where T : class, IAggregateRoot;
         IQueryable<T> FindAll<T>() where T : class, IAggregateRoot, IQueryableEntity;

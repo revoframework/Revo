@@ -18,7 +18,8 @@ namespace GTRevo.Infrastructure.EF6.Projections
     /// Common stub for EF6 single-read-model entity projections.
     /// </summary>
     public class EF6EntityEventToPocoProjector<TSource, TTarget> :
-        EntityEventToPocoProjector<TSource, TTarget>
+        EntityEventToPocoProjector<TSource, TTarget>,
+        IEF6EntityEventProjector<TSource>
         where TSource : class, IEventSourcedAggregateRoot
         where TTarget : class, new()
     {

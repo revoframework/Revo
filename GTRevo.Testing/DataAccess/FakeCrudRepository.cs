@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 using GTRevo.DataAccess.Entities;
 
@@ -29,6 +30,11 @@ namespace GTRevo.Testing.DataAccess
             return entities.Select(x => x.Instance).OfType<T>().First(x => HasEntityId(x, id));
         }
 
+        public Task<T> GetAsync<T>(CancellationToken cancellationToken, params object[] id) where T : class
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<T> GetAsync<T>(params object[] id) where T : class
         {
             throw new NotImplementedException();
@@ -37,6 +43,11 @@ namespace GTRevo.Testing.DataAccess
         public Task<T> GetAsync<T>(object id) where T : class
         {
             return Task.FromResult(entities.Select(x => x.Instance).OfType<T>().First(x => HasEntityId(x, id)));
+        }
+
+        public Task<T> GetAsync<T>(CancellationToken cancellationToken, object id) where T : class
+        {
+            return GetAsync<T>(id);
         }
 
         public T FirstOrDefault<T>(Expression<Func<T, bool>> predicate) where T : class
@@ -49,12 +60,12 @@ namespace GTRevo.Testing.DataAccess
             return entities.Select(x => x.Instance).OfType<T>().First(predicate.Compile());
         }
 
-        public Task<T> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> predicate) where T : class
+        public Task<T> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken)) where T : class
         {
             return Task.FromResult(entities.Select(x => x.Instance).OfType<T>().FirstOrDefault(predicate.Compile()));
         }
 
-        public Task<T> FirstAsync<T>(Expression<Func<T, bool>> predicate) where T : class
+        public Task<T> FirstAsync<T>(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken)) where T : class
         {
             return Task.FromResult(First(predicate));
         }
@@ -72,9 +83,19 @@ namespace GTRevo.Testing.DataAccess
                 .FirstOrDefault(x => HasEntityId(x, id));
         }
 
+        public Task<T> FindAsync<T>(CancellationToken cancellationToken, params object[] id) where T : class
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<T> FindAsync<T>(params object[] id) where T : class
         {
             throw new NotImplementedException();
+        }
+
+        public Task<T> FindAsync<T>(CancellationToken cancellationToken, object id) where T : class
+        {
+            return FindAsync<T>(id);
         }
 
         public Task<T> FindAsync<T>(object id) where T : class
@@ -90,7 +111,7 @@ namespace GTRevo.Testing.DataAccess
                 .OfType<T>());
         }
 
-        public Task<IList<T>> FindAllAsync<T>() where T : class
+        public Task<IList<T>> FindAllAsync<T>(CancellationToken cancellationToken = default(CancellationToken)) where T : class
         {
             return Task.FromResult((IList<T>)entities
                 .Where(x => (x.State &EntityState.Added) == 0 && (x.State & EntityState.Detached) == 0)
@@ -239,7 +260,7 @@ namespace GTRevo.Testing.DataAccess
             }
         }
 
-        public Task SaveChangesAsync()
+        public Task SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             SaveChanges();
             return Task.FromResult(0);

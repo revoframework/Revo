@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 using GTRevo.Core.Transactions;
 using GTRevo.DataAccess.EF6.Model;
@@ -88,9 +89,25 @@ namespace GTRevo.DataAccess.EF6.Entities
             return t;
         }
 
+        public async Task<T> GetAsync<T>(CancellationToken cancellationToken, object[] id) where T : class
+        {
+            T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(cancellationToken, id);
+            t = FilterResult(t);
+            RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
+            return t;
+        }
+
         public async Task<T> GetAsync<T>(object id) where T : class
         {
             T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(id);
+            t = FilterResult(t);
+            RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
+            return t;
+        }
+
+        public async Task<T> GetAsync<T>(CancellationToken cancellationToken, object id) where T : class
+        {
+            T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(cancellationToken, id);
             t = FilterResult(t);
             RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
             return t;
@@ -108,16 +125,16 @@ namespace GTRevo.DataAccess.EF6.Entities
                 .First(predicate);
         }
 
-        public async Task<T> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> predicate) where T : class
+        public async Task<T> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken) where T : class
         {
             return await FilterResults(GetDbContext(typeof(T)).Set<T>())
-                .FirstOrDefaultAsync(predicate);
+                .FirstOrDefaultAsync(predicate, cancellationToken);
         }
 
-        public async Task<T> FirstAsync<T>(Expression<Func<T, bool>> predicate) where T : class
+        public async Task<T> FirstAsync<T>(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken) where T : class
         {
             return await FilterResults(GetDbContext(typeof(T)).Set<T>())
-                .FirstAsync(predicate);
+                .FirstAsync(predicate, cancellationToken);
         }
 
         public T Find<T>(object id) where T : class
@@ -141,9 +158,23 @@ namespace GTRevo.DataAccess.EF6.Entities
             return t;
         }
 
+        public async Task<T> FindAsync<T>(CancellationToken cancellationToken, object[] id) where T : class
+        {
+            T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(cancellationToken, id);
+            t = FilterResult(t);
+            return t;
+        }
+
         public async Task<T> FindAsync<T>(object id) where T : class
         {
             T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(id);
+            t = FilterResult(t);
+            return t;
+        }
+
+        public async Task<T> FindAsync<T>(CancellationToken cancellationToken, object id) where T : class
+        {
+            T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(cancellationToken, id);
             t = FilterResult(t);
             return t;
         }
@@ -153,9 +184,9 @@ namespace GTRevo.DataAccess.EF6.Entities
             return FilterResults(GetDbContext(typeof(T)).Set<T>());
         }
         
-        public async Task<IList<T>> FindAllAsync<T>() where T : class
+        public async Task<IList<T>> FindAllAsync<T>(CancellationToken cancellationToken) where T : class
         {
-            return await FilterResults(GetDbContext(typeof(T)).Set<T>()).ToListAsync();
+            return await FilterResults(GetDbContext(typeof(T)).Set<T>()).ToListAsync(cancellationToken);
         }
 
         public IEnumerable<T> FindAllWithAdded<T>() where T : class
@@ -266,7 +297,7 @@ namespace GTRevo.DataAccess.EF6.Entities
             }
         }
 
-        public async Task SaveChangesAsync()
+        public async Task SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             List<DbContext> modifiedDbContexts = dbContexts.Values.Where(x => x.ChangeTracker.HasChanges()).ToList();
             if (modifiedDbContexts.Count == 0)
@@ -284,7 +315,7 @@ namespace GTRevo.DataAccess.EF6.Entities
             IncrementEntityVersions(dbContext);
             try
             {
-                await dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync(cancellationToken);
             }
             catch (Exception)
             {

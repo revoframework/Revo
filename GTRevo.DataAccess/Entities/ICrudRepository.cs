@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace GTRevo.DataAccess.Entities
@@ -21,6 +22,6 @@ namespace GTRevo.DataAccess.Entities
         /// <summary>
         /// Asynchronously save the repository changes. Not needed when using unit of work.
         /// </summary>
-        Task SaveChangesAsync();
+        Task SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
     }
 }
