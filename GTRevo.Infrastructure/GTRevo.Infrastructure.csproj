@@ -316,6 +316,7 @@
     <Compile Include="Notifications\Channels\Fcm\Services\ExternalFcmService.cs" />
     <Compile Include="Notifications\Channels\Fcm\Services\FcmDeviceRegistrationService.cs" />
     <Compile Include="Notifications\Channels\Fcm\WrappedFcmNotification.cs" />
+    <Compile Include="Projections\CrudEntityEventToPocoProjector.cs" />
     <Compile Include="Web\JSBridge\JsonMessageExportCacheReloader.cs" />
     <Compile Include="Globalization\Messages\Database\IDbMessageLoader.cs" />
     <Compile Include="Globalization\Messages\Database\DbMessageCache.cs" />
@@ -491,7 +492,7 @@
       <Name>GTRevo.Infrastructure.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\GTRevo.Platform\GTRevo.Platform.csproj">
-      <Project>{42CDFAD0-CB40-433E-AC6E-874F3F58E77D}</Project>
+      <Project>{42cdfad0-cb40-433e-ac6e-874f3f58e77d}</Project>
       <Name>GTRevo.Platform</Name>
     </ProjectReference>
   </ItemGroup>

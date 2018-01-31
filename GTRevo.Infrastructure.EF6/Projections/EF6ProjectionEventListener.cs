@@ -14,17 +14,26 @@ using GTRevo.Infrastructure.Projections;
 namespace GTRevo.Infrastructure.EF6.Projections
 {
     public class EF6ProjectionEventListener : ProjectionEventListener
-
     {
+        private readonly IServiceLocator serviceLocator;
+
         public EF6ProjectionEventListener(IEventSourcedAggregateRepository eventSourcedRepository,
             IEntityTypeManager entityTypeManager, IServiceLocator serviceLocator,
-            EF6ProjectionEventSequencer eventSequencer)
-            : base(eventSourcedRepository, entityTypeManager, serviceLocator)
+            EF6ProjectionEventSequencer eventSequencer) :
+            base(eventSourcedRepository, entityTypeManager)
         {
+            this.serviceLocator = serviceLocator;
             EventSequencer = eventSequencer;
         }
         
         public override IAsyncEventSequencer EventSequencer { get; }
+
+        protected override IEnumerable<IEntityEventProjector> GetProjectors(Type entityType)
+        {
+            return serviceLocator.GetAll(
+                    typeof(IEF6EntityEventProjector<>).MakeGenericType(entityType))
+                .Cast<IEntityEventProjector>();
+        }
 
         public class EF6ProjectionEventSequencer : AsyncEventSequencer<DomainAggregateEvent>
         {

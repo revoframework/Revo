@@ -59,6 +59,17 @@ namespace GTRevo.Testing.Infrastructure.Repositories
             return Task.FromResult(First(predicate));
         }
 
+        public T Find<T>(Guid id) where T : class, IAggregateRoot
+        {
+            return Aggregates.Select(x => x.Instance).OfType<T>().FirstOrDefault(x => x.Id.Equals(id));
+        }
+
+        public Task<T> FindAsync<T>(Guid id) where T : class, IAggregateRoot
+        {
+            return Task.FromResult(
+                Aggregates.Select(x => x.Instance).OfType<T>().FirstOrDefault(x => x.Id.Equals(id)));
+        }
+
         public T Get<T>(Guid id) where T : class, IAggregateRoot
         {
             return Aggregates.Select(x => x.Instance).OfType<T>().First(x => x.Id.Equals(id));

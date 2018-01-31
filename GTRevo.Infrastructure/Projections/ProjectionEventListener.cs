@@ -19,19 +19,18 @@ namespace GTRevo.Infrastructure.Projections
     {
         private readonly IEventSourcedAggregateRepository eventSourcedRepository;
         private readonly IEntityTypeManager entityTypeManager;
-        private readonly IServiceLocator serviceLocator;
         private readonly Dictionary<Guid, PublishedEntityEvents> allEvents = new Dictionary<Guid, PublishedEntityEvents>();
 
         public ProjectionEventListener(IEventSourcedAggregateRepository eventSourcedRepository,
-            IEntityTypeManager entityTypeManager,
-            IServiceLocator serviceLocator)
+            IEntityTypeManager entityTypeManager)
         {
             this.eventSourcedRepository = eventSourcedRepository;
             this.entityTypeManager = entityTypeManager;
-            this.serviceLocator = serviceLocator;
         }
 
         public abstract IAsyncEventSequencer EventSequencer { get; }
+
+        protected abstract IEnumerable<IEntityEventProjector> GetProjectors(Type entityType);
 
         public async Task HandleAsync(IEventMessage<DomainAggregateEvent> message, string sequenceName)
         {
@@ -63,9 +62,7 @@ namespace GTRevo.Infrastructure.Projections
                 IEventSourcedAggregateRoot entity = await eventSourcedRepository
                     .GetAsync(entityEvents.Key);
 
-                IEnumerable<IEntityEventProjector> projectors = serviceLocator.GetAll(
-                    typeof(IEntityEventProjector<>).MakeGenericType(entityType))
-                    .Cast<IEntityEventProjector>();
+                IEnumerable<IEntityEventProjector> projectors = GetProjectors(entityType);
 
                 foreach (var projector in projectors)
                 {
