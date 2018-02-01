@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FluentAssertions;
 using GTRevo.Infrastructure.Events.Async;
 using NSubstitute;
 using Xunit;
@@ -14,7 +15,8 @@ namespace GTRevo.Infrastructure.Tests.Events.Async
         private AsyncEventExecutionCatchUp sut;
         private IEventSourceCatchUp[] eventSourceCatchUps;
         private IAsyncEventQueueManager asyncEventQueueManager;
-        private IAsyncEventQueueBacklogWorker asyncEventQueueBacklogWorker;
+        private List<IAsyncEventQueueBacklogWorker> asyncEventQueueBacklogWorkers = new List<IAsyncEventQueueBacklogWorker>();
+        private List<(IAsyncEventQueueBacklogWorker, string)> processedQueues = new List<(IAsyncEventQueueBacklogWorker, string)>();
 
         public AsyncEventExecutionCatchUpTests()
         {
@@ -25,12 +27,24 @@ namespace GTRevo.Infrastructure.Tests.Events.Async
             };
 
             asyncEventQueueManager = Substitute.For<IAsyncEventQueueManager>();
-            asyncEventQueueBacklogWorker = Substitute.For<IAsyncEventQueueBacklogWorker>();
 
             sut = new AsyncEventExecutionCatchUp(
                 eventSourceCatchUps,
                 asyncEventQueueManager,
-                asyncEventQueueBacklogWorker);
+                () =>
+                {
+                    var worker = Substitute.For<IAsyncEventQueueBacklogWorker>();
+                    worker.WhenForAnyArgs(x => x.RunQueueBacklogAsync(null)).Do(ci =>
+                    {
+                        lock (processedQueues)
+                        {
+                            processedQueues.Add((worker, ci.ArgAt<string>(0)));
+                        }
+                    });
+
+                    asyncEventQueueBacklogWorkers.Add(worker);
+                    return worker;
+                });
         }
 
         [Fact]
@@ -53,9 +67,10 @@ namespace GTRevo.Infrastructure.Tests.Events.Async
             asyncEventQueueManager.GetNonemptyQueueNamesAsync().Returns(nonEmptyQueueNames);
 
             sut.OnApplicationStarted();
-
-            asyncEventQueueBacklogWorker.Received(1).RunQueueBacklogAsync("first");
-            asyncEventQueueBacklogWorker.Received(1).RunQueueBacklogAsync("second");
+            
+            processedQueues.Should().HaveCount(2);
+            processedQueues.Select(x => x.Item1).Should().BeEquivalentTo(asyncEventQueueBacklogWorkers);
+            processedQueues.Select(x => x.Item2).Should().BeEquivalentTo("first", "second");
         }
     }
 }

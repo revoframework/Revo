@@ -30,7 +30,7 @@ namespace GTRevo.Infrastructure.Projections
 
         public abstract IAsyncEventSequencer EventSequencer { get; }
 
-        protected abstract IEnumerable<IEntityEventProjector> GetProjectors(Type entityType);
+        public abstract IEnumerable<IEntityEventProjector> GetProjectors(Type entityType);
 
         public async Task HandleAsync(IEventMessage<DomainAggregateEvent> message, string sequenceName)
         {

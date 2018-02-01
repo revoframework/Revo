@@ -18,7 +18,8 @@ namespace GTRevo.Infrastructure.Tests.Events.Async
     public class AsyncEventProcessorTests
     {
         private AsyncEventProcessor sut;
-        private IAsyncEventQueueBacklogWorker asyncEventQueueBacklogWorker;
+        private List<IAsyncEventQueueBacklogWorker> asyncEventQueueBacklogWorkers = new List<IAsyncEventQueueBacklogWorker>();
+        private List<(IAsyncEventQueueBacklogWorker, string)> processedQueues = new List<(IAsyncEventQueueBacklogWorker, string)>();
         private IAsyncEventQueueManager asyncEventQueueManager;
         private IJobScheduler jobScheduler;
         private List<IAsyncEventQueueRecord> events;
@@ -26,11 +27,45 @@ namespace GTRevo.Infrastructure.Tests.Events.Async
 
         public AsyncEventProcessorTests()
         {
-            asyncEventQueueBacklogWorker = Substitute.For<IAsyncEventQueueBacklogWorker>();
             asyncEventQueueManager = Substitute.For<IAsyncEventQueueManager>();
             jobScheduler = Substitute.For<IJobScheduler>();
 
-            sut = new AsyncEventProcessor(asyncEventQueueBacklogWorker,
+            IAsyncEventQueueBacklogWorker AsyncEventQueueBacklogWorkerFunc()
+            {
+                var worker = Substitute.For<IAsyncEventQueueBacklogWorker>();
+
+                worker.WhenForAnyArgs(x => x.RunQueueBacklogAsync(null)).Do(
+                    ci =>
+                    {
+                        string queue = ci.ArgAt<string>(0);
+
+                        lock (processedQueues)
+                        {
+                            processedQueues.Add((worker, queue));
+                        }
+
+                        lock (queueExceptions)
+                        {
+                            int exIndex = queueExceptions.FindIndex(x => x.queueName == queue);
+                            if (exIndex != -1)
+                            {
+                                Exception ex = queueExceptions[exIndex].e;
+                                queueExceptions.RemoveAt(exIndex);
+                                throw ex;
+                            }
+                        }
+
+                        lock (events)
+                        {
+                            events.Where(x => x.QueueName == queue).ToArray().ForEach(x => events.Remove(x));
+                        }
+                    });
+
+                asyncEventQueueBacklogWorkers.Add(worker);
+                return worker;
+            }
+
+            sut = new AsyncEventProcessor(AsyncEventQueueBacklogWorkerFunc,
                 asyncEventQueueManager, jobScheduler);
 
             var sleep = Substitute.For<ISleep>();
@@ -65,28 +100,6 @@ namespace GTRevo.Infrastructure.Tests.Events.Async
                 }
             });
 
-            asyncEventQueueBacklogWorker.WhenForAnyArgs(x => x.RunQueueBacklogAsync(null)).Do(
-                ci =>
-                {
-                    string queue = ci.ArgAt<string>(0);
-
-                    lock (queueExceptions)
-                    {
-                        int exIndex = queueExceptions.FindIndex(x => x.queueName == queue);
-                        if (exIndex != -1)
-                        {
-                            Exception ex = queueExceptions[exIndex].e;
-                            queueExceptions.RemoveAt(exIndex);
-                            throw ex;
-                        }
-                    }
-
-                    lock (events)
-                    {
-                        events.Where(x => x.QueueName == queue).ToArray().ForEach(x => events.Remove(x));
-                    }
-                });
-
             queueExceptions = new List<(string queueName, Exception e)>();
 
             AsyncEventPipelineConfiguration.Current = new AsyncEventPipelineConfiguration()
@@ -106,8 +119,9 @@ namespace GTRevo.Infrastructure.Tests.Events.Async
         {
             await sut.ProcessSynchronously(events);
 
-            asyncEventQueueBacklogWorker.Received(1).RunQueueBacklogAsync("Queue1");
-            asyncEventQueueBacklogWorker.Received(1).RunQueueBacklogAsync("Queue2");
+            asyncEventQueueBacklogWorkers.Should().HaveCount(2);
+            processedQueues.Select(x => x.Item1).Should().BeEquivalentTo(asyncEventQueueBacklogWorkers);
+            processedQueues.Select(x => x.Item2).Should().BeEquivalentTo("Queue1", "Queue2");
             Sleep.Current.DidNotReceiveWithAnyArgs().SleepAsync(TimeSpan.Zero);
         }
 
@@ -118,14 +132,20 @@ namespace GTRevo.Infrastructure.Tests.Events.Async
 
             await sut.ProcessSynchronously(events);
 
+            asyncEventQueueBacklogWorkers.Should().HaveCount(3);
+            processedQueues.Select(x => x.Item1).Should().BeEquivalentTo(asyncEventQueueBacklogWorkers);
+            processedQueues.Select(x => x.Item2).Should().BeEquivalentTo("Queue1", "Queue1", "Queue2");
+            var queue1Processors = processedQueues.Where(x => x.Item2 == "Queue1").Select(x => x.Item1).ToArray();
+            var queue2Processors = processedQueues.Where(x => x.Item2 == "Queue2").Select(x => x.Item1).ToArray();
+
             Received.InOrder(() =>
             {
-                asyncEventQueueBacklogWorker.RunQueueBacklogAsync("Queue1");
+                queue1Processors[0].RunQueueBacklogAsync("Queue1");
                 Sleep.Current.SleepAsync(AsyncEventPipelineConfiguration.Current.SyncProcessRetryTimeout);
-                asyncEventQueueBacklogWorker.RunQueueBacklogAsync("Queue1");
+                queue1Processors[1].RunQueueBacklogAsync("Queue1");
             });
-            
-            asyncEventQueueBacklogWorker.Received(1).RunQueueBacklogAsync("Queue2");
+
+            queue2Processors[0].Received(1).RunQueueBacklogAsync("Queue2");
         }
 
         [Fact]
@@ -135,14 +155,20 @@ namespace GTRevo.Infrastructure.Tests.Events.Async
 
             await sut.ProcessSynchronously(events);
 
+            asyncEventQueueBacklogWorkers.Should().HaveCount(3);
+            processedQueues.Select(x => x.Item1).Should().BeEquivalentTo(asyncEventQueueBacklogWorkers);
+            processedQueues.Select(x => x.Item2).Should().BeEquivalentTo("Queue1", "Queue1", "Queue2");
+            var queue1Processors = processedQueues.Where(x => x.Item2 == "Queue1").Select(x => x.Item1).ToArray();
+            var queue2Processors = processedQueues.Where(x => x.Item2 == "Queue2").Select(x => x.Item1).ToArray();
+
             Received.InOrder(() =>
             {
-                asyncEventQueueBacklogWorker.RunQueueBacklogAsync("Queue1");
+                queue1Processors[0].RunQueueBacklogAsync("Queue1");
                 Sleep.Current.SleepAsync(AsyncEventPipelineConfiguration.Current.SyncProcessRetryTimeout);
-                asyncEventQueueBacklogWorker.RunQueueBacklogAsync("Queue1");
+                queue1Processors[1].RunQueueBacklogAsync("Queue1");
             });
-            
-            asyncEventQueueBacklogWorker.Received(1).RunQueueBacklogAsync("Queue2");
+
+            queue2Processors[0].Received(1).RunQueueBacklogAsync("Queue2");
         }
         
         [Fact]
@@ -153,17 +179,23 @@ namespace GTRevo.Infrastructure.Tests.Events.Async
 
             await sut.ProcessSynchronously(events);
 
+            asyncEventQueueBacklogWorkers.Should().HaveCount(4);
+            processedQueues.Select(x => x.Item1).Should().BeEquivalentTo(asyncEventQueueBacklogWorkers);
+            processedQueues.Select(x => x.Item2).Should().BeEquivalentTo("Queue1", "Queue1", "Queue1", "Queue2");
+            var queue1Processors = processedQueues.Where(x => x.Item2 == "Queue1").Select(x => x.Item1).ToArray();
+            var queue2Processors = processedQueues.Where(x => x.Item2 == "Queue2").Select(x => x.Item1).ToArray();
+
             Received.InOrder(() =>
             {
-                asyncEventQueueBacklogWorker.RunQueueBacklogAsync("Queue1");
+                queue1Processors[0].RunQueueBacklogAsync("Queue1");
                 Sleep.Current.SleepAsync(AsyncEventPipelineConfiguration.Current.SyncProcessRetryTimeout);
-                asyncEventQueueBacklogWorker.RunQueueBacklogAsync("Queue1");
+                queue1Processors[1].RunQueueBacklogAsync("Queue1");
                 Sleep.Current.SleepAsync(new TimeSpan(AsyncEventPipelineConfiguration.Current.SyncProcessRetryTimeout.Ticks
                     * AsyncEventPipelineConfiguration.Current.SyncProcessRetryTimeoutMultiplier));
-                asyncEventQueueBacklogWorker.RunQueueBacklogAsync("Queue1");
+                queue1Processors[2].RunQueueBacklogAsync("Queue1");
             });
 
-            asyncEventQueueBacklogWorker.Received(1).RunQueueBacklogAsync("Queue2");
+            queue2Processors[0].Received(1).RunQueueBacklogAsync("Queue2");
         }
 
         [Fact]
@@ -175,14 +207,20 @@ namespace GTRevo.Infrastructure.Tests.Events.Async
 
             await sut.ProcessSynchronously(events);
 
+            asyncEventQueueBacklogWorkers.Should().HaveCount(4);
+            processedQueues.Select(x => x.Item1).Should().BeEquivalentTo(asyncEventQueueBacklogWorkers);
+            processedQueues.Select(x => x.Item2).Should().BeEquivalentTo("Queue1", "Queue1", "Queue1", "Queue2");
+            var queue1Processors = processedQueues.Where(x => x.Item2 == "Queue1").Select(x => x.Item1).ToArray();
+            var queue2Processors = processedQueues.Where(x => x.Item2 == "Queue2").Select(x => x.Item1).ToArray();
+
             Received.InOrder(() =>
             {
-                asyncEventQueueBacklogWorker.RunQueueBacklogAsync("Queue1");
+                queue1Processors[0].RunQueueBacklogAsync("Queue1");
                 Sleep.Current.SleepAsync(AsyncEventPipelineConfiguration.Current.SyncProcessRetryTimeout);
-                asyncEventQueueBacklogWorker.RunQueueBacklogAsync("Queue1");
+                queue1Processors[1].RunQueueBacklogAsync("Queue1");
                 Sleep.Current.SleepAsync(new TimeSpan(AsyncEventPipelineConfiguration.Current.SyncProcessRetryTimeout.Ticks
                     * AsyncEventPipelineConfiguration.Current.SyncProcessRetryTimeoutMultiplier));
-                asyncEventQueueBacklogWorker.RunQueueBacklogAsync("Queue1");
+                queue1Processors[2].RunQueueBacklogAsync("Queue1");
                 jobScheduler.EnqeueJobAsync(Arg.Is<ProcessAsyncEventsJob>(x =>
                     x.AttemptsLeft == AsyncEventPipelineConfiguration.Current.AsyncProcessAttemptCount
                     && x.QueueName == "Queue1"
@@ -191,7 +229,7 @@ namespace GTRevo.Infrastructure.Tests.Events.Async
             });
 
             Sleep.Current.Received(2).SleepAsync(Arg.Any<TimeSpan>());
-            asyncEventQueueBacklogWorker.Received(1).RunQueueBacklogAsync("Queue2");
+            queue2Processors[0].Received(1).RunQueueBacklogAsync("Queue2");
         }
 
         [Fact]
@@ -204,8 +242,15 @@ namespace GTRevo.Infrastructure.Tests.Events.Async
             await sut.ProcessSynchronously(events2);
 
             Sleep.Current.DidNotReceiveWithAnyArgs().SleepAsync(TimeSpan.Zero);
-            asyncEventQueueBacklogWorker.Received(1).RunQueueBacklogAsync("Queue1");
-            asyncEventQueueBacklogWorker.Received(1).RunQueueBacklogAsync("Queue2");
+
+            asyncEventQueueBacklogWorkers.Should().HaveCount(2);
+            processedQueues.Select(x => x.Item1).Should().BeEquivalentTo(asyncEventQueueBacklogWorkers);
+            processedQueues.Select(x => x.Item2).Should().BeEquivalentTo("Queue1", "Queue2");
+            var queue1Processors = processedQueues.Where(x => x.Item2 == "Queue1").Select(x => x.Item1).ToArray();
+            var queue2Processors = processedQueues.Where(x => x.Item2 == "Queue2").Select(x => x.Item1).ToArray();
+
+            queue1Processors[0].Received(1).RunQueueBacklogAsync("Queue1");
+            queue2Processors[0].Received(1).RunQueueBacklogAsync("Queue2");
         }
 
         [Fact]

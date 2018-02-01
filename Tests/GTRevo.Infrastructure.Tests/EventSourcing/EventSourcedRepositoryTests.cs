@@ -63,15 +63,28 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
                 .Returns(new Dictionary<string, string>()
                 {
                     { "TestKey", "TestValue" },
-                    { BasicEventMetadataNames.AggregateClassId, entity2ClassId.ToString() }
+                    { AggregateEventStreamMetadataNames.ClassId, entity2ClassId.ToString() }
                 });
 
             eventStore.GetStreamMetadataAsync(entity3Id)
                 .Returns(new Dictionary<string, string>()
                 {
                     { "TestKey", "TestValue" },
-                    { BasicEventMetadataNames.AggregateClassId, entity3ClassId.ToString() }
+                    { AggregateEventStreamMetadataNames.ClassId, entity3ClassId.ToString() }
                 });
+
+            eventStore.PushEventsAsync(Guid.Empty, null, null).ReturnsForAnyArgs(ci =>
+            {
+                var events = ci.ArgAt<IEnumerable<IUncommittedEventStoreRecord>>(1);
+                return events.Select(x => new FakeEventStoreRecord()
+                {
+                    AdditionalMetadata = x.Metadata,
+                    Event = x.Event,
+                    EventId = Guid.NewGuid(),
+                    StoreDate = DateTimeOffset.Now,
+                    StreamSequenceNumber = 0
+                }).ToList();
+            });
 
             entityTypeManager.GetClrTypeByClassId(entityClassId)
                 .Returns(typeof(MyEntity));
@@ -269,9 +282,9 @@ namespace GTRevo.Infrastructure.Tests.EventSourcing
             await sut.SaveChangesAsync();
 
             eventMessages.Should().HaveCount(1);
-            eventMessages[0].Metadata.Should().HaveCount(2);
             eventMessages[0].Metadata.Should().Contain(x => x.Key == "TestKey" && x.Value == "TestValue");
             eventMessages[0].Metadata.Should().Contain(x => x.Key == BasicEventMetadataNames.AggregateClassId && x.Value == entityClassId.ToString());
+            // TODO test also other metadata values?
         }
 
         [Fact]

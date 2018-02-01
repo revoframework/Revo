@@ -20,11 +20,11 @@ namespace GTRevo.Infrastructure.Tests.Projections
     public class ProjectionEventListenerTests
     {
         private readonly ProjectionEventListener sut;
+        private readonly IAsyncEventSequencer<DomainAggregateEvent> sequencer;
         private readonly IEntityEventProjector<MyEntity1> myEntity1Projector;
         private readonly IEntityEventProjector<MyEntity2> myEntity2Projector;
         private readonly IEventSourcedAggregateRepository eventSourcedRepository;
         private readonly IEntityTypeManager entityTypeManager;
-        private readonly IServiceLocator serviceLocator;
 
         private readonly MyEntity1 aggregate1;
         private readonly MyEntity2 aggregate2;
@@ -48,11 +48,21 @@ namespace GTRevo.Infrastructure.Tests.Projections
             myEntity2Projector = Substitute.For<IEntityEventProjector<MyEntity2>>();
             myEntity2Projector.ProjectedAggregateType.Returns(typeof(MyEntity2));
 
-            serviceLocator = Substitute.For<IServiceLocator>();
-            serviceLocator.GetAll(typeof(IEntityEventProjector<MyEntity1>)).Returns(new object[] { myEntity1Projector });
-            serviceLocator.GetAll(typeof(IEntityEventProjector<MyEntity2>)).Returns(new object[] { myEntity2Projector });
+            sequencer = Substitute.For<IAsyncEventSequencer<DomainAggregateEvent>>();
+            sequencer.GetEventSequencing(null).ReturnsForAnyArgs(new[]
+            {
+                new EventSequencing()
+                {
+                    SequenceName = "MyProjectionEventListener",
+                    EventSequenceNumber = 1
+                }
+            });
+            sequencer.ShouldAttemptSynchronousDispatch(null).ReturnsForAnyArgs(true);
 
-            sut = new MyProjectionEventListener(eventSourcedRepository, entityTypeManager, serviceLocator);
+            sut = Substitute.ForPartsOf<ProjectionEventListener>(eventSourcedRepository, entityTypeManager);
+            sut.EventSequencer.Returns(sequencer);
+            sut.GetProjectors(typeof(MyEntity1)).Returns(new[] {myEntity1Projector});
+            sut.GetProjectors(typeof(MyEntity2)).Returns(new[] {myEntity2Projector});
         }
 
         [Fact]
@@ -96,30 +106,7 @@ namespace GTRevo.Infrastructure.Tests.Projections
                     .ProjectEventsAsync((IEventSourcedAggregateRoot) aggregate2, Arg.Is<IReadOnlyCollection<IEventMessage<DomainAggregateEvent>>>(x => x.SequenceEqual(new List<IEventMessage<DomainAggregateEvent>>() { ev2 })));
             myEntity2Projector.Received(1).CommitChangesAsync();
         }
-
-        public class MyProjectionEventListener : ProjectionEventListener
-        {
-            public MyProjectionEventListener(IEventSourcedAggregateRepository eventSourcedRepository, IEntityTypeManager entityTypeManager,
-                IServiceLocator serviceLocator) : base(eventSourcedRepository, entityTypeManager, serviceLocator)
-            {
-            }
-
-            public override IAsyncEventSequencer EventSequencer { get; } = new MyEventSequencer();
-
-            public class MyEventSequencer : IAsyncEventSequencer<DomainAggregateEvent>
-            {
-                public IEnumerable<EventSequencing> GetEventSequencing(IEventMessage message)
-                {
-                    yield return new EventSequencing() { SequenceName = "MyProjectionEventListener", EventSequenceNumber = 1 };
-                }
-
-                public bool ShouldAttemptSynchronousDispatch(IEventMessage message)
-                {
-                    return true;
-                }
-            }
-        }
-
+        
         public class MyEntity1 : AggregateRoot, IEventSourcedAggregateRoot
         {
             public static Guid ClassId = Guid.NewGuid();

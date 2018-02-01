@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using GTRevo.Core.Events;
@@ -36,6 +37,9 @@ namespace GTRevo.Core.Tests.Events
             var ev1 = new Event1().ToMessageDraft();
             var ev2 = new Event1().ToMessageDraft();
             sut.PushEvent(ev1);
+            sut.PushEvent(ev2);
+
+            await sut.FlushAsync(CancellationToken.None);
 
             eventBus.Received(1).PublishAsync(ev1);
             eventBus.Received(1).PublishAsync(ev2);

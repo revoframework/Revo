@@ -28,7 +28,7 @@ namespace GTRevo.Infrastructure.EF6.Projections
         
         public override IAsyncEventSequencer EventSequencer { get; }
 
-        protected override IEnumerable<IEntityEventProjector> GetProjectors(Type entityType)
+        public override IEnumerable<IEntityEventProjector> GetProjectors(Type entityType)
         {
             return serviceLocator.GetAll(
                     typeof(IEF6EntityEventProjector<>).MakeGenericType(entityType))
