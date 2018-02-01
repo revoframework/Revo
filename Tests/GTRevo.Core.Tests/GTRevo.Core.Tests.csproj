@@ -85,6 +85,8 @@
   <ItemGroup>
     <Compile Include="Collections\DoubleDictinaryTests.cs" />
     <Compile Include="Commands\CommandBusTests.cs" />
+    <Compile Include="Commands\CommandContextStackTests.cs" />
+    <Compile Include="Commands\CommandContextTests.cs" />
     <Compile Include="Commands\CommandHandlerPipelineTests.cs" />
     <Compile Include="Commands\CommandHandlerPipelineTests_Queries.cs" />
     <Compile Include="Core\ParamsComparerTests.cs" />

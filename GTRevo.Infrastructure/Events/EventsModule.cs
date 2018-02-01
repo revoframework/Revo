@@ -28,6 +28,10 @@ namespace GTRevo.Infrastructure.Events
             Bind<IEventMetadataProvider>()
                 .To<UserIdEventMetadataProvider>()
                 .InRequestOrJobScope();
+            
+            Bind<IEventMetadataProvider>()
+                .To<CommandContextEventMetadataProvider>()
+                .InRequestOrJobScope();
         }
     }
 }

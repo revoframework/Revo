@@ -20,5 +20,7 @@ namespace GTRevo.Infrastructure.Core.Domain.Events
         public static readonly string AggregateClassId = "AggregateClassId";
         public static readonly string MachineName = "MachineName";
         public static readonly string EventSourceName = "EventSourceName";
+        public static readonly string CommandTypeId = "CommandTypeId";
+        public static readonly string CommandId = "CommandId";
     }
 }

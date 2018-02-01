@@ -109,12 +109,15 @@
     <Compile Include="Collections\IDoubleDictionary.cs" />
     <Compile Include="Commands\CommandBindExtensions.cs" />
     <Compile Include="Commands\CommandBus.cs" />
+    <Compile Include="Commands\CommandContext.cs" />
+    <Compile Include="Commands\CommandContextStack.cs" />
     <Compile Include="Commands\CommandHandlerDiscovery.cs" />
     <Compile Include="Commands\CommandHandlerPipeline.cs" />
     <Compile Include="Commands\CommandRequest.cs" />
     <Compile Include="Commands\CommandRequestContextData.cs" />
     <Compile Include="Commands\EntityQuery.cs" />
     <Compile Include="Commands\EntityQueryWithContext.cs" />
+    <Compile Include="Commands\ICommandContext.cs" />
     <Compile Include="Commands\ICommandHandler.cs" />
     <Compile Include="Commands\IExceptionCommandFilter.cs" />
     <Compile Include="Commands\IQueryHandler.cs" />

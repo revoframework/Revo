@@ -90,13 +90,8 @@ namespace GTRevo.Core.Tests.Commands
             await Assert.ThrowsAsync<Exception>(() =>
                 sut.HandleAsync(command, cancellationToken));
 
-            Received.InOrder(()
-                =>
-            {
-                decorated.HandleAsync(command, cancellationToken);
-                exceptionFilters[0].FilterExceptionAsync(command, e);
-            });
-
+            decorated.Received(1).HandleAsync(command, cancellationToken);
+            exceptionFilters[0].Received(1).FilterExceptionAsync(command, e);
             postFilters[0].DidNotReceiveWithAnyArgs().PostFilterAsync(null, null);
         }
 

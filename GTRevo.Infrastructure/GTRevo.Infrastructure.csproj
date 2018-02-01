@@ -259,6 +259,7 @@
     <Compile Include="Events\EventMessageFactory.cs" />
     <Compile Include="Events\Async\IAsyncEventListener.cs" />
     <Compile Include="Events\IEventMessageFactory.cs" />
+    <Compile Include="Events\Metadata\CommandContextEventMetadataProvider.cs" />
     <Compile Include="Events\Metadata\IEventMetadataProvider.cs" />
     <Compile Include="Events\Metadata\MachineNameEventMetadataProvider.cs" />
     <Compile Include="Events\Metadata\UserIdEventMetadataProvider.cs" />

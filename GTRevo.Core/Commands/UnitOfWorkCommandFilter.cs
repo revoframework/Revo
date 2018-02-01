@@ -10,39 +10,52 @@ namespace GTRevo.Core.Commands
     public class UnitOfWorkCommandFilter : IPreCommandFilter<ICommandBase>,
         IPostCommandFilter<ICommandBase>, IExceptionCommandFilter<ICommandBase>
     {
-        private readonly IUnitOfWork unitOfWork;
+        private readonly IUnitOfWorkFactory unitOfWorkFactory;
+        private readonly CommandContextStack commandContextStack;
 
-        public UnitOfWorkCommandFilter(IUnitOfWork unitOfWork)
+        public UnitOfWorkCommandFilter(IUnitOfWorkFactory unitOfWorkFactory,
+            CommandContextStack commandContextStack)
         {
-            this.unitOfWork = unitOfWork;
+            this.unitOfWorkFactory = unitOfWorkFactory;
+            this.commandContextStack = commandContextStack;
         }
 
         public Task PreFilterAsync(ICommandBase command)
         {
+            ICommandContext newContext = new CommandContext(command, unitOfWorkFactory.CreateUnitOfWork());
+            commandContextStack.Push(newContext);
+
             return Task.FromResult(0);
         }
         
         public async Task PostFilterAsync(ICommandBase command, object result)
         {
-            if (unitOfWork != null
-                && !command.GetType().GetInterfaces().Any(
-                    x => x.IsConstructedGenericType && x.GetGenericTypeDefinition() == typeof(IQuery<>)))
+
+            try
             {
-                try
+                if (commandContextStack.UnitOfWork != null
+                    && !command.GetType().GetInterfaces().Any(
+                        x => x.IsConstructedGenericType && x.GetGenericTypeDefinition() == typeof(IQuery<>)))
                 {
-                    await unitOfWork.CommitAsync();
+
+                    await commandContextStack.UnitOfWork.CommitAsync();
                 }
-                finally
+            }
+            finally
+            {
+                if (commandContextStack.PeekOrDefault != null)
                 {
+                    commandContextStack.Pop();
                 }
             }
         }
 
         public Task FilterExceptionAsync(ICommandBase command, Exception e)
         {
-            if (unitOfWork != null)
+            if (commandContextStack.PeekOrDefault != null)
             {
-                unitOfWork.Dispose(); // TODO: maybe?
+                // commandContextStack.UnitOfWork.Dispose(); // TODO maybe?
+                commandContextStack.Pop();
             }
 
             return Task.FromResult(0);

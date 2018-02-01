@@ -147,6 +147,7 @@
     <Compile Include="Events\Async\FakeAsyncEventQueueState.cs" />
     <Compile Include="Events\Async\ProcessAsyncEventsJobHandlerTests.cs" />
     <Compile Include="Events\EventMessageFactoryTests.cs" />
+    <Compile Include="Events\Metadata\CommandContextEventMetadataProviderTests.cs" />
     <Compile Include="Globalization\Messages\CompositeMessageSourceTests.cs" />
     <Compile Include="Globalization\MessageRepositoryTests.cs" />
     <Compile Include="Globalization\Messages\Database\DbMessageCacheTests.cs" />

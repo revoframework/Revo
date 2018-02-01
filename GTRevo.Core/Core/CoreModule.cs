@@ -23,13 +23,17 @@ namespace GTRevo.Core.Core
                 .To<EventBus>()
                 .InRequestOrJobScope();
 
+            Bind<ICommandContext, CommandContextStack>()
+                .To<CommandContextStack>()
+                .InRequestOrJobScope();
+
             Bind<IUnitOfWorkFactory>()
                 .To<UnitOfWorkFactory>()
                 .InRequestOrJobScope();
 
             Bind<IUnitOfWork>()
-                .ToMethod(ctx => ctx.Kernel.Get<IUnitOfWorkFactory>().CreateUnitOfWork())
-                .InRequestOrJobScope();
+                .ToMethod(ctx => ctx.Kernel.Get<ICommandContext>().UnitOfWork)
+                .InTransientScope();
 
             Bind<IPublishEventBuffer>()
                 .To<PublishEventBuffer>()
