@@ -14,11 +14,13 @@ namespace GTRevo.Infrastructure.EF6.DataAcccess
         public static T GetById<T>(this IQueryable<T> queryable, Guid id)
             where T : IEntity
         {
+            // TODO probaby merge with async version?
             T t = queryable.FirstOrDefault(x => x.Id == id);
             RepositoryHelpers.ThrowIfGetFailed(t, id);
 
             return t;
         }
+
         public static async Task<T> GetByIdAsync<T, TId>(this IQueryable<T> queryable, TId id)
             where T : IHasId<TId>
         {

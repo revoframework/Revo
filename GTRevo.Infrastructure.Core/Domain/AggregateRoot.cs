@@ -37,6 +37,11 @@ namespace GTRevo.Infrastructure.Core.Domain
             EventRouter.CommitEvents();
         }
 
+        public override string ToString()
+        {
+            return $"{GetType().FullName} (ID: {Id})";
+        }
+
         protected virtual void ApplyEvent<T>(T evt) where T : DomainAggregateEvent
         {
             if (IsDeleted)

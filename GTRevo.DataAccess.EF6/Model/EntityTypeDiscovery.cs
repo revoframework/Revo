@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using GTRevo.Core;
 using GTRevo.Core.Core;
@@ -56,7 +57,8 @@ namespace GTRevo.DataAccess.EF6.Model
         {
             return typeExplorer.GetAllTypes()
                 .Where(x => x.IsClass && !x.IsAbstract && !x.IsGenericTypeDefinition
-                    && x.GetCustomAttributes(typeof(DatabaseEntityAttribute), true).Length > 0);
+                    && x.GetCustomAttributes(typeof(DatabaseEntityAttribute), true).Length > 0
+                    && x.GetCustomAttributes(typeof(NotMappedAttribute), true).Length == 0);
         }
     }
 }

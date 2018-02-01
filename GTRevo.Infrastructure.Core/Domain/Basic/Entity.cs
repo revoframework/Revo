@@ -14,5 +14,10 @@ namespace GTRevo.Infrastructure.Core.Domain.Basic
         }
 
         public Guid Id { get; private set; }
+
+        public override string ToString()
+        {
+            return $"{GetType().FullName} (ID: {Id})";
+        }
     }
 }

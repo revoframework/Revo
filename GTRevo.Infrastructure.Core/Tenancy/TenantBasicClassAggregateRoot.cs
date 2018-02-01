@@ -14,6 +14,6 @@ namespace GTRevo.Infrastructure.Core.Tenancy
         {
         }
 
-        public Guid? TenantId { get; }
+        public Guid? TenantId { get; private set; }
     }
 }
