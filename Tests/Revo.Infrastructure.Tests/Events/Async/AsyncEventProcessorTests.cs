@@ -61,7 +61,11 @@ namespace Revo.Infrastructure.Tests.Events.Async
                         }
                     });
 
-                asyncEventQueueBacklogWorkers.Add(worker);
+                lock (asyncEventQueueBacklogWorkers)
+                {
+                    asyncEventQueueBacklogWorkers.Add(worker);
+                }
+
                 return worker;
             }
 
