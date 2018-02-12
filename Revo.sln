@@ -56,6 +56,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.Infrastructure.Tests",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.Platforms.AspNet.Tests", "Tests\Revo.Platforms.AspNet.Tests\Revo.Platforms.AspNet.Tests.csproj", "{368BF029-76E0-43C9-930B-70915DC2B11A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.DataAccess.RavenDB", "DataAccess\Revo.DataAccess.RavenDB\Revo.DataAccess.RavenDB.csproj", "{4FF04362-9B93-4BC2-9A64-7AFCA20D3A6C}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.Extensions.AspNet.Interop", "Extensions\Revo.Extensions.AspNet.Interop\Revo.Extensions.AspNet.Interop.csproj", "{BF63237A-187F-40F8-8EEA-616E960A5E62}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.Extensions.AspNet.Interop.Tests", "Tests\Revo.Extensions.AspNet.Interop.Tests\Revo.Extensions.AspNet.Interop.Tests.csproj", "{8262F3E3-8683-44AA-A3E7-98020A76F52A}"
@@ -138,6 +140,10 @@ Global
 		{368BF029-76E0-43C9-930B-70915DC2B11A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{368BF029-76E0-43C9-930B-70915DC2B11A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{368BF029-76E0-43C9-930B-70915DC2B11A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FF04362-9B93-4BC2-9A64-7AFCA20D3A6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FF04362-9B93-4BC2-9A64-7AFCA20D3A6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FF04362-9B93-4BC2-9A64-7AFCA20D3A6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FF04362-9B93-4BC2-9A64-7AFCA20D3A6C}.Release|Any CPU.Build.0 = Release|Any CPU		
 		{BF63237A-187F-40F8-8EEA-616E960A5E62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BF63237A-187F-40F8-8EEA-616E960A5E62}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BF63237A-187F-40F8-8EEA-616E960A5E62}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -177,6 +183,7 @@ Global
 		{B6E2BF61-054B-4923-9F49-A11DE72DA2E6} = {25A48354-8863-4FC8-B85D-EDE6E2974EE5}
 		{1B940646-6559-47CE-8381-EB232DC98734} = {25A48354-8863-4FC8-B85D-EDE6E2974EE5}
 		{6C549156-DDEC-4F9F-8E75-9E07A55833E1} = {25A48354-8863-4FC8-B85D-EDE6E2974EE5}
+		{4FF04362-9B93-4BC2-9A64-7AFCA20D3A6C} = {3FCA615C-32A7-4AD7-8F97-23299F266902}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C98B2018-4C0A-4011-94CB-77D70109215F}
