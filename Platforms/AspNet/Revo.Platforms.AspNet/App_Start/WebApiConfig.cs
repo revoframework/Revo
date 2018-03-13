@@ -4,6 +4,7 @@ using System.Web.Http.Controllers;
 using System.Web.Http.Dispatcher;
 using System.Web.OData.Extensions;
 using Microsoft.Owin.Security.OAuth;
+using Newtonsoft.Json.Serialization;
 using Revo.Platforms.AspNet.Globalization;
 using Revo.Platforms.AspNet.IO;
 using Revo.Platforms.AspNet.Web;
@@ -18,7 +19,7 @@ namespace Revo.Platforms.AspNet
             
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
-                routeTemplate: "api/{controller}/{action}/{id}",
+                routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
 
@@ -30,8 +31,8 @@ namespace Revo.Platforms.AspNet
             config.EnableDependencyInjection();
             config.Select().Expand().Filter().OrderBy().MaxTop(null).Count(); //enable common OData options
 
-            /*config.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-            config.Formatters.JsonFormatter.UseDataContractJsonSerializer = false;*/
+            config.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            config.Formatters.JsonFormatter.UseDataContractJsonSerializer = false;
             config.Formatters.JsonFormatter.SerializerSettings.Converters.Add(new BracesGuidJsonConverter());
             config.Formatters.JsonFormatter.SerializerSettings.Converters.Add(new TranslatingJsonConverter());
 

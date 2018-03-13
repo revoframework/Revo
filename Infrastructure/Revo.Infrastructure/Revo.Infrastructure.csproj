@@ -319,7 +319,6 @@
     <Compile Include="Notifications\Channels\Fcm\Services\FcmDeviceRegistrationService.cs" />
     <Compile Include="Notifications\Channels\Fcm\WrappedFcmNotification.cs" />
     <Compile Include="Projections\CrudEntityEventToPocoProjector.cs" />
-    <Compile Include="Web\JSBridge\JsonMessageExportCacheReloader.cs" />
     <Compile Include="Globalization\Messages\Database\IDbMessageLoader.cs" />
     <Compile Include="Globalization\Messages\Database\DbMessageCache.cs" />
     <Compile Include="Globalization\Messages\Database\IDbMessageCache.cs" />
@@ -469,8 +468,6 @@
     <Compile Include="Web\JSBridge\JSBridgeService.cs" />
     <Compile Include="Web\JSBridge\JsonMessageExportCache.cs" />
     <Compile Include="Web\JSBridge\JsonMessageExporter.cs" />
-    <Compile Include="Web\JSBridge\JSServiceWrapperCache.cs" />
-    <Compile Include="Web\JSBridge\JSServiceWrapperGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

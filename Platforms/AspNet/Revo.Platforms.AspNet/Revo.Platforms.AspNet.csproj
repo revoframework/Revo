@@ -273,7 +273,6 @@
     <Compile Include="Globalization\TranslatingJsonSerializer.cs" />
     <Compile Include="IO\BracesGuidJsonConverter.cs" />
     <Compile Include="IO\ODataQueryableExtensions.cs" />
-    <Compile Include="IO\Mapping\ProjectedDto.cs" />
     <Compile Include="IO\Resources\IResourceManager.cs" />
     <Compile Include="IO\Resources\ResourceManager.cs" />
     <Compile Include="IO\Resources\ResourceManagerConfigurationSection.cs" />

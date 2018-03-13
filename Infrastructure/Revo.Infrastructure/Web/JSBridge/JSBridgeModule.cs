@@ -19,10 +19,6 @@ namespace Revo.Infrastructure.Web.JSBridge
                 .To<DbMessageCacheReloader>()
                 .InRequestOrJobScope();
 
-            Bind<JSServiceWrapperCache>()
-                .ToSelf()
-                .InSingletonScope();
-
             Bind<IApiExplorer>()
                 .To<ApiExplorer>()
                 .InSingletonScope();
