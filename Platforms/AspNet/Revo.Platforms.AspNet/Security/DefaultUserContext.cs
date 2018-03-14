@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
@@ -43,10 +44,17 @@ namespace Revo.Platforms.AspNet.Security
 
         public async Task<IEnumerable<Permission>> GetPermissionsAsync()
         {
-            if (userPermissions == null && IsAuthenticated)
+            if (userPermissions == null)
             {
-                IUser user = await GetUserAsync();
-                userPermissions = await userManager.GetUserPermissionsAsync((IIdentityUser) user);
+                if (IsAuthenticated)
+                {
+                    IUser user = await GetUserAsync();
+                    userPermissions = await userManager.GetUserPermissionsAsync((IIdentityUser) user);
+                }
+                else
+                {
+                    userPermissions = Enumerable.Empty<Permission>();
+                }
             }
 
             return userPermissions;

@@ -18,10 +18,6 @@ namespace Revo.Extensions.AspNet.Interop.Globalization
             Bind<IEventListener<MessageRepositoryReloadedEvent>>()
                 .To<DbMessageCacheReloader>()
                 .InRequestOrJobScope();
-
-            Bind<IApiExplorer>()
-                .To<ApiExplorer>()
-                .InSingletonScope();
         }
     }
 }
