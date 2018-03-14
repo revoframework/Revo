@@ -4,8 +4,8 @@ namespace Revo.Core.Security
 {
     public class Permission
     {
-        public Guid? ResourceId { get; set; }
-        public Guid? ContextId { get; set; }
+        public string ResourceId { get; set; }
+        public string ContextId { get; set; }
         public PermissionType PermissionType { get; set; }
 
         public override bool Equals(object obj)

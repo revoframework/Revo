@@ -21,7 +21,7 @@ namespace Revo.Core.Security
                     contextsToResources = new ContextsToResources();
                     Permissions[permission.PermissionType.Id] = contextsToResources;
 
-                    Guid contextId = permission.ContextId ?? Guid.Empty;
+                    string contextId = permission.ContextId ?? string.Empty;
                     Resources resources;
                     if (!contextsToResources.TryGetValue(contextId, out resources))
                     {
@@ -29,7 +29,7 @@ namespace Revo.Core.Security
                         contextsToResources[contextId] = resources;
                     }
 
-                    resources.Add(permission.ResourceId ?? Guid.Empty);
+                    resources.Add(permission.ResourceId ?? string.Empty);
                 }
             }
         }
@@ -42,19 +42,19 @@ namespace Revo.Core.Security
                 return false;
             }
             
-            if (requiredPermission.ContextId.HasValue)
+            if (requiredPermission.ContextId?.Length > 0)
             {
                 Resources resources;
                 if (!contextsToResources.TryGetValue(requiredPermission.ContextId, out resources)
-                    && !contextsToResources.TryGetValue(Guid.Empty, out resources))
+                    && !contextsToResources.TryGetValue(string.Empty, out resources))
                 {
                     return false;
                 }
 
-                if (requiredPermission.ResourceId.HasValue)
+                if (requiredPermission.ResourceId?.Length > 0)
                 {
-                    if (!resources.Contains(requiredPermission.ResourceId.Value)
-                    && !resources.Contains(Guid.Empty))
+                    if (!resources.Contains(requiredPermission.ResourceId)
+                    && !resources.Contains(string.Empty))
                     {
                         return false;
                     }
@@ -75,10 +75,10 @@ namespace Revo.Core.Security
                     {
                         Resources resources = resourcesKV.Value;
 
-                        if (requiredPermission.ResourceId.HasValue)
+                        if (requiredPermission.ResourceId?.Length > 0)
                         {
-                            if (!resources.Contains(requiredPermission.ResourceId.Value)
-                            && !resources.Contains(Guid.Empty))
+                            if (!resources.Contains(requiredPermission.ResourceId)
+                            && !resources.Contains(string.Empty))
                             {
                                 return false;
                             }
@@ -101,11 +101,11 @@ namespace Revo.Core.Security
             return true;
         }
 
-        public class ContextsToResources : Dictionary<Guid?, Resources>
+        public class ContextsToResources : Dictionary<string, Resources>
         {
         }
 
-        public class Resources : HashSet<Guid?>
+        public class Resources : HashSet<string>
         {
         }
     }
