@@ -2,6 +2,8 @@
 using Ninject.Modules;
 using Revo.Core.Core;
 using Revo.Core.Core.Lifecycle;
+using Revo.Core.IO;
+using Revo.Core.IO.Resources;
 using Revo.Platforms.AspNet.Core.Lifecycle;
 using Revo.Platforms.AspNet.IO.Resources;
 using Revo.Platforms.AspNet.IO.Stache;
@@ -38,8 +40,8 @@ namespace Revo.Platforms.AspNet.Core
                 .To<EmbeddedResourceAppInitializer>()
                 .InSingletonScope();
 
-            Bind<IResourceManager, IWebActivatorExHooks>()
-                .To<ResourceManager>()
+            Bind<IResourceManager, IAspNetResourceManager, IWebActivatorExHooks>()
+                .To<AspNetResourceManager>()
                 .InSingletonScope();
             
             Bind<IOwinConfigurator>()

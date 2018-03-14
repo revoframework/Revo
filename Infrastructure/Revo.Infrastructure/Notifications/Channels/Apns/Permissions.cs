@@ -1,4 +1,4 @@
-﻿using Revo.Platforms.AspNet.Security;
+﻿using Revo.Core.Security;
 
 namespace Revo.Infrastructure.Notifications.Channels.Apns
 {

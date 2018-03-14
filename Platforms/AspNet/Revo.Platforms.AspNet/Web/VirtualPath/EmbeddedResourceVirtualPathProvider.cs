@@ -3,15 +3,17 @@ using System.Collections;
 using System.Linq;
 using System.Web.Caching;
 using System.Web.Hosting;
+using Revo.Core.IO;
+using Revo.Core.IO.Resources;
 using Revo.Platforms.AspNet.IO.Resources;
 
 namespace Revo.Platforms.AspNet.Web.VirtualPath
 {
     public class EmbeddedResourceVirtualPathProvider : VirtualPathProvider, IEnumerable
     {
-        private IResourceManager resourceManager;
+        private IAspNetResourceManager resourceManager;
 
-        public EmbeddedResourceVirtualPathProvider(IResourceManager resourceManager)
+        public EmbeddedResourceVirtualPathProvider(IAspNetResourceManager resourceManager)
         {
             this.resourceManager = resourceManager;
             CacheControl = er => null;

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using Ninject.Modules;
 using PushSharp.Google;
+using Revo.Core.Core;
 using Revo.Core.Core.Lifecycle;
-using Revo.Platforms.AspNet.Core;
 
 namespace Revo.Infrastructure.Notifications.Channels.Fcm
 {

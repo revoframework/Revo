@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using RazorEngine.Templating;
+using Revo.Core.IO;
+using Revo.Core.IO.Resources;
 using Revo.Platforms.AspNet.IO.Resources;
 
 namespace Revo.Platforms.AspNet.IO.Templates

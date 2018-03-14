@@ -3,6 +3,7 @@ using AutoMapper;
 using AutoMapper.Attributes;
 using Revo.Core.Core;
 using Revo.Core.Core.Lifecycle;
+using Revo.Core.IO;
 
 namespace Revo.Platforms.AspNet.Core
 {

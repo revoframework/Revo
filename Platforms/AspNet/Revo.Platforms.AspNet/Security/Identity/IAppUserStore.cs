@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
+using Revo.Core.Security;
 
 namespace Revo.Platforms.AspNet.Security.Identity
 {

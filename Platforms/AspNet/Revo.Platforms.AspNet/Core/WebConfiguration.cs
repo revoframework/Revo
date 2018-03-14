@@ -1,4 +1,5 @@
 ﻿using System.Web.Configuration;
+using Revo.Core.Core;
 
 namespace Revo.Platforms.AspNet.Core
 {

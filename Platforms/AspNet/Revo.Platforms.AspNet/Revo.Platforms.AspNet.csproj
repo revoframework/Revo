@@ -256,15 +256,12 @@
     <Compile Include="Core\AutoMapperDefinitionDiscovery.cs" />
     <Compile Include="Core\CommandsModule.cs" />
     <Compile Include="Core\HangfireOwinConfigurator.cs" />
-    <Compile Include="Core\IAutoMapperDefinition.cs" />
-    <Compile Include="Core\LocalConfiguration.cs" />
     <Compile Include="Core\NinjectServiceLocator.cs" />
     <Compile Include="Core\RevoHttpApplication.cs" />
     <Compile Include="Core\UserActorContext.cs" />
     <Compile Include="Core\AutoMapperInitializer.cs" />
     <Compile Include="Core\ContravariantBindingResolver.cs" />
     <Compile Include="Core\CorePlatformModule.cs" />
-    <Compile Include="Core\IConfiguration.cs" />
     <Compile Include="Core\Lifecycle\IHttpApplicationInitializer.cs" />
     <Compile Include="Core\Lifecycle\IOwinConfigurator.cs" />
     <Compile Include="Core\Lifecycle\IWebActivatorExHooks.cs" />
@@ -272,9 +269,10 @@
     <Compile Include="Core\WebConfiguration.cs" />
     <Compile Include="Globalization\TranslatingJsonSerializer.cs" />
     <Compile Include="IO\BracesGuidJsonConverter.cs" />
+    <Compile Include="IO\Notifications\HtmlTemplateMailNotificationFormatter.cs" />
     <Compile Include="IO\ODataQueryableExtensions.cs" />
-    <Compile Include="IO\Resources\IResourceManager.cs" />
-    <Compile Include="IO\Resources\ResourceManager.cs" />
+    <Compile Include="IO\Resources\AspNetResourceManager.cs" />
+    <Compile Include="IO\Resources\IAspNetResourceManager.cs" />
     <Compile Include="IO\Resources\ResourceManagerConfigurationSection.cs" />
     <Compile Include="IO\Resources\ResourcePathRegistration.cs" />
     <Compile Include="IO\Templates\RazorEngineTemplates.cs" />
@@ -284,7 +282,6 @@
     <Compile Include="IO\Stache\StacheRenderer.cs" />
     <Compile Include="IO\Stache\WebStacheRenderer.cs" />
     <Compile Include="Security\ApplicationOAuthProvider.cs" />
-    <Compile Include="Security\AuthorizationException.cs" />
     <Compile Include="Security\DefaultUserContext.cs" />
     <Compile Include="Security\Identity\AppClaimsIdentityFactory.cs" />
     <Compile Include="Security\Identity\AppSignInManager.cs" />
@@ -295,18 +292,8 @@
     <Compile Include="Security\Identity\IAppUserStore.cs" />
     <Compile Include="Security\Identity\IPasswordValidator.cs" />
     <Compile Include="Security\Identity\IUserValidator.cs" />
-    <Compile Include="Security\Identity\PermissionClaimsIdentity.cs" />
-    <Compile Include="Security\IPermissionTypeRegistry.cs" />
-    <Compile Include="Security\IRolePermissionResolver.cs" />
     <Compile Include="Security\IIdentityUser.cs" />
     <Compile Include="Security\Mvc\AuthorizePermissionsAttribute.cs" />
-    <Compile Include="Security\PermissionAuthorizer.cs" />
-    <Compile Include="Security\PermissionCache.cs" />
-    <Compile Include="Security\PermissionData.cs" />
-    <Compile Include="Security\PermissionTree.cs" />
-    <Compile Include="Security\PermissionTypeCatalogAttribute.cs" />
-    <Compile Include="Security\PermissionTypeIndexer.cs" />
-    <Compile Include="Security\PermissionTypeRegistry.cs" />
     <Compile Include="Security\ScryptPasswordHasher.cs" />
     <Compile Include="Security\SecurityAppInitializer.cs" />
     <Compile Include="Security\SecurityModule.cs" />
@@ -349,6 +336,10 @@
     <ProjectReference Include="..\..\..\DataAccess\Revo.DataAccess\Revo.DataAccess.csproj">
       <Project>{fa942fe7-71fd-4cf5-8959-309583fe7903}</Project>
       <Name>Revo.DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Infrastructure\Revo.Infrastructure\Revo.Infrastructure.csproj">
+      <Project>{6f893b4e-8119-41f8-b1c9-28eea56946a9}</Project>
+      <Name>Revo.Infrastructure</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Revo.Core\Revo.Core.csproj">
       <Project>{1015BA79-4241-4221-9D27-0DB033EA624B}</Project>

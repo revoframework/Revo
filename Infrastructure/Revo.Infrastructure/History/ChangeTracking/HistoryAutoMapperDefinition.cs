@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using Revo.Core.IO;
 using Revo.Infrastructure.History.ChangeTracking.Model;
-using Revo.Platforms.AspNet.Core;
 
 namespace Revo.Infrastructure.History.ChangeTracking
 {

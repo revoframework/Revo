@@ -184,7 +184,6 @@
     <Compile Include="Tenancy\DefaultTenantContextTests.cs" />
     <Compile Include="Tenancy\SingleTenantContextResolverTests.cs" />
     <Compile Include="Tenancy\TenantRepositoryFilterTests.cs" />
-    <Compile Include="Web\JSBridge\JSMessageExporterTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

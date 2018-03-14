@@ -1,6 +1,7 @@
 ﻿using System.IO;
+using Revo.Core.IO;
+using Revo.Core.IO.Resources;
 using Revo.Infrastructure.Globalization.Messages;
-using Revo.Platforms.AspNet.IO.Resources;
 
 namespace Revo.Infrastructure.Globalization
 {

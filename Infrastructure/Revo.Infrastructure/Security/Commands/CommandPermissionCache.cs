@@ -5,7 +5,6 @@ using Revo.Core.Commands;
 using Revo.Core.Core;
 using Revo.Core.Core.Lifecycle;
 using Revo.Core.Security;
-using Revo.Platforms.AspNet.Security;
 
 namespace Revo.Infrastructure.Security.Commands
 {

@@ -315,8 +315,6 @@
     <Compile Include="Notifications\Channels\Fcm\Model\FcmExternalUserDeviceToken.cs" />
     <Compile Include="Notifications\Channels\Fcm\Model\FcmUserDeviceToken.cs" />
     <Compile Include="Notifications\Channels\Fcm\Permissions.cs" />
-    <Compile Include="Notifications\Channels\Fcm\Services\ExternalFcmService.cs" />
-    <Compile Include="Notifications\Channels\Fcm\Services\FcmDeviceRegistrationService.cs" />
     <Compile Include="Notifications\Channels\Fcm\WrappedFcmNotification.cs" />
     <Compile Include="Projections\CrudEntityEventToPocoProjector.cs" />
     <Compile Include="Globalization\Messages\Database\IDbMessageLoader.cs" />
@@ -346,8 +344,6 @@
     <Compile Include="History\ChangeTracking\TrackedChange.cs" />
     <Compile Include="History\ChangeTracking\TrackedChangeRecordConverter.cs" />
     <Compile Include="History\ChangeTracking\TrackedChangeAdded.cs" />
-    <Compile Include="Navigation\Breadcrumb.cs" />
-    <Compile Include="Navigation\IBreadcrumbNavigationItem.cs" />
     <Compile Include="Notifications\BufferedAdaptorNotificationChannel.cs" />
     <Compile Include="Notifications\BufferedNotificationProcessJob.cs" />
     <Compile Include="Notifications\BufferedNotificationStore.cs" />
@@ -369,9 +365,6 @@
     <Compile Include="Notifications\Channels\Apns\Model\ApnsUserDeviceToken.cs" />
     <Compile Include="Notifications\Channels\Apns\Permissions.cs" />
     <Compile Include="Notifications\Channels\Apns\ApnsNotificationsModule.cs" />
-    <Compile Include="Notifications\Channels\Apns\Services\ApnsDeviceRegistrationService.cs" />
-    <Compile Include="Notifications\Channels\Apns\Services\ExternalApnsService.cs" />
-    <Compile Include="Notifications\Channels\Mail\HtmlTemplateMailNotificationFormatter.cs" />
     <Compile Include="Notifications\Channels\Mail\IMailNotificationFormatter.cs" />
     <Compile Include="Notifications\Channels\Mail\SendSmtpMailNotificationJob.cs" />
     <Compile Include="Notifications\Channels\Mail\SerializableMailMessage.cs" />
@@ -464,10 +457,6 @@
     <Compile Include="Validation\CommandAttributeValidationFilter.cs" />
     <Compile Include="Validation\CommandValidationException.cs" />
     <Compile Include="Validation\ValidationInfrastructureModule.cs" />
-    <Compile Include="Web\JSBridge\JSBridgeModule.cs" />
-    <Compile Include="Web\JSBridge\JSBridgeService.cs" />
-    <Compile Include="Web\JSBridge\JsonMessageExportCache.cs" />
-    <Compile Include="Web\JSBridge\JsonMessageExporter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -481,10 +470,6 @@
     <ProjectReference Include="..\..\DataAccess\Revo.DataAccess\Revo.DataAccess.csproj">
       <Project>{fa942fe7-71fd-4cf5-8959-309583fe7903}</Project>
       <Name>Revo.DataAccess</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Platforms\AspNet\Revo.Platforms.AspNet\Revo.Platforms.AspNet.csproj">
-      <Project>{42cdfad0-cb40-433e-ac6e-874f3f58e77d}</Project>
-      <Name>Revo.Platforms.AspNet</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Revo.Core\Revo.Core.csproj">
       <Project>{1015ba79-4241-4221-9d27-0db033ea624b}</Project>
