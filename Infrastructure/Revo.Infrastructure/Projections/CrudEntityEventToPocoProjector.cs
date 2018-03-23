@@ -18,21 +18,21 @@ namespace Revo.Infrastructure.Projections
         where TSource : class, IEventSourcedAggregateRoot
         where TTarget : class, new()
     {
-        private readonly ICrudRepository repository;
-
         public CrudEntityEventToPocoProjector(ICrudRepository repository)
         {
-            this.repository = repository;
+            Repository = repository;
         }
+
+        protected ICrudRepository Repository { get; }
 
         public override Task CommitChangesAsync()
         {
-            return repository.SaveChangesAsync();
+            return Repository.SaveChangesAsync();
         }
 
         protected override async Task<TTarget> CreateProjectionTargetAsync(TSource aggregate, IEnumerable<IEventMessage<DomainAggregateEvent>> events)
         {
-            var rm = await repository.FindAsync<TTarget>(aggregate.Id);
+            var rm = await Repository.FindAsync<TTarget>(aggregate.Id);
             if (rm != null)
             {
                 return rm; //in case we previously did a projection, but didn't succeed in dequeuing async events
@@ -66,13 +66,13 @@ namespace Revo.Infrastructure.Projections
                 }
             }
 
-            repository.Add(rm);
+            Repository.Add(rm);
             return rm;
         }
 
         protected override Task<TTarget> GetProjectionTargetAsync(TSource aggregate)
         {
-            return repository.GetAsync<TTarget>(aggregate.Id);
+            return Repository.GetAsync<TTarget>(aggregate.Id);
         }
     }
 }

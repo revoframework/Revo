@@ -18,6 +18,9 @@ namespace Revo.DataAccess.RavenDB.Projections
     {
         public RavenEntityEventToPocoProjector(IRavenCrudRepository repository) : base(repository)
         {
+            Repository = repository;
         }
+
+        protected new IRavenCrudRepository Repository { get; }
     }
 }

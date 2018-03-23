@@ -29,7 +29,7 @@ namespace Revo.Infrastructure.Projections
 
         public abstract IEnumerable<IEntityEventProjector> GetProjectors(Type entityType);
 
-        public async Task HandleAsync(IEventMessage<DomainAggregateEvent> message, string sequenceName)
+        public Task HandleAsync(IEventMessage<DomainAggregateEvent> message, string sequenceName)
         {
             PublishedEntityEvents events;
             if (!allEvents.TryGetValue(message.Event.AggregateId, out events))
@@ -39,6 +39,7 @@ namespace Revo.Infrastructure.Projections
             }
 
             events.Add(message);
+            return Task.FromResult(0);
         }
 
         public Task OnFinishedEventQueueAsync(string sequenceName)
