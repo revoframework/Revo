@@ -10,6 +10,9 @@ using Ninject.Modules;
 using Raven.Client;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
+using Revo.Core.IO.OData;
+using Revo.DataAccess.RavenDB.IO.OData;
+using Revo.Platforms.AspNet.Core.Lifecycle;
 
 namespace Revo.DataAccess.RavenDB
 {
@@ -31,6 +34,7 @@ namespace Revo.DataAccess.RavenDB
                     };
 
                     store.Conventions.FindIdentityProperty = memberInfo => memberInfo.Name == "DocumentId";
+                    store.Conventions.UseOptimisticConcurrency = true;
 
                     return store.Initialize();
                 })
@@ -47,6 +51,10 @@ namespace Revo.DataAccess.RavenDB
             Bind<IRavenCrudRepository>()
                 .To<RavenCrudRepository>()
                 .InRequestOrJobScope();
+
+            Bind<IQueryableToODataResultConverter>()
+                .To<RavenQueryableToODataResultConverter>()
+                .InSingletonScope();
         }
     }
 }

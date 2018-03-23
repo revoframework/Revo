@@ -226,6 +226,10 @@
     <Compile Include="Globalization\ITranslatable.cs" />
     <Compile Include="Commands\IPreCommandFilter.cs" />
     <Compile Include="IO\IAutoMapperDefinition.cs" />
+    <Compile Include="IO\OData\IQueryableToODataResultConverter.cs" />
+    <Compile Include="IO\OData\ODataQueryableExtensions.cs" />
+    <Compile Include="IO\OData\ODataResult.cs" />
+    <Compile Include="IO\OData\ODataResultWithCount.cs" />
     <Compile Include="IO\Resources\IResourceManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\StringExtensions.cs" />

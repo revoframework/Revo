@@ -2,7 +2,9 @@
 using Ninject.Modules;
 using Revo.Core.Core;
 using Revo.Core.Core.Lifecycle;
+using Revo.Core.IO.OData;
 using Revo.DataAccess.EF6.Entities;
+using Revo.DataAccess.EF6.IO.OData;
 using Revo.DataAccess.EF6.Model;
 using Revo.DataAccess.Entities;
 
@@ -42,6 +44,10 @@ namespace Revo.DataAccess.EF6
 
             Bind<IDbContextFactory, IApplicationStartListener>()
                 .To<DbContextFactory>()
+                .InSingletonScope();
+
+            Bind<IQueryableToODataResultConverter>()
+                .To<EF6QueryableToODataResultConverter>()
                 .InSingletonScope();
         }
     }
