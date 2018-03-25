@@ -35,11 +35,15 @@ namespace Revo.Core.Security
         private void Index()
         {
             foreach (Type catalogType in typeExplorer.GetAllTypes()
-                                            .Where(x => x.IsClass
-                                                && x.IsAbstract /* static in C# = abstract + sealed */
-                                                && x.IsSealed
-                                                && x.GetCustomAttributes(typeof(PermissionTypeCatalogAttribute), false).Any()))
+                                            .Where(x => x.GetCustomAttributes(typeof(PermissionTypeCatalogAttribute), false).Any()))
             {
+                if (!catalogType.IsClass
+                    || !catalogType.IsAbstract /* static in C# = abstract + sealed */
+                    || !catalogType.IsSealed)
+                {
+                    throw new InvalidOperationException($"Cannot register permission catalog {catalogType.FullName}: all catalogs must be of a static class type");
+                }
+
                 if (!registeredCatalogTypes.Contains(catalogType))
                 {
                     RegisterCatalog(catalogType);
@@ -54,14 +58,17 @@ namespace Revo.Core.Security
                 .GetCustomAttributes(typeof(PermissionTypeCatalogAttribute), false)
                 .First();
 
-            foreach (var field in catalogType.GetFields(System.Reflection.BindingFlags.Static
-                                    | System.Reflection.BindingFlags.Public)
-                                    .Where(x => x.IsLiteral && !x.IsInitOnly /* exclude readonly */
-                                        && x.FieldType == typeof(string)))
+            foreach (var field in catalogType.GetFields(
+                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Instance))
             {
+                if (!field.IsStatic || !field.IsLiteral || field.IsInitOnly  /* exclude readonly */
+                    || field.FieldType != typeof(string))
+                {
+                    throw new InvalidOperationException($"Invalid permission catalog field {catalogType.FullName}.{field.Name}: permission catalogs must contain only static const string fields");
+                }
+
                 try
                 {
-
                     PermissionType permissionType = new PermissionType(
                         Guid.Parse((string)field.GetValue(null)),
                         catalogAttribute.CatalogName + "." + field.Name);
