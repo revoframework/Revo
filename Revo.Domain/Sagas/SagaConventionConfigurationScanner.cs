@@ -85,7 +85,7 @@ namespace Revo.Domain.Sagas
                         eventKeyProperty);
 
                     var toStringWithFormatMethod = eventKeyProperty.PropertyType.GetMethod("ToString", new[] { typeof(IFormatProvider) });
-                    var toStringMethod = eventKeyProperty.PropertyType.GetMethod("ToString", new[] { typeof(IFormatProvider) });
+                    var toStringMethod = eventKeyProperty.PropertyType.GetMethod("ToString", new Type[] {});
 
                     Func<DomainEvent, string> eventKeyExpression;
                     if (toStringWithFormatMethod != null)
