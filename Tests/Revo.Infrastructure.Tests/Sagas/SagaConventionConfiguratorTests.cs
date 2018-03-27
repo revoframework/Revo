@@ -27,18 +27,17 @@ namespace Revo.Infrastructure.Tests.Sagas
         public void ConfigureSagas_AddsToRegistry_AlwaysStarting()
         {
             sagaConventionConfigurationCache.ConfigurationInfos.Returns(
-                new ReadOnlyDictionary<Type, SagaConfigurationInfo>(
                     new Dictionary<Type, SagaConfigurationInfo>()
                     {
                         {
-                            typeof(Saga1), new SagaConfigurationInfo(
-                                new ReadOnlyDictionary<Type, SagaConventionEventInfo>(
-                                    new Dictionary<Type, SagaConventionEventInfo>()
-                                    {
-                                        {typeof(Event1), new SagaConventionEventInfo((saga, domainEvent) => { })}
-                                    }))
+                            typeof(Saga1),
+                            new SagaConfigurationInfo(
+                                new Dictionary<Type, IReadOnlyCollection<SagaConventionEventInfo>>()
+                                {
+                                    {typeof(Event1), new[] {new SagaConventionEventInfo((saga, domainEvent) => { })}}
+                                })
                         }
-                    }));
+                    });
 
             var sagaRegistry = Substitute.For<ISagaRegistry>();
             sut.ConfigureSagas(sagaRegistry);
@@ -58,11 +57,17 @@ namespace Revo.Infrastructure.Tests.Sagas
                     {
                         {
                             typeof(Saga1), new SagaConfigurationInfo(
-                                new ReadOnlyDictionary<Type, SagaConventionEventInfo>(
-                                    new Dictionary<Type, SagaConventionEventInfo>()
+                                new Dictionary<Type, IReadOnlyCollection<SagaConventionEventInfo>>()
+                                {
                                     {
-                                        {typeof(Event1), new SagaConventionEventInfo(eventKeyExpression, "key", false, (saga, domainEvent) => { })}
-                                    }))
+                                        typeof(Event1),
+                                        new[]
+                                        {
+                                            new SagaConventionEventInfo(eventKeyExpression, "key", false,
+                                                (saga, domainEvent) => { })
+                                        }
+                                    }
+                                })
                         }
                     }));
 

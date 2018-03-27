@@ -14,13 +14,13 @@ namespace Revo.Domain.Sagas
     {
         public static SagaConfigurationInfo GetSagaConfiguration(Type sagaType)
         {
-            Dictionary<Type, SagaConventionEventInfo> events = new Dictionary<Type, SagaConventionEventInfo>();
+            MultiValueDictionary<Type, SagaConventionEventInfo> events = new MultiValueDictionary<Type, SagaConventionEventInfo>();
             AddEvents(sagaType, events);
 
             return new SagaConfigurationInfo(events);
         }
 
-        private static void AddEvents(Type sagaType, Dictionary<Type, SagaConventionEventInfo> events)
+        private static void AddEvents(Type sagaType, MultiValueDictionary<Type, SagaConventionEventInfo> events)
         {
             if (sagaType.BaseType != null
                 && typeof(Saga).IsAssignableFrom(sagaType.BaseType))
@@ -57,53 +57,56 @@ namespace Revo.Domain.Sagas
 
                 var handleDelegate = (Action<Saga, IEventMessage<DomainEvent>>) eventDelegate;
 
-                var sagaEventAttribute = handleMethod.GetCustomAttribute<SagaEventAttribute>(true);
-                if (sagaEventAttribute == null)
+                var sagaEventAttributes = handleMethod.GetCustomAttributes<SagaEventAttribute>(true).ToList();
+                if (sagaEventAttributes.Count == 0)
                 {
                     throw new SagaConfigurationException(
                         $"{sagaType.FullName} saga Handle({eventType.FullName}) is missing a SagaEvent attribute");
                 }
-                
-                if (sagaEventAttribute.IsAlwaysStarting)
+
+                foreach (var sagaEventAttribute in sagaEventAttributes)
                 {
-                    events[eventType] = new SagaConventionEventInfo(handleDelegate);
-                }
-                else
-                {
-                    PropertyInfo eventKeyProperty = eventType.GetProperty(sagaEventAttribute.EventKey);
-                    if (eventKeyProperty == null)
+                    if (sagaEventAttribute.IsAlwaysStarting)
                     {
-                        throw new SagaConfigurationException($"Invalid {sagaType.FullName} saga configuration: can't find event key property '{sagaEventAttribute.EventKey}' in event {eventType.FullName}");
-                    }
-
-                    var eventParameter = Expression.Parameter(typeof(DomainEvent), "ev");
-
-                    var getPropertyExpression = Expression.Property(
-                        Expression.Convert(
-                            eventParameter,
-                            eventType),
-                        eventKeyProperty);
-
-                    var toStringWithFormatMethod = eventKeyProperty.PropertyType.GetMethod("ToString", new[] { typeof(IFormatProvider) });
-                    var toStringMethod = eventKeyProperty.PropertyType.GetMethod("ToString", new Type[] {});
-
-                    Func<DomainEvent, string> eventKeyExpression;
-                    if (toStringWithFormatMethod != null)
-                    {
-                        eventKeyExpression = (Func<DomainEvent, string>) Expression.Lambda(
-                            Expression.Call(getPropertyExpression, toStringWithFormatMethod,
-                                Expression.Constant(CultureInfo.InvariantCulture)),
-                            eventParameter).Compile();
+                        events.Add(eventType, new SagaConventionEventInfo(handleDelegate));
                     }
                     else
                     {
-                        eventKeyExpression = (Func<DomainEvent, string>)Expression.Lambda(
-                            Expression.Call(getPropertyExpression, toStringMethod),
-                            eventParameter).Compile();
-                    }
+                        PropertyInfo eventKeyProperty = eventType.GetProperty(sagaEventAttribute.EventKey);
+                        if (eventKeyProperty == null)
+                        {
+                            throw new SagaConfigurationException($"Invalid {sagaType.FullName} saga configuration: can't find event key property '{sagaEventAttribute.EventKey}' in event {eventType.FullName}");
+                        }
 
-                    events[eventType] = new SagaConventionEventInfo(eventKeyExpression,
-                        sagaEventAttribute.SagaKey, sagaEventAttribute.IsStartingIfSagaNotFound, handleDelegate);
+                        var eventParameter = Expression.Parameter(typeof(DomainEvent), "ev");
+
+                        var getPropertyExpression = Expression.Property(
+                            Expression.Convert(
+                                eventParameter,
+                                eventType),
+                            eventKeyProperty);
+
+                        var toStringWithFormatMethod = eventKeyProperty.PropertyType.GetMethod("ToString", new[] { typeof(IFormatProvider) });
+                        var toStringMethod = eventKeyProperty.PropertyType.GetMethod("ToString", new Type[] { });
+
+                        Func<DomainEvent, string> eventKeyExpression;
+                        if (toStringWithFormatMethod != null)
+                        {
+                            eventKeyExpression = (Func<DomainEvent, string>)Expression.Lambda(
+                                Expression.Call(getPropertyExpression, toStringWithFormatMethod,
+                                    Expression.Constant(CultureInfo.InvariantCulture)),
+                                eventParameter).Compile();
+                        }
+                        else
+                        {
+                            eventKeyExpression = (Func<DomainEvent, string>)Expression.Lambda(
+                                Expression.Call(getPropertyExpression, toStringMethod),
+                                eventParameter).Compile();
+                        }
+
+                        events.Add(eventType, new SagaConventionEventInfo(eventKeyExpression,
+                            sagaEventAttribute.SagaKey, sagaEventAttribute.IsStartingIfSagaNotFound, handleDelegate));
+                    }
                 }
             }
         }

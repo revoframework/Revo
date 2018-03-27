@@ -13,7 +13,7 @@ namespace Revo.Domain.Sagas
     {
         private readonly List<ICommand> uncommitedCommands = new List<ICommand>();
         private readonly MultiValueDictionary<string, string> keys = new MultiValueDictionary<string, string>();
-        private readonly IReadOnlyDictionary<Type, SagaConventionEventInfo> events;
+        private readonly IReadOnlyDictionary<Type, IReadOnlyCollection<SagaConventionEventInfo>> events;
 
         public Saga(Guid id) : base(id)
         {
@@ -29,9 +29,12 @@ namespace Revo.Domain.Sagas
 
         public void HandleEvent(IEventMessage<DomainEvent> ev)
         {
-            if (events.TryGetValue(ev.Event.GetType(), out SagaConventionEventInfo eventInfo))
+            if (events.TryGetValue(ev.Event.GetType(), out var eventInfos))
             {
-                eventInfo.HandleDelegate(this, ev);
+                foreach (var eventInfo in eventInfos)
+                {
+                    eventInfo.HandleDelegate(this, ev);
+                }
             }
         }
 

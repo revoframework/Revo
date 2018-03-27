@@ -2,6 +2,7 @@
 
 namespace Revo.Domain.Sagas.Attributes
 {
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public class SagaEventAttribute : Attribute
     {
         public bool IsAlwaysStarting { get; set; }

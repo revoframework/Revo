@@ -17,11 +17,11 @@ namespace Revo.Domain.Sagas
         {
             this.typeExplorer = typeExplorer;
             CreateConfigurationInfos();
-            ConfigurationInfos = new ReadOnlyDictionary<Type, SagaConfigurationInfo>(configurationInfos);
         }
-        
-        public ReadOnlyDictionary<Type, SagaConfigurationInfo> ConfigurationInfos { get; }
-        
+
+        public IReadOnlyDictionary<Type, SagaConfigurationInfo> ConfigurationInfos => configurationInfos;
+
+
         public void OnApplicationStarted()
         {
             //construction of the object itself is enough

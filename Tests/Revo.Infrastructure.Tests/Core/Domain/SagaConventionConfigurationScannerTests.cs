@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Revo.Core.Events;
 using NSubstitute;
 using Revo.Domain.Events;
@@ -21,7 +22,9 @@ namespace Revo.Infrastructure.Tests.Core.Domain
 
             Assert.Equal(1, configurationInfo.Events.Count);
             Assert.True(configurationInfo.Events.TryGetValue(typeof(Event1),
-                out SagaConventionEventInfo eventInfo));
+                out var eventInfos));
+            Assert.Equal(1, eventInfos.Count);
+            var eventInfo = eventInfos.ElementAt(0);
 
             Saga1 saga = new Saga1(Guid.NewGuid());
             var event1 = new EventMessage<Event1>(new Event1(), new Dictionary<string, string>());
@@ -38,7 +41,9 @@ namespace Revo.Infrastructure.Tests.Core.Domain
 
             Assert.Equal(2, configurationInfo.Events.Count);
             Assert.True(configurationInfo.Events.TryGetValue(typeof(Event1),
-                out SagaConventionEventInfo eventInfo));
+                out var eventInfos));
+            Assert.Equal(1, eventInfos.Count);
+            var eventInfo = eventInfos.ElementAt(0);
 
             Saga1 saga = new Saga1(Guid.NewGuid());
             var event1 = new EventMessage<Event1>(new Event1(), new Dictionary<string, string>());
@@ -55,7 +60,9 @@ namespace Revo.Infrastructure.Tests.Core.Domain
 
             Assert.Equal(1, configurationInfo.Events.Count);
             Assert.True(configurationInfo.Events.TryGetValue(typeof(Event1),
-                out SagaConventionEventInfo eventInfo));
+                out var eventInfos));
+            Assert.Equal(1, eventInfos.Count);
+            var eventInfo = eventInfos.ElementAt(0);
 
             Saga3 saga = new Saga3(Guid.NewGuid());
             var event1 = new EventMessage<Event1>(new Event1() { Foo = 5 }, new Dictionary<string, string>());
@@ -76,7 +83,9 @@ namespace Revo.Infrastructure.Tests.Core.Domain
 
             Assert.Equal(1, configurationInfo.Events.Count);
             Assert.True(configurationInfo.Events.TryGetValue(typeof(Event1),
-                out SagaConventionEventInfo eventInfo));
+                out var eventInfos));
+            Assert.Equal(1, eventInfos.Count);
+            var eventInfo = eventInfos.ElementAt(0);
 
             Saga4 saga = new Saga4(Guid.NewGuid());
             Guid bar = Guid.Parse("{3A9A28C9-1776-4D17-A3DA-AA54AC618076}");
@@ -87,6 +96,22 @@ namespace Revo.Infrastructure.Tests.Core.Domain
             Assert.Equal(event1, saga.HandledEvents[0]);
 
             Assert.Equal("3a9a28c9-1776-4d17-a3da-aa54ac618076", eventInfo.EventKeyExpression(event1.Event));
+        }
+
+        [Fact]   
+        public void GetSagaConfiguration_MultipleAttributesPerEvent()
+        {
+            var configurationInfo = SagaConventionConfigurationScanner.GetSagaConfiguration(typeof(Saga5));
+
+            Assert.Equal(1, configurationInfo.Events.Count);
+            Assert.True(configurationInfo.Events.TryGetValue(typeof(Event1),
+                out var eventInfos));
+            Assert.Equal(2, eventInfos.Count);
+            var eventInfo1 = eventInfos.ElementAt(0);
+            var eventInfo2 = eventInfos.ElementAt(1);
+            
+            Assert.Equal("foo", eventInfo1.SagaKey);
+            Assert.Equal("bar", eventInfo2.SagaKey);
         }
 
         public class Saga1 : Saga

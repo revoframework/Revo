@@ -15,16 +15,19 @@ namespace Revo.Infrastructure.Sagas
         {
             foreach (var sagaConfigInfo in sagaConventionConfigurationCache.ConfigurationInfos)
             {
-                foreach (var eventInfo in sagaConfigInfo.Value.Events)
+                foreach (var typeToEventInfos in sagaConfigInfo.Value.Events)
                 {
-                    if (eventInfo.Value.IsAlwaysStarting)
+                    foreach (var eventInfo in typeToEventInfos.Value)
                     {
-                        sagaRegistry.Add(new SagaEventRegistration(sagaConfigInfo.Key, eventInfo.Key));
-                    }
-                    else
-                    {
-                        sagaRegistry.Add(new SagaEventRegistration(sagaConfigInfo.Key, eventInfo.Key,
-                            eventInfo.Value.EventKeyExpression, eventInfo.Value.SagaKey, eventInfo.Value.IsStartingIfSagaNotFound));
+                        if (eventInfo.IsAlwaysStarting)
+                        {
+                            sagaRegistry.Add(new SagaEventRegistration(sagaConfigInfo.Key, typeToEventInfos.Key));
+                        }
+                        else
+                        {
+                            sagaRegistry.Add(new SagaEventRegistration(sagaConfigInfo.Key, typeToEventInfos.Key,
+                                eventInfo.EventKeyExpression, eventInfo.SagaKey, eventInfo.IsStartingIfSagaNotFound));
+                        }
                     }
                 }
             }
