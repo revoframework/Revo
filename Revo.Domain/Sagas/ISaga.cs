@@ -9,7 +9,7 @@ namespace Revo.Domain.Sagas
     public interface ISaga : IEventSourcedAggregateRoot
     {
         IEnumerable<ICommand> UncommitedCommands { get; }
-        IReadOnlyDictionary<string, string> Keys { get; }
+        IReadOnlyDictionary<string, IReadOnlyCollection<string>> Keys { get; }
         bool IsEnded { get; }
 
         void HandleEvent(IEventMessage<DomainEvent> ev);

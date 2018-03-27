@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FluentAssertions;
+using MoreLinq;
 using Revo.Core.Commands;
 using Revo.Core.Core;
 using Revo.Core.Events;
@@ -79,11 +81,21 @@ namespace Revo.Infrastructure.Tests.Sagas
             saga1.Do();
             sut.Add(saga1);
 
+            SagaMetadata sagaMetadata = null;
+            sagaMetadataRepository.When(x => x.SetSagaMetadataAsync(saga1.Id, Arg.Any<SagaMetadata>())).Do(
+                ci => sagaMetadata = ci.ArgAt<SagaMetadata>(1));
+
             await sut.SaveChangesAsync();
 
-            sagaMetadataRepository.Received(1)
-                .SetSagaMetadataAsync(saga1.Id, Arg.Is<SagaMetadata>(x =>  x.Keys.ToList().SequenceEqual(saga1.Keys)));
+            sagaMetadataRepository.Received(1).SetSagaMetadataAsync(saga1.Id, Arg.Any<SagaMetadata>());
             sagaMetadataRepository.Received(1).SaveChangesAsync();
+
+            sagaMetadata.Keys.Count.ShouldBeEquivalentTo(saga1.Keys.Count);
+            sagaMetadata.Keys.ForEach(x =>
+                {
+                    saga1.Keys.Keys.Should().Contain(x.Key);
+                    saga1.Keys[x.Key].Should().BeEquivalentTo(x.Value);
+                });
         }
 
         public class Saga1 : Saga
@@ -95,7 +107,7 @@ namespace Revo.Infrastructure.Tests.Sagas
             public void Do()
             {
                 SendCommand(new Command1());
-                SetKey("key", "value");
+                SetSagaKey("key", "value");
             }
         }
 

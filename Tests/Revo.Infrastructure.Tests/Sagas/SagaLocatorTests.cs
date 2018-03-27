@@ -168,7 +168,7 @@ namespace Revo.Infrastructure.Tests.Sagas
             }
 
             public IEnumerable<ICommand> UncommitedCommands { get; set; }
-            public IReadOnlyDictionary<string, string> Keys { get; set; } = new Dictionary<string, string>();
+            public IReadOnlyDictionary<string, IReadOnlyCollection<string>> Keys { get; set; } = new Dictionary<string, IReadOnlyCollection<string>>();
             public bool IsEnded { get; }
 
             public List<IEventMessage<DomainEvent>> HandledEvents { get; set; } = new List<IEventMessage<DomainEvent>>();
@@ -191,14 +191,14 @@ namespace Revo.Infrastructure.Tests.Sagas
 
                 if (ev is IEventMessage<Event1> event1)
                 {
-                    Keys = new Dictionary<string, string>()
+                    Keys = new Dictionary<string, IReadOnlyCollection<string>>()
                     {
-                        {"foo", event1.Event.Foo.ToString()}
+                        {"foo", new List<string>() { event1.Event.Foo.ToString() }}
                     };
                 }
                 else
                 {
-                    Keys = new Dictionary<string, string>();
+                    Keys = new Dictionary<string, IReadOnlyCollection<string>>();
                 }
             }
         }

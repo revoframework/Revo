@@ -12,19 +12,18 @@ namespace Revo.Domain.Sagas
     public class Saga : EventSourcedAggregateRoot, ISaga
     {
         private readonly List<ICommand> uncommitedCommands = new List<ICommand>();
-        private readonly Dictionary<string, string> keys = new Dictionary<string, string>();
+        private readonly MultiValueDictionary<string, string> keys = new MultiValueDictionary<string, string>();
         private readonly IReadOnlyDictionary<Type, SagaConventionEventInfo> events;
 
         public Saga(Guid id) : base(id)
         {
             events = SagaConventionConfigurationCache.GetSagaConfigurationInfo(this.GetType()).Events;
-            Keys = new ReadOnlyDictionary<string, string>(keys);
         }
 
         public override bool IsChanged => base.IsChanged || uncommitedCommands.Any();
 
         public IEnumerable<ICommand> UncommitedCommands => uncommitedCommands;
-        public IReadOnlyDictionary<string, string> Keys { get; }
+        public IReadOnlyDictionary<string, IReadOnlyCollection<string>> Keys => keys;
 
         public bool IsEnded { get; }
 
@@ -47,26 +46,45 @@ namespace Revo.Domain.Sagas
             uncommitedCommands.Add(command);
         }
 
-        protected string GetKeyOrDefault(string name)
+        protected string GetSagaKeyOrDefault(string name)
         {
-            if (keys.TryGetValue(name, out string value))
+            if (keys.TryGetValue(name, out var values))
             {
-                return value;
+                return values.FirstOrDefault();
             }
 
             return null;
         }
 
-        protected void SetKey(string name, string value)
+        protected string[] GetSagaKeys(string name)
         {
-            if (value != null)
+            if (keys.TryGetValue(name, out var values))
             {
-                keys[name] = value;
+                return values.ToArray();
             }
-            else
-            {
-                keys.Remove(name);
-            }
+
+            return null;
+        }
+
+        protected void RemoveSagaKey(string name, string value)
+        {
+            keys.Remove(name, value);
+        }
+
+        protected void RemoveSagaKeys(string name)
+        {
+            keys.Remove(name);
+        }
+
+        protected void AddSagaKey(string name, string value)
+        {
+            keys.Add(name, value);
+        }
+
+        protected void SetSagaKey(string name, string value)
+        {
+            RemoveSagaKeys(name);
+            AddSagaKey(name, value);
         }
     }
 }

@@ -52,7 +52,7 @@ namespace Revo.Infrastructure.Sagas
                             matchingSagas.Add(saga);
                         }
 
-                        newSagas.Where(x => x.Keys.Any(y => y.Key == registration.SagaKey && y.Value == sagaKeyValue))
+                        newSagas.Where(x => x.Keys.TryGetValue(registration.SagaKey, out var keyValues) && keyValues.Contains(sagaKeyValue))
                             .ForEach(x => matchingSagas.Add(x)); //add new sagas that don't have metadata saved yet
                     }
 

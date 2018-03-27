@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
@@ -26,46 +27,48 @@ namespace Revo.Infrastructure.EF6.Sagas
             return crudRepository.Where<SagaMetadataKey>(x => x.KeyName == keyName
                                                               && x.KeyValue == keyValue)
                 .Select(x => x.SagaId)
+                .Distinct()
                 .ToArrayAsync();
         }
 
         public async Task<SagaMetadata> GetSagaMetadataAsync(Guid sagaId)
         {
             List<SagaMetadataKey> keys = await GetSagaMetadataKeysAsync(sagaId);
-            return new SagaMetadata(keys.Select(x => new KeyValuePair<string, string>(x.KeyName, x.KeyValue)));
+            return new SagaMetadata(keys.GroupBy(x => x.KeyName)
+                .ToImmutableDictionary(x => x.Key,
+                    x => x.Select(y => y.KeyValue).ToImmutableList()));
         }
 
         public async Task SetSagaMetadataAsync(Guid sagaId, SagaMetadata sagaMetadata)
         {
             List<SagaMetadataKey> keys = await GetSagaMetadataKeysAsync(sagaId);
 
-            foreach (var keyPair in sagaMetadata.Keys)
+            foreach (var keyGroup in sagaMetadata.Keys)
             {
-                SagaMetadataKey key = keys.FirstOrDefault(x => x.KeyName == keyPair.Key);
-                if (key != null)
+                foreach (var keyValue in keyGroup.Value)
                 {
-                    if (key.KeyValue != keyPair.Value)
+                    SagaMetadataKey key = keys.FirstOrDefault(x => x.KeyName == keyGroup.Key && x.KeyValue == keyValue);
+                    if (key != null)
                     {
-                        key.KeyValue = keyPair.Value;
+                        keys.Remove(key);
+                        continue;
                     }
-                }
-                else
-                {
+
                     key = new SagaMetadataKey()
                     {
-                        KeyName = keyPair.Key,
-                        KeyValue = keyPair.Value,
+                        Id = Guid.NewGuid(),
+                        KeyName = keyGroup.Key,
+                        KeyValue = keyValue,
                         SagaId = sagaId
                     };
-
+                    
                     crudRepository.Add(key);
                 }
             }
 
-            foreach (var unmatched in keys.Where(x => !sagaMetadata.Keys.ContainsKey(x.KeyName)).ToList())
+            foreach (SagaMetadataKey key in keys) //remove unmatched
             {
-                keys.Remove(unmatched);
-                crudRepository.Remove(unmatched);
+                crudRepository.Remove(key);
             }
         }
 

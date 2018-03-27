@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading.Tasks;
 using Revo.Core.Commands;
 using Revo.Core.Events;
@@ -70,7 +71,9 @@ namespace Revo.Infrastructure.Sagas
             {
                 if (aggregate.IsChanged)
                 {
-                    await MetadataRepository.SetSagaMetadataAsync(aggregate.Id, new SagaMetadata(aggregate.Keys));
+                    await MetadataRepository.SetSagaMetadataAsync(aggregate.Id,
+                        new SagaMetadata(aggregate.Keys.ToImmutableDictionary(x => x.Key,
+                            x => x.Value.ToImmutableList())));
                 }
             }
 

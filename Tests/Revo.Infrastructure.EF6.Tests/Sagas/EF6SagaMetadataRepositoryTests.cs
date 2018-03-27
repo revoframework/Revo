@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -46,10 +47,12 @@ namespace Revo.Infrastructure.EF6.Tests.Sagas
         public async Task SetSagaMetadataAsync_AddsNew()
         {
             Guid sagaId = Guid.NewGuid();
-            await sut.SetSagaMetadataAsync(sagaId, new SagaMetadata(new List<KeyValuePair<string, string>>()
-            {
-                new KeyValuePair<string, string>("key", "value")
-            }));
+            await sut.SetSagaMetadataAsync(sagaId, new SagaMetadata(
+                ImmutableDictionary.CreateRange<string, ImmutableList<string>>(new[]
+                {
+                    new KeyValuePair<string, ImmutableList<string>>("key",
+                        ImmutableList.CreateRange<string>(new[] {"value"}))
+                })));
 
             var allMetadataKeys = fakeCrudRepository.FindAllWithAdded<SagaMetadataKey>().ToList();
             Assert.Contains(allMetadataKeys, x => x.KeyName == "key" && x.KeyValue == "value" && x.SagaId == sagaId);
@@ -57,32 +60,75 @@ namespace Revo.Infrastructure.EF6.Tests.Sagas
         }
 
         [Fact]
+        public async Task SetSagaMetadataAsync_AddsNewMultiValue()
+        {
+            Guid sagaId = Guid.NewGuid();
+            await sut.SetSagaMetadataAsync(sagaId, new SagaMetadata(
+                ImmutableDictionary.CreateRange<string, ImmutableList<string>>(new[]
+                {
+                    new KeyValuePair<string, ImmutableList<string>>("key",
+                        ImmutableList.CreateRange<string>(new[] {"value1", "value2"}))
+                })));
+
+            var allMetadataKeys = fakeCrudRepository.FindAllWithAdded<SagaMetadataKey>().ToList();
+            Assert.Contains(allMetadataKeys, x => x.KeyName == "key" && x.KeyValue == "value1" && x.SagaId == sagaId);
+            Assert.Contains(allMetadataKeys, x => x.KeyName == "key" && x.KeyValue == "value2" && x.SagaId == sagaId);
+            Assert.Equal(2, allMetadataKeys.Count);
+        }
+
+        [Fact]
         public async Task SetSagaMetadataAsync_UpdatesExisting()
         {
             Guid sagaId = Guid.NewGuid();
-            fakeCrudRepository.Attach(new SagaMetadataKey() {SagaId = sagaId, KeyName = "name", KeyValue = "value"});
+            fakeCrudRepository.Attach(new SagaMetadataKey() {SagaId = sagaId, KeyName = "key", KeyValue = "value"});
+            
+            await sut.SetSagaMetadataAsync(sagaId, new SagaMetadata(
+                ImmutableDictionary.CreateRange<string, ImmutableList<string>>(new[]
+                {
+                    new KeyValuePair<string, ImmutableList<string>>("key",
+                        ImmutableList.CreateRange<string>(new[] {"value2"}))
+                })));
 
-            await sut.SetSagaMetadataAsync(sagaId, new SagaMetadata(new List<KeyValuePair<string, string>>()
-            {
-                new KeyValuePair<string, string>("name", "value")
-            }));
-
-            var allMetadataKeys = fakeCrudRepository.FindAllWithAdded<SagaMetadataKey>().ToList();
-            Assert.Contains(allMetadataKeys, x => x.KeyName == "name" && x.KeyValue == "value" && x.SagaId == sagaId);
+            await fakeCrudRepository.SaveChangesAsync();
+            var allMetadataKeys = fakeCrudRepository.FindAll<SagaMetadataKey>().ToList();
+            Assert.Contains(allMetadataKeys, x => x.KeyName == "key" && x.KeyValue == "value2" && x.SagaId == sagaId);
             Assert.Equal(1, allMetadataKeys.Count);
+        }
+
+        [Fact]
+        public async Task SetSagaMetadataAsync_UpdatesSome()
+        {
+            Guid sagaId = Guid.NewGuid();
+            fakeCrudRepository.Attach(new SagaMetadataKey() {SagaId = sagaId, KeyName = "key", KeyValue = "value1"});
+            fakeCrudRepository.Attach(new SagaMetadataKey() {SagaId = sagaId, KeyName = "key", KeyValue = "value2"});
+            
+            await sut.SetSagaMetadataAsync(sagaId, new SagaMetadata(
+                ImmutableDictionary.CreateRange<string, ImmutableList<string>>(new[]
+                {
+                    new KeyValuePair<string, ImmutableList<string>>("key",
+                        ImmutableList.CreateRange<string>(new[] {"value2", "value3"}))
+                })));
+
+            await fakeCrudRepository.SaveChangesAsync();
+            var allMetadataKeys = fakeCrudRepository.FindAll<SagaMetadataKey>().ToList();
+
+            Assert.Contains(allMetadataKeys, x => x.KeyName == "key" && x.KeyValue == "value2" && x.SagaId == sagaId);
+            Assert.Contains(allMetadataKeys, x => x.KeyName == "key" && x.KeyValue == "value3" && x.SagaId == sagaId);
+            Assert.Equal(2, allMetadataKeys.Count);
         }
 
         [Fact]
         public async Task SetSagaMetadataAsync_RemovesUnmatched()
         {
             Guid sagaId = Guid.NewGuid();
-            var key = new SagaMetadataKey() {SagaId = sagaId, KeyName = "name", KeyValue = "value"};
+            var key = new SagaMetadataKey() {SagaId = sagaId, KeyName = "key", KeyValue = "value"};
             fakeCrudRepository.Attach(key);
 
-            await sut.SetSagaMetadataAsync(sagaId, new SagaMetadata(new List<KeyValuePair<string, string>>()
-            {
-            }));
-            
+            await sut.SetSagaMetadataAsync(sagaId, new SagaMetadata(
+                ImmutableDictionary.CreateRange<string, ImmutableList<string>>(new KeyValuePair<string, ImmutableList<string>>[]
+                {
+                })));
+
             Assert.Equal(EntityState.Deleted, fakeCrudRepository.GetEntityState(key));
         }
     }
