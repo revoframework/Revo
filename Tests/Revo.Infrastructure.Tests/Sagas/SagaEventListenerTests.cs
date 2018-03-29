@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Revo.Core.Events;
 using Revo.Core.Transactions;
 using Revo.Infrastructure.Sagas;
@@ -16,13 +17,13 @@ namespace Revo.Infrastructure.Tests.Sagas
     public class SagaEventListenerTests
     {
         private readonly SagaEventListener sut;
-        private readonly ISagaLocator sagaLocator;
+        private readonly ISagaEventDispatcher sagaEventDispatcher;
 
         public SagaEventListenerTests()
         {
-            sagaLocator = Substitute.For<ISagaLocator>();
+            sagaEventDispatcher = Substitute.For<ISagaEventDispatcher>();
 
-            sut = new SagaEventListener(sagaLocator, new SagaEventListener.SagaEventSequencer());
+            sut = new SagaEventListener(sagaEventDispatcher, new SagaEventListener.SagaEventSequencer());
         }
 
         [Fact]
@@ -31,7 +32,7 @@ namespace Revo.Infrastructure.Tests.Sagas
             var event1 = new Event1().ToMessageDraft();
 
             List<IEventMessage<DomainEvent>> events = null;
-            sagaLocator.WhenForAnyArgs(x => x.LocateAndDispatchAsync(null))
+            sagaEventDispatcher.WhenForAnyArgs(x => x.DispatchEventsToSagas(null))
                 .Do(ci =>
                 {
                     events = ci.ArgAt<IEnumerable<IEventMessage<DomainEvent>>>(0).ToList();
@@ -40,12 +41,13 @@ namespace Revo.Infrastructure.Tests.Sagas
             await sut.HandleAsync(event1, "SagaEventListener");
             await sut.OnFinishedEventQueueAsync("SagaEventListener");
 
-            sagaLocator.ReceivedWithAnyArgs(1).LocateAndDispatchAsync(null);
+            sagaEventDispatcher.ReceivedWithAnyArgs(1).DispatchEventsToSagas(null);
 
-            Assert.True(events != null && events.SequenceEqual(new List<IEventMessage<DomainEvent>>()
+            events.Should().NotBeNull();
+            events.ShouldBeEquivalentTo(new[]
             {
                 event1
-            }));
+            }, options => options.WithStrictOrdering());
         }
 
         public class Event1 : DomainEvent

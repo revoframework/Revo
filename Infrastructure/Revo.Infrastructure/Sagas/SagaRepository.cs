@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Revo.Core.Commands;
 using Revo.Core.Events;
@@ -10,116 +12,104 @@ using Revo.Domain.Sagas;
 using Revo.Infrastructure.Events;
 using Revo.Infrastructure.EventSourcing;
 using Revo.Infrastructure.EventStore;
+using Revo.Infrastructure.Repositories;
 
 namespace Revo.Infrastructure.Sagas
 {
-    public class SagaRepository : EventSourcedRepository<ISaga>, ISagaRepository
+    public class SagaRepository : ISagaRepository
     {
         private readonly ICommandBus commandBus;
-        private readonly List<ICommand> bufferedCommands = new List<ICommand>();
+        private readonly IRepository repository;
+        private readonly IEntityTypeManager entityTypeManager;
+
+        private readonly Dictionary<Guid, ISaga> sagas = new Dictionary<Guid, ISaga>();
 
         public SagaRepository(ICommandBus commandBus,
-            IEventStore eventStore,
-            IEntityTypeManager entityTypeManager,
-            IPublishEventBuffer publishEventBuffer,
-            IRepositoryFilter[] repositoryFilters,
-            IEventMessageFactory eventMessageFactory,
-            ISagaMetadataRepository sagaMetadataRepository)
-            : base(eventStore, entityTypeManager, publishEventBuffer, repositoryFilters, eventMessageFactory)
+            IRepository repository,
+            ISagaMetadataRepository metadataRepository,
+            IEntityTypeManager entityTypeManager)
         {
-            MetadataRepository = sagaMetadataRepository;
             this.commandBus = commandBus;
-        }
-
-        public SagaRepository(ICommandBus commandBus,
-            IEventStore eventStore,
-            IEntityTypeManager entityTypeManager,
-            IPublishEventBuffer publishEventBuffer,
-            IRepositoryFilter[] repositoryFilters,
-            IEventMessageFactory eventMessageFactory,
-            ISagaMetadataRepository sagaMetadataRepository,
-            Dictionary<Guid, ISaga> aggregates)
-            : base(eventStore, entityTypeManager, publishEventBuffer, repositoryFilters, eventMessageFactory, aggregates)
-        {
-            MetadataRepository = sagaMetadataRepository;
-            this.commandBus = commandBus;
+            this.repository = repository;
+            MetadataRepository = metadataRepository;
+            this.entityTypeManager = entityTypeManager;
         }
 
         public ISagaMetadataRepository MetadataRepository { get; }
 
-        public override void SaveChanges()
+        public void Add(ISaga saga)
         {
-            throw new NotImplementedException("SagaRepository.SaveChanges is not supported yet");
-
-            base.SaveChanges();
-            MetadataRepository.SaveChanges();
-
-            if (bufferedCommands.Count > 0)
+            if (sagas.TryGetValue(saga.Id, out ISaga existing))
             {
-                foreach (ICommand command in bufferedCommands)
+                if (saga != existing)
                 {
-                    //await commandBus.Send(command);
+                    throw new ArgumentException($"Saga {saga} with specified ID already exists");
                 }
 
-                bufferedCommands.Clear();
+                return;
             }
+
+            repository.Add(saga);
+
+            Guid sagaClassId = entityTypeManager.GetClassIdByClrType(saga.GetType());
+            MetadataRepository.AddSaga(saga.Id, sagaClassId);
+
+            sagas[saga.Id] = saga;
         }
 
-        public override async Task SaveChangesAsync()
+        public Task<ISaga> GetAsync(Guid id, Guid classId)
         {
-            foreach (var aggregate in GetLoadedAggregates())
+            Type clrType = entityTypeManager.GetClrTypeByClassId(classId);
+            return (Task<ISaga>) GetType().GetMethod(nameof(GetAsyncInternal), BindingFlags.Instance | BindingFlags.NonPublic)
+                .MakeGenericMethod(new[] {clrType}).Invoke(this, new object[] { id });
+        }
+
+        public async Task<T> GetAsync<T>(Guid id) where T : class, ISaga
+        {
+            if (sagas.TryGetValue(id, out ISaga saga))
             {
-                if (aggregate.IsChanged)
+                if (saga is T typedSaga)
                 {
-                    await MetadataRepository.SetSagaMetadataAsync(aggregate.Id,
-                        new SagaMetadata(aggregate.Keys.ToImmutableDictionary(x => x.Key,
-                            x => x.Value.ToImmutableList())));
+                    return typedSaga;
+                }
+                else
+                {
+                    throw new ArgumentException($"Saga {saga} expected to have be of type {typeof(T)}, but actually is {saga.GetType()}");
                 }
             }
 
-            await base.SaveChangesAsync();
+            T loadedSaga = await repository.GetAsync<T>(id);
+            sagas.Add(id, loadedSaga);
+            return loadedSaga;
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            List<ICommandBase> bufferedCommands = new List<ICommandBase>();
+
+            foreach (var sagaPair in sagas)
+            {
+                await MetadataRepository.SetSagaKeysAsync(sagaPair.Value.Id,
+                    sagaPair.Value.Keys.SelectMany(x => x.Value.Select(y => new KeyValuePair<string, string>(x.Key, y))));
+
+                if (sagaPair.Value.IsChanged)
+                {
+                    bufferedCommands.AddRange(sagaPair.Value.UncommitedCommands);
+                }
+            }
+
+            foreach (ICommandBase command in bufferedCommands)
+            {
+                await commandBus.SendAsync(command);
+            }
+
+            await repository.SaveChangesAsync();
             await MetadataRepository.SaveChangesAsync();
-
-            if (bufferedCommands.Count > 0)
-            {
-                foreach (ICommand command in bufferedCommands)
-                {
-                    await commandBus.SendAsync(command);
-                }
-
-                bufferedCommands.Clear();
-            }
         }
 
-        protected override EventSourcedRepository<ISaga> CloneWithFilters(
-            IEventStore eventStore,
-            IEntityTypeManager entityTypeManager,
-            IPublishEventBuffer publishEventBuffer,
-            IRepositoryFilter[] repositoryFilters,
-            IEventMessageFactory eventMessageFactory,
-            Dictionary<Guid, ISaga> aggregates)
+        private async Task<ISaga> GetAsyncInternal<T>(Guid id) where T : class, ISaga
         {
-            return new SagaRepository(commandBus,
-                eventStore,
-                entityTypeManager,
-                publishEventBuffer,
-                repositoryFilters,
-                eventMessageFactory,
-                MetadataRepository,
-                aggregates);
-        }
-
-        protected override void CommitAggregates()
-        {
-            foreach (var aggregate in GetLoadedAggregates())
-            {
-                if (aggregate.IsChanged)
-                {
-                    bufferedCommands.AddRange(aggregate.UncommitedCommands);
-                }
-            }
-
-            base.CommitAggregates();
+            return await GetAsync<T>(id);
         }
     }
 }

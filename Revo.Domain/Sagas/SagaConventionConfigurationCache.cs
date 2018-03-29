@@ -21,7 +21,6 @@ namespace Revo.Domain.Sagas
 
         public IReadOnlyDictionary<Type, SagaConfigurationInfo> ConfigurationInfos => configurationInfos;
 
-
         public void OnApplicationStarted()
         {
             //construction of the object itself is enough
@@ -29,7 +28,7 @@ namespace Revo.Domain.Sagas
 
         public static SagaConfigurationInfo GetSagaConfigurationInfo(Type sagaType)
         {
-            if (!typeof(Saga).IsAssignableFrom(sagaType))
+            if (!typeof(EventSourcedSaga).IsAssignableFrom(sagaType))
             {
                 throw new ArgumentException($"Only Saga-derived sagas are configured using conventions");
             }
@@ -52,7 +51,7 @@ namespace Revo.Domain.Sagas
         {
             configurationInfos = new Dictionary<Type, SagaConfigurationInfo>();
             var sagaTypes = typeExplorer.GetAllTypes()
-                .Where(x => typeof(Saga).IsAssignableFrom(x)
+                .Where(x => typeof(EventSourcedSaga).IsAssignableFrom(x)
                     && !x.IsAbstract && !x.IsGenericTypeDefinition);
 
             foreach (Type sagaType in sagaTypes)

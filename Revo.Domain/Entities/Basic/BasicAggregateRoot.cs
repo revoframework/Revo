@@ -4,7 +4,9 @@ using Revo.DataAccess.Entities;
 namespace Revo.Domain.Entities.Basic
 {
     /// <summary>
-    /// Aggregate root that is typically persisted to a RDBMS store using an ORM.
+    /// Basic aggregate root type that is typically persisted using its visible state data
+    /// (as compared to other types persisting only their events, etc.).
+    /// This is usually desirable when working with an ORM and RDBMS or document database.
     /// </summary>
     [DatabaseEntity]
     public abstract class BasicAggregateRoot : AggregateRoot, IQueryableEntity, IRowVersioned

@@ -1,32 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Revo.Core.Commands;
 using Revo.Core.Events;
-using Revo.Domain.Entities.EventSourcing;
+using Revo.Domain.Entities.Basic;
 using Revo.Domain.Events;
 
 namespace Revo.Domain.Sagas
 {
-    public class Saga : EventSourcedAggregateRoot, ISaga
+    /// <summary>
+    /// <para>Saga whose state is typically persisted using just its visible state data.</para>
+    /// <seealso cref="BasicAggregateRoot"/>
+    /// </summary>
+    public class BasicSaga : BasicAggregateRoot, ISaga
     {
-        private readonly List<ICommand> uncommitedCommands = new List<ICommand>();
+        private readonly List<ICommandBase> uncommitedCommands = new List<ICommandBase>();
         private readonly MultiValueDictionary<string, string> keys = new MultiValueDictionary<string, string>();
         private readonly IReadOnlyDictionary<Type, IReadOnlyCollection<SagaConventionEventInfo>> events;
 
-        public Saga(Guid id) : base(id)
+        public BasicSaga(Guid id) : base(id)
         {
             events = SagaConventionConfigurationCache.GetSagaConfigurationInfo(this.GetType()).Events;
         }
 
         public override bool IsChanged => base.IsChanged || uncommitedCommands.Any();
 
-        public IEnumerable<ICommand> UncommitedCommands => uncommitedCommands;
+        public IEnumerable<ICommandBase> UncommitedCommands => uncommitedCommands;
         public IReadOnlyDictionary<string, IReadOnlyCollection<string>> Keys => keys;
-
-        public bool IsEnded { get; }
-
+        
         public void HandleEvent(IEventMessage<DomainEvent> ev)
         {
             if (events.TryGetValue(ev.Event.GetType(), out var eventInfos))
@@ -44,7 +47,7 @@ namespace Revo.Domain.Sagas
             uncommitedCommands.Clear();
         }
 
-        protected void SendCommand(ICommand command)
+        protected void SendCommand(ICommandBase command)
         {
             uncommitedCommands.Add(command);
         }

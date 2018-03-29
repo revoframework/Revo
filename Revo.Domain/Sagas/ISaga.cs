@@ -1,16 +1,15 @@
 ﻿using System.Collections.Generic;
 using Revo.Core.Commands;
 using Revo.Core.Events;
-using Revo.Domain.Entities.EventSourcing;
+using Revo.Domain.Entities;
 using Revo.Domain.Events;
 
 namespace Revo.Domain.Sagas
 {
-    public interface ISaga : IEventSourcedAggregateRoot
+    public interface ISaga : IAggregateRoot
     {
-        IEnumerable<ICommand> UncommitedCommands { get; }
+        IEnumerable<ICommandBase> UncommitedCommands { get; }
         IReadOnlyDictionary<string, IReadOnlyCollection<string>> Keys { get; }
-        bool IsEnded { get; }
 
         void HandleEvent(IEventMessage<DomainEvent> ev);
     }

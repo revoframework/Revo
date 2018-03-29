@@ -4,7 +4,7 @@ using Revo.Domain.Entities;
 using Revo.Domain.Events;
 using Xunit;
 
-namespace Revo.Infrastructure.Tests.Core.Domain
+namespace Revo.Domain.Tests.Events
 {
     public class ConventionEventApplyRegistratorTests
     {

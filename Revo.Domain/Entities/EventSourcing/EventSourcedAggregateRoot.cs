@@ -5,6 +5,12 @@ using Revo.Domain.Events;
 
 namespace Revo.Domain.Entities.EventSourcing
 {
+    /// <summary>
+    /// Aggregate root that uses event-sourcing to define its state.
+    /// As such, it should only modify its state by publishing events using the protected ApplyEvent method.
+    /// After publishing an event or loading its state from a repository, the applied events can be observed
+    /// and acted upon by implementing private void Apply(EVENT_TYPE) methods (uses convention-based method discovery).
+    /// </summary>
     public abstract class EventSourcedAggregateRoot : AggregateRoot, IEventSourcedAggregateRoot
     {
         public EventSourcedAggregateRoot(Guid id) : base(id)

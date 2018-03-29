@@ -1,8 +1,11 @@
-﻿using Ninject.Modules;
+﻿using Ninject;
+using Ninject.Modules;
 using Revo.Core.Core;
 using Revo.Core.Core.Lifecycle;
+using Revo.Core.Events;
 using Revo.Domain.Events;
 using Revo.Infrastructure.Events.Async;
+using Revo.Infrastructure.Repositories;
 
 namespace Revo.Infrastructure.Sagas
 {
@@ -11,7 +14,7 @@ namespace Revo.Infrastructure.Sagas
         public override void Load()
         {
             Bind<ISagaLocator>()
-                .To<SagaLocator>()
+                .To<KeySagaLocator>()
                 .InRequestOrJobScope();
 
             Bind<ISagaRegistry>()
@@ -28,6 +31,16 @@ namespace Revo.Infrastructure.Sagas
 
             Bind<ISagaRepository>() //itransactionprovider?
                 .To<SagaRepository>()
+                .InRequestOrJobScope();
+
+            Bind<IRepository>()
+                .ToMethod(ctx =>
+                    ctx.Kernel.Get<IRepositoryFactory>().CreateRepository(ctx.Kernel.Get<IPublishEventBuffer>()))
+                .WhenInjectedInto<SagaRepository>()
+                .InRequestOrJobScope();
+
+            Bind<ISagaEventDispatcher>()
+                .To<SagaEventDispatcher>()
                 .InRequestOrJobScope();
 
             Bind<IAsyncEventSequencer<DomainEvent>, SagaEventListener.SagaEventSequencer>()

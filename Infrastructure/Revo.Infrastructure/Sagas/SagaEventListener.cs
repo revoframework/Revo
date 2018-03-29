@@ -9,12 +9,12 @@ namespace Revo.Infrastructure.Sagas
     public class SagaEventListener :
         IAsyncEventListener<DomainEvent>
     {
-        private readonly ISagaLocator sagaLocator;
+        private readonly ISagaEventDispatcher sagaEventDispatcher;
         private readonly List<IEventMessage<DomainEvent>> bufferedEvents = new List<IEventMessage<DomainEvent>>();
 
-        public SagaEventListener(ISagaLocator sagaLocator, SagaEventSequencer sagaEventSequencer)
+        public SagaEventListener(ISagaEventDispatcher sagaEventDispatcher, SagaEventSequencer sagaEventSequencer)
         {
-            this.sagaLocator = sagaLocator;
+            this.sagaEventDispatcher = sagaEventDispatcher;
             EventSequencer = sagaEventSequencer;
         }
 
@@ -33,7 +33,7 @@ namespace Revo.Infrastructure.Sagas
 
         private async Task DispatchSagaEvents()
         {
-            await sagaLocator.LocateAndDispatchAsync(bufferedEvents);
+            await sagaEventDispatcher.DispatchEventsToSagas(bufferedEvents);
             bufferedEvents.Clear();
         }
 
@@ -44,9 +44,10 @@ namespace Revo.Infrastructure.Sagas
                 yield return new EventSequencing()
                 {
                     SequenceName = message.Event is DomainAggregateEvent domainAggregateEvent
-                        ? "SagaEventListener:" + domainAggregateEvent.AggregateId.ToString() // TODO queue per saga instance
+                        ? "SagaEventListener:" + domainAggregateEvent.AggregateId.ToString()
                         : "SagaEventListener",
-                    EventSequenceNumber = message.Metadata.GetStreamSequenceNumber()
+                    EventSequenceNumber = message.Event is DomainAggregateEvent
+                        ? message.Metadata.GetStreamSequenceNumber() : null
                 };
             }
 

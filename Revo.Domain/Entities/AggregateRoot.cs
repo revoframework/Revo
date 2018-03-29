@@ -5,6 +5,11 @@ using Revo.Domain.Events;
 
 namespace Revo.Domain.Entities
 {
+    /// <summary>
+    /// Abstract base class for aggregate root implementations.
+    /// Implements a basic aggregate-event-routing and convention-based discovery of Apply methods
+    /// that can act upon the events published inside the aggregate.
+    /// </summary>
     public abstract class AggregateRoot : IAggregateRoot
     {
         private bool isDeleted;

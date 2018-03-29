@@ -80,7 +80,7 @@ namespace Revo.Infrastructure.Tests.Sagas
                 && x.SagaKey == "key"));
         }
 
-        public class Saga1 : Saga
+        public class Saga1 : EventSourcedSaga
         {
             public Saga1(Guid id) : base(id)
             {

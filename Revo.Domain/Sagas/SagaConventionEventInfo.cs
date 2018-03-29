@@ -7,7 +7,7 @@ namespace Revo.Domain.Sagas
     public class SagaConventionEventInfo
     {
         public SagaConventionEventInfo(Func<DomainEvent, string> eventKeyExpression,
-            string sagaKey, bool isStartingIfSagaNotFound, Action<Saga, IEventMessage<DomainEvent>> handleDelegate)
+            string sagaKey, bool isStartingIfSagaNotFound, Action<ISaga, IEventMessage<DomainEvent>> handleDelegate)
         {
             HandleDelegate = handleDelegate;
             EventKeyExpression = eventKeyExpression;
@@ -16,7 +16,7 @@ namespace Revo.Domain.Sagas
             IsStartingIfSagaNotFound = isStartingIfSagaNotFound;
         }
 
-        public SagaConventionEventInfo(Action<Saga, IEventMessage<DomainEvent>> handleDelegate)
+        public SagaConventionEventInfo(Action<ISaga, IEventMessage<DomainEvent>> handleDelegate)
         {
             HandleDelegate = handleDelegate;
             IsAlwaysStarting = true;
@@ -27,6 +27,6 @@ namespace Revo.Domain.Sagas
         public bool IsStartingIfSagaNotFound { get; }
         public string SagaKey { get; }
         public Func<DomainEvent, string> EventKeyExpression { get; }
-        public Action<Saga, IEventMessage<DomainEvent>> HandleDelegate { get; }
+        public Action<ISaga, IEventMessage<DomainEvent>> HandleDelegate { get; }
     }
 }

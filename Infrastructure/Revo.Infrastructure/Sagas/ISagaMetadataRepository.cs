@@ -1,13 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Revo.Infrastructure.Sagas
 {
     public interface ISagaMetadataRepository
     {
-        Task<Guid[]> FindSagaIdsByKeyAsync(string keyName, string keyValue);
+        void AddSaga(Guid sagaId, Guid sagaClassId);
+        Task<SagaKeyMatch[]> FindSagasByKeyAsync(string keyName, string keyValue);
         Task<SagaMetadata> GetSagaMetadataAsync(Guid sagaId);
-        Task SetSagaMetadataAsync(Guid sagaId, SagaMetadata sagaMetadata);
+        Task SetSagaKeysAsync(Guid sagaId, IEnumerable<KeyValuePair<string, string>> keys);
         void SaveChanges();
         Task SaveChangesAsync();
     }

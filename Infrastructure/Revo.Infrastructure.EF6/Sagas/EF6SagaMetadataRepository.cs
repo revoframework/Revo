@@ -7,67 +7,82 @@ using System.Threading.Tasks;
 using Revo.DataAccess.Entities;
 using Revo.Infrastructure.EF6.Sagas.Model;
 using Revo.Infrastructure.Sagas;
+using EntityState = Revo.DataAccess.Entities.EntityState;
 
 namespace Revo.Infrastructure.EF6.Sagas
 {
     public class EF6SagaMetadataRepository : ISagaMetadataRepository
     {
         private readonly ICrudRepository crudRepository;
-
-        private readonly Dictionary<Guid, List<SagaMetadataKey>> sagaMetadatas =
-            new Dictionary<Guid, List<SagaMetadataKey>>();
+        private readonly Dictionary<Guid, SagaMetadataRecord> metadataRecords = new Dictionary<Guid, SagaMetadataRecord>();
 
         public EF6SagaMetadataRepository(ICrudRepository crudRepository)
         {
             this.crudRepository = crudRepository;
         }
 
-        public Task<Guid[]> FindSagaIdsByKeyAsync(string keyName, string keyValue)
+        public void AddSaga(Guid sagaId, Guid sagaClassId)
         {
-            return crudRepository.Where<SagaMetadataKey>(x => x.KeyName == keyName
-                                                              && x.KeyValue == keyValue)
-                .Select(x => x.SagaId)
+            if (metadataRecords.ContainsKey(sagaId))
+            {
+                throw new ArgumentException($"Saga with ID {sagaId} already has metadata added");
+            }
+
+            var metadataRecord = metadataRecords[sagaId] = new SagaMetadataRecord(sagaId, sagaClassId);
+            crudRepository.Add(metadataRecord);
+        }
+
+        public async Task<SagaKeyMatch[]> FindSagasByKeyAsync(string keyName, string keyValue)
+        {
+            var databaseKeys = (await crudRepository.FindAll<SagaMetadataRecord>()
+                .Where(x => x.Keys.Any(y => y.KeyName == keyName && y.KeyValue == keyValue))
+                .ToArrayAsync())
+                .Where(x => (crudRepository.GetEntityState(x) & EntityState.Deleted) == 0);
+
+            var withCachedKeys = databaseKeys
+                .Concat(metadataRecords.Values) // merge with keys in cache they might've gotten updated in the meantime
                 .Distinct()
-                .ToArrayAsync();
+                .Where(x => x.Keys.Any(y => y.KeyName == keyName && y.KeyValue == keyValue));
+
+            var metadata = withCachedKeys
+                .Select(x => new SagaKeyMatch() {Id = x.Id, ClassId = x.ClassId})
+                .ToArray();
+            return metadata;
         }
 
         public async Task<SagaMetadata> GetSagaMetadataAsync(Guid sagaId)
         {
-            List<SagaMetadataKey> keys = await GetSagaMetadataKeysAsync(sagaId);
-            return new SagaMetadata(keys.GroupBy(x => x.KeyName)
-                .ToImmutableDictionary(x => x.Key,
-                    x => x.Select(y => y.KeyValue).ToImmutableList()));
+            var metadataRecord = await GetMetadataRecordAsync(sagaId);
+
+            var keys = metadataRecord.Keys.GroupBy(x => x.KeyName)
+                .Select(x =>
+                    new KeyValuePair<string, ImmutableList<string>>(x.Key,
+                        x.Select(y => y.KeyValue).ToImmutableList()));
+            return new SagaMetadata(keys.ToImmutableDictionary(), metadataRecord.ClassId);
         }
 
-        public async Task SetSagaMetadataAsync(Guid sagaId, SagaMetadata sagaMetadata)
+        public async Task SetSagaKeysAsync(Guid sagaId, IEnumerable<KeyValuePair<string, string>> keys)
         {
-            List<SagaMetadataKey> keys = await GetSagaMetadataKeysAsync(sagaId);
+            var metadataRecord = await GetMetadataRecordAsync(sagaId);
+            var unmatchedKeys = metadataRecord.Keys.ToList();
 
-            foreach (var keyGroup in sagaMetadata.Keys)
+            foreach (var keyPair in keys)
             {
-                foreach (var keyValue in keyGroup.Value)
+                SagaMetadataKey key = unmatchedKeys.FirstOrDefault(x => x.KeyName == keyPair.Key && x.KeyValue == keyPair.Value);
+                if (key != null)
                 {
-                    SagaMetadataKey key = keys.FirstOrDefault(x => x.KeyName == keyGroup.Key && x.KeyValue == keyValue);
-                    if (key != null)
-                    {
-                        keys.Remove(key);
-                        continue;
-                    }
-
-                    key = new SagaMetadataKey()
-                    {
-                        Id = Guid.NewGuid(),
-                        KeyName = keyGroup.Key,
-                        KeyValue = keyValue,
-                        SagaId = sagaId
-                    };
-                    
-                    crudRepository.Add(key);
+                    unmatchedKeys.Remove(key);
+                    continue;
                 }
+
+                key = new SagaMetadataKey(Guid.NewGuid(), sagaId, keyPair.Key, keyPair.Value);
+                metadataRecord.Keys.Add(key);
+                crudRepository.Add(key);
             }
 
-            foreach (SagaMetadataKey key in keys) //remove unmatched
+            foreach (SagaMetadataKey key in unmatchedKeys)
             {
+                metadataRecord.Keys.Remove(key);
                 crudRepository.Remove(key);
             }
         }
@@ -82,16 +97,17 @@ namespace Revo.Infrastructure.EF6.Sagas
             return crudRepository.SaveChangesAsync();
         }
 
-        private async Task<List<SagaMetadataKey>> GetSagaMetadataKeysAsync(Guid sagaId)
+        private async Task<SagaMetadataRecord> GetMetadataRecordAsync(Guid sagaId)
         {
-            if (!sagaMetadatas.TryGetValue(sagaId, out List<SagaMetadataKey> keys))
+            if (!metadataRecords.TryGetValue(sagaId, out SagaMetadataRecord metadataRecord))
             {
-                keys = await crudRepository.Where<SagaMetadataKey>(x => x.SagaId == sagaId)
-                    .ToListAsync();
-                sagaMetadatas[sagaId] = keys;
+                metadataRecord = await crudRepository.Where<SagaMetadataRecord>(x => x.Id == sagaId)
+                    .Include(x => x.Keys)
+                    .FirstAsync();
+                metadataRecords[sagaId] = metadataRecord;
             }
 
-            return keys;
+            return metadataRecord;
         }
     }
 }

@@ -1,5 +1,8 @@
-﻿namespace Revo.DataAccess.Entities
+﻿using System;
+
+namespace Revo.DataAccess.Entities
 {
+    [Flags]
     public enum EntityState
     {
         //

@@ -18,10 +18,10 @@ namespace Revo.Testing.Infrastructure.Repositories
         {
         }
 
-        public List<EntityEntry> Aggregates { get; } = new List<EntityEntry>();
-        public IReadOnlyList<SaveTransaction> SaveTransactions => saveTransactions;
+        public virtual List<EntityEntry> Aggregates { get; } = new List<EntityEntry>();
+        public virtual IReadOnlyList<SaveTransaction> SaveTransactions => saveTransactions;
 
-        public ITransaction CreateTransaction()
+        public virtual ITransaction CreateTransaction()
         {
             throw new NotImplementedException();
         }
@@ -30,7 +30,7 @@ namespace Revo.Testing.Infrastructure.Repositories
         {
         }
 
-        public void Add<T>(T aggregate) where T : class, IAggregateRoot
+        public virtual void Add<T>(T aggregate) where T : class, IAggregateRoot
         {
             if (!Aggregates.Any(x => x.Instance == aggregate))
             {
@@ -38,63 +38,63 @@ namespace Revo.Testing.Infrastructure.Repositories
             }
         }
 
-        public T FirstOrDefault<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
+        public virtual T FirstOrDefault<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
         {
             return GetSavedAggregates<T>().FirstOrDefault(predicate.Compile());
         }
 
-        public T First<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
+        public virtual T First<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
         {
             return GetSavedAggregates<T>().First(predicate.Compile());
         }
 
-        public Task<T> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
+        public virtual Task<T> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
         {
             return Task.FromResult(FirstOrDefault(predicate));
         }
 
-        public Task<T> FirstAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
+        public virtual Task<T> FirstAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
         {
             return Task.FromResult(First(predicate));
         }
 
-        public T Find<T>(Guid id) where T : class, IAggregateRoot
+        public virtual T Find<T>(Guid id) where T : class, IAggregateRoot
         {
             return Aggregates.Select(x => x.Instance).OfType<T>().FirstOrDefault(x => x.Id.Equals(id));
         }
 
-        public Task<T> FindAsync<T>(Guid id) where T : class, IAggregateRoot
+        public virtual Task<T> FindAsync<T>(Guid id) where T : class, IAggregateRoot
         {
             return Task.FromResult(
                 Aggregates.Select(x => x.Instance).OfType<T>().FirstOrDefault(x => x.Id.Equals(id)));
         }
 
-        public T Get<T>(Guid id) where T : class, IAggregateRoot
+        public virtual T Get<T>(Guid id) where T : class, IAggregateRoot
         {
             return Aggregates.Select(x => x.Instance).OfType<T>().First(x => x.Id.Equals(id));
         }
 
-        public Task<T> GetAsync<T>(Guid id) where T : class, IAggregateRoot
+        public virtual Task<T> GetAsync<T>(Guid id) where T : class, IAggregateRoot
         {
             return Task.FromResult(Get<T>(id));
         }
 
-        public IQueryable<T> FindAll<T>() where T : class, IAggregateRoot, IQueryableEntity
+        public virtual IQueryable<T> FindAll<T>() where T : class, IAggregateRoot, IQueryableEntity
         {
             return GetSavedAggregates<T>().AsQueryable();
         }
 
-        public Task<IList<T>> FindAllAsync<T>() where T : class, IAggregateRoot, IQueryableEntity
+        public virtual Task<IList<T>> FindAllAsync<T>() where T : class, IAggregateRoot, IQueryableEntity
         {
             return Task.FromResult((IList<T>)FindAll<T>().ToList());
         }
 
-        public IQueryable<T> Where<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
+        public virtual IQueryable<T> Where<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
         {
             return GetSavedAggregates<T>().Where(predicate.Compile()).AsQueryable();
         }
 
-        public void Remove<T>(T aggregate) where T : class, IAggregateRoot
+        public virtual void Remove<T>(T aggregate) where T : class, IAggregateRoot
         {
             EntityEntry entry = Aggregates.FirstOrDefault(x => x.Instance == aggregate);
             if (entry != null)
@@ -103,7 +103,7 @@ namespace Revo.Testing.Infrastructure.Repositories
             }
         }
 
-        public void MarkModified<T>(T aggregate) where T : class, IAggregateRoot
+        public virtual void MarkModified<T>(T aggregate) where T : class, IAggregateRoot
         {
             EntityEntry entry = Aggregates.FirstOrDefault(x => x.Instance == aggregate);
             if (entry != null)
@@ -112,7 +112,7 @@ namespace Revo.Testing.Infrastructure.Repositories
             }
         }
 
-        public void SaveChanges()
+        public virtual void SaveChanges()
         {
             List<EntityEntry> added = new List<EntityEntry>();
             List<EntityEntry> modified = new List<EntityEntry>();
@@ -153,13 +153,13 @@ namespace Revo.Testing.Infrastructure.Repositories
                 new SaveTransaction(added, modified, removed, publishedEvents.AsLookup()));
         }
 
-        public Task SaveChangesAsync()
+        public virtual Task SaveChangesAsync()
         {
             SaveChanges();
             return Task.FromResult(0);
         }
 
-        public IEnumerable<T> GetRemovedAggregates<T>() where T : class, IAggregateRoot
+        public virtual IEnumerable<T> GetRemovedAggregates<T>() where T : class, IAggregateRoot
         {
             return SaveTransactions
                 .SelectMany(x => x.Removed)
@@ -167,13 +167,13 @@ namespace Revo.Testing.Infrastructure.Repositories
                 .OfType<T>();
         }
 
-        public bool HasUnsavedChanges()
+        public virtual bool HasUnsavedChanges()
         {
             return Aggregates
                 .Any(x => x.Instance.UncommittedEvents.Any() || x.EntityState != EntityState.Unchanged);
         }
 
-        protected IEnumerable<T> GetSavedAggregates<T>() where T : class, IAggregateRoot
+        protected virtual IEnumerable<T> GetSavedAggregates<T>() where T : class, IAggregateRoot
         {
             return Aggregates
                 .Where(x => x.EntityState == EntityState.Modified || x.EntityState == EntityState.Unchanged)

@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using MoreLinq;
@@ -16,6 +18,8 @@ using Revo.Infrastructure.Sagas;
 using NSubstitute;
 using Revo.Domain.Entities;
 using Revo.Domain.Sagas;
+using Revo.Infrastructure.Repositories;
+using Revo.Testing.Infrastructure.Repositories;
 using Xunit;
 
 namespace Revo.Infrastructure.Tests.Sagas
@@ -24,40 +28,97 @@ namespace Revo.Infrastructure.Tests.Sagas
     {
         private readonly ICommandBus commandBus;
         private readonly ISagaMetadataRepository sagaMetadataRepository;
-        private readonly IPublishEventBuffer publishEventBuffer;
-        private readonly IEventStore eventStore;
         private readonly IEntityTypeManager entityTypeManager;
-        private readonly IEventMessageFactory eventMessageFactory;
+        private readonly FakeRepository repository;
 
         private readonly SagaRepository sut;
+
+
+        private readonly Guid saga1ClassId = Guid.NewGuid();
 
         public SagaRepositoryTests()
         {
             commandBus = Substitute.For<ICommandBus>();
             sagaMetadataRepository = Substitute.For<ISagaMetadataRepository>();
-            publishEventBuffer = Substitute.For<IPublishEventBuffer>();
-            eventStore = Substitute.For<IEventStore>();
+            entityTypeManager = Substitute.For<IEntityTypeManager>();
+            repository = Substitute.ForPartsOf<FakeRepository>();
             entityTypeManager = Substitute.For<IEntityTypeManager>();
 
-            Guid saga1ClassId = Guid.NewGuid();
             entityTypeManager.GetClrTypeByClassId(saga1ClassId)
                 .Returns(typeof(Saga1));
 
             entityTypeManager.GetClassIdByClrType(typeof(Saga1))
                 .Returns(saga1ClassId);
+            
+            sut = new SagaRepository(commandBus, repository, sagaMetadataRepository, entityTypeManager);
+        }
 
-            eventMessageFactory = Substitute.For<IEventMessageFactory>();
-            eventMessageFactory.CreateMessageAsync(null).ReturnsForAnyArgs(ci =>
-            {
-                var @event = ci.ArgAt<IEvent>(0);
-                Type messageType = typeof(EventMessageDraft<>).MakeGenericType(@event.GetType());
-                IEventMessageDraft messageDraft = (IEventMessageDraft)messageType.GetConstructor(new[] { @event.GetType() }).Invoke(new[] { @event });
-                messageDraft.SetMetadata("TestKey", "TestValue");
-                return messageDraft;
-            }); // TODO something more lightweight?
+        [Fact]
+        public void MetadataRepository_GetsRepo()
+        {
+            sut.MetadataRepository.Should().Be(sagaMetadataRepository);
+        }
 
-            sut = new SagaRepository(commandBus, eventStore, entityTypeManager,
-                publishEventBuffer, new IRepositoryFilter[] {}, eventMessageFactory, sagaMetadataRepository);
+        [Fact]
+        public void Add_AddsToMetadataRepo()
+        {
+            Saga1 saga = new Saga1(Guid.NewGuid());
+            sut.Add(saga);
+
+            sagaMetadataRepository.Received(1).AddSaga(saga.Id, saga1ClassId);
+        }
+
+        [Fact]
+        public void Add_AddsToRepo()
+        {
+            Saga1 saga = new Saga1(Guid.NewGuid());
+            sut.Add(saga);
+
+            repository.Received(1).Add(saga);
+        }
+
+        [Fact]
+        public void Add_ThrowsForDuplicateIds()
+        {
+            Saga1 saga = new Saga1(Guid.NewGuid());
+            Saga1 saga2 = new Saga1(saga.Id);
+            sut.Add(saga);
+
+            sut.Invoking(x => x.Add(saga2))
+                .ShouldThrow<ArgumentException>();
+
+            repository.Received(1).Add(saga);
+        }
+
+        [Fact]
+        public void Add_TwiceIsNoop()
+        {
+            Saga1 saga = new Saga1(Guid.NewGuid());
+            sut.Add(saga);
+            sut.Add(saga);
+
+            sagaMetadataRepository.Received(1).AddSaga(saga.Id, saga1ClassId);
+            repository.Received(1).Add(saga);
+        }
+
+        [Fact]
+        public async Task GetAsync_GetsFromRepo()
+        {
+            Saga1 saga = new Saga1(Guid.NewGuid());
+            repository.Aggregates.Add(new FakeRepository.EntityEntry(saga, FakeRepository.EntityState.Unchanged));
+
+            var result = await sut.GetAsync<Saga1>(saga.Id);
+            result.Should().Be(saga);
+        }
+
+        [Fact]
+        public async Task GetAsync_ByClassIdGetsFromRepo()
+        {
+            Saga1 saga = new Saga1(Guid.NewGuid());
+            repository.Aggregates.Add(new FakeRepository.EntityEntry(saga, FakeRepository.EntityState.Unchanged));
+
+            var result = await sut.GetAsync(saga.Id, saga1ClassId);
+            result.Should().Be(saga);
         }
 
         [Fact]
@@ -67,11 +128,27 @@ namespace Revo.Infrastructure.Tests.Sagas
             saga1.Do();
             sut.Add(saga1);
 
-            ICommand command = saga1.UncommitedCommands.First();
+            ICommandBase command = saga1.UncommitedCommands.First();
 
             await sut.SaveChangesAsync();
 
             commandBus.Received(1).SendAsync(command);
+        }
+
+        [Fact]
+        public async Task SaveChangesAsync_PublishesCommandsSavesSagasAndMetadataInOrder()
+        {
+            var saga = new Saga1(Guid.NewGuid());
+            saga.Do();
+            sut.Add(saga);
+            await sut.SaveChangesAsync();
+
+            Received.InOrder(() =>
+            {
+                commandBus.SendAsync(Arg.Any<ICommandBase>(), Arg.Any<CancellationToken>());
+                repository.SaveChangesAsync();
+                sagaMetadataRepository.SaveChangesAsync();
+            });
         }
 
         [Fact]
@@ -81,24 +158,24 @@ namespace Revo.Infrastructure.Tests.Sagas
             saga1.Do();
             sut.Add(saga1);
 
-            SagaMetadata sagaMetadata = null;
-            sagaMetadataRepository.When(x => x.SetSagaMetadataAsync(saga1.Id, Arg.Any<SagaMetadata>())).Do(
-                ci => sagaMetadata = ci.ArgAt<SagaMetadata>(1));
+            IEnumerable<KeyValuePair<string, string>> sagaKeys = null;
+            sagaMetadataRepository.When(x => x.SetSagaKeysAsync(saga1.Id, Arg.Any<IEnumerable<KeyValuePair<string, string>>>())).Do(
+                ci => sagaKeys = ci.ArgAt<IEnumerable<KeyValuePair<string, string>>>(1));
 
             await sut.SaveChangesAsync();
 
-            sagaMetadataRepository.Received(1).SetSagaMetadataAsync(saga1.Id, Arg.Any<SagaMetadata>());
-            sagaMetadataRepository.Received(1).SaveChangesAsync();
+            Received.InOrder(() =>
+            {
+                sagaMetadataRepository.Received(1).SetSagaKeysAsync(saga1.Id, Arg.Any<IEnumerable<KeyValuePair<string, string>>>());
+                sagaMetadataRepository.Received(1).SaveChangesAsync();
+            });
 
-            sagaMetadata.Keys.Count.ShouldBeEquivalentTo(saga1.Keys.Count);
-            sagaMetadata.Keys.ForEach(x =>
-                {
-                    saga1.Keys.Keys.Should().Contain(x.Key);
-                    saga1.Keys[x.Key].Should().BeEquivalentTo(x.Value);
-                });
+            sagaKeys.Should()
+                .BeEquivalentTo(saga1.Keys.SelectMany(x =>
+                    x.Value.Select(y => new KeyValuePair<string, string>(x.Key, y))));
         }
 
-        public class Saga1 : Saga
+        public class Saga1 : EventSourcedSaga
         {
             public Saga1(Guid id) : base(id)
             {

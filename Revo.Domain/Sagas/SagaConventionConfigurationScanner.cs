@@ -23,13 +23,13 @@ namespace Revo.Domain.Sagas
         private static void AddEvents(Type sagaType, MultiValueDictionary<Type, SagaConventionEventInfo> events)
         {
             if (sagaType.BaseType != null
-                && typeof(Saga).IsAssignableFrom(sagaType.BaseType))
+                && typeof(EventSourcedSaga).IsAssignableFrom(sagaType.BaseType))
             {
                 AddEvents(sagaType.BaseType, events);
             }
 
             var handleMethods = sagaType
-                .GetMethods(BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.NonPublic)
+                .GetMethods(BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.NonPublic)
                 .Where(x => x.Name == "Handle"
                             && x.GetParameters().Length == 1
                             && typeof(IEventMessage<DomainEvent>).IsAssignableFrom(x.GetParameters()[0].ParameterType));
@@ -41,7 +41,7 @@ namespace Revo.Domain.Sagas
 
                 // Create an Action<AggregateRoot, IEvent> that does (agg, evt) => ((ConcreteAggregate)agg).Handle((ConcreteEvent)evt)
                 var evtParam = Expression.Parameter(typeof(IEventMessage<DomainEvent>), "evt");
-                var aggParam = Expression.Parameter(typeof(Saga), "agg");
+                var aggParam = Expression.Parameter(typeof(ISaga), "agg");
 
                 var eventDelegate = Expression.Lambda(
                     Expression.Call(
@@ -55,7 +55,7 @@ namespace Revo.Domain.Sagas
                     aggParam,
                     evtParam).Compile();
 
-                var handleDelegate = (Action<Saga, IEventMessage<DomainEvent>>) eventDelegate;
+                var handleDelegate = (Action<ISaga, IEventMessage<DomainEvent>>) eventDelegate;
 
                 var sagaEventAttributes = handleMethod.GetCustomAttributes<SagaEventAttribute>(true).ToList();
                 if (sagaEventAttributes.Count == 0)
@@ -66,6 +66,8 @@ namespace Revo.Domain.Sagas
 
                 foreach (var sagaEventAttribute in sagaEventAttributes)
                 {
+                    ValidateAttribute(sagaEventAttribute, handleMethod);
+
                     if (sagaEventAttribute.IsAlwaysStarting)
                     {
                         events.Add(eventType, new SagaConventionEventInfo(handleDelegate));
@@ -108,6 +110,19 @@ namespace Revo.Domain.Sagas
                             sagaEventAttribute.SagaKey, sagaEventAttribute.IsStartingIfSagaNotFound, handleDelegate));
                     }
                 }
+            }
+        }
+
+        private static void ValidateAttribute(SagaEventAttribute sagaEventAttribute, MethodInfo handleMethod)
+        {
+            if ((sagaEventAttribute.EventKey == null) != (sagaEventAttribute.SagaKey == null))
+            {
+                throw new InvalidOperationException($"Invalid SagaEvent attribute for {handleMethod}: if EventKey is set, then SagaKey must also be set (and vice-versa)");
+            }
+
+            if (!sagaEventAttribute.IsAlwaysStarting && sagaEventAttribute.EventKey == null)
+            {
+                throw new InvalidOperationException($"Invalid SagaEvent attribute for {handleMethod}: if IsAlwaysStarting, then both EventKey and SagaKey must also be set");
             }
         }
     }

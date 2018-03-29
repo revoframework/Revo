@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
+using NSubstitute;
 using Revo.DataAccess.Entities;
 using Revo.Infrastructure.EF6.Sagas;
 using Revo.Infrastructure.EF6.Sagas.Model;
@@ -20,116 +23,244 @@ namespace Revo.Infrastructure.EF6.Tests.Sagas
 
         public EF6SagaMetadataRepositoryTests()
         {
-            fakeCrudRepository = new FakeCrudRepository();
+            fakeCrudRepository = Substitute.ForPartsOf<FakeCrudRepository>();
             sut = new EF6SagaMetadataRepository(fakeCrudRepository);
         }
 
         [Fact]
-        public async Task FindSagaIdsByKeyAsync_FindsSagas()
+        public void AddSaga_CreatesNewSagaRecord()
         {
-            Guid saga1Id = Guid.NewGuid();
-            Guid saga2Id = Guid.NewGuid();
+            Guid sagaId = Guid.Parse("1367F325-CF6C-4EB3-8C23-696A7135CD9A");
+            Guid sagaClassId = Guid.Parse("10452E7E-4888-4EF0-BC78-D76C4D8062B5");
+            sut.AddSaga(sagaId, sagaClassId);
 
-            fakeCrudRepository.AttachRange<SagaMetadataKey>(new List<SagaMetadataKey>()
+            var metadatas = fakeCrudRepository.FindAllWithAdded<SagaMetadataRecord>().ToList();
+
+            metadatas.Count.Should().Be(1);
+            metadatas.Should().Contain(x => x.Id == sagaId && x.ClassId == sagaClassId);
+        }
+
+        [Fact]
+        public async Task FindSagasByKeyAsync_FindsSagas()
+        {
+            Guid saga1Id = Guid.Parse("6B3577DF-B0F7-444A-8506-029591BC9894");
+            Guid saga2Id = Guid.Parse("75E24A6E-29BF-4863-AB6A-299EB107947D");
+
+            var sagaMetadata1 = new SagaMetadataRecord(saga1Id, Guid.Parse("39F01E63-CA48-463E-B9C9-F049832DE92E"));
+            sagaMetadata1.Keys.AddRange(new[]
             {
-                new SagaMetadataKey() {SagaId = saga1Id, KeyName = "key", KeyValue = "value"},
-                new SagaMetadataKey() {SagaId = Guid.NewGuid(), KeyName = "key2", KeyValue = "value"},
-                new SagaMetadataKey() {SagaId = saga2Id, KeyName = "key", KeyValue = "value"}
+                new SagaMetadataKey(Guid.Parse("FC9083F9-0FB1-46DE-BC50-EECD5D5B1A79"), saga1Id, "key", "value")
             });
 
-            Guid[] result = await sut.FindSagaIdsByKeyAsync("key", "value");
+            var sagaMetadata2 = new SagaMetadataRecord(saga2Id, Guid.Parse("068E9684-0B5F-4F0B-BF76-65734403F25B"));
+            sagaMetadata2.Keys.AddRange(new[]
+            {
+                new SagaMetadataKey(Guid.Parse("919274C2-E501-430D-A60D-60DFD486C0EB"), saga2Id, "key", "value")
+            });
 
-            Assert.Contains(saga1Id, result);
-            Assert.Contains(saga2Id, result);
+            var sagaMetadata3 = new SagaMetadataRecord(Guid.NewGuid(), Guid.NewGuid());
+            sagaMetadata3.Keys.AddRange(new[]
+            {
+                new SagaMetadataKey(Guid.NewGuid(), sagaMetadata3.Id, "key2", "value")
+            });
+
+            fakeCrudRepository.AttachRange(sagaMetadata1.Keys.Concat(sagaMetadata2.Keys).Concat(sagaMetadata3.Keys));
+            fakeCrudRepository.AttachRange(new[]
+            {
+                sagaMetadata1, sagaMetadata2, sagaMetadata3
+            });
+
+            SagaKeyMatch[] result = await sut.FindSagasByKeyAsync("key", "value");
+
+            result.ShouldBeEquivalentTo(new[]
+            {
+                new SagaKeyMatch() { Id = sagaMetadata1.Id, ClassId = sagaMetadata1.ClassId },
+                new SagaKeyMatch() { Id = sagaMetadata2.Id, ClassId = sagaMetadata2.ClassId }
+            });
+        }
+
+        [Fact]
+        public async Task FindSagasByKeyAsync_ReflectsCachedChanges()
+        {
+            Guid saga1Id = Guid.Parse("6B3577DF-B0F7-444A-8506-029591BC9894");
+            Guid saga2Id = Guid.Parse("75E24A6E-29BF-4863-AB6A-299EB107947D");
+            Guid saga3Id = Guid.Parse("03A96C89-8004-42DB-874D-D25C3D3C2476");
+
+            var sagaMetadata1 = new SagaMetadataRecord(saga1Id, Guid.Parse("39F01E63-CA48-463E-B9C9-F049832DE92E"));
+            sagaMetadata1.Keys.AddRange(new[]
+            {
+                new SagaMetadataKey(Guid.Parse("FC9083F9-0FB1-46DE-BC50-EECD5D5B1A79"), saga1Id, "key", "value")
+            });
+
+            var sagaMetadata2 = new SagaMetadataRecord(saga2Id, Guid.Parse("068E9684-0B5F-4F0B-BF76-65734403F25B"));
+            sagaMetadata2.Keys.AddRange(new[]
+            {
+                new SagaMetadataKey(Guid.Parse("919274C2-E501-430D-A60D-60DFD486C0EB"), saga2Id, "key", "value2")
+            });
+
+            var sagaMetadata3 = new SagaMetadataRecord(saga3Id, Guid.Parse("EDAA5DD0-8396-44E2-AC9F-4D29FE255C59"));
+            sagaMetadata3.Keys.AddRange(new[]
+            {
+                new SagaMetadataKey(Guid.Parse("919274C2-E501-430D-A60D-60DFD486C0EB"), sagaMetadata3.Id, "key", "value")
+            });
+
+            fakeCrudRepository.AttachRange(sagaMetadata1.Keys.Concat(sagaMetadata2.Keys).Concat(sagaMetadata3.Keys));
+            fakeCrudRepository.AttachRange(new[]
+            {
+                sagaMetadata1, sagaMetadata2, sagaMetadata3
+            });
+
+            await sut.SetSagaKeysAsync(sagaMetadata2.Id, new[]
+            {
+                new KeyValuePair<string, string>("key", "value"),
+            });
+
+            await sut.SetSagaKeysAsync(sagaMetadata3.Id, new[]
+            {
+                new KeyValuePair<string, string>("key", "value3"),
+            });
+
+            SagaKeyMatch[] result = await sut.FindSagasByKeyAsync("key", "value");
+
+            result.ShouldBeEquivalentTo(new[]
+            {
+                new SagaKeyMatch() { Id = sagaMetadata1.Id, ClassId = sagaMetadata1.ClassId },
+                new SagaKeyMatch() { Id = sagaMetadata2.Id, ClassId = sagaMetadata2.ClassId }
+            });
+        }
+
+        [Fact]
+        public async Task GetSagaMetadataAsync_GetsFromRepo()
+        {
+            var sagaMetadata1 = new SagaMetadataRecord(Guid.Parse("46FA66FF-C8AC-4E24-AE74-11DAFF21D3D4"), Guid.Parse("39F01E63-CA48-463E-B9C9-F049832DE92E"));
+            fakeCrudRepository.Attach(sagaMetadata1);
+
+            var result = await sut.GetSagaMetadataAsync(sagaMetadata1.Id);
+            result.ClassId.Should().Be(sagaMetadata1.ClassId);
+        }
+
+        [Fact]
+        public async Task GetSagaMetadataAsync_GetsNewylAdded()
+        {
+            Guid sagaId = Guid.Parse("46FA66FF-C8AC-4E24-AE74-11DAFF21D3D4");
+            Guid sagaClassId = Guid.Parse("39F01E63-CA48-463E-B9C9-F049832DE92E");
+
+            sut.AddSaga(sagaId, sagaClassId);
+
+            var result = await sut.GetSagaMetadataAsync(sagaId);
+            result.ClassId.Should().Be(sagaClassId);
         }
 
         [Fact]
         public async Task SetSagaMetadataAsync_AddsNew()
         {
-            Guid sagaId = Guid.NewGuid();
-            await sut.SetSagaMetadataAsync(sagaId, new SagaMetadata(
-                ImmutableDictionary.CreateRange<string, ImmutableList<string>>(new[]
+            var sagaMetadata1 = new SagaMetadataRecord(Guid.Parse("B3F5E8E2-2681-4F57-8F9D-5577B9198CA8"), Guid.NewGuid());
+            fakeCrudRepository.Attach(sagaMetadata1);
+
+            await sut.SetSagaKeysAsync(sagaMetadata1.Id, new[]
                 {
-                    new KeyValuePair<string, ImmutableList<string>>("key",
-                        ImmutableList.CreateRange<string>(new[] {"value"}))
-                })));
+                    new KeyValuePair<string, string>("key", "value")
+                });
 
             var allMetadataKeys = fakeCrudRepository.FindAllWithAdded<SagaMetadataKey>().ToList();
-            Assert.Contains(allMetadataKeys, x => x.KeyName == "key" && x.KeyValue == "value" && x.SagaId == sagaId);
-            Assert.Equal(1, allMetadataKeys.Count);
+            allMetadataKeys.Count.Should().Be(1);
+            allMetadataKeys.Should().Contain(x => x.KeyName == "key" && x.KeyValue == "value" && x.SagaId == sagaMetadata1.Id);
+            sagaMetadata1.Keys.ShouldBeEquivalentTo(allMetadataKeys);
         }
 
         [Fact]
         public async Task SetSagaMetadataAsync_AddsNewMultiValue()
         {
-            Guid sagaId = Guid.NewGuid();
-            await sut.SetSagaMetadataAsync(sagaId, new SagaMetadata(
-                ImmutableDictionary.CreateRange<string, ImmutableList<string>>(new[]
-                {
-                    new KeyValuePair<string, ImmutableList<string>>("key",
-                        ImmutableList.CreateRange<string>(new[] {"value1", "value2"}))
-                })));
+            var sagaMetadata1 = new SagaMetadataRecord(Guid.Parse("B3F5E8E2-2681-4F57-8F9D-5577B9198CA8"), Guid.NewGuid());
+            fakeCrudRepository.Attach(sagaMetadata1);
+
+            await sut.SetSagaKeysAsync(sagaMetadata1.Id, new[]
+            {
+                new KeyValuePair<string, string>("key", "value1"),
+                new KeyValuePair<string, string>("key", "value2")
+            });
 
             var allMetadataKeys = fakeCrudRepository.FindAllWithAdded<SagaMetadataKey>().ToList();
-            Assert.Contains(allMetadataKeys, x => x.KeyName == "key" && x.KeyValue == "value1" && x.SagaId == sagaId);
-            Assert.Contains(allMetadataKeys, x => x.KeyName == "key" && x.KeyValue == "value2" && x.SagaId == sagaId);
-            Assert.Equal(2, allMetadataKeys.Count);
+            allMetadataKeys.Count.Should().Be(2);
+            allMetadataKeys.Should().Contain(x => x.KeyName == "key" && x.KeyValue == "value1" && x.SagaId == sagaMetadata1.Id);
+            allMetadataKeys.Should().Contain(x => x.KeyName == "key" && x.KeyValue == "value2" && x.SagaId == sagaMetadata1.Id);
+            sagaMetadata1.Keys.ShouldBeEquivalentTo(allMetadataKeys);
         }
 
         [Fact]
         public async Task SetSagaMetadataAsync_UpdatesExisting()
         {
-            Guid sagaId = Guid.NewGuid();
-            fakeCrudRepository.Attach(new SagaMetadataKey() {SagaId = sagaId, KeyName = "key", KeyValue = "value"});
-            
-            await sut.SetSagaMetadataAsync(sagaId, new SagaMetadata(
-                ImmutableDictionary.CreateRange<string, ImmutableList<string>>(new[]
-                {
-                    new KeyValuePair<string, ImmutableList<string>>("key",
-                        ImmutableList.CreateRange<string>(new[] {"value2"}))
-                })));
+            var sagaMetadata1 = new SagaMetadataRecord(Guid.Parse("B3F5E8E2-2681-4F57-8F9D-5577B9198CA8"), Guid.NewGuid());
+            fakeCrudRepository.Attach(sagaMetadata1);
+            sagaMetadata1.Keys.AddRange(new[]
+            {
+                new SagaMetadataKey(Guid.Parse("FC9083F9-0FB1-46DE-BC50-EECD5D5B1A79"), sagaMetadata1.Id, "key", "value")
+            });
+            fakeCrudRepository.AttachRange(sagaMetadata1.Keys);
 
+            await sut.SetSagaKeysAsync(sagaMetadata1.Id, new[]
+            {
+                new KeyValuePair<string, string>("key", "value2")
+            });
+            
             await fakeCrudRepository.SaveChangesAsync();
-            var allMetadataKeys = fakeCrudRepository.FindAll<SagaMetadataKey>().ToList();
-            Assert.Contains(allMetadataKeys, x => x.KeyName == "key" && x.KeyValue == "value2" && x.SagaId == sagaId);
-            Assert.Equal(1, allMetadataKeys.Count);
+
+            var allMetadataKeys = fakeCrudRepository.FindAllWithAdded<SagaMetadataKey>().ToList();
+            allMetadataKeys.Count.Should().Be(1);
+            allMetadataKeys.Should().Contain(x => x.KeyName == "key" && x.KeyValue == "value2" && x.SagaId == sagaMetadata1.Id);
+            sagaMetadata1.Keys.ShouldBeEquivalentTo(allMetadataKeys);
         }
 
         [Fact]
         public async Task SetSagaMetadataAsync_UpdatesSome()
         {
-            Guid sagaId = Guid.NewGuid();
-            fakeCrudRepository.Attach(new SagaMetadataKey() {SagaId = sagaId, KeyName = "key", KeyValue = "value1"});
-            fakeCrudRepository.Attach(new SagaMetadataKey() {SagaId = sagaId, KeyName = "key", KeyValue = "value2"});
+            var sagaMetadata1 = new SagaMetadataRecord(Guid.Parse("B3F5E8E2-2681-4F57-8F9D-5577B9198CA8"), Guid.NewGuid());
+            fakeCrudRepository.Attach(sagaMetadata1);
+            sagaMetadata1.Keys.AddRange(new[]
+            {
+                new SagaMetadataKey(Guid.NewGuid(), sagaMetadata1.Id, "key", "value1"),
+                new SagaMetadataKey(Guid.NewGuid(), sagaMetadata1.Id, "key", "value2")
+            });
+            fakeCrudRepository.AttachRange(sagaMetadata1.Keys);
             
-            await sut.SetSagaMetadataAsync(sagaId, new SagaMetadata(
-                ImmutableDictionary.CreateRange<string, ImmutableList<string>>(new[]
-                {
-                    new KeyValuePair<string, ImmutableList<string>>("key",
-                        ImmutableList.CreateRange<string>(new[] {"value2", "value3"}))
-                })));
+            await sut.SetSagaKeysAsync(sagaMetadata1.Id, new[]
+            {
+                new KeyValuePair<string, string>("key", "value2"),
+                new KeyValuePair<string, string>("key", "value3")
+            });
 
             await fakeCrudRepository.SaveChangesAsync();
-            var allMetadataKeys = fakeCrudRepository.FindAll<SagaMetadataKey>().ToList();
 
-            Assert.Contains(allMetadataKeys, x => x.KeyName == "key" && x.KeyValue == "value2" && x.SagaId == sagaId);
-            Assert.Contains(allMetadataKeys, x => x.KeyName == "key" && x.KeyValue == "value3" && x.SagaId == sagaId);
-            Assert.Equal(2, allMetadataKeys.Count);
+            var allMetadataKeys = fakeCrudRepository.FindAllWithAdded<SagaMetadataKey>().ToList();
+            allMetadataKeys.Count.Should().Be(2);
+            allMetadataKeys.Should().Contain(x => x.KeyName == "key" && x.KeyValue == "value2" && x.SagaId == sagaMetadata1.Id);
+            allMetadataKeys.Should().Contain(x => x.KeyName == "key" && x.KeyValue == "value3" && x.SagaId == sagaMetadata1.Id);
+            sagaMetadata1.Keys.ShouldBeEquivalentTo(allMetadataKeys);
         }
 
         [Fact]
         public async Task SetSagaMetadataAsync_RemovesUnmatched()
         {
-            Guid sagaId = Guid.NewGuid();
-            var key = new SagaMetadataKey() {SagaId = sagaId, KeyName = "key", KeyValue = "value"};
-            fakeCrudRepository.Attach(key);
+            var sagaMetadata1 = new SagaMetadataRecord(Guid.Parse("B3F5E8E2-2681-4F57-8F9D-5577B9198CA8"), Guid.NewGuid());
+            fakeCrudRepository.Attach(sagaMetadata1);
+            var key = new SagaMetadataKey(Guid.Parse("FC9083F9-0FB1-46DE-BC50-EECD5D5B1A79"), sagaMetadata1.Id, "key", "value");
+            sagaMetadata1.Keys.AddRange(new[]
+            {
+                key
+            });
+            fakeCrudRepository.AttachRange(sagaMetadata1.Keys);
 
-            await sut.SetSagaMetadataAsync(sagaId, new SagaMetadata(
-                ImmutableDictionary.CreateRange<string, ImmutableList<string>>(new KeyValuePair<string, ImmutableList<string>>[]
-                {
-                })));
+            await sut.SetSagaKeysAsync(sagaMetadata1.Id, new KeyValuePair<string, string>[] {});
 
-            Assert.Equal(EntityState.Deleted, fakeCrudRepository.GetEntityState(key));
+            fakeCrudRepository.GetEntityState(key).Should().Be(EntityState.Deleted);
+            sagaMetadata1.Keys.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task SaveChangesAsync_SavesRepo()
+        {
+            await sut.SaveChangesAsync();
+            fakeCrudRepository.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
         }
     }
 }

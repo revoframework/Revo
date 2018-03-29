@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Revo.Domain.Entities;
 using Revo.Domain.Events;
 using Xunit;
 
-namespace Revo.Infrastructure.Tests.Core.Domain
+namespace Revo.Domain.Tests.Entities
 {
     public class AggregateRootTests
     {

@@ -114,7 +114,7 @@ namespace Revo.Testing.DataAccess
         public Task<IList<T>> FindAllAsync<T>(CancellationToken cancellationToken = default(CancellationToken)) where T : class
         {
             return Task.FromResult((IList<T>)entities
-                .Where(x => (x.State &EntityState.Added) == 0 && (x.State & EntityState.Detached) == 0)
+                .Where(x => (x.State & EntityState.Added) == 0 && (x.State & EntityState.Detached) == 0)
                 .Select(x => x.Instance)
                 .OfType<T>()
                 .ToList());

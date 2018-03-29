@@ -10,6 +10,7 @@ using Revo.Domain.Entities.EventSourcing;
 using Revo.Domain.Events;
 using Revo.Infrastructure.Events;
 using Revo.Infrastructure.EventStore;
+using Revo.Infrastructure.Repositories;
 
 namespace Revo.Infrastructure.EventSourcing
 {
@@ -51,7 +52,7 @@ namespace Revo.Infrastructure.EventSourcing
 
         public IEnumerable<IRepositoryFilter> DefaultFilters => repositoryFilters;
 
-        protected virtual IEventSourcedEntityFactory EntityFactory { get; } = new EventSourcedEntityFactory();
+        protected virtual IEntityFactory EntityFactory { get; } = new EntityFactory();
 
         public ITransaction CreateTransaction()
         {

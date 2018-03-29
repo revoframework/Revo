@@ -137,9 +137,11 @@
     <Compile Include="ReadModel\ReadModelBase.cs" />
     <Compile Include="ReadModel\ReadModelForEntityAttribute.cs" />
     <Compile Include="Sagas\Attributes\SagaEventAttribute.cs" />
+    <Compile Include="Sagas\BasicSaga.cs" />
+    <Compile Include="Sagas\Events\SagaKeysChangedEvent.cs" />
     <Compile Include="Sagas\ISaga.cs" />
     <Compile Include="Sagas\ISagaConventionConfigurationCache.cs" />
-    <Compile Include="Sagas\Saga.cs" />
+    <Compile Include="Sagas\EventSourcedSaga.cs" />
     <Compile Include="Sagas\SagaConfigurationException.cs" />
     <Compile Include="Sagas\SagaConventionConfigurationCache.cs" />
     <Compile Include="Sagas\SagaConventionConfigurationInfo.cs" />

@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Revo.Core.Events;
-using NSubstitute;
 using Revo.Domain.Events;
 using Revo.Domain.Sagas;
 using Revo.Domain.Sagas.Attributes;
 using Xunit;
 
-namespace Revo.Infrastructure.Tests.Core.Domain
+namespace Revo.Domain.Tests.Sagas
 {
     public class SagaConventionConfigurationScannerTests
     {
@@ -39,63 +36,47 @@ namespace Revo.Infrastructure.Tests.Core.Domain
         {
             var configurationInfo = SagaConventionConfigurationScanner.GetSagaConfiguration(typeof(Saga2));
 
-            Assert.Equal(2, configurationInfo.Events.Count);
-            Assert.True(configurationInfo.Events.TryGetValue(typeof(Event1),
-                out var eventInfos));
-            Assert.Equal(1, eventInfos.Count);
-            var eventInfo = eventInfos.ElementAt(0);
+            configurationInfo.Events.Count.Should().Be(2);
+            configurationInfo.Events.Keys.Should().Contain(typeof(Event1));
+            configurationInfo.Events.Keys.Should().Contain(typeof(Event2));
+        }
 
-            Saga1 saga = new Saga1(Guid.NewGuid());
-            var event1 = new EventMessage<Event1>(new Event1(), new Dictionary<string, string>());
-            eventInfo.HandleDelegate(saga, event1);
-
-            Assert.Equal(1, saga.HandledEvents.Count);
-            Assert.Equal(event1, saga.HandledEvents[0]);
+        [Fact]
+        public void GetSagaConfiguration_GetsPublicHandlers()
+        {
+            var configurationInfo = SagaConventionConfigurationScanner.GetSagaConfiguration(typeof(Saga6PublicHandlers));
+            configurationInfo.Events.Count.Should().Be(2);
         }
 
         [Fact]   
         public void GetSagaConfiguration_GetsAttributeConfiguredEvent()
         {
+            var event1 = new EventMessage<Event1>(new Event1() { Foo = 5 }, new Dictionary<string, string>());
             var configurationInfo = SagaConventionConfigurationScanner.GetSagaConfiguration(typeof(Saga3));
 
-            Assert.Equal(1, configurationInfo.Events.Count);
-            Assert.True(configurationInfo.Events.TryGetValue(typeof(Event1),
-                out var eventInfos));
-            Assert.Equal(1, eventInfos.Count);
+            configurationInfo.Events.TryGetValue(typeof(Event1),
+                out var eventInfos).Should().BeTrue();
+            eventInfos.Count.Should().Be(1);
             var eventInfo = eventInfos.ElementAt(0);
 
-            Saga3 saga = new Saga3(Guid.NewGuid());
-            var event1 = new EventMessage<Event1>(new Event1() { Foo = 5 }, new Dictionary<string, string>());
-            eventInfo.HandleDelegate(saga, event1);
-
-            Assert.Equal(1, saga.HandledEvents.Count);
-            Assert.Equal(event1, saga.HandledEvents[0]);
-
-            Assert.Equal("5", eventInfo.EventKeyExpression(event1.Event));
-            Assert.Equal("foo", eventInfo.SagaKey);
-            Assert.True(eventInfo.IsStartingIfSagaNotFound);
+            eventInfo.EventKeyExpression(event1.Event).Should().Be("5");
+            eventInfo.SagaKey.Should().Be("foo");
+            eventInfo.IsStartingIfSagaNotFound.Should().BeTrue();
         }
 
         [Fact]   
         public void GetSagaConfiguration_EventKeyExpressionToStringWithoutFormat()
         {
-            var configurationInfo = SagaConventionConfigurationScanner.GetSagaConfiguration(typeof(Saga4));
-
-            Assert.Equal(1, configurationInfo.Events.Count);
-            Assert.True(configurationInfo.Events.TryGetValue(typeof(Event1),
-                out var eventInfos));
-            Assert.Equal(1, eventInfos.Count);
-            var eventInfo = eventInfos.ElementAt(0);
-
-            Saga4 saga = new Saga4(Guid.NewGuid());
             Guid bar = Guid.Parse("{3A9A28C9-1776-4D17-A3DA-AA54AC618076}");
             var event1 = new EventMessage<Event1>(new Event1() { Foo = 5, Bar = bar }, new Dictionary<string, string>());
-            eventInfo.HandleDelegate(saga, event1);
+            var configurationInfo = SagaConventionConfigurationScanner.GetSagaConfiguration(typeof(Saga4));
 
-            Assert.Equal(1, saga.HandledEvents.Count);
-            Assert.Equal(event1, saga.HandledEvents[0]);
-
-            Assert.Equal("3a9a28c9-1776-4d17-a3da-aa54ac618076", eventInfo.EventKeyExpression(event1.Event));
+            configurationInfo.Events.TryGetValue(typeof(Event1),
+                out var eventInfos).Should().BeTrue();
+            eventInfos.Count.Should().Be(1);
+            var eventInfo = eventInfos.ElementAt(0);
+            
+            eventInfo.EventKeyExpression(event1.Event).Should().Be(bar.ToString());
         }
 
         [Fact]   
@@ -114,7 +95,7 @@ namespace Revo.Infrastructure.Tests.Core.Domain
             Assert.Equal("bar", eventInfo2.SagaKey);
         }
 
-        public class Saga1 : Saga
+        public class Saga1 : EventSourcedSaga
         {
             public Saga1(Guid id) : base(id)
             {
@@ -142,7 +123,7 @@ namespace Revo.Infrastructure.Tests.Core.Domain
             }
         }
 
-        public class Saga3 : Saga
+        public class Saga3 : EventSourcedSaga
         {
             public Saga3(Guid id) : base(id)
             {
@@ -157,7 +138,7 @@ namespace Revo.Infrastructure.Tests.Core.Domain
             }
         }
 
-        public class Saga4 : Saga
+        public class Saga4 : EventSourcedSaga
         {
             public Saga4(Guid id) : base(id)
             {
@@ -172,7 +153,7 @@ namespace Revo.Infrastructure.Tests.Core.Domain
             }
         }
 
-        public class Saga5 : Saga
+        public class Saga5 : EventSourcedSaga
         {
             public Saga5(Guid id) : base(id)
             {
@@ -183,6 +164,19 @@ namespace Revo.Infrastructure.Tests.Core.Domain
             [SagaEvent(EventKey = "Foo", SagaKey = "foo")]
             [SagaEvent(EventKey = "Bar", SagaKey = "bar")]
             private void Handle(IEventMessage<Event1> ev)
+            {
+                HandledEvents.Add(ev);
+            }
+        }
+        
+        public class Saga6PublicHandlers : Saga1
+        {
+            public Saga6PublicHandlers(Guid id) : base(id)
+            {
+            }
+
+            [SagaEvent(IsAlwaysStarting = true)]
+            public void Handle(IEventMessage<Event2> ev)
             {
                 HandledEvents.Add(ev);
             }

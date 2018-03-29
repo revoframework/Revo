@@ -140,12 +140,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\Domain\AggregateRootTests.cs" />
-    <Compile Include="Core\Domain\SagaConventionConfigurationScannerTests.cs" />
     <Compile Include="DataAccess\DatabaseInitializerLoaderTests.cs" />
     <Compile Include="DataAccess\StaticClassifierDatabaseInitializerTests.cs" />
-    <Compile Include="Core\Domain\AggregateEventRouterTests.cs" />
-    <Compile Include="Core\Domain\ConventionEventApplyRegistratorTests.cs" />
     <Compile Include="EventSourcing\FakeEventStoreRecord.cs" />
     <Compile Include="Events\Async\AsyncEventExecutionCatchUpTests.cs" />
     <Compile Include="Events\Async\AsyncEventProcessorTests.cs" />
@@ -186,9 +182,10 @@
     <Compile Include="Repositories\EventSourcedAggregateStoreTests.cs" />
     <Compile Include="Repositories\RepositoryExtensionsTests.cs" />
     <Compile Include="Repositories\RepositoryTests.cs" />
+    <Compile Include="Sagas\KeySagaLocatorTests.cs" />
     <Compile Include="Sagas\SagaConventionConfiguratorTests.cs" />
+    <Compile Include="Sagas\SagaEventDispatcherTests.cs" />
     <Compile Include="Sagas\SagaEventListenerTests.cs" />
-    <Compile Include="Sagas\SagaLocatorTests.cs" />
     <Compile Include="Sagas\SagaRepositoryTests.cs" />
     <Compile Include="Tenancy\DefaultTenantContextTests.cs" />
     <Compile Include="Tenancy\SingleTenantContextResolverTests.cs" />
@@ -202,6 +199,7 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Core\" />
     <Folder Include="History\Auditing\" />
     <Folder Include="Notifications\Channels\Fcm\" />
   </ItemGroup>

@@ -2,11 +2,11 @@
 using System.Reflection;
 using Revo.Domain.Entities;
 
-namespace Revo.Infrastructure.EventSourcing
+namespace Revo.Infrastructure.Repositories
 {
-    public class EventSourcedEntityFactory : IEventSourcedEntityFactory
+    public class EntityFactory : IEntityFactory
     {
-        public IEntity ConstructEntity(Type entityType, Guid id, params object[] parameters)
+        public IEntity ConstructEntity(Type entityType, Guid id/*, params object[] parameters*/)
         {
             if (!typeof(IEntity).IsAssignableFrom(entityType))
             {
