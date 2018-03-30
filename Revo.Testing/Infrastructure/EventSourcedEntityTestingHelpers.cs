@@ -5,62 +5,149 @@ using System.Reflection;
 using FluentAssertions;
 using Revo.Domain.Entities.EventSourcing;
 using Revo.Domain.Events;
+using Revo.Infrastructure.Repositories;
 
 namespace Revo.Testing.Infrastructure
 {
     public static class EventSourcedEntityTestingHelpers
     {
-        public static void AssertEvents(this EventSourcedAggregateRoot aggregate, Action action,
-            Action stateAssertion, bool loadEventsOnly,
-            params (DomainAggregateEvent ev, Action<DomainAggregateEvent, DomainAggregateEvent> eventAssertion)[] expectedEvents)
+        public static void AssertEvents<T>(this T aggregate, Action<T> action,
+            Action<T> stateAssertion, bool loadEventsOnly, params DomainAggregateEvent[] expectedEvents)
+            where T : EventSourcedAggregateRoot
         {
             DoAssertEvents(aggregate, action, stateAssertion, loadEventsOnly,
-                expectedEvents.Select<(DomainAggregateEvent ev, Action<DomainAggregateEvent, DomainAggregateEvent> eventAssertion),
-                    Func<(DomainAggregateEvent ev, Action<DomainAggregateEvent, DomainAggregateEvent> eventAssertion)>>(x =>
-                {
-                    return () => x;
-                }).ToArray(), false);
+                expectedEvents
+                    .Select<DomainAggregateEvent, Func<(DomainAggregateEvent ev,
+                        Action<DomainAggregateEvent, DomainAggregateEvent> eventAssertion)>>(x =>
+                    {
+                        return () => (ev: x, eventAssertion: null);
+                    }).ToArray(), false);
         }
 
-        public static void AssertEvents(this EventSourcedAggregateRoot aggregate, Action action,
-            Action stateAssertion, bool loadEventsOnly,
+        public static void AssertEvents<T>(this T aggregate, Action<T> action,
+            Action<T> stateAssertion, bool loadEventsOnly,
+            params (DomainAggregateEvent ev, Action<DomainAggregateEvent, DomainAggregateEvent> eventAssertion)[]
+                expectedEvents)
+            where T : EventSourcedAggregateRoot
+        {
+            DoAssertEvents(aggregate, action, stateAssertion, loadEventsOnly,
+                expectedEvents
+                    .Select<(DomainAggregateEvent ev, Action<DomainAggregateEvent, DomainAggregateEvent> eventAssertion),
+                        Func<(DomainAggregateEvent ev, Action<DomainAggregateEvent, DomainAggregateEvent> eventAssertion)>>(
+                        x =>
+                        {
+                            return () => x;
+                        }).ToArray(), false);
+        }
+
+        public static void AssertEvents<T>(this T aggregate, Action<T> action,
+            Action<T> stateAssertion, bool loadEventsOnly,
             params Func<(DomainAggregateEvent ev, Action<DomainAggregateEvent, DomainAggregateEvent> eventAssertion)>[]
                 expectedEvents)
+            where T : EventSourcedAggregateRoot
         {
             DoAssertEvents(aggregate, action, stateAssertion, loadEventsOnly, expectedEvents, false);
         }
 
-        public static void AssertAllEvents(this EventSourcedAggregateRoot aggregate, Action action,
-            Action stateAssertion, bool loadEventsOnly,
-            params (DomainAggregateEvent ev, Action<DomainAggregateEvent, DomainAggregateEvent> eventAssertion)[] expectedEvents)
+        public static void AssertAllEvents<T>(this T aggregate, Action<T> action,
+            Action<T> stateAssertion, bool loadEventsOnly, params DomainAggregateEvent[] expectedEvents)
+            where T : EventSourcedAggregateRoot
         {
             DoAssertEvents(aggregate, action, stateAssertion, loadEventsOnly,
-                expectedEvents.Select<(DomainAggregateEvent ev, Action<DomainAggregateEvent, DomainAggregateEvent> eventAssertion),
-                    Func<(DomainAggregateEvent ev, Action<DomainAggregateEvent, DomainAggregateEvent> eventAssertion)>>(x =>
-                {
-                    return () => x;
-                }).ToArray(), true);
+                expectedEvents
+                    .Select<DomainAggregateEvent, Func<(DomainAggregateEvent ev,
+                        Action<DomainAggregateEvent, DomainAggregateEvent> eventAssertion)>>(x =>
+                    {
+                        return () => (ev: x, eventAssertion: null);
+                    }).ToArray(), true);
         }
 
-        public static void AssertAllEvents(this EventSourcedAggregateRoot aggregate, Action action,
-            Action stateAssertion, bool loadEventsOnly,
+        public static void AssertAllEvents<T>(this T aggregate, Action<T> action,
+            Action<T> stateAssertion, bool loadEventsOnly,
+            params (DomainAggregateEvent ev, Action<DomainAggregateEvent, DomainAggregateEvent> eventAssertion)[]
+                expectedEvents)
+            where T : EventSourcedAggregateRoot
+        {
+            DoAssertEvents(aggregate, action, stateAssertion, loadEventsOnly,
+                expectedEvents
+                    .Select<(DomainAggregateEvent ev, Action<DomainAggregateEvent, DomainAggregateEvent> eventAssertion),
+                        Func<(DomainAggregateEvent ev, Action<DomainAggregateEvent, DomainAggregateEvent> eventAssertion)>>(
+                        x =>
+                        {
+                            return () => x;
+                        }).ToArray(), true);
+        }
+
+        public static void AssertAllEvents<T>(this T aggregate, Action<T> action,
+            Action<T> stateAssertion, bool loadEventsOnly,
             params Func<(DomainAggregateEvent ev, Action<DomainAggregateEvent, DomainAggregateEvent> eventAssertion)>[]
                 expectedEvents)
+            where T : EventSourcedAggregateRoot
         {
             DoAssertEvents(aggregate, action, stateAssertion, loadEventsOnly, expectedEvents, true);
         }
 
-        private static void DoAssertEvents(EventSourcedAggregateRoot aggregate, Action action,
-            Action stateAssertion, bool loadEventsOnly,
+        public static void AssertConstructorEvents<T>(this T aggregate,
+            Action<T> stateAssertion, bool loadEventsOnly, params DomainAggregateEvent[] expectedEvents)
+            where T : EventSourcedAggregateRoot
+        {
+            AssertConstructorEvents(aggregate, stateAssertion, loadEventsOnly,
+                expectedEvents
+                    .Select<DomainAggregateEvent, Func<(DomainAggregateEvent ev,
+                        Action<DomainAggregateEvent, DomainAggregateEvent> eventAssertion)>>(x =>
+                    {
+                        return () => (ev: x, eventAssertion: null);
+                    }).ToArray());
+        }
+
+        public static void AssertConstructorEvents<T>(this T aggregate,
+            Action<T> stateAssertion, bool loadEventsOnly,
+            params (DomainAggregateEvent ev, Action<DomainAggregateEvent, DomainAggregateEvent> eventAssertion)[]
+                expectedEvents)
+            where T : EventSourcedAggregateRoot
+        {
+            AssertConstructorEvents(aggregate, stateAssertion, loadEventsOnly,
+                expectedEvents
+                    .Select<(DomainAggregateEvent ev, Action<DomainAggregateEvent, DomainAggregateEvent> eventAssertion),
+                        Func<(DomainAggregateEvent ev, Action<DomainAggregateEvent, DomainAggregateEvent> eventAssertion)>>(
+                        x =>
+                        {
+                            return () => x;
+                        }).ToArray());
+        }
+
+        public static void AssertConstructorEvents<T>(this T aggregate,
+            Action<T> stateAssertion, bool loadEventsOnly,
+            params Func<(DomainAggregateEvent ev, Action<DomainAggregateEvent, DomainAggregateEvent> eventAssertion)>[]
+                expectedEvents)
+            where T : EventSourcedAggregateRoot
+        {
+            T sut;
+            if (loadEventsOnly)
+            {
+                IEntityFactory entityFactory = new EntityFactory();
+                sut = (T) entityFactory.ConstructEntity(aggregate.GetType(), aggregate.Id);
+            }
+            else
+            {
+                sut = aggregate;
+            }
+
+            DoAssertEvents(sut, _ => { }, stateAssertion, loadEventsOnly, expectedEvents, true);
+        }
+        
+        private static void DoAssertEvents<T>(this T aggregate, Action<T> action,
+            Action<T> stateAssertion, bool loadEventsOnly,
             Func<(DomainAggregateEvent ev, Action<DomainAggregateEvent, DomainAggregateEvent> eventAssertion)>[] expectedEvents,
             bool assertAllEvents)
+            where T : EventSourcedAggregateRoot
         {
             if (!loadEventsOnly)
             {
                 List<DomainAggregateEvent> newEvents;
 
                 List<DomainAggregateEvent> originalEvents = aggregate.UncommittedEvents.ToList();
-                action();
+                action(aggregate);
 
                 if (assertAllEvents)
                 {
@@ -111,7 +198,7 @@ namespace Revo.Testing.Infrastructure
                 aggregate.ReplayEvents(expectedEvents.Select(x => x().ev));
             }
 
-            stateAssertion();
+            stateAssertion(aggregate);
         }
     }
 }
