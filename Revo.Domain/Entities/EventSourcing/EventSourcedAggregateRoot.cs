@@ -16,7 +16,6 @@ namespace Revo.Domain.Entities.EventSourcing
         public EventSourcedAggregateRoot(Guid id) : base(id)
         {
             new ConventionEventApplyRegistrator().RegisterEvents(this, EventRouter);
-            //ApplyEvent(new AggregateCreated());
         }
 
         public override void Commit()
@@ -38,7 +37,7 @@ namespace Revo.Domain.Entities.EventSourcing
             EventRouter.ReplayEvents(events);
         }
 
-        protected override void ApplyEvent<T>(T evt)
+        protected sealed override void ApplyEvent<T>(T evt)
         {
             base.ApplyEvent(evt);
         }

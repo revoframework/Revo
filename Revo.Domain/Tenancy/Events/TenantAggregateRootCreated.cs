@@ -5,6 +5,11 @@ namespace Revo.Domain.Tenancy.Events
 {
     public class TenantAggregateRootCreated : DomainAggregateEvent
     {
-        public Guid? TenantId { get; set; }
+        public TenantAggregateRootCreated(Guid? tenantId)
+        {
+            TenantId = tenantId;
+        }
+
+        public Guid? TenantId { get; private set; }
     }
 }

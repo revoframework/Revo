@@ -109,8 +109,6 @@
     <Compile Include="Entities\EventSourcing\EventSourcedAggregateRoot.cs" />
     <Compile Include="Entities\EventSourcing\EventSourcedComponent.cs" />
     <Compile Include="Entities\EventSourcing\EventSourcedEntity.cs" />
-    <Compile Include="Entities\EventSourcing\Events\AggregateCreated.cs" />
-    <Compile Include="Entities\EventSourcing\Events\AggregateDeleted.cs" />
     <Compile Include="Entities\EventSourcing\IEventSourcedAggregateRoot.cs" />
     <Compile Include="Entities\IAggregateRoot.cs" />
     <Compile Include="Entities\IComponent.cs" />
