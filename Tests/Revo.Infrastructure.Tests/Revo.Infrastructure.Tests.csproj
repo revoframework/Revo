@@ -161,6 +161,7 @@
     <Compile Include="Globalization\Messages\Database\LocalizationMessageTests.cs" />
     <Compile Include="Globalization\Messages\Database\MessageRepositoryReloaderTests.cs" />
     <Compile Include="Globalization\Messages\YamlMessageSourceTests.cs" />
+    <Compile Include="Projections\CrudEntityEventToPocoProjectorTests.cs" />
     <Compile Include="Projections\EntityEventToPocoProjectorTests.cs" />
     <Compile Include="Notifications\Channels\Apns\ApnsBufferedNotificationChannelTests.cs" />
     <Compile Include="Notifications\Channels\Apns\ApnsUserDeviceTokenTests.cs" />
@@ -204,6 +205,10 @@
     <Folder Include="Notifications\Channels\Fcm\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\DataAccess\Revo.DataAccess.EF6\Revo.DataAccess.EF6.csproj">
+      <Project>{A8DE2F53-E404-48DD-B11F-B6A3302CE163}</Project>
+      <Name>Revo.DataAccess.EF6</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\DataAccess\Revo.DataAccess\Revo.DataAccess.csproj">
       <Project>{fa942fe7-71fd-4cf5-8959-309583fe7903}</Project>
       <Name>Revo.DataAccess</Name>
