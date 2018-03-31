@@ -132,6 +132,9 @@
     <Compile Include="ReadModel\ClassEntityView.cs" />
     <Compile Include="ReadModel\EntityReadModel.cs" />
     <Compile Include="ReadModel\EntityView.cs" />
+    <Compile Include="ReadModel\IClassEntityReadModel.cs" />
+    <Compile Include="ReadModel\IEntityReadModel.cs" />
+    <Compile Include="ReadModel\ITenantReadModel.cs" />
     <Compile Include="ReadModel\ReadModelBase.cs" />
     <Compile Include="ReadModel\ReadModelForEntityAttribute.cs" />
     <Compile Include="Sagas\Attributes\SagaEventAttribute.cs" />

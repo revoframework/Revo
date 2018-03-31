@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Revo.Core.Events;
 using Revo.DataAccess.Entities;
@@ -7,13 +9,14 @@ using Revo.Domain.Entities.EventSourcing;
 using Revo.Domain.Events;
 using Revo.Domain.ReadModel;
 using Revo.Domain.Tenancy;
+using Revo.Domain.Tenancy.Events;
 
 namespace Revo.Infrastructure.Projections
 {
     /// <summary>
     /// Common stub for EF6 single-read-model entity projections.
     /// </summary>
-    public class CrudEntityEventToPocoProjector<TSource, TTarget> :
+    public abstract class CrudEntityEventToPocoProjector<TSource, TTarget> :
         EntityEventToPocoProjector<TSource, TTarget>
         where TSource : class, IEventSourcedAggregateRoot
         where TTarget : class, new()
@@ -30,39 +33,35 @@ namespace Revo.Infrastructure.Projections
             return Repository.SaveChangesAsync();
         }
 
-        protected override async Task<TTarget> CreateProjectionTargetAsync(TSource aggregate, IEnumerable<IEventMessage<DomainAggregateEvent>> events)
+        protected override async Task<TTarget> CreateProjectionTargetAsync(Guid aggregateId, IReadOnlyCollection<IEventMessage<DomainAggregateEvent>> events)
         {
-            var rm = await Repository.FindAsync<TTarget>(aggregate.Id);
+            var rm = await Repository.FindAsync<TTarget>(aggregateId);
             if (rm != null)
             {
-                return rm; //in case we previously did a projection, but didn't succeed in dequeuing async events
+                return rm; // in case we previously did a projection, but didn't succeed in dequeuing async events
             }
 
             rm = new TTarget();
 
-            if (typeof(ClassEntityReadModel).IsAssignableFrom(typeof(TTarget)))
+            IClassEntityReadModel classEntityReadModel = rm as IClassEntityReadModel;
+            if (classEntityReadModel != null)
             {
-                var classEntityRm = (ClassEntityReadModel)(object)rm;
-                classEntityRm.Id = aggregate.Id;
-                classEntityRm.ClassId = typeof(TSource).GetClassId();
-            }
-            else if (typeof(EntityReadModel).IsAssignableFrom(typeof(TTarget)))
-            {
-                var entityRm = (EntityReadModel)(object)rm;
-                entityRm.Id = aggregate.Id;
+                classEntityReadModel.ClassId = events.FirstOrDefault()?.Metadata.GetAggregateClassId() ?? typeof(TSource).GetClassId();
             }
 
-            if (aggregate is ITenantOwned tenantOwnedAggregate)
+            IEntityReadModel entityReadModel = classEntityReadModel ?? rm as IEntityReadModel;
+            if (entityReadModel != null)
             {
-                if (typeof(TenantClassEntityReadModel).IsAssignableFrom(typeof(TTarget)))
+                entityReadModel.Id = aggregateId;
+            }
+
+            if (rm is ITenantReadModel tenantReadModel)
+            {
+                var tenantAggregateCreatedEvent =
+                    events.OfType<IEventMessage<TenantAggregateRootCreated>>().FirstOrDefault();
+                if (tenantAggregateCreatedEvent != null)
                 {
-                    var tenantClassEntityRm = (TenantClassEntityReadModel)(object) rm;
-                    tenantClassEntityRm.TenantId = tenantOwnedAggregate.TenantId;
-                }
-                else if (typeof(TenantEntityReadModel).IsAssignableFrom(typeof(TTarget)))
-                {
-                    var tenantEntityRm = (TenantEntityReadModel)(object)rm;
-                    tenantEntityRm.TenantId = tenantOwnedAggregate.TenantId;
+                    tenantReadModel.TenantId = tenantAggregateCreatedEvent.Event.TenantId;
                 }
             }
 
@@ -70,9 +69,9 @@ namespace Revo.Infrastructure.Projections
             return rm;
         }
 
-        protected override Task<TTarget> GetProjectionTargetAsync(TSource aggregate)
+        protected override Task<TTarget> GetProjectionTargetAsync(Guid aggregateId)
         {
-            return Repository.GetAsync<TTarget>(aggregate.Id);
+            return Repository.GetAsync<TTarget>(aggregateId);
         }
     }
 }

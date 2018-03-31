@@ -21,13 +21,11 @@ namespace Revo.Infrastructure.EF6.Tests.Projections
     {
         private readonly ProjectionEventListener sut;
         private readonly IEntityEventProjector<MyEntity1> myEntity1Projector;
-        private readonly IEventSourcedAggregateRepository eventSourcedRepository;
         private readonly IEntityTypeManager entityTypeManager;
         private readonly IServiceLocator serviceLocator;
 
         public ProjectionEventListenerTests()
         {
-            eventSourcedRepository = Substitute.For<IEventSourcedAggregateRepository>();
             entityTypeManager = Substitute.For<IEntityTypeManager>();
 
             myEntity1Projector = Substitute.For<IEntityEventProjector<MyEntity1>>();
@@ -35,7 +33,7 @@ namespace Revo.Infrastructure.EF6.Tests.Projections
             serviceLocator = Substitute.For<IServiceLocator>();
             serviceLocator.GetAll(typeof(IEF6EntityEventProjector<MyEntity1>)).Returns(new object[] { myEntity1Projector });
 
-            sut = Substitute.ForPartsOf<EF6ProjectionEventListener>(eventSourcedRepository, entityTypeManager,
+            sut = Substitute.ForPartsOf<EF6ProjectionEventListener>(entityTypeManager,
                 serviceLocator, new EF6ProjectionEventListener.EF6ProjectionEventSequencer());
         }
 

@@ -14,14 +14,11 @@ namespace Revo.Infrastructure.Projections
     public abstract class ProjectionEventListener :
         IAsyncEventListener<DomainAggregateEvent>
     {
-        private readonly IEventSourcedAggregateRepository eventSourcedRepository;
         private readonly IEntityTypeManager entityTypeManager;
         private readonly Dictionary<Guid, PublishedEntityEvents> allEvents = new Dictionary<Guid, PublishedEntityEvents>();
 
-        public ProjectionEventListener(IEventSourcedAggregateRepository eventSourcedRepository,
-            IEntityTypeManager entityTypeManager)
+        public ProjectionEventListener(IEntityTypeManager entityTypeManager)
         {
-            this.eventSourcedRepository = eventSourcedRepository;
             this.entityTypeManager = entityTypeManager;
         }
 
@@ -57,14 +54,12 @@ namespace Revo.Infrastructure.Projections
                 Guid classId = events.First().Metadata.GetAggregateClassId() ?? throw new InvalidOperationException($"Cannot create projection for aggregate ID {entityEvents.Key} because event metadata don't contain aggregate class ID");
                 Type entityType = entityTypeManager.GetClrTypeByClassId(classId);
 
-                IEventSourcedAggregateRoot entity = await eventSourcedRepository
-                    .GetAsync(entityEvents.Key);
-
+                Guid aggregateId = entityEvents.Key;
                 IEnumerable<IEntityEventProjector> projectors = GetProjectors(entityType);
 
                 foreach (var projector in projectors)
                 {
-                    await projector.ProjectEventsAsync(entity, events);
+                    await projector.ProjectEventsAsync(aggregateId, events);
                     usedProjectors.Add(projector);
                 }
             }

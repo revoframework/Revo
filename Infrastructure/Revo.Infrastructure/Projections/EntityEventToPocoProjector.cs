@@ -22,49 +22,32 @@ namespace Revo.Infrastructure.Projections
         }
 
         public Type ProjectedAggregateType => typeof(TSource);
-
-        protected TSource Aggregate { get; private set; }
+        
+        protected Guid AggregateId { get; private set; }
         protected TTarget Target { get; private set; }
 
         public abstract Task CommitChangesAsync();
-        protected abstract Task<TTarget> CreateProjectionTargetAsync(TSource aggregate, IEnumerable<IEventMessage<DomainAggregateEvent>> events);
-        protected abstract Task<TTarget> GetProjectionTargetAsync(TSource aggregate);
-
-        public Task ProjectEventsAsync(IEventSourcedAggregateRoot aggregate, IReadOnlyCollection<IEventMessage<DomainAggregateEvent>> events)
+        protected abstract Task<TTarget> CreateProjectionTargetAsync(Guid aggregateId, IReadOnlyCollection<IEventMessage<DomainAggregateEvent>> events);
+        protected abstract Task<TTarget> GetProjectionTargetAsync(Guid aggregateId);
+        
+        public async Task ProjectEventsAsync(Guid aggregateId, IReadOnlyCollection<IEventMessage<DomainAggregateEvent>> events)
         {
-            TSource source = aggregate as TSource;
-            if (source == null)
-            {
-                throw new ArgumentException($"Invalid aggregate type for projection: {aggregate?.GetType().FullName ?? "null"}");
-            }
-
-            return ProjectEventsAsync(source, events);
-        }
-
-        public async Task ProjectEventsAsync(TSource aggregate, IReadOnlyCollection<IEventMessage<DomainAggregateEvent>> events)
-        {
-            if (aggregate.Version < 1)
-            {
-                throw new ArgumentException(
-                    "Unexpected version of aggregate to project: should only project after savig its state, i.e. Version >= 1");
-            }
-
             if (events.Count == 0)
             {
-                throw new InvalidOperationException($"No events to project for aggregate with ID {aggregate.Id}");
+                throw new InvalidOperationException($"No events to project for aggregate with ID {aggregateId}");
             }
 
             TTarget target;
             long firstEventNumber = events.First().Metadata.GetStreamSequenceNumber()
                                     ?? throw new InvalidOperationException(
-                                        $"Cannot project events for aggregate with ID {aggregate.Id}, unknown StreamSequenceNumber for first events");
+                                        $"Cannot project events for aggregate with ID {aggregateId}, unknown StreamSequenceNumber for first events");
             if (firstEventNumber == 1)
             {
-                target = await CreateProjectionTargetAsync(aggregate, events);
+                target = await CreateProjectionTargetAsync(aggregateId, events);
             }
             else
             {
-                target = await GetProjectionTargetAsync(aggregate);
+                target = await GetProjectionTargetAsync(aggregateId);
             }
 
             if (target == null)
@@ -72,7 +55,7 @@ namespace Revo.Infrastructure.Projections
                 return; //skip
             }
 
-            Aggregate = aggregate;
+            AggregateId = aggregateId;
             Target = target;
 
             try
@@ -101,7 +84,7 @@ namespace Revo.Infrastructure.Projections
             }
             finally
             {
-                Aggregate = default(TSource);
+                AggregateId = default(Guid);
                 Target = default(TTarget);
             }
         }
@@ -170,12 +153,12 @@ namespace Revo.Infrastructure.Projections
                                 && x.GetBaseDefinition() == x //exclude overrides
                                 && x.GetParameters().Length == 3
                                 && typeof(IEventMessage<DomainAggregateEvent>).IsAssignableFrom(x.GetParameters()[0].ParameterType)
-                                && x.GetParameters()[1].ParameterType.IsAssignableFrom(typeof(TSource))
+                                && x.GetParameters()[1].ParameterType.IsAssignableFrom(typeof(Guid))
                                 && x.GetParameters()[2].ParameterType.IsAssignableFrom(typeof(TTarget)))
                     .Select(x => new Tuple<Type, Func<IEventMessage<DomainAggregateEvent>, Task>>(x.GetParameters()[0].ParameterType.GetGenericArguments()[0],
                         ev =>
                         {
-                            Task ret = x.Invoke(instance, new object[] {ev, this.Aggregate, this.Target}) as Task;
+                            Task ret = x.Invoke(instance, new object[] {ev, this.AggregateId, this.Target}) as Task;
                             if (ret != null)
                             {
                                 return ret;

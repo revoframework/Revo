@@ -15,10 +15,9 @@ namespace Revo.Infrastructure.EF6.Projections
     {
         private readonly IServiceLocator serviceLocator;
 
-        public EF6ProjectionEventListener(IEventSourcedAggregateRepository eventSourcedRepository,
-            IEntityTypeManager entityTypeManager, IServiceLocator serviceLocator,
-            EF6ProjectionEventSequencer eventSequencer) :
-            base(eventSourcedRepository, entityTypeManager)
+        public EF6ProjectionEventListener(IEntityTypeManager entityTypeManager,
+            IServiceLocator serviceLocator, EF6ProjectionEventSequencer eventSequencer) :
+            base(entityTypeManager)
         {
             this.serviceLocator = serviceLocator;
             EventSequencer = eventSequencer;

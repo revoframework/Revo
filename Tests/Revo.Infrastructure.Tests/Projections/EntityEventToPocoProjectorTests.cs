@@ -24,11 +24,13 @@ namespace Revo.Infrastructure.Tests.Projections
         public EntityEventToPocoProjectorTests()
         {
             aggregate = new TestAggregate(Guid.NewGuid());
-            aggregate.Do1();
-            aggregate.Do2();
-            aggregate.Do3();
 
-            eventMessages = aggregate.UncommittedEvents.Select((x, i) =>
+            eventMessages = new DomainAggregateEvent[]
+            {
+                new TestEvent1(),
+                new TestEvent2(),
+                new TestEvent3()
+            }.Select((x, i) =>
             {
                 var message = x.ToMessageDraft();
                 message.SetMetadata(BasicEventMetadataNames.StreamSequenceNumber, (i + 1).ToString());
@@ -42,7 +44,7 @@ namespace Revo.Infrastructure.Tests.Projections
         public async Task ProjectEventsAsync_CallsApplyProjections()
         {
             sut = new TestEntityEventToPocoProjector();
-            await sut.ProjectEventsAsync(aggregate, eventMessages);
+            await sut.ProjectEventsAsync(aggregate.Id, eventMessages);
 
             Assert.True(sut.AppliedEvents.SequenceEqual(new List<IEventMessage<DomainAggregateEvent>>()
             {
@@ -55,7 +57,7 @@ namespace Revo.Infrastructure.Tests.Projections
         public async Task ProjectEventsAsync_CallsOverridesOnlyOnce()
         {
             sut = new TestEntityEventToPocoProjectorWithOverrides();
-            await sut.ProjectEventsAsync(aggregate, eventMessages);
+            await sut.ProjectEventsAsync(aggregate.Id, eventMessages);
 
             Assert.True(sut.AppliedEvents.SequenceEqual(new List<IEventMessage<DomainAggregateEvent>>()
             {
@@ -71,7 +73,7 @@ namespace Revo.Infrastructure.Tests.Projections
             sut = new TestEntityEventToPocoProjector();
             var subProjector = Substitute.ForPartsOf<TestSubProjector>(new object[] {sut.AppliedEvents});
             sut.AddSubProjector(subProjector);
-            await sut.ProjectEventsAsync(aggregate, eventMessages);
+            await sut.ProjectEventsAsync(aggregate.Id, eventMessages);
             
             Assert.True(sut.AppliedEvents.SequenceEqual(new List<IEventMessage<DomainAggregateEvent>>()
             {
@@ -80,28 +82,13 @@ namespace Revo.Infrastructure.Tests.Projections
                 eventMessages[2]
             }));
 
-            subProjector.Received(1).Apply((IEventMessage<TestEvent3>)eventMessages[2], aggregate, sut.LastTarget);
+            subProjector.Received(1).Apply((IEventMessage<TestEvent3>)eventMessages[2], aggregate.Id, sut.LastTarget);
         }
 
         public class TestAggregate : EventSourcedAggregateRoot
         {
             public TestAggregate(Guid id) : base(id)
             {
-            }
-
-            public void Do1()
-            {
-                ApplyEvent(new TestEvent1());
-            }
-
-            public void Do2()
-            {
-                ApplyEvent(new TestEvent2());
-            }
-
-            public void Do3()
-            {
-                ApplyEvent(new TestEvent3());
             }
         }
 
@@ -128,12 +115,12 @@ namespace Revo.Infrastructure.Tests.Projections
             {
             }
 
-            protected override async Task<TestReadModel> CreateProjectionTargetAsync(TestAggregate aggregate, IEnumerable<IEventMessage<DomainAggregateEvent>> events)
+            protected override async Task<TestReadModel> CreateProjectionTargetAsync(Guid aggregateId, IReadOnlyCollection<IEventMessage<DomainAggregateEvent>> events)
             {
                 return LastTarget = new TestReadModel();
             }
 
-            protected override Task<TestReadModel> GetProjectionTargetAsync(TestAggregate aggregate)
+            protected override Task<TestReadModel> GetProjectionTargetAsync(Guid aggregateId)
             {
                 throw new NotImplementedException();
             }
@@ -171,7 +158,7 @@ namespace Revo.Infrastructure.Tests.Projections
 
             public List<IEventMessage<DomainAggregateEvent>> AppliedEvents { get; private set; }
 
-            public virtual void Apply(IEventMessage<TestEvent3> ev, TestAggregate aggregate, TestReadModel target)
+            public virtual void Apply(IEventMessage<TestEvent3> ev, Guid aggregateId, TestReadModel target)
             {
                 AppliedEvents.Add(ev);
             }

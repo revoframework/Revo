@@ -11,14 +11,12 @@ namespace Revo.Infrastructure.Projections
     {
         Type ProjectedAggregateType { get; }
 
-        Task ProjectEventsAsync(IEventSourcedAggregateRoot aggregate,
-            IReadOnlyCollection<IEventMessage<DomainAggregateEvent>> events);
+        Task ProjectEventsAsync(Guid aggregateId, IReadOnlyCollection<IEventMessage<DomainAggregateEvent>> events);
         Task CommitChangesAsync();
     }
 
     public interface IEntityEventProjector<T> : IEntityEventProjector
         where T : IEventSourcedAggregateRoot
     {
-        Task ProjectEventsAsync(T aggregate, IReadOnlyCollection<IEventMessage<DomainAggregateEvent>> events);
     }
 }

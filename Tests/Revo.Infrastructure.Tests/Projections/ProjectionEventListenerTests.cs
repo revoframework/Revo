@@ -23,21 +23,13 @@ namespace Revo.Infrastructure.Tests.Projections
         private readonly IAsyncEventSequencer<DomainAggregateEvent> sequencer;
         private readonly IEntityEventProjector<MyEntity1> myEntity1Projector;
         private readonly IEntityEventProjector<MyEntity2> myEntity2Projector;
-        private readonly IEventSourcedAggregateRepository eventSourcedRepository;
         private readonly IEntityTypeManager entityTypeManager;
 
-        private readonly MyEntity1 aggregate1;
-        private readonly MyEntity2 aggregate2;
+        private readonly Guid aggregate1Id = Guid.Parse("F2280E17-8FC0-4F49-B57B-4335AEFC0063");
+        private readonly Guid aggregate2Id = Guid.Parse("8D165937-CB74-4052-B9E3-A7E56AA49106");
 
         public ProjectionEventListenerTests()
         {
-            aggregate1 = new MyEntity1(Guid.NewGuid());
-            aggregate2 = new MyEntity2(Guid.NewGuid());
-
-            eventSourcedRepository = Substitute.For<IEventSourcedAggregateRepository>();
-            eventSourcedRepository.GetAsync(aggregate1.Id).Returns(aggregate1);
-            eventSourcedRepository.GetAsync(aggregate2.Id).Returns(aggregate2);
-
             entityTypeManager = Substitute.For<IEntityTypeManager>();
             entityTypeManager.GetClrTypeByClassId(MyEntity1.ClassId).Returns(typeof(MyEntity1));
             entityTypeManager.GetClrTypeByClassId(MyEntity2.ClassId).Returns(typeof(MyEntity2));
@@ -59,7 +51,7 @@ namespace Revo.Infrastructure.Tests.Projections
             });
             sequencer.ShouldAttemptSynchronousDispatch(null).ReturnsForAnyArgs(true);
 
-            sut = Substitute.ForPartsOf<ProjectionEventListener>(eventSourcedRepository, entityTypeManager);
+            sut = Substitute.ForPartsOf<ProjectionEventListener>(entityTypeManager);
             sut.EventSequencer.Returns(sequencer);
             sut.GetProjectors(typeof(MyEntity1)).Returns(new[] {myEntity1Projector});
             sut.GetProjectors(typeof(MyEntity2)).Returns(new[] {myEntity2Projector});
@@ -70,7 +62,7 @@ namespace Revo.Infrastructure.Tests.Projections
         {
             var ev1 = new EventMessage<DomainAggregateEvent>(new MyEvent()
             {
-                AggregateId = aggregate1.Id
+                AggregateId = aggregate1Id
             }, new Dictionary<string, string>()
             {
                 { BasicEventMetadataNames.AggregateClassId, MyEntity1.ClassId.ToString() }
@@ -78,7 +70,7 @@ namespace Revo.Infrastructure.Tests.Projections
 
             var ev2 = new EventMessage<DomainAggregateEvent>(new MyEvent()
             {
-                AggregateId = aggregate2.Id
+                AggregateId = aggregate2Id
             }, new Dictionary<string, string>()
             {
                 { BasicEventMetadataNames.AggregateClassId, MyEntity2.ClassId.ToString() }
@@ -86,7 +78,7 @@ namespace Revo.Infrastructure.Tests.Projections
 
             var ev3 = new EventMessage<DomainAggregateEvent>(new MyEvent()
             {
-                AggregateId = aggregate1.Id
+                AggregateId = aggregate1Id
             }, new Dictionary<string, string>()
             {
                 { BasicEventMetadataNames.AggregateClassId, MyEntity1.ClassId.ToString() }
@@ -99,36 +91,28 @@ namespace Revo.Infrastructure.Tests.Projections
             await sut.OnFinishedEventQueueAsync("MyProjectionEventListener");
             
             myEntity1Projector.Received(1)
-                    .ProjectEventsAsync((IEventSourcedAggregateRoot) aggregate1, Arg.Is<IReadOnlyCollection<IEventMessage<DomainAggregateEvent>>>(x => x.SequenceEqual(new List<IEventMessage<DomainAggregateEvent>> () { ev1, ev3 })));
+                    .ProjectEventsAsync(aggregate1Id, Arg.Is<IReadOnlyCollection<IEventMessage<DomainAggregateEvent>>>(x => x.SequenceEqual(new List<IEventMessage<DomainAggregateEvent>> () { ev1, ev3 })));
             myEntity1Projector.Received(1).CommitChangesAsync();
 
             myEntity2Projector.Received(1)
-                    .ProjectEventsAsync((IEventSourcedAggregateRoot) aggregate2, Arg.Is<IReadOnlyCollection<IEventMessage<DomainAggregateEvent>>>(x => x.SequenceEqual(new List<IEventMessage<DomainAggregateEvent>>() { ev2 })));
+                    .ProjectEventsAsync(aggregate2Id, Arg.Is<IReadOnlyCollection<IEventMessage<DomainAggregateEvent>>>(x => x.SequenceEqual(new List<IEventMessage<DomainAggregateEvent>>() { ev2 })));
             myEntity2Projector.Received(1).CommitChangesAsync();
         }
         
-        public class MyEntity1 : AggregateRoot, IEventSourcedAggregateRoot
+        public class MyEntity1 : EventSourcedAggregateRoot
         {
             public static Guid ClassId = Guid.NewGuid();
 
             public MyEntity1(Guid id) : base(id)
             {
             }
-
-            public void LoadState(AggregateState state)
-            {
-            }
         }
 
-        public class MyEntity2 : AggregateRoot, IEventSourcedAggregateRoot
+        public class MyEntity2 : EventSourcedAggregateRoot
         {
             public static Guid ClassId = Guid.NewGuid();
 
             public MyEntity2(Guid id) : base(id)
-            {
-            }
-
-            public void LoadState(AggregateState state)
             {
             }
         }
