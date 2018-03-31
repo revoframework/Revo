@@ -126,7 +126,25 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\ChildCollection.cs" />
+    <Compile Include="Entities\WrapperDbCollectionEntry{}.cs" />
+    <Compile Include="Entities\WrapperDbEntityEntry.cs" />
     <Compile Include="Entities\EF6CrudRepository.cs" />
+    <Compile Include="Entities\IDbCollectionEntry{}.cs" />
+    <Compile Include="Entities\IDbEntityEntry.cs" />
+    <Compile Include="Entities\IDbEntityEntry{}.cs" />
+    <Compile Include="Entities\IDbMemberEntry{}.cs" />
+    <Compile Include="Entities\IDbReferenceEntry{}.cs" />
+    <Compile Include="Entities\WrapperDbEntityEntry{}.cs" />
+    <Compile Include="Entities\WrapperDbReferenceEntry{}.cs" />
+    <Compile Include="InMemory\EF6InMemoryCrudRepository.cs" />
+    <Compile Include="InMemory\InMemoryDbCollectionEntry{}.cs" />
+    <Compile Include="InMemory\InMemoryDbEntityEntry.cs" />
+    <Compile Include="InMemory\InMemoryDbEntityEntry{}.cs" />
+    <Compile Include="InMemory\InMemoryDbMemberEntry{}.cs" />
+    <Compile Include="InMemory\InMemoryDbReferenceEntry{}.cs" />
+    <Compile Include="InMemory\LocalDbAsyncEnumerable.cs" />
+    <Compile Include="InMemory\LocalDbAsyncEnumerator.cs" />
+    <Compile Include="InMemory\LocalDbAsyncQueryProvider.cs" />
     <Compile Include="IO\OData\EF6QueryableToODataResultConverter.cs" />
     <Compile Include="Model\CustomStoreConvention.cs" />
     <Compile Include="Entities\DatabaseAcccess.cs" />

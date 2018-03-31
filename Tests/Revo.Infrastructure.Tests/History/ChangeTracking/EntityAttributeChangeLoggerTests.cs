@@ -2,15 +2,15 @@
 using System.Threading.Tasks;
 using Revo.Infrastructure.History.ChangeTracking;
 using Revo.Infrastructure.History.ChangeTracking.Changes;
-using Revo.Testing.DataAccess;
 using NSubstitute;
+using Revo.DataAccess.InMemory;
 using Xunit;
 
 namespace Revo.Infrastructure.Tests.History.ChangeTracking
 {
     public class EntityAttributeChangeLoggerTests
     {
-        private readonly FakeCrudRepository crudRepository;
+        private readonly InMemoryCrudRepository crudRepository;
         private readonly IChangeTracker changeTracker;
         private readonly EntityAttributeChangeLogger sut;
 
@@ -21,7 +21,7 @@ namespace Revo.Infrastructure.Tests.History.ChangeTracking
 
         public EntityAttributeChangeLoggerTests()
         {
-            crudRepository = new FakeCrudRepository();
+            crudRepository = new InMemoryCrudRepository();
             changeTracker = Substitute.For<IChangeTracker>();
             sut = new EntityAttributeChangeLogger(changeTracker, crudRepository);
         }

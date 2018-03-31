@@ -128,6 +128,7 @@
     <Compile Include="Entities\OptimisticConcurrencyException.cs" />
     <Compile Include="Entities\ReadRepositoryExtensions.cs" />
     <Compile Include="Entities\TablePrefixAttribute.cs" />
+    <Compile Include="InMemory\InMemoryCrudRepository.cs" />
     <Compile Include="Sequences\IContextSequence.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

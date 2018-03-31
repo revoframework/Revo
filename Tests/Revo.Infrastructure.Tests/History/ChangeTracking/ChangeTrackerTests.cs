@@ -9,8 +9,8 @@ using Revo.Core.Transactions;
 using Revo.Infrastructure.History.ChangeTracking;
 using Revo.Infrastructure.History.ChangeTracking.Model;
 using Revo.Testing.Core;
-using Revo.Testing.DataAccess;
 using NSubstitute;
+using Revo.DataAccess.InMemory;
 using Xunit;
 
 namespace Revo.Infrastructure.Tests.History.ChangeTracking
@@ -18,7 +18,7 @@ namespace Revo.Infrastructure.Tests.History.ChangeTracking
     public class ChangeTrackerTests
     {
         private readonly ChangeTracker sut;
-        private readonly FakeCrudRepository crudRepository;
+        private readonly InMemoryCrudRepository crudRepository;
         private readonly IActorContext actorContext;
         private readonly IEventBus eventBus;
         private readonly ITrackedChangeRecordConverter trackedChangeRecordConverter;
@@ -29,7 +29,7 @@ namespace Revo.Infrastructure.Tests.History.ChangeTracking
 
         public ChangeTrackerTests()
         {
-            crudRepository = new FakeCrudRepository();
+            crudRepository = new InMemoryCrudRepository();
             actorContext = Substitute.For<IActorContext>();
             actorContext.CurrentActorName.Returns("actor");
             eventBus = Substitute.For<IEventBus>();

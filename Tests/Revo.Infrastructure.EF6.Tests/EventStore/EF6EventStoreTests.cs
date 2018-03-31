@@ -9,8 +9,9 @@ using Revo.DataAccess.Entities;
 using Revo.Infrastructure.EF6.EventStore;
 using Revo.Infrastructure.EF6.EventStore.Model;
 using Revo.Infrastructure.EventStore;
-using Revo.Testing.DataAccess;
 using NSubstitute;
+using Revo.DataAccess.EF6.InMemory;
+using Revo.DataAccess.InMemory;
 using Revo.Domain.Events;
 using Xunit;
 
@@ -19,24 +20,24 @@ namespace Revo.Infrastructure.EF6.Tests.EventStore
     public class EF6EventStoreTests
     {
         private readonly EF6EventStore sut;
-        private readonly FakeCrudRepository fakeCrudRepository;
+        private readonly EF6InMemoryCrudRepository inMemoryCrudRepository;
         private readonly IDomainEventTypeCache domainEventTypeCache;
         private readonly EventStream[] eventStreams;
         private readonly EventStreamRow[] eventStreamRows;
 
         public EF6EventStoreTests()
         {
-            fakeCrudRepository = new FakeCrudRepository();
+            inMemoryCrudRepository = new EF6InMemoryCrudRepository();
             domainEventTypeCache = Substitute.For<IDomainEventTypeCache>();
 
-            sut = new EF6EventStore(fakeCrudRepository, domainEventTypeCache);
+            sut = new EF6EventStore(inMemoryCrudRepository, domainEventTypeCache);
 
             eventStreams = new[]
             {
                 new EventStream(Guid.NewGuid()),
                 new EventStream(Guid.NewGuid())
             };
-            fakeCrudRepository.AttachRange(eventStreams);
+            inMemoryCrudRepository.AttachRange(eventStreams);
 
             eventStreamRows = new[]
             {
@@ -48,7 +49,7 @@ namespace Revo.Infrastructure.EF6.Tests.EventStore
                 new EventStreamRow(domainEventTypeCache, Guid.NewGuid(), new Event1(), eventStreams[1].Id, 5, Clock.Current.Now, new Dictionary<string, string>())
             };
 
-            fakeCrudRepository.AttachRange(eventStreamRows);
+            inMemoryCrudRepository.AttachRange(eventStreamRows);
         }
 
         [Fact]

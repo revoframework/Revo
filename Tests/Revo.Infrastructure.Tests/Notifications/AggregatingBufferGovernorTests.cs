@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Revo.DataAccess.EF6.InMemory;
+using Revo.DataAccess.InMemory;
 using Revo.Infrastructure.Notifications;
 using Revo.Infrastructure.Notifications.Model;
 using Revo.Testing.Core;
-using Revo.Testing.DataAccess;
 using Xunit;
 
 namespace Revo.Infrastructure.Tests.Notifications
@@ -13,12 +14,12 @@ namespace Revo.Infrastructure.Tests.Notifications
     {
         private readonly AggregatingBufferGovernor sut;
         private readonly Guid governorId = Guid.NewGuid();
-        private readonly FakeCrudRepository fakeCrudRepository;
+        private readonly EF6InMemoryCrudRepository inMemoryCrudRepository;
 
         public AggregatingBufferGovernorTests()
         {
             sut = new AggregatingBufferGovernor(governorId, TimeSpan.FromMinutes(5));
-            fakeCrudRepository = new FakeCrudRepository();
+            inMemoryCrudRepository = new EF6InMemoryCrudRepository();
         }
 
         [Fact]
@@ -34,27 +35,27 @@ namespace Revo.Infrastructure.Tests.Notifications
             FakeClock.Now = DateTime.Now;
 
             NotificationBuffer buffer1 = new NotificationBuffer(Guid.NewGuid(), governorId, Guid.NewGuid());
-            fakeCrudRepository.Attach(buffer1);
+            inMemoryCrudRepository.Attach(buffer1);
             BufferedNotification notification1 = new BufferedNotification(Guid.NewGuid(), "Notification1", "{}",
                 buffer1, FakeClock.Now.Subtract(TimeSpan.FromMinutes(6)));
-            fakeCrudRepository.Attach(notification1);
+            inMemoryCrudRepository.Attach(notification1);
             BufferedNotification notification2 = new BufferedNotification(Guid.NewGuid(), "Notification2", "{}",
                 buffer1, FakeClock.Now.Subtract(TimeSpan.FromMinutes(3)));
-            fakeCrudRepository.Attach(notification2);
+            inMemoryCrudRepository.Attach(notification2);
 
             NotificationBuffer buffer2 = new NotificationBuffer(Guid.NewGuid(), governorId, Guid.NewGuid());
-            fakeCrudRepository.Attach(buffer2);
+            inMemoryCrudRepository.Attach(buffer2);
             BufferedNotification notification3 = new BufferedNotification(Guid.NewGuid(), "Notification3", "{}",
                 buffer2, FakeClock.Now.Subtract(TimeSpan.FromMinutes(8)));
-            fakeCrudRepository.Attach(notification3);
+            inMemoryCrudRepository.Attach(notification3);
             
             NotificationBuffer buffer3 = new NotificationBuffer(Guid.NewGuid(), governorId, Guid.NewGuid());
-            fakeCrudRepository.Attach(buffer3);
+            inMemoryCrudRepository.Attach(buffer3);
             BufferedNotification notification4 = new BufferedNotification(Guid.NewGuid(), "Notification3", "{}",
                 buffer3, FakeClock.Now.Subtract(TimeSpan.FromMinutes(1)));
-            fakeCrudRepository.Attach(notification4);
+            inMemoryCrudRepository.Attach(notification4);
 
-            var notifications = await sut.SelectNotificationsForReleaseAsync(fakeCrudRepository);
+            var notifications = await sut.SelectNotificationsForReleaseAsync(inMemoryCrudRepository);
 
             Assert.Equal(2, notifications.Keys.Count());
             Assert.Equal(2, notifications[buffer1].Count);
@@ -71,18 +72,18 @@ namespace Revo.Infrastructure.Tests.Notifications
             FakeClock.Now = DateTime.Now;
 
             NotificationBuffer buffer1 = new NotificationBuffer(Guid.NewGuid(), governorId, Guid.NewGuid());
-            fakeCrudRepository.Attach(buffer1);
+            inMemoryCrudRepository.Attach(buffer1);
             BufferedNotification notification1 = new BufferedNotification(Guid.NewGuid(), "Notification1", "{}",
                 buffer1, FakeClock.Now.Subtract(TimeSpan.FromMinutes(6)));
-            fakeCrudRepository.Attach(notification1);
+            inMemoryCrudRepository.Attach(notification1);
 
             NotificationBuffer buffer2 = new NotificationBuffer(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
-            fakeCrudRepository.Attach(buffer2);
+            inMemoryCrudRepository.Attach(buffer2);
             BufferedNotification notification3 = new BufferedNotification(Guid.NewGuid(), "Notification3", "{}",
                 buffer2, FakeClock.Now.Subtract(TimeSpan.FromMinutes(8)));
-            fakeCrudRepository.Attach(notification3);
+            inMemoryCrudRepository.Attach(notification3);
 
-            var notifications = await sut.SelectNotificationsForReleaseAsync(fakeCrudRepository);
+            var notifications = await sut.SelectNotificationsForReleaseAsync(inMemoryCrudRepository);
 
             Assert.Equal(1, notifications.Keys.Count());
             Assert.Contains(buffer1, notifications.Keys);

@@ -104,10 +104,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\AssertEx.cs" />
-    <Compile Include="DataAccess\FakeCrudRepository.cs" />
-    <Compile Include="DataAccess\LocalDbAsyncEnumerable.cs" />
-    <Compile Include="DataAccess\LocalDbAsyncEnumerator.cs" />
-    <Compile Include="DataAccess\LocalDbAsyncQueryProvider.cs" />
     <Compile Include="Extensions\XunitExtensions.cs" />
     <Compile Include="Infrastructure\EventExtensions.cs" />
     <Compile Include="Infrastructure\EventSourcedEntityTestingHelpers.cs" />
@@ -146,6 +142,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="DataAccess\" />
     <Folder Include="Platform\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

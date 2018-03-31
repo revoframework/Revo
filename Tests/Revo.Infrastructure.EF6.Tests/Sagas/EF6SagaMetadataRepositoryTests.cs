@@ -7,11 +7,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NSubstitute;
+using Revo.DataAccess.EF6.InMemory;
 using Revo.DataAccess.Entities;
+using Revo.DataAccess.InMemory;
 using Revo.Infrastructure.EF6.Sagas;
 using Revo.Infrastructure.EF6.Sagas.Model;
 using Revo.Infrastructure.Sagas;
-using Revo.Testing.DataAccess;
 using Xunit;
 
 namespace Revo.Infrastructure.EF6.Tests.Sagas
@@ -19,12 +20,12 @@ namespace Revo.Infrastructure.EF6.Tests.Sagas
     public class EF6SagaMetadataRepositoryTests
     {
         private readonly EF6SagaMetadataRepository sut;
-        private readonly FakeCrudRepository fakeCrudRepository;
+        private readonly EF6InMemoryCrudRepository inMemoryCrudRepository;
 
         public EF6SagaMetadataRepositoryTests()
         {
-            fakeCrudRepository = Substitute.ForPartsOf<FakeCrudRepository>();
-            sut = new EF6SagaMetadataRepository(fakeCrudRepository);
+            inMemoryCrudRepository = new EF6InMemoryCrudRepository();
+            sut = new EF6SagaMetadataRepository(inMemoryCrudRepository);
         }
 
         [Fact]
@@ -34,7 +35,7 @@ namespace Revo.Infrastructure.EF6.Tests.Sagas
             Guid sagaClassId = Guid.Parse("10452E7E-4888-4EF0-BC78-D76C4D8062B5");
             sut.AddSaga(sagaId, sagaClassId);
 
-            var metadatas = fakeCrudRepository.FindAllWithAdded<SagaMetadataRecord>().ToList();
+            var metadatas = inMemoryCrudRepository.FindAllWithAdded<SagaMetadataRecord>().ToList();
 
             metadatas.Count.Should().Be(1);
             metadatas.Should().Contain(x => x.Id == sagaId && x.ClassId == sagaClassId);
@@ -64,8 +65,8 @@ namespace Revo.Infrastructure.EF6.Tests.Sagas
                 new SagaMetadataKey(Guid.NewGuid(), sagaMetadata3.Id, "key2", "value")
             });
 
-            fakeCrudRepository.AttachRange(sagaMetadata1.Keys.Concat(sagaMetadata2.Keys).Concat(sagaMetadata3.Keys));
-            fakeCrudRepository.AttachRange(new[]
+            inMemoryCrudRepository.AttachRange(sagaMetadata1.Keys.Concat(sagaMetadata2.Keys).Concat(sagaMetadata3.Keys));
+            inMemoryCrudRepository.AttachRange(new[]
             {
                 sagaMetadata1, sagaMetadata2, sagaMetadata3
             });
@@ -104,8 +105,8 @@ namespace Revo.Infrastructure.EF6.Tests.Sagas
                 new SagaMetadataKey(Guid.Parse("919274C2-E501-430D-A60D-60DFD486C0EB"), sagaMetadata3.Id, "key", "value")
             });
 
-            fakeCrudRepository.AttachRange(sagaMetadata1.Keys.Concat(sagaMetadata2.Keys).Concat(sagaMetadata3.Keys));
-            fakeCrudRepository.AttachRange(new[]
+            inMemoryCrudRepository.AttachRange(sagaMetadata1.Keys.Concat(sagaMetadata2.Keys).Concat(sagaMetadata3.Keys));
+            inMemoryCrudRepository.AttachRange(new[]
             {
                 sagaMetadata1, sagaMetadata2, sagaMetadata3
             });
@@ -133,7 +134,7 @@ namespace Revo.Infrastructure.EF6.Tests.Sagas
         public async Task GetSagaMetadataAsync_GetsFromRepo()
         {
             var sagaMetadata1 = new SagaMetadataRecord(Guid.Parse("46FA66FF-C8AC-4E24-AE74-11DAFF21D3D4"), Guid.Parse("39F01E63-CA48-463E-B9C9-F049832DE92E"));
-            fakeCrudRepository.Attach(sagaMetadata1);
+            inMemoryCrudRepository.Attach(sagaMetadata1);
 
             var result = await sut.GetSagaMetadataAsync(sagaMetadata1.Id);
             result.ClassId.Should().Be(sagaMetadata1.ClassId);
@@ -155,14 +156,14 @@ namespace Revo.Infrastructure.EF6.Tests.Sagas
         public async Task SetSagaMetadataAsync_AddsNew()
         {
             var sagaMetadata1 = new SagaMetadataRecord(Guid.Parse("B3F5E8E2-2681-4F57-8F9D-5577B9198CA8"), Guid.NewGuid());
-            fakeCrudRepository.Attach(sagaMetadata1);
+            inMemoryCrudRepository.Attach(sagaMetadata1);
 
             await sut.SetSagaKeysAsync(sagaMetadata1.Id, new[]
                 {
                     new KeyValuePair<string, string>("key", "value")
                 });
 
-            var allMetadataKeys = fakeCrudRepository.FindAllWithAdded<SagaMetadataKey>().ToList();
+            var allMetadataKeys = inMemoryCrudRepository.FindAllWithAdded<SagaMetadataKey>().ToList();
             allMetadataKeys.Count.Should().Be(1);
             allMetadataKeys.Should().Contain(x => x.KeyName == "key" && x.KeyValue == "value" && x.SagaId == sagaMetadata1.Id);
             sagaMetadata1.Keys.ShouldBeEquivalentTo(allMetadataKeys);
@@ -172,7 +173,7 @@ namespace Revo.Infrastructure.EF6.Tests.Sagas
         public async Task SetSagaMetadataAsync_AddsNewMultiValue()
         {
             var sagaMetadata1 = new SagaMetadataRecord(Guid.Parse("B3F5E8E2-2681-4F57-8F9D-5577B9198CA8"), Guid.NewGuid());
-            fakeCrudRepository.Attach(sagaMetadata1);
+            inMemoryCrudRepository.Attach(sagaMetadata1);
 
             await sut.SetSagaKeysAsync(sagaMetadata1.Id, new[]
             {
@@ -180,7 +181,7 @@ namespace Revo.Infrastructure.EF6.Tests.Sagas
                 new KeyValuePair<string, string>("key", "value2")
             });
 
-            var allMetadataKeys = fakeCrudRepository.FindAllWithAdded<SagaMetadataKey>().ToList();
+            var allMetadataKeys = inMemoryCrudRepository.FindAllWithAdded<SagaMetadataKey>().ToList();
             allMetadataKeys.Count.Should().Be(2);
             allMetadataKeys.Should().Contain(x => x.KeyName == "key" && x.KeyValue == "value1" && x.SagaId == sagaMetadata1.Id);
             allMetadataKeys.Should().Contain(x => x.KeyName == "key" && x.KeyValue == "value2" && x.SagaId == sagaMetadata1.Id);
@@ -191,21 +192,21 @@ namespace Revo.Infrastructure.EF6.Tests.Sagas
         public async Task SetSagaMetadataAsync_UpdatesExisting()
         {
             var sagaMetadata1 = new SagaMetadataRecord(Guid.Parse("B3F5E8E2-2681-4F57-8F9D-5577B9198CA8"), Guid.NewGuid());
-            fakeCrudRepository.Attach(sagaMetadata1);
+            inMemoryCrudRepository.Attach(sagaMetadata1);
             sagaMetadata1.Keys.AddRange(new[]
             {
                 new SagaMetadataKey(Guid.Parse("FC9083F9-0FB1-46DE-BC50-EECD5D5B1A79"), sagaMetadata1.Id, "key", "value")
             });
-            fakeCrudRepository.AttachRange(sagaMetadata1.Keys);
+            inMemoryCrudRepository.AttachRange(sagaMetadata1.Keys);
 
             await sut.SetSagaKeysAsync(sagaMetadata1.Id, new[]
             {
                 new KeyValuePair<string, string>("key", "value2")
             });
             
-            await fakeCrudRepository.SaveChangesAsync();
+            await inMemoryCrudRepository.SaveChangesAsync();
 
-            var allMetadataKeys = fakeCrudRepository.FindAllWithAdded<SagaMetadataKey>().ToList();
+            var allMetadataKeys = inMemoryCrudRepository.FindAllWithAdded<SagaMetadataKey>().ToList();
             allMetadataKeys.Count.Should().Be(1);
             allMetadataKeys.Should().Contain(x => x.KeyName == "key" && x.KeyValue == "value2" && x.SagaId == sagaMetadata1.Id);
             sagaMetadata1.Keys.ShouldBeEquivalentTo(allMetadataKeys);
@@ -215,13 +216,13 @@ namespace Revo.Infrastructure.EF6.Tests.Sagas
         public async Task SetSagaMetadataAsync_UpdatesSome()
         {
             var sagaMetadata1 = new SagaMetadataRecord(Guid.Parse("B3F5E8E2-2681-4F57-8F9D-5577B9198CA8"), Guid.NewGuid());
-            fakeCrudRepository.Attach(sagaMetadata1);
+            inMemoryCrudRepository.Attach(sagaMetadata1);
             sagaMetadata1.Keys.AddRange(new[]
             {
                 new SagaMetadataKey(Guid.NewGuid(), sagaMetadata1.Id, "key", "value1"),
                 new SagaMetadataKey(Guid.NewGuid(), sagaMetadata1.Id, "key", "value2")
             });
-            fakeCrudRepository.AttachRange(sagaMetadata1.Keys);
+            inMemoryCrudRepository.AttachRange(sagaMetadata1.Keys);
             
             await sut.SetSagaKeysAsync(sagaMetadata1.Id, new[]
             {
@@ -229,9 +230,9 @@ namespace Revo.Infrastructure.EF6.Tests.Sagas
                 new KeyValuePair<string, string>("key", "value3")
             });
 
-            await fakeCrudRepository.SaveChangesAsync();
+            await inMemoryCrudRepository.SaveChangesAsync();
 
-            var allMetadataKeys = fakeCrudRepository.FindAllWithAdded<SagaMetadataKey>().ToList();
+            var allMetadataKeys = inMemoryCrudRepository.FindAllWithAdded<SagaMetadataKey>().ToList();
             allMetadataKeys.Count.Should().Be(2);
             allMetadataKeys.Should().Contain(x => x.KeyName == "key" && x.KeyValue == "value2" && x.SagaId == sagaMetadata1.Id);
             allMetadataKeys.Should().Contain(x => x.KeyName == "key" && x.KeyValue == "value3" && x.SagaId == sagaMetadata1.Id);
@@ -242,25 +243,28 @@ namespace Revo.Infrastructure.EF6.Tests.Sagas
         public async Task SetSagaMetadataAsync_RemovesUnmatched()
         {
             var sagaMetadata1 = new SagaMetadataRecord(Guid.Parse("B3F5E8E2-2681-4F57-8F9D-5577B9198CA8"), Guid.NewGuid());
-            fakeCrudRepository.Attach(sagaMetadata1);
+            inMemoryCrudRepository.Attach(sagaMetadata1);
             var key = new SagaMetadataKey(Guid.Parse("FC9083F9-0FB1-46DE-BC50-EECD5D5B1A79"), sagaMetadata1.Id, "key", "value");
             sagaMetadata1.Keys.AddRange(new[]
             {
                 key
             });
-            fakeCrudRepository.AttachRange(sagaMetadata1.Keys);
+            inMemoryCrudRepository.AttachRange(sagaMetadata1.Keys);
 
             await sut.SetSagaKeysAsync(sagaMetadata1.Id, new KeyValuePair<string, string>[] {});
 
-            fakeCrudRepository.GetEntityState(key).Should().Be(EntityState.Deleted);
+            inMemoryCrudRepository.GetEntityState(key).Should().Be(EntityState.Deleted);
             sagaMetadata1.Keys.Should().BeEmpty();
         }
 
         [Fact]
         public async Task SaveChangesAsync_SavesRepo()
         {
+            var inMemoryCrudRepository = Substitute.ForPartsOf<EF6InMemoryCrudRepository>(); // we could do this the entire fixture, but there is likely a bug in NSubstitute causing occasional failure of some tests (proxy calls base implementation CreateQueryable instead of derived)
+            var sut = new EF6SagaMetadataRepository(inMemoryCrudRepository);
+
             await sut.SaveChangesAsync();
-            fakeCrudRepository.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+            inMemoryCrudRepository.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
         }
     }
 }

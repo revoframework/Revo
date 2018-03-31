@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Revo.Testing.DataAccess
+namespace Revo.DataAccess.EF6.InMemory
 {
     public class LocalDbAsyncQueryProvider<TEntity> : IDbAsyncQueryProvider
     {

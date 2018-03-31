@@ -6,8 +6,8 @@ namespace Revo.DataAccess.EF6.Entities
 {
     public interface IEF6ReadRepository : IReadRepository
     {
-        IEnumerable<DbEntityEntry> Entries();
-        DbEntityEntry Entry(object entity);
-        DbEntityEntry<T> Entry<T>(T entity) where T : class;
+        IEnumerable<IDbEntityEntry> Entries();
+        IDbEntityEntry Entry(object entity);
+        IDbEntityEntry<T> Entry<T>(T entity) where T : class;
     }
 }

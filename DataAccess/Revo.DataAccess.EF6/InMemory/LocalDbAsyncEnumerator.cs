@@ -3,7 +3,7 @@ using System.Data.Entity.Infrastructure;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Revo.Testing.DataAccess
+namespace Revo.DataAccess.EF6.InMemory
 {
     public class LocalDbAsyncEnumerator<T> : IDbAsyncEnumerator<T>
     {

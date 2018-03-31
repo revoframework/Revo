@@ -7,9 +7,9 @@ using Revo.Core.Events;
 using Revo.DataAccess.EF6.Model;
 using Revo.Infrastructure.EF6.Repositories;
 using Revo.Infrastructure.Events;
-using Revo.Testing.DataAccess;
 using Revo.Testing.Infrastructure;
 using NSubstitute;
+using Revo.DataAccess.InMemory;
 using Revo.Domain.Entities;
 using Revo.Domain.Entities.Attributes;
 using Revo.Domain.Entities.Basic;
@@ -23,7 +23,7 @@ namespace Revo.Infrastructure.EF6.Tests.Repositories
         private const string TestAggregateClassId = "{4057D3AC-2D96-4C25-935D-F72BAC6BA626}";
 
         private readonly EF6AggregateStore sut;
-        private readonly FakeCrudRepository crudRepository;
+        private readonly InMemoryCrudRepository crudRepository;
         private readonly IModelMetadataExplorer modelMetadataExplorer;
         private readonly IEntityTypeManager entityTypeManager;
         private readonly IPublishEventBuffer publishEventBuffer;
@@ -31,7 +31,7 @@ namespace Revo.Infrastructure.EF6.Tests.Repositories
 
         public EF6AggregateStoreTests()
         {
-            crudRepository = new FakeCrudRepository();
+            crudRepository = new InMemoryCrudRepository();
             modelMetadataExplorer = Substitute.For<IModelMetadataExplorer>();
             entityTypeManager = Substitute.For<IEntityTypeManager>();
             publishEventBuffer = Substitute.For<IPublishEventBuffer>();

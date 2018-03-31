@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Revo.Infrastructure.Notifications;
 using Revo.Infrastructure.Notifications.Model;
-using Revo.Testing.DataAccess;
 using NSubstitute;
+using Revo.DataAccess.InMemory;
 using Xunit;
 
 namespace Revo.Infrastructure.Tests.Notifications
@@ -14,7 +14,7 @@ namespace Revo.Infrastructure.Tests.Notifications
     {
         private readonly BufferedNotificationProcessJob sut;
         private readonly IBufferGovernor bufferGovernor1;
-        private readonly FakeCrudRepository fakeCrudRepository;
+        private readonly InMemoryCrudRepository inMemoryCrudRepository;
         private readonly INotificationSerializer notificationSerializer;
         private readonly INotificationPipeline notificationPipeline1;
         private readonly INotificationPipeline notificationPipeline2;
@@ -23,7 +23,7 @@ namespace Revo.Infrastructure.Tests.Notifications
         {
             bufferGovernor1 = Substitute.For<IBufferGovernor>();
             bufferGovernor1.Id.Returns(Guid.NewGuid());
-            fakeCrudRepository = new FakeCrudRepository();
+            inMemoryCrudRepository = new InMemoryCrudRepository();
             notificationSerializer = Substitute.For<INotificationSerializer>();
             notificationPipeline1 = Substitute.For<INotificationPipeline>();
             notificationPipeline1.Id.Returns(Guid.NewGuid());
@@ -37,7 +37,7 @@ namespace Revo.Infrastructure.Tests.Notifications
                     TypeName = ci.ArgAt<SerializedNotification>(0).NotificationClassName
                 });
 
-            sut = new BufferedNotificationProcessJob(new[] {bufferGovernor1}, fakeCrudRepository,
+            sut = new BufferedNotificationProcessJob(new[] {bufferGovernor1}, inMemoryCrudRepository,
                 new[] {notificationPipeline1, notificationPipeline2}, notificationSerializer);
         }
 
@@ -48,25 +48,25 @@ namespace Revo.Infrastructure.Tests.Notifications
 
             NotificationBuffer buffer1 = new NotificationBuffer(Guid.NewGuid(), bufferGovernor1.Id,
                 notificationPipeline1.Id);
-            fakeCrudRepository.Attach(buffer1);
+            inMemoryCrudRepository.Attach(buffer1);
             BufferedNotification notification1 = new BufferedNotification(Guid.NewGuid(), "Notification1", "{}",
                 buffer1, DateTime.Today);
             notificationsToRelease.Add(buffer1, notification1);
-            fakeCrudRepository.Attach(notification1);
+            inMemoryCrudRepository.Attach(notification1);
             BufferedNotification notification2 = new BufferedNotification(Guid.NewGuid(), "Notification2", "{}",
                 buffer1, DateTime.Today);
             notificationsToRelease.Add(buffer1, notification2);
-            fakeCrudRepository.Attach(notification2);
+            inMemoryCrudRepository.Attach(notification2);
 
             NotificationBuffer buffer2 = new NotificationBuffer(Guid.NewGuid(), bufferGovernor1.Id,
                 notificationPipeline2.Id);
-            fakeCrudRepository.Attach(buffer2);
+            inMemoryCrudRepository.Attach(buffer2);
             BufferedNotification notification3 = new BufferedNotification(Guid.NewGuid(), "Notification3", "{}",
                 buffer2, DateTime.Today);
             notificationsToRelease.Add(buffer2, notification3);
-            fakeCrudRepository.Attach(notification3);
+            inMemoryCrudRepository.Attach(notification3);
             
-            bufferGovernor1.SelectNotificationsForReleaseAsync(fakeCrudRepository)
+            bufferGovernor1.SelectNotificationsForReleaseAsync(inMemoryCrudRepository)
                 .Returns(notificationsToRelease);
 
             await sut.Run();
@@ -90,18 +90,18 @@ namespace Revo.Infrastructure.Tests.Notifications
 
             NotificationBuffer buffer1 = new NotificationBuffer(Guid.NewGuid(), bufferGovernor1.Id,
                 notificationPipeline1.Id);
-            fakeCrudRepository.Attach(buffer1);
+            inMemoryCrudRepository.Attach(buffer1);
             BufferedNotification notification1 = new BufferedNotification(Guid.NewGuid(), "Notification1", "{}",
                 buffer1, DateTime.Today);
             notificationsToRelease.Add(buffer1, notification1);
-            fakeCrudRepository.Attach(notification1);
+            inMemoryCrudRepository.Attach(notification1);
             
-            bufferGovernor1.SelectNotificationsForReleaseAsync(fakeCrudRepository)
+            bufferGovernor1.SelectNotificationsForReleaseAsync(inMemoryCrudRepository)
                 .Returns(notificationsToRelease);
 
             await sut.Run();
 
-            Assert.DoesNotContain(notification1, fakeCrudRepository.FindAll<BufferedNotification>());
+            Assert.DoesNotContain(notification1, inMemoryCrudRepository.FindAll<BufferedNotification>());
         }
 
         public class TestNotification : INotification

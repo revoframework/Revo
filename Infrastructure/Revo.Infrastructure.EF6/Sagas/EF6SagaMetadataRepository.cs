@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
+using Revo.DataAccess.EF6.Entities;
 using Revo.DataAccess.Entities;
 using Revo.Infrastructure.EF6.Sagas.Model;
 using Revo.Infrastructure.Sagas;
@@ -13,10 +14,10 @@ namespace Revo.Infrastructure.EF6.Sagas
 {
     public class EF6SagaMetadataRepository : ISagaMetadataRepository
     {
-        private readonly ICrudRepository crudRepository;
+        private readonly IEF6CrudRepository crudRepository;
         private readonly Dictionary<Guid, SagaMetadataRecord> metadataRecords = new Dictionary<Guid, SagaMetadataRecord>();
 
-        public EF6SagaMetadataRepository(ICrudRepository crudRepository)
+        public EF6SagaMetadataRepository(IEF6CrudRepository crudRepository)
         {
             this.crudRepository = crudRepository;
         }

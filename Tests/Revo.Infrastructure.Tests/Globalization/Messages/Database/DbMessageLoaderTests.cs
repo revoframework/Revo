@@ -8,23 +8,23 @@ using Revo.Core.Events;
 using Revo.Infrastructure.Events;
 using Revo.Infrastructure.Globalization;
 using Revo.Infrastructure.Globalization.Messages.Database;
-using Revo.Testing.DataAccess;
 using Revo.Testing.Infrastructure;
 using NSubstitute;
+using Revo.DataAccess.InMemory;
 using Xunit;
 
 namespace Revo.Infrastructure.Tests.Globalization.Messages.Database
 {
     public class DbMessageLoaderTests
     {
-        private readonly FakeCrudRepository fakeCrudRepository;
+        private readonly InMemoryCrudRepository inMemoryCrudRepository;
         private readonly IDbMessageCache dbMessageCache;
         private readonly LocalizationMessage[] messages;
         private readonly DbMessageLoader sut;
 
         public DbMessageLoaderTests()
         {
-            fakeCrudRepository = new FakeCrudRepository();
+            inMemoryCrudRepository = new InMemoryCrudRepository();
             dbMessageCache = Substitute.For<IDbMessageCache>();
 
             messages = new[]
@@ -33,9 +33,9 @@ namespace Revo.Infrastructure.Tests.Globalization.Messages.Database
                 new LocalizationMessage(Guid.NewGuid(), null, "coffee", "kafe", new Locale("cs-CZ"), null)
             };
 
-            fakeCrudRepository.AttachRange(messages);
+            inMemoryCrudRepository.AttachRange(messages);
 
-            sut = new DbMessageLoader(dbMessageCache, fakeCrudRepository);
+            sut = new DbMessageLoader(dbMessageCache, inMemoryCrudRepository);
         }
 
         [Fact]

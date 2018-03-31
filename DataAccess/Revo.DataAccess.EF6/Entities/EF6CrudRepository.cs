@@ -372,19 +372,20 @@ namespace Revo.DataAccess.EF6.Entities
             }
         }
 
-        public IEnumerable<DbEntityEntry> Entries()
+        public IEnumerable<IDbEntityEntry> Entries()
         {
-            return dbContexts.Values.SelectMany(x => x.ChangeTracker.Entries());
+            return dbContexts.Values.SelectMany(x => x.ChangeTracker.Entries())
+                .Select(x => new WrapperDbEntityEntry(x));
         }
 
-        public DbEntityEntry Entry(object entity)
+        public IDbEntityEntry Entry(object entity)
         {
-            return GetDbContext(entity.GetType()).Entry(entity);
+            return new WrapperDbEntityEntry(GetDbContext(entity.GetType()).Entry(entity));
         }
 
-        public DbEntityEntry<T> Entry<T>(T entity) where T : class
+        public IDbEntityEntry<T> Entry<T>(T entity) where T : class
         {
-            return GetDbContext(typeof(T)).Entry<T>(entity);
+            return new WrapperDbEntityEntry<T>(GetDbContext(typeof(T)).Entry<T>(entity));
         }
 
         public ITransaction CreateTransaction()
