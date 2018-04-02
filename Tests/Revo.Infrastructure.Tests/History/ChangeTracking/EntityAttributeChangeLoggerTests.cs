@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Revo.Infrastructure.History.ChangeTracking;
 using Revo.Infrastructure.History.ChangeTracking.Changes;
 using NSubstitute;
+using Revo.DataAccess.EF6.InMemory;
 using Revo.DataAccess.InMemory;
 using Xunit;
 
@@ -21,7 +22,7 @@ namespace Revo.Infrastructure.Tests.History.ChangeTracking
 
         public EntityAttributeChangeLoggerTests()
         {
-            crudRepository = new InMemoryCrudRepository();
+            crudRepository = new EF6InMemoryCrudRepository();
             changeTracker = Substitute.For<IChangeTracker>();
             sut = new EntityAttributeChangeLogger(changeTracker, crudRepository);
         }
