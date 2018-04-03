@@ -166,8 +166,8 @@ namespace Revo.Infrastructure.Tests.Sagas
 
             Received.InOrder(() =>
             {
-                sagaMetadataRepository.Received(1).SetSagaKeysAsync(saga1.Id, Arg.Any<IEnumerable<KeyValuePair<string, string>>>());
-                sagaMetadataRepository.Received(1).SaveChangesAsync();
+                sagaMetadataRepository.SetSagaKeysAsync(saga1.Id, Arg.Any<IEnumerable<KeyValuePair<string, string>>>());
+                sagaMetadataRepository.SaveChangesAsync();
             });
 
             sagaKeys.Should()
