@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2009
+VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2_Tests", "2_Tests", "{25A48354-8863-4FC8-B85D-EDE6E2974EE5}"
 EndProject
@@ -43,8 +43,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.DataAccess", "DataAccess\Revo.DataAccess\Revo.DataAccess.csproj", "{FA942FE7-71FD-4CF5-8959-309583FE7903}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.DataAccess.EF6", "DataAccess\Revo.DataAccess.EF6\Revo.DataAccess.EF6.csproj", "{A8DE2F53-E404-48DD-B11F-B6A3302CE163}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMapper.Attributes.V5", "..\..\AutoMapper.Attributes\AutoMapper.Attributes.V5\AutoMapper.Attributes.V5.csproj", "{6A6191B1-FEA5-4A40-A01A-6497EB452D92}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.Core.Tests", "Tests\Revo.Core.Tests\Revo.Core.Tests.csproj", "{4053DE6B-225B-42E1-8336-F031FE1CFE77}"
 EndProject
@@ -120,10 +118,6 @@ Global
 		{A8DE2F53-E404-48DD-B11F-B6A3302CE163}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A8DE2F53-E404-48DD-B11F-B6A3302CE163}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A8DE2F53-E404-48DD-B11F-B6A3302CE163}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6A6191B1-FEA5-4A40-A01A-6497EB452D92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6A6191B1-FEA5-4A40-A01A-6497EB452D92}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6A6191B1-FEA5-4A40-A01A-6497EB452D92}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6A6191B1-FEA5-4A40-A01A-6497EB452D92}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4053DE6B-225B-42E1-8336-F031FE1CFE77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4053DE6B-225B-42E1-8336-F031FE1CFE77}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4053DE6B-225B-42E1-8336-F031FE1CFE77}.Release|Any CPU.ActiveCfg = Release|Any CPU

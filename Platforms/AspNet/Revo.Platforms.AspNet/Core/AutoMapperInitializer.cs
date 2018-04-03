@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-using AutoMapper;
-using AutoMapper.Attributes;
+﻿using AutoMapper;
 using Revo.Core.Core;
 using Revo.Core.Core.Lifecycle;
 using Revo.Core.IO;
@@ -23,11 +21,6 @@ namespace Revo.Platforms.AspNet.Core
         {
             Mapper.Initialize(config =>
             {
-                foreach (Assembly assembly in typeExplorer.GetAllReferencedAssemblies())
-                {
-                    assembly.MapTypes(config);
-                }
-
                 var definitions = autoMapperDefinitionDiscovery.DiscoverAutoMapperDefinitions();
                 foreach (IAutoMapperDefinition definition in definitions)
                 {

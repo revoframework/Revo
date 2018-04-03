@@ -128,10 +128,6 @@
     <Compile Include="Sagas\EF6SagaMetadataRepository.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\AutoMapper.Attributes\AutoMapper.Attributes.V5\AutoMapper.Attributes.V5.csproj">
-      <Project>{6a6191b1-fea5-4a40-a01a-6497eb452d92}</Project>
-      <Name>AutoMapper.Attributes.V5</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\DataAccess\Revo.DataAccess.EF6\Revo.DataAccess.EF6.csproj">
       <Project>{a8de2f53-e404-48dd-b11f-b6a3302ce163}</Project>
       <Name>Revo.DataAccess.EF6</Name>

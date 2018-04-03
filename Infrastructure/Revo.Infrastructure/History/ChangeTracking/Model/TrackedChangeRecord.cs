@@ -1,12 +1,10 @@
 ﻿using System;
-using AutoMapper.Attributes;
 using Revo.DataAccess.Entities;
 using Revo.Domain.ReadModel;
 
 namespace Revo.Infrastructure.History.ChangeTracking.Model
 {
     [TablePrefix(NamespacePrefix = "REV", ColumnPrefix = "TCH")]
-    [MapsTo(typeof(TrackedChange))]
     public class TrackedChangeRecord : ReadModelBase
     {
         public Guid Id { get; set; }
