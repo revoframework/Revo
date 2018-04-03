@@ -6,6 +6,7 @@ using Revo.Domain.Entities;
 using Revo.Domain.Entities.EventSourcing;
 using Revo.Infrastructure.Events;
 using Revo.Infrastructure.EventStore;
+using Revo.Infrastructure.Repositories;
 
 namespace Revo.Infrastructure.EventSourcing
 {
@@ -15,8 +16,9 @@ namespace Revo.Infrastructure.EventSourcing
             IEntityTypeManager entityTypeManager,
             IPublishEventBuffer publishEventBuffer,
             IRepositoryFilter[] repositoryFilters,
-            IEventMessageFactory eventMessageFactory)
-            : base(eventStore, entityTypeManager, publishEventBuffer, repositoryFilters, eventMessageFactory)
+            IEventMessageFactory eventMessageFactory,
+            IEntityFactory entityFactory)
+            : base(eventStore, entityTypeManager, publishEventBuffer, repositoryFilters, eventMessageFactory, entityFactory)
         {
         }
 
@@ -25,8 +27,9 @@ namespace Revo.Infrastructure.EventSourcing
             IPublishEventBuffer publishEventBuffer,
             IRepositoryFilter[] repositoryFilters,
             IEventMessageFactory eventMessageFactory,
+            IEntityFactory entityFactory,
             Dictionary<Guid, IEventSourcedAggregateRoot> aggregates)
-            : base(eventStore, entityTypeManager, publishEventBuffer, repositoryFilters, eventMessageFactory, aggregates)
+            : base(eventStore, entityTypeManager, publishEventBuffer, repositoryFilters, eventMessageFactory, entityFactory, aggregates)
         {
         }
 
@@ -43,6 +46,7 @@ namespace Revo.Infrastructure.EventSourcing
                 publishEventBuffer,
                 repositoryFilters,
                 eventMessageFactory,
+                EntityFactory,
                 aggregates);
         }
     }

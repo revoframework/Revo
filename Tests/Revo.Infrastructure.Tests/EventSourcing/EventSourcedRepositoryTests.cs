@@ -14,6 +14,7 @@ using NSubstitute;
 using Revo.Domain.Entities;
 using Revo.Domain.Entities.EventSourcing;
 using Revo.Domain.Events;
+using Revo.Infrastructure.Repositories;
 using Xunit;
 
 namespace Revo.Infrastructure.Tests.EventSourcing
@@ -111,7 +112,7 @@ namespace Revo.Infrastructure.Tests.EventSourcing
             }); // TODO something more lightweight?
 
             sut = new EventSourcedAggregateRepository(eventStore,
-                entityTypeManager, publishEventBuffer, new IRepositoryFilter[] {}, eventMessageFactory);
+                entityTypeManager, publishEventBuffer, new IRepositoryFilter[] {}, eventMessageFactory, new EntityFactory());
         }
 
         [Fact]
@@ -319,7 +320,7 @@ namespace Revo.Infrastructure.Tests.EventSourcing
         public async Task DefaultFilters_GetsInitialFilters()
         {
             sut = new EventSourcedAggregateRepository(eventStore, entityTypeManager, publishEventBuffer,
-                new[] { repositoryFilter1 }, eventMessageFactory);
+                new[] { repositoryFilter1 }, eventMessageFactory, new EntityFactory());
             Assert.True(sut.DefaultFilters.SequenceEqual(new IRepositoryFilter[] {repositoryFilter1}));
         }
 
@@ -330,7 +331,7 @@ namespace Revo.Infrastructure.Tests.EventSourcing
                 .ReturnsForAnyArgs(ci => ci.ArgAt<IEventSourcedAggregateRoot>(0));
 
             sut = new EventSourcedAggregateRepository(eventStore, entityTypeManager, publishEventBuffer,
-                new[] { repositoryFilter1 }, eventMessageFactory);
+                new[] { repositoryFilter1 }, eventMessageFactory, new EntityFactory());
 
             await sut.GetAsync<MyEntity2>(entity2Id);
 
@@ -345,7 +346,7 @@ namespace Revo.Infrastructure.Tests.EventSourcing
                 .ReturnsForAnyArgs(replacementEntity);
 
             sut = new EventSourcedAggregateRepository(eventStore, entityTypeManager, publishEventBuffer,
-                new[] { repositoryFilter1 }, eventMessageFactory);
+                new[] { repositoryFilter1 }, eventMessageFactory, new EntityFactory());
 
             Assert.Equal(replacementEntity, await sut.GetAsync<MyEntity2>(entity2Id));
         }
@@ -354,7 +355,7 @@ namespace Revo.Infrastructure.Tests.EventSourcing
         public async Task SaveChangesAsync_FiltersAdded()
         {
             sut = new EventSourcedAggregateRepository(eventStore, entityTypeManager, publishEventBuffer,
-                new[] { repositoryFilter1 }, eventMessageFactory);
+                new[] { repositoryFilter1 }, eventMessageFactory, new EntityFactory());
 
             var entity = new MyEntity(entityId, 5);
             sut.Add(entity);
@@ -376,7 +377,7 @@ namespace Revo.Infrastructure.Tests.EventSourcing
         public async Task SaveChangesAsync_FiltersModified()
         {
             sut = new EventSourcedAggregateRepository(eventStore, entityTypeManager, publishEventBuffer,
-                new[] { repositoryFilter1 }, eventMessageFactory);
+                new[] { repositoryFilter1 }, eventMessageFactory, new EntityFactory());
 
             var entity = new MyEntity(entityId, 5);
             sut.Add(entity);

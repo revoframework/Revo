@@ -30,13 +30,15 @@ namespace Revo.Infrastructure.EventSourcing
             IEntityTypeManager entityTypeManager,
             IPublishEventBuffer publishEventBuffer,
             IRepositoryFilter[] repositoryFilters,
-            IEventMessageFactory eventMessageFactory)
+            IEventMessageFactory eventMessageFactory,
+            IEntityFactory entityFactory)
         {
             this.eventStore = eventStore;
             this.entityTypeManager = entityTypeManager;
             this.publishEventBuffer = publishEventBuffer;
             this.repositoryFilters = repositoryFilters;
             this.eventMessageFactory = eventMessageFactory;
+            EntityFactory = entityFactory;
         }
 
         protected EventSourcedRepository(IEventStore eventStore,
@@ -44,15 +46,16 @@ namespace Revo.Infrastructure.EventSourcing
             IPublishEventBuffer publishEventBuffer,
             IRepositoryFilter[] repositoryFilters,
             IEventMessageFactory eventMessageFactory,
+            IEntityFactory entityFactory,
             Dictionary<Guid, TBase> aggregates)
-            : this(eventStore, entityTypeManager, publishEventBuffer, repositoryFilters, eventMessageFactory)
+            : this(eventStore, entityTypeManager, publishEventBuffer, repositoryFilters, eventMessageFactory, entityFactory)
         {
             this.aggregates = aggregates;
         }
 
         public IEnumerable<IRepositoryFilter> DefaultFilters => repositoryFilters;
 
-        protected virtual IEntityFactory EntityFactory { get; } = new EntityFactory();
+        protected virtual IEntityFactory EntityFactory { get; }
 
         public ITransaction CreateTransaction()
         {
@@ -248,6 +251,7 @@ namespace Revo.Infrastructure.EventSourcing
                 publishEventBuffer,
                 repositoryFilters,
                 eventMessageFactory,
+                EntityFactory,
                 aggregates);
         }
 

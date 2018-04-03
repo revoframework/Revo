@@ -16,10 +16,9 @@ namespace Revo.DataAccess.RavenDB.Projections
     {
         private readonly IServiceLocator serviceLocator;
 
-        public RavenProjectionEventListener(IEventSourcedAggregateRepository eventSourcedRepository,
-            IEntityTypeManager entityTypeManager, IServiceLocator serviceLocator,
-            RavenProjectionEventSequencer eventSequencer) :
-            base(eventSourcedRepository, entityTypeManager)
+        public RavenProjectionEventListener(IEntityTypeManager entityTypeManager,
+            IServiceLocator serviceLocator, RavenProjectionEventSequencer eventSequencer) :
+            base(entityTypeManager)
         {
             this.serviceLocator = serviceLocator;
             EventSequencer = eventSequencer;
