@@ -71,13 +71,13 @@ namespace Revo.Infrastructure.Tests.Notifications
 
             await sut.Run();
 
-            notificationPipeline1.ProcessNotificationsAsync(
+            notificationPipeline1.Received(1).ProcessNotificationsAsync(
                 Arg.Is<IEnumerable<INotification>>(
                     x => x.Count() == 2
                          && x.Count(y => ((TestNotification) y).TypeName == "Notification1") == 1
                          && x.Count(y => ((TestNotification) y).TypeName == "Notification2") == 1));
 
-            notificationPipeline2.ProcessNotificationsAsync(
+            notificationPipeline2.Received(1).ProcessNotificationsAsync(
                 Arg.Is<IEnumerable<INotification>>(
                     x => x.Count() == 1
                          && x.Count(y => ((TestNotification)y).TypeName == "Notification3") == 1));

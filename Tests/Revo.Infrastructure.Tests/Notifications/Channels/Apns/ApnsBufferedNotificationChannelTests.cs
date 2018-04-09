@@ -54,7 +54,7 @@ namespace Revo.Infrastructure.Tests.Notifications.Channels.Apns
             await sut.SendNotificationsAsync(notifications);
 
             //we want them to get queued efficiently, all at once
-            apnsBrokerDispatcher.Received().QueueNotifications(Arg.Is<IEnumerable<WrappedApnsNotification>>(
+            apnsBrokerDispatcher.Received(1).QueueNotifications(Arg.Is<IEnumerable<WrappedApnsNotification>>(
                 x => x.Count() == apnsNotifications.Count && x.All(apnsNotifications.Contains)));
         }
 
