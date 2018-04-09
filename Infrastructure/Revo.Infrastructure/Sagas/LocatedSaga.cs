@@ -6,21 +6,34 @@ using System.Threading.Tasks;
 
 namespace Revo.Infrastructure.Sagas
 {
-    public struct LocatedSaga
+    public class LocatedSaga
     {
-        public LocatedSaga(Guid id, Type sagaType)
+        private LocatedSaga(Guid? id, Type sagaType)
         {
             Id = id;
             SagaType = sagaType;
         }
 
-        public LocatedSaga(Type sagaType)
+        public Guid? Id { get; }
+        public Type SagaType { get; }
+        
+        public static LocatedSaga FromId(Guid id, Type sagaType)
         {
-            SagaType = sagaType;
-            Id = null;
+            return new LocatedSaga(id, sagaType);
         }
 
-        public Guid? Id { get; set; }
-        public Type SagaType { get; set; }
+        public static LocatedSaga CreateNew(Type sagaType)
+        {
+            return new LocatedSaga(null, sagaType);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is LocatedSaga other
+                   && other.SagaType == SagaType
+                   && other.Id == Id;
+        }
+
+        public override int GetHashCode() => (SagaType.GetHashCode() * 397) ^ (Id != null ? Id.GetHashCode() : 0);
     }
 }

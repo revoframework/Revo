@@ -475,7 +475,7 @@
     <Compile Include="Sagas\SagaConfigurationLoader.cs" />
     <Compile Include="Sagas\SagaConventionConfigurator.cs" />
     <Compile Include="Sagas\SagaEventDispatcher.cs" />
-    <Compile Include="Sagas\SagaKeyMatch.cs" />
+    <Compile Include="Sagas\SagaMatch.cs" />
     <Compile Include="Sagas\SagasConfiguration.cs" />
     <Compile Include="Sagas\SagaEventListener.cs" />
     <Compile Include="Sagas\SagaEventRegistration.cs" />

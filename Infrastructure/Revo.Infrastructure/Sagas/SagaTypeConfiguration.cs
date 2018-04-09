@@ -13,20 +13,27 @@ namespace Revo.Infrastructure.Sagas
         public IEnumerable<SagaEventRegistration> EventRegistrations => eventRegistrations;
         public Type SagaType => typeof(T);
 
-        public SagaTypeConfiguration<T> Handles<TEvent>(string sagaKey,
+        public SagaTypeConfiguration<T> HandlesByKey<TEvent>(string sagaKey,
             Expression<Func<TEvent, string>> eventKeyExpression, bool isStartingIfSagaNotFound = false) where TEvent : DomainEvent
         {
             var eventKeyExpressionFunc = eventKeyExpression.Compile();
 
-            eventRegistrations.Add(new SagaEventRegistration(typeof(T), typeof(TEvent),
+            eventRegistrations.Add(SagaEventRegistration.MatchedByKey(typeof(T), typeof(TEvent),
                 domainEvent => eventKeyExpressionFunc((TEvent)domainEvent),
                 sagaKey, isStartingIfSagaNotFound));
+            return this;
+        }
+
+        public SagaTypeConfiguration<T> HandlesAll<TEvent>(bool isStartingIfSagaNotFound = false) where TEvent : DomainEvent
+        {
+            eventRegistrations.Add(SagaEventRegistration.ToAllExistingInstances(typeof(T), typeof(TEvent),
+                isStartingIfSagaNotFound));
             return this;
         }
         
         public SagaTypeConfiguration<T> StartsWith<TEvent>() where TEvent : DomainEvent
         {
-            eventRegistrations.Add(new SagaEventRegistration(typeof(T), typeof(TEvent)));
+            eventRegistrations.Add(SagaEventRegistration.AlwaysStarting(typeof(T), typeof(TEvent)));
             return this;
         }
     }

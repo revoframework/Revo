@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Revo.Infrastructure.Sagas
 {
-    public struct SagaKeyMatch
+    public struct SagaMatch
     {
         public Guid Id { get; set; }
         public Guid ClassId { get; set; }

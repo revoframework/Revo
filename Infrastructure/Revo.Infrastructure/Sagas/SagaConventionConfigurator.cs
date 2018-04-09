@@ -21,12 +21,16 @@ namespace Revo.Infrastructure.Sagas
                     {
                         if (eventInfo.IsAlwaysStarting)
                         {
-                            sagaRegistry.Add(new SagaEventRegistration(sagaConfigInfo.Key, typeToEventInfos.Key));
+                            sagaRegistry.Add(SagaEventRegistration.AlwaysStarting(sagaConfigInfo.Key, typeToEventInfos.Key));
+                        }
+                        else if (eventInfo.SagaKey != null)
+                        {
+                            sagaRegistry.Add(SagaEventRegistration.MatchedByKey(sagaConfigInfo.Key, typeToEventInfos.Key,
+                                eventInfo.EventKeyExpression, eventInfo.SagaKey, eventInfo.IsStartingIfSagaNotFound));
                         }
                         else
                         {
-                            sagaRegistry.Add(new SagaEventRegistration(sagaConfigInfo.Key, typeToEventInfos.Key,
-                                eventInfo.EventKeyExpression, eventInfo.SagaKey, eventInfo.IsStartingIfSagaNotFound));
+                            sagaRegistry.Add(SagaEventRegistration.ToAllExistingInstances(sagaConfigInfo.Key, typeToEventInfos.Key, eventInfo.IsStartingIfSagaNotFound));
                         }
                     }
                 }

@@ -46,12 +46,31 @@ namespace Revo.Infrastructure.Tests.Sagas
             };
 
             Saga1 saga = new Saga1(Guid.Parse("20D27705-FFB8-49F5-8331-99E3654B5B19"));
-            sagaLocators[0].LocateSagasAsync(events[0]).Returns(new[] {new LocatedSaga(saga.Id, typeof(Saga1))});
+            sagaLocators[0].LocateSagasAsync(events[0]).Returns(new[] {LocatedSaga.FromId(saga.Id, typeof(Saga1))});
             sagaRepository.GetAsync<Saga1>(saga.Id).Returns(saga);
 
             await sut.DispatchEventsToSagas(events);
 
-            saga.HandledEvents.Should().Contain(events[0]);
+            saga.HandledEvents.ShouldBeEquivalentTo(events);
+            sagaRepository.Received(1).SaveChangesAsync();
+        }
+
+        [Fact]
+        public async Task DispatchEventsToSagas_InvokesSagaOnlyOnceWhenMatchedByMultipleLocators()
+        {
+            var events = new List<IEventMessage<DomainEvent>>()
+            {
+                new Event1().ToMessageDraft()
+            };
+
+            Saga1 saga = new Saga1(Guid.Parse("20D27705-FFB8-49F5-8331-99E3654B5B19"));
+            sagaLocators[0].LocateSagasAsync(events[0]).Returns(new[] {LocatedSaga.FromId(saga.Id, typeof(Saga1))});
+            sagaLocators[1].LocateSagasAsync(events[0]).Returns(new[] {LocatedSaga.FromId(saga.Id, typeof(Saga1))});
+            sagaRepository.GetAsync<Saga1>(saga.Id).Returns(saga);
+
+            await sut.DispatchEventsToSagas(events);
+
+            saga.HandledEvents.ShouldBeEquivalentTo(events);
             sagaRepository.Received(1).SaveChangesAsync();
         }
 
@@ -64,7 +83,7 @@ namespace Revo.Infrastructure.Tests.Sagas
             };
 
             Saga1 saga = null;
-            sagaLocators[0].LocateSagasAsync(events[0]).Returns(new[] {new LocatedSaga(typeof(Saga1))});
+            sagaLocators[0].LocateSagasAsync(events[0]).Returns(new[] {LocatedSaga.CreateNew(typeof(Saga1))});
             entityFactory.ConstructEntity(typeof(Saga1), Arg.Any<Guid>()).Returns(ci =>
             {
                 return saga = new Saga1(ci.ArgAt<Guid>(1));
@@ -73,7 +92,7 @@ namespace Revo.Infrastructure.Tests.Sagas
             await sut.DispatchEventsToSagas(events);
 
             saga.Should().NotBeNull();
-            saga.HandledEvents.Should().Contain(events[0]);
+            saga.HandledEvents.ShouldBeEquivalentTo(events);
             sagaRepository.Received(1).SaveChangesAsync();
         }
 

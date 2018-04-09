@@ -29,10 +29,14 @@ namespace Revo.Infrastructure.Sagas
         {
             foreach (var eventMessage in eventMessages)
             {
-                List<LocatedSaga> locatedSagas = new List<LocatedSaga>();
+                HashSet<LocatedSaga> locatedSagas = new HashSet<LocatedSaga>();
                 foreach (ISagaLocator sagaLocator in sagaLocators)
                 {
-                    locatedSagas.AddRange(await sagaLocator.LocateSagasAsync(eventMessage));
+                    var addedSagas = await sagaLocator.LocateSagasAsync(eventMessage);
+                    foreach (var addedSaga in addedSagas)
+                    {
+                        locatedSagas.Add(addedSaga);
+                    }
                 }
 
                 foreach (LocatedSaga locatedSaga in locatedSagas)

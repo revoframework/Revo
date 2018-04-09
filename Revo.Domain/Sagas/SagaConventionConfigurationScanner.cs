@@ -119,11 +119,6 @@ namespace Revo.Domain.Sagas
             {
                 throw new InvalidOperationException($"Invalid SagaEvent attribute for {handleMethod}: if EventKey is set, then SagaKey must also be set (and vice-versa)");
             }
-
-            if (!sagaEventAttribute.IsAlwaysStarting && sagaEventAttribute.EventKey == null)
-            {
-                throw new InvalidOperationException($"Invalid SagaEvent attribute for {handleMethod}: if IsAlwaysStarting, then both EventKey and SagaKey must also be set");
-            }
         }
     }
 }

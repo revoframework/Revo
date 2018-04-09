@@ -10,6 +10,7 @@ using Revo.Infrastructure.Sagas;
 using Revo.Testing.Infrastructure;
 using NSubstitute;
 using Revo.Domain.Entities;
+using Revo.Domain.Entities.Attributes;
 using Revo.Domain.Entities.EventSourcing;
 using Revo.Domain.Events;
 using Revo.Domain.Sagas;
@@ -21,21 +22,14 @@ namespace Revo.Infrastructure.Tests.Sagas
     {
         private readonly ISagaMetadataRepository sagaMetadataRepository;
         private readonly ISagaRegistry sagaRegistry;
-        private readonly IEntityTypeManager entityTypeManager;
         private readonly KeySagaLocator sut;
-
-        private readonly Guid saga1ClassId = Guid.NewGuid();
-
+        
         public KeySagaLocatorTests()
         {
             sagaRegistry = Substitute.For<ISagaRegistry>();
             sagaMetadataRepository = Substitute.For<ISagaMetadataRepository>();
 
-            entityTypeManager = Substitute.For<IEntityTypeManager>();
-            entityTypeManager.GetClrTypeByClassId(saga1ClassId).Returns(typeof(Saga1));
-            entityTypeManager.GetClassIdByClrType(typeof(Saga1)).Returns(saga1ClassId);
-
-            sut = new KeySagaLocator(sagaRegistry, sagaMetadataRepository, entityTypeManager);
+            sut = new KeySagaLocator(sagaRegistry, sagaMetadataRepository);
         }
 
         [Fact]
@@ -44,7 +38,7 @@ namespace Revo.Infrastructure.Tests.Sagas
             sagaRegistry.LookupRegistrations(typeof(Event1))
                 .Returns(new List<SagaEventRegistration>()
                 {
-                    new SagaEventRegistration(typeof(Saga1), typeof(Event1))
+                    SagaEventRegistration.AlwaysStarting(typeof(Saga1), typeof(Event1))
                 });
             
             var result = await sut.LocateSagasAsync(
@@ -52,51 +46,123 @@ namespace Revo.Infrastructure.Tests.Sagas
 
             result.Should().BeEquivalentTo(new[]
             {
-                new LocatedSaga(typeof(Saga1))
+                LocatedSaga.CreateNew(typeof(Saga1))
             });
         }
 
         [Fact]
-        public async Task LocateSagasAsync_FindsExistingSaga()
+        public async Task LocateSagasAsync_FindsExistingSagaByKey()
         {
             sagaRegistry.LookupRegistrations(typeof(Event1))
                 .Returns(new List<SagaEventRegistration>()
                 {
-                    new SagaEventRegistration(typeof(Saga1), typeof(Event1), x => ((Event1) x).Foo.ToString(),
-                        "foo", false)
+                    SagaEventRegistration.MatchedByKey(typeof(Saga1), typeof(Event1),
+                        x => ((Event1) x).Foo.ToString(), "foo", false)
                 });
 
             Guid sagaId1 = Guid.NewGuid();
             
-            sagaMetadataRepository.FindSagasByKeyAsync("foo", "5")
-                .Returns(new [] { new SagaKeyMatch() { Id = sagaId1, ClassId = saga1ClassId} });
+            sagaMetadataRepository.FindSagasByKeyAsync(typeof(Saga1).GetClassId(), "foo", "5")
+                .Returns(new [] { new SagaMatch() { Id = sagaId1, ClassId = typeof(Saga1).GetClassId() } });
 
             var result = await sut.LocateSagasAsync(new Event1() { Foo = 5 }.ToMessageDraft());
 
             result.Should().BeEquivalentTo(new[]
             {
-                new LocatedSaga(sagaId1, typeof(Saga1))
+                LocatedSaga.FromId(sagaId1, typeof(Saga1))
             });
         }
         
         [Fact]
-        public async Task LocateSagasAsync_StartsSagaWhenNotFound()
+        public async Task LocateSagasAsync_StartsSagaWhenNotFoundByKey()
         {
             sagaRegistry.LookupRegistrations(typeof(Event1))
                 .Returns(new List<SagaEventRegistration>()
                 {
-                    new SagaEventRegistration(typeof(Saga1), typeof(Event1), x => ((Event1) x).Foo.ToString(),
-                        "foo", true)
+                    SagaEventRegistration.MatchedByKey(typeof(Saga1), typeof(Event1),
+                        x => ((Event1) x).Foo.ToString(), "foo", true)
                 });
             
             var result = await sut.LocateSagasAsync(new Event1() { Foo = 5 }.ToMessageDraft());
 
             result.Should().BeEquivalentTo(new[]
             {
-                new LocatedSaga(typeof(Saga1))
+                LocatedSaga.CreateNew(typeof(Saga1))
             });
         }
 
+        [Fact]
+        public async Task LocateSagasAsync_DeliversToAll()
+        {
+            sagaRegistry.LookupRegistrations(typeof(Event1))
+                .Returns(new List<SagaEventRegistration>()
+                {
+                    SagaEventRegistration.ToAllExistingInstances(typeof(Saga1), typeof(Event1), true)
+                });
+
+            Guid sagaId1 = Guid.NewGuid();
+
+            sagaMetadataRepository.FindSagasAsync(typeof(Saga1).GetClassId())
+                .Returns(new[] { new SagaMatch() { Id = sagaId1, ClassId = typeof(Saga1).GetClassId() } });
+
+            var result = await sut.LocateSagasAsync(new Event1().ToMessageDraft());
+
+            result.Should().BeEquivalentTo(new[]
+            {
+                LocatedSaga.FromId(sagaId1, typeof(Saga1))
+            });
+        }
+
+        [Fact]
+        public async Task LocateSagasAsync_DeliverToAllStartsNewWhenNoSagas()
+        {
+            sagaRegistry.LookupRegistrations(typeof(Event1))
+                .Returns(new List<SagaEventRegistration>()
+                {
+                    SagaEventRegistration.ToAllExistingInstances(typeof(Saga1), typeof(Event1), true)
+                });
+
+            Guid sagaId1 = Guid.NewGuid();
+
+            sagaMetadataRepository.FindSagasAsync(typeof(Saga1).GetClassId())
+                .Returns(new SagaMatch[] { });
+
+            var result = await sut.LocateSagasAsync(new Event1().ToMessageDraft());
+
+            result.Should().BeEquivalentTo(new[]
+            {
+                LocatedSaga.CreateNew(typeof(Saga1))
+            });
+        }
+
+        [Fact]
+        public async Task LocateSagasAsync_DistinctWhenMultipleMatchesPerSaga()
+        {
+            sagaRegistry.LookupRegistrations(typeof(Event1))
+                .Returns(new List<SagaEventRegistration>()
+                {
+                    SagaEventRegistration.MatchedByKey(typeof(Saga1), typeof(Event1),
+                        x => ((Event1) x).Foo.ToString(), "foo", false),
+                    SagaEventRegistration.MatchedByKey(typeof(Saga1), typeof(Event1),
+                        x => ((Event1) x).Bar.ToString(), "bar", false)
+                });
+
+            Guid sagaId1 = Guid.NewGuid();
+
+            sagaMetadataRepository.FindSagasByKeyAsync(typeof(Saga1).GetClassId(), "foo", "5")
+                .Returns(new[] { new SagaMatch() { Id = sagaId1, ClassId = typeof(Saga1).GetClassId() } });
+            sagaMetadataRepository.FindSagasByKeyAsync(typeof(Saga1).GetClassId(), "bar", "42")
+                .Returns(new[] { new SagaMatch() { Id = sagaId1, ClassId = typeof(Saga1).GetClassId() } });
+
+            var result = await sut.LocateSagasAsync(new Event1() { Foo = 5, Bar = 42 }.ToMessageDraft());
+
+            result.Should().BeEquivalentTo(new[]
+            {
+                LocatedSaga.FromId(sagaId1, typeof(Saga1))
+            });
+        }
+
+        [DomainClassId("2C7348E9-B7DE-4C26-BB1D-33464F86DADE")]
         public class Saga1 : ISaga
         {
             public Saga1(Guid id)
@@ -133,6 +199,7 @@ namespace Revo.Infrastructure.Tests.Sagas
             }
         }
 
+        [DomainClassId("2F6B0532-D4CA-4C8E-AFFD-40AC732317D2")]
         public class Saga2 : Saga1
         {
             public Saga2(Guid id) : base(id)
@@ -160,6 +227,7 @@ namespace Revo.Infrastructure.Tests.Sagas
         public class Event1 : DomainEvent
         {
             public int Foo { get; set; }
+            public int Bar { get; set; }
         }
     }
 }

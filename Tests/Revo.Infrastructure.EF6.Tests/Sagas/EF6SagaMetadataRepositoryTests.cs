@@ -42,24 +42,49 @@ namespace Revo.Infrastructure.EF6.Tests.Sagas
         }
 
         [Fact]
-        public async Task FindSagasByKeyAsync_FindsSagas()
+        public async Task FindSagasAsync_ByClassId()
         {
             Guid saga1Id = Guid.Parse("6B3577DF-B0F7-444A-8506-029591BC9894");
             Guid saga2Id = Guid.Parse("75E24A6E-29BF-4863-AB6A-299EB107947D");
+            Guid saga1ClassId = Guid.Parse("D3F5C4A9-DC44-49F7-B629-230852265B87");
+            Guid saga2ClassId = Guid.Parse("B68CFFB0-5ECD-424B-B837-BCC4394F5465");
 
-            var sagaMetadata1 = new SagaMetadataRecord(saga1Id, Guid.Parse("39F01E63-CA48-463E-B9C9-F049832DE92E"));
+            var sagaMetadata1 = new SagaMetadataRecord(saga1Id, saga1ClassId);
+            var sagaMetadata2 = new SagaMetadataRecord(saga2Id, saga2ClassId);
+
+            inMemoryCrudRepository.AttachRange(new[]
+            {
+                sagaMetadata1, sagaMetadata2
+            });
+
+            SagaMatch[] result = await sut.FindSagasAsync(saga1ClassId);
+
+            result.ShouldBeEquivalentTo(new[]
+            {
+                new SagaMatch() { Id = sagaMetadata1.Id, ClassId = sagaMetadata1.ClassId }
+            });
+        }
+
+        [Fact]
+        public async Task FindSagasByKeyAsync_WithCorrespondingKeys()
+        {
+            Guid saga1Id = Guid.Parse("6B3577DF-B0F7-444A-8506-029591BC9894");
+            Guid saga2Id = Guid.Parse("75E24A6E-29BF-4863-AB6A-299EB107947D");
+            Guid sagaClassId = Guid.Parse("D3F5C4A9-DC44-49F7-B629-230852265B87");
+
+            var sagaMetadata1 = new SagaMetadataRecord(saga1Id, sagaClassId);
             sagaMetadata1.Keys.AddRange(new[]
             {
                 new SagaMetadataKey(Guid.Parse("FC9083F9-0FB1-46DE-BC50-EECD5D5B1A79"), saga1Id, "key", "value")
             });
 
-            var sagaMetadata2 = new SagaMetadataRecord(saga2Id, Guid.Parse("068E9684-0B5F-4F0B-BF76-65734403F25B"));
+            var sagaMetadata2 = new SagaMetadataRecord(saga2Id, sagaClassId);
             sagaMetadata2.Keys.AddRange(new[]
             {
                 new SagaMetadataKey(Guid.Parse("919274C2-E501-430D-A60D-60DFD486C0EB"), saga2Id, "key", "value")
             });
 
-            var sagaMetadata3 = new SagaMetadataRecord(Guid.NewGuid(), Guid.NewGuid());
+            var sagaMetadata3 = new SagaMetadataRecord(Guid.NewGuid(), sagaClassId);
             sagaMetadata3.Keys.AddRange(new[]
             {
                 new SagaMetadataKey(Guid.NewGuid(), sagaMetadata3.Id, "key2", "value")
@@ -71,12 +96,46 @@ namespace Revo.Infrastructure.EF6.Tests.Sagas
                 sagaMetadata1, sagaMetadata2, sagaMetadata3
             });
 
-            SagaKeyMatch[] result = await sut.FindSagasByKeyAsync("key", "value");
+            SagaMatch[] result = await sut.FindSagasByKeyAsync(sagaClassId, "key", "value");
 
             result.ShouldBeEquivalentTo(new[]
             {
-                new SagaKeyMatch() { Id = sagaMetadata1.Id, ClassId = sagaMetadata1.ClassId },
-                new SagaKeyMatch() { Id = sagaMetadata2.Id, ClassId = sagaMetadata2.ClassId }
+                new SagaMatch() { Id = sagaMetadata1.Id, ClassId = sagaMetadata1.ClassId },
+                new SagaMatch() { Id = sagaMetadata2.Id, ClassId = sagaMetadata2.ClassId }
+            });
+        }
+
+        [Fact]
+        public async Task FindSagasByKeyAsync_OnlyWithSpecifiedClassId()
+        {
+            Guid saga1Id = Guid.Parse("6B3577DF-B0F7-444A-8506-029591BC9894");
+            Guid saga2Id = Guid.Parse("75E24A6E-29BF-4863-AB6A-299EB107947D");
+            Guid saga1ClassId = Guid.Parse("D3F5C4A9-DC44-49F7-B629-230852265B87");
+            Guid saga2ClassId = Guid.Parse("C3DDB0AD-8E4A-4CDB-9311-4AE52B167F99");
+
+            var sagaMetadata1 = new SagaMetadataRecord(saga1Id, saga1ClassId);
+            sagaMetadata1.Keys.AddRange(new[]
+            {
+                new SagaMetadataKey(Guid.Parse("FC9083F9-0FB1-46DE-BC50-EECD5D5B1A79"), saga1Id, "key", "value")
+            });
+
+            var sagaMetadata2 = new SagaMetadataRecord(saga2Id, saga2ClassId);
+            sagaMetadata2.Keys.AddRange(new[]
+            {
+                new SagaMetadataKey(Guid.Parse("919274C2-E501-430D-A60D-60DFD486C0EB"), saga2Id, "key", "value")
+            });
+
+            inMemoryCrudRepository.AttachRange(sagaMetadata1.Keys.Concat(sagaMetadata2.Keys));
+            inMemoryCrudRepository.AttachRange(new[]
+            {
+                sagaMetadata1, sagaMetadata2
+            });
+
+            SagaMatch[] result = await sut.FindSagasByKeyAsync(saga1ClassId, "key", "value");
+
+            result.ShouldBeEquivalentTo(new[]
+            {
+                new SagaMatch() { Id = sagaMetadata1.Id, ClassId = sagaMetadata1.ClassId }
             });
         }
 
@@ -86,20 +145,21 @@ namespace Revo.Infrastructure.EF6.Tests.Sagas
             Guid saga1Id = Guid.Parse("6B3577DF-B0F7-444A-8506-029591BC9894");
             Guid saga2Id = Guid.Parse("75E24A6E-29BF-4863-AB6A-299EB107947D");
             Guid saga3Id = Guid.Parse("03A96C89-8004-42DB-874D-D25C3D3C2476");
+            Guid sagaClassId = Guid.Parse("D3F5C4A9-DC44-49F7-B629-230852265B87");
 
-            var sagaMetadata1 = new SagaMetadataRecord(saga1Id, Guid.Parse("39F01E63-CA48-463E-B9C9-F049832DE92E"));
+            var sagaMetadata1 = new SagaMetadataRecord(saga1Id, sagaClassId);
             sagaMetadata1.Keys.AddRange(new[]
             {
                 new SagaMetadataKey(Guid.Parse("FC9083F9-0FB1-46DE-BC50-EECD5D5B1A79"), saga1Id, "key", "value")
             });
 
-            var sagaMetadata2 = new SagaMetadataRecord(saga2Id, Guid.Parse("068E9684-0B5F-4F0B-BF76-65734403F25B"));
+            var sagaMetadata2 = new SagaMetadataRecord(saga2Id, sagaClassId);
             sagaMetadata2.Keys.AddRange(new[]
             {
                 new SagaMetadataKey(Guid.Parse("919274C2-E501-430D-A60D-60DFD486C0EB"), saga2Id, "key", "value2")
             });
 
-            var sagaMetadata3 = new SagaMetadataRecord(saga3Id, Guid.Parse("EDAA5DD0-8396-44E2-AC9F-4D29FE255C59"));
+            var sagaMetadata3 = new SagaMetadataRecord(saga3Id, sagaClassId);
             sagaMetadata3.Keys.AddRange(new[]
             {
                 new SagaMetadataKey(Guid.Parse("919274C2-E501-430D-A60D-60DFD486C0EB"), sagaMetadata3.Id, "key", "value")
@@ -121,12 +181,12 @@ namespace Revo.Infrastructure.EF6.Tests.Sagas
                 new KeyValuePair<string, string>("key", "value3"),
             });
 
-            SagaKeyMatch[] result = await sut.FindSagasByKeyAsync("key", "value");
+            SagaMatch[] result = await sut.FindSagasByKeyAsync(sagaClassId, "key", "value");
 
             result.ShouldBeEquivalentTo(new[]
             {
-                new SagaKeyMatch() { Id = sagaMetadata1.Id, ClassId = sagaMetadata1.ClassId },
-                new SagaKeyMatch() { Id = sagaMetadata2.Id, ClassId = sagaMetadata2.ClassId }
+                new SagaMatch() { Id = sagaMetadata1.Id, ClassId = sagaMetadata1.ClassId },
+                new SagaMatch() { Id = sagaMetadata2.Id, ClassId = sagaMetadata2.ClassId }
             });
         }
 

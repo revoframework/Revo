@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using MoreLinq;
@@ -15,39 +16,47 @@ namespace Revo.Infrastructure.Sagas
     {
         private readonly ISagaRegistry sagaRegistry;
         private readonly ISagaMetadataRepository sagaMetadataRepository;
-        private readonly IEntityTypeManager entityTypeManager;
 
-        public KeySagaLocator(ISagaRegistry sagaRegistry, ISagaMetadataRepository sagaMetadataRepository,
-            IEntityTypeManager entityTypeManager)
+        public KeySagaLocator(ISagaRegistry sagaRegistry, ISagaMetadataRepository sagaMetadataRepository)
         {
             this.sagaRegistry = sagaRegistry;
             this.sagaMetadataRepository = sagaMetadataRepository;
-            this.entityTypeManager = entityTypeManager;
         }
 
         public async Task<IEnumerable<LocatedSaga>> LocateSagasAsync(IEventMessage<DomainEvent> domainEvent)
         {
-            List<LocatedSaga> locatedSagas = new List<LocatedSaga>();
+            HashSet<LocatedSaga> locatedSagas = new HashSet<LocatedSaga>();
 
             var registrations = sagaRegistry.LookupRegistrations(domainEvent.Event.GetType());
             foreach (SagaEventRegistration registration in registrations)
             {
-                SagaKeyMatch[] sagaMatches = {};
+                SagaMatch[] sagaMatches = {};
                 if (!registration.IsAlwaysStarting)
                 {
-                    string sagaKeyValue = registration.EventKeyExpression(domainEvent.Event);
-                    sagaMatches = await sagaMetadataRepository
-                        .FindSagasByKeyAsync(registration.SagaKey, sagaKeyValue);
-                    foreach (SagaKeyMatch sagaMatch in sagaMatches)
+                    Guid sagaClassId = EntityClassUtils.GetEntityClassId(registration.SagaType);
+
+                    if (registration.EventKeyExpression != null && registration.SagaKey != null)
                     {
-                        Type sagaType = entityTypeManager.GetClrTypeByClassId(sagaMatch.ClassId);
-                        locatedSagas.Add(new LocatedSaga(sagaMatch.Id, sagaType));
+                        string sagaKeyValue = registration.EventKeyExpression(domainEvent.Event);
+                        sagaMatches = await sagaMetadataRepository.FindSagasByKeyAsync(
+                            sagaClassId, registration.SagaKey, sagaKeyValue);
+                    }
+                    else
+                    {
+                        sagaMatches = await sagaMetadataRepository.FindSagasAsync(sagaClassId);
+                    }
+
+                    foreach (SagaMatch sagaMatch in sagaMatches)
+                    {
+                        Debug.Assert(sagaMatch.ClassId == sagaClassId);
+
+                        locatedSagas.Add(LocatedSaga.FromId(sagaMatch.Id, registration.SagaType));
                     }
                 }
 
                 if (registration.IsAlwaysStarting || (sagaMatches.Length == 0 && registration.IsStartingIfSagaNotFound))
                 {
-                    locatedSagas.Add(new LocatedSaga(registration.SagaType));
+                    locatedSagas.Add(LocatedSaga.CreateNew(registration.SagaType));
                 }
             }
 

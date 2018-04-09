@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Data.Entity;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Revo.DataAccess.EF6.Entities;
 using Revo.DataAccess.Entities;
@@ -22,33 +23,27 @@ namespace Revo.Infrastructure.EF6.Sagas
             this.crudRepository = crudRepository;
         }
 
-        public void AddSaga(Guid sagaId, Guid sagaClassId)
+        public void AddSaga(Guid id, Guid classId)
         {
-            if (metadataRecords.ContainsKey(sagaId))
+            if (metadataRecords.ContainsKey(id))
             {
-                throw new ArgumentException($"Saga with ID {sagaId} already has metadata added");
+                throw new ArgumentException($"Saga with ID {id} already has metadata added");
             }
 
-            var metadataRecord = metadataRecords[sagaId] = new SagaMetadataRecord(sagaId, sagaClassId);
+            var metadataRecord = metadataRecords[id] = new SagaMetadataRecord(id, classId);
             crudRepository.Add(metadataRecord);
         }
 
-        public async Task<SagaKeyMatch[]> FindSagasByKeyAsync(string keyName, string keyValue)
+        public Task<SagaMatch[]> FindSagasAsync(Guid classId)
         {
-            var databaseKeys = (await crudRepository.FindAll<SagaMetadataRecord>()
-                .Where(x => x.Keys.Any(y => y.KeyName == keyName && y.KeyValue == keyValue))
-                .ToArrayAsync())
-                .Where(x => (crudRepository.GetEntityState(x) & EntityState.Deleted) == 0);
+            return QuerySagaRecords(x => x.ClassId == classId);
+        }
 
-            var withCachedKeys = databaseKeys
-                .Concat(metadataRecords.Values) // merge with keys in cache they might've gotten updated in the meantime
-                .Distinct()
-                .Where(x => x.Keys.Any(y => y.KeyName == keyName && y.KeyValue == keyValue));
+        public  Task<SagaMatch[]> FindSagasByKeyAsync(Guid classId, string keyName, string keyValue)
+        {
+            return QuerySagaRecords(x => x.ClassId == classId
+                                         && x.Keys.Any(y => y.KeyName == keyName && y.KeyValue == keyValue));
 
-            var metadata = withCachedKeys
-                .Select(x => new SagaKeyMatch() {Id = x.Id, ClassId = x.ClassId})
-                .ToArray();
-            return metadata;
         }
 
         public async Task<SagaMetadata> GetSagaMetadataAsync(Guid sagaId)
@@ -109,6 +104,24 @@ namespace Revo.Infrastructure.EF6.Sagas
             }
 
             return metadataRecord;
+        }
+
+        private async Task<SagaMatch[]> QuerySagaRecords(Expression<Func<SagaMetadataRecord, bool>> query)
+        {
+            var databaseKeys = (await crudRepository.FindAll<SagaMetadataRecord>()
+                    .Where(query)
+                    .ToArrayAsync())
+                .Where(x => (crudRepository.GetEntityState(x) & EntityState.Deleted) == 0);
+
+            var withCachedKeys = databaseKeys
+                .Concat(metadataRecords.Values) // merge with keys in cache they might've gotten updated in the meantime
+                .Distinct()
+                .Where(query.Compile());
+
+            var metadata = withCachedKeys
+                .Select(x => new SagaMatch() { Id = x.Id, ClassId = x.ClassId })
+                .ToArray();
+            return metadata;
         }
     }
 }

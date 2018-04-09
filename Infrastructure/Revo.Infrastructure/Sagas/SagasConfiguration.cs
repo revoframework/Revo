@@ -21,7 +21,7 @@ namespace Revo.Infrastructure.Sagas
             return genericSagaTypeConfiguration;
         }
 
-        public void LoadToRegistry(SagaRegistry sagaRegistry)
+        public void LoadToRegistry(ISagaRegistry sagaRegistry)
         {
             foreach (var sagaType in sagaTypes)
             {

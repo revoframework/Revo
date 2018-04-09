@@ -184,9 +184,11 @@
     <Compile Include="Repositories\RepositoryExtensionsTests.cs" />
     <Compile Include="Repositories\RepositoryTests.cs" />
     <Compile Include="Sagas\KeySagaLocatorTests.cs" />
+    <Compile Include="Sagas\SagaConfigurationLoaderTests.cs" />
     <Compile Include="Sagas\SagaConventionConfiguratorTests.cs" />
     <Compile Include="Sagas\SagaEventDispatcherTests.cs" />
     <Compile Include="Sagas\SagaEventListenerTests.cs" />
+    <Compile Include="Sagas\SagaRegistryTests.cs" />
     <Compile Include="Sagas\SagaRepositoryTests.cs" />
     <Compile Include="Tenancy\DefaultTenantContextTests.cs" />
     <Compile Include="Tenancy\SingleTenantContextResolverTests.cs" />
