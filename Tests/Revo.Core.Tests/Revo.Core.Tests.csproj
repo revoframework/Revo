@@ -98,6 +98,7 @@
     <Compile Include="Commands\CommandContextTests.cs" />
     <Compile Include="Commands\CommandHandlerPipelineTests.cs" />
     <Compile Include="Commands\CommandHandlerPipelineTests_Queries.cs" />
+    <Compile Include="Commands\UnitOfWorkCommandFilterTests.cs" />
     <Compile Include="Core\ParamsComparerTests.cs" />
     <Compile Include="Events\EventBusTests.cs" />
     <Compile Include="Events\PublishEventBufferTests.cs" />
