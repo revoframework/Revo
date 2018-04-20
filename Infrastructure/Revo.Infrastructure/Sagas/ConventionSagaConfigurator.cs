@@ -2,11 +2,11 @@
 
 namespace Revo.Infrastructure.Sagas
 {
-    public class SagaConventionConfigurator : ISagaConfigurator
+    public class ConventionSagaConfigurator : ISagaConfigurator
     {
         private readonly ISagaConventionConfigurationCache sagaConventionConfigurationCache;
 
-        public SagaConventionConfigurator(ISagaConventionConfigurationCache sagaConventionConfigurationCache)
+        public ConventionSagaConfigurator(ISagaConventionConfigurationCache sagaConventionConfigurationCache)
         {
             this.sagaConventionConfigurationCache = sagaConventionConfigurationCache;
         }

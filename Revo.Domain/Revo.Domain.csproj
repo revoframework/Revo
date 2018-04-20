@@ -140,6 +140,7 @@
     <Compile Include="Sagas\Attributes\SagaEventAttribute.cs" />
     <Compile Include="Sagas\BasicSaga.cs" />
     <Compile Include="Sagas\Events\SagaKeysChangedEvent.cs" />
+    <Compile Include="Sagas\IConventionBasedSaga.cs" />
     <Compile Include="Sagas\ISaga.cs" />
     <Compile Include="Sagas\ISagaConventionConfigurationCache.cs" />
     <Compile Include="Sagas\EventSourcedSaga.cs" />
@@ -171,6 +172,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="ClassDiagram1.cd" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

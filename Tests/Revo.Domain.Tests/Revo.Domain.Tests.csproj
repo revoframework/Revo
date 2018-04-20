@@ -84,6 +84,8 @@
     <Compile Include="Events\AggregateEventRouterTests.cs" />
     <Compile Include="Events\ConventionEventApplyRegistratorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sagas\BasicSagaTests.cs" />
+    <Compile Include="Sagas\EventSourcedSagaTests.cs" />
     <Compile Include="Sagas\SagaConventionConfigurationScannerTests.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -14,7 +14,7 @@ namespace Revo.Domain.Sagas
     /// <para>Saga whose state is typically persisted using just its visible state data.</para>
     /// <seealso cref="BasicAggregateRoot"/>
     /// </summary>
-    public class BasicSaga : BasicAggregateRoot, ISaga
+    public class BasicSaga : BasicAggregateRoot, IConventionBasedSaga
     {
         private readonly List<ICommandBase> uncommitedCommands = new List<ICommandBase>();
         private readonly MultiValueDictionary<string, string> keys = new MultiValueDictionary<string, string>();
@@ -34,10 +34,8 @@ namespace Revo.Domain.Sagas
         {
             if (events.TryGetValue(ev.Event.GetType(), out var eventInfos))
             {
-                foreach (var eventInfo in eventInfos)
-                {
-                    eventInfo.HandleDelegate(this, ev);
-                }
+                var first = eventInfos.First(); // because we use Apply(T) convention, all handle delegates should be the same
+                first.HandleDelegate(this, ev);
             }
         }
 

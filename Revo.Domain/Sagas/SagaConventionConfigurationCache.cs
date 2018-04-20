@@ -28,9 +28,9 @@ namespace Revo.Domain.Sagas
 
         public static SagaConfigurationInfo GetSagaConfigurationInfo(Type sagaType)
         {
-            if (!typeof(EventSourcedSaga).IsAssignableFrom(sagaType))
+            if (!typeof(IConventionBasedSaga).IsAssignableFrom(sagaType))
             {
-                throw new ArgumentException($"Only Saga-derived sagas are configured using conventions");
+                throw new ArgumentException($"{sagaType} is not an IConventionBasedSaga");
             }
 
             if (configurationInfos == null)
@@ -51,7 +51,7 @@ namespace Revo.Domain.Sagas
         {
             configurationInfos = new Dictionary<Type, SagaConfigurationInfo>();
             var sagaTypes = typeExplorer.GetAllTypes()
-                .Where(x => typeof(EventSourcedSaga).IsAssignableFrom(x)
+                .Where(x => x.IsClass && typeof(IConventionBasedSaga).IsAssignableFrom(x)
                     && !x.IsAbstract && !x.IsGenericTypeDefinition);
 
             foreach (Type sagaType in sagaTypes)

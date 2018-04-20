@@ -464,6 +464,7 @@
     <Compile Include="Repositories\IQueryableAggregateStore.cs" />
     <Compile Include="Repositories\RepositoryExtensions.cs" />
     <Compile Include="Repositories\RepositoryFactory.cs" />
+    <Compile Include="Sagas\ConventionSagaConfigurator.cs" />
     <Compile Include="Sagas\ISagaConfigurator.cs" />
     <Compile Include="Sagas\ISagaEventDispatcher.cs" />
     <Compile Include="Sagas\ISagaLocator.cs" />
@@ -473,7 +474,6 @@
     <Compile Include="Sagas\ISagaTypeConfiguration.cs" />
     <Compile Include="Sagas\LocatedSaga.cs" />
     <Compile Include="Sagas\SagaConfigurationLoader.cs" />
-    <Compile Include="Sagas\SagaConventionConfigurator.cs" />
     <Compile Include="Sagas\SagaEventDispatcher.cs" />
     <Compile Include="Sagas\SagaMatch.cs" />
     <Compile Include="Sagas\SagasConfiguration.cs" />

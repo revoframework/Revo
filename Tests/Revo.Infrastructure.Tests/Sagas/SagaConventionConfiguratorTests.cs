@@ -14,13 +14,13 @@ namespace Revo.Infrastructure.Tests.Sagas
 {
     public class SagaConventionConfiguratorTests
     {
-        private readonly SagaConventionConfigurator sut;
+        private readonly ConventionSagaConfigurator sut;
         private readonly ISagaConventionConfigurationCache sagaConventionConfigurationCache;
 
         public SagaConventionConfiguratorTests()
         {
             sagaConventionConfigurationCache = Substitute.For<ISagaConventionConfigurationCache>();
-            sut = new SagaConventionConfigurator(sagaConventionConfigurationCache);
+            sut = new ConventionSagaConfigurator(sagaConventionConfigurationCache);
         }
 
         [Fact]

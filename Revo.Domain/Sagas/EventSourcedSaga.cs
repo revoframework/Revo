@@ -15,7 +15,7 @@ namespace Revo.Domain.Sagas
     /// <para>Saga that uses event-sourcing to define its state.</para>
     /// <seealso cref="EventSourcedAggregateRoot"/>
     /// </summary>
-    public class EventSourcedSaga : EventSourcedAggregateRoot, ISaga
+    public class EventSourcedSaga : EventSourcedAggregateRoot, IConventionBasedSaga
     {
         private readonly List<ICommandBase> uncommitedCommands = new List<ICommandBase>();
         private readonly MultiValueDictionary<string, string> keys = new MultiValueDictionary<string, string>();
@@ -35,10 +35,8 @@ namespace Revo.Domain.Sagas
         {
             if (events.TryGetValue(ev.Event.GetType(), out var eventInfos))
             {
-                foreach (var eventInfo in eventInfos)
-                {
-                    eventInfo.HandleDelegate(this, ev);
-                }
+                var first = eventInfos.First(); // because we use Apply(T) convention, all handle delegates should be the same
+                first.HandleDelegate(this, ev);
             }
         }
 
@@ -46,6 +44,17 @@ namespace Revo.Domain.Sagas
         {
             base.Commit();
             uncommitedCommands.Clear();
+        }
+
+        protected void AddSagaKey(string name, string value)
+        {
+            var newKeys = new MultiValueDictionary<string, string>(keys);
+            newKeys.Add(name, value);
+
+            ApplyEvent(new SagaKeysChangedEvent(
+                newKeys
+                    .Select(x => new KeyValuePair<string, ImmutableList<string>>(x.Key, x.Value.ToImmutableList()))
+                    .ToImmutableDictionary()));
         }
 
         protected void SendCommand(ICommandBase command)
@@ -105,17 +114,6 @@ namespace Revo.Domain.Sagas
                     .Select(x => new KeyValuePair<string, ImmutableList<string>>(x.Key, x.Value.ToImmutableList()))
                     .ToImmutableDictionary()));
             }
-        }
-
-        protected void AddSagaKey(string name, string value)
-        {
-            var newKeys = new MultiValueDictionary<string, string>(keys);
-            newKeys.Add(name, value);
-
-            ApplyEvent(new SagaKeysChangedEvent(
-                newKeys
-                    .Select(x => new KeyValuePair<string, ImmutableList<string>>(x.Key, x.Value.ToImmutableList()))
-                    .ToImmutableDictionary()));
         }
 
         protected void SetSagaKey(string name, string value)
