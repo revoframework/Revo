@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
+using Revo.Core.Core;
 
-namespace Revo.Infrastructure.Jobs
+namespace Revo.Infrastructure.Jobs.Hangfire
 {
     public class HangfireJobEntryPoint<TJob>
         where TJob : IJob
@@ -14,7 +15,10 @@ namespace Revo.Infrastructure.Jobs
 
         public Task ExecuteAsync(TJob job)
         {
-            return jobRunner.RunJobAsync(job);
+            using (TaskContext.Enter())
+            {
+                return jobRunner.RunJobAsync(job);
+            }
         }
     }
 }

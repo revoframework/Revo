@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Hangfire;
+using Ninject;
 using Ninject.Syntax;
 using Ninject.Web.Common;
 using Revo.Core.Core;
@@ -13,7 +14,6 @@ namespace Revo.Platforms.AspNet.Core
             return syntax
                 .InScope(context => context.Kernel.Components.GetAll<INinjectHttpApplicationPlugin>()
                     .Select(c => c.GetRequestScope(context)).FirstOrDefault(s => s != null)
-                    ?? (object) JobActivatorScope.Current
                     ?? (object) TaskContext.Current);
         }
     }

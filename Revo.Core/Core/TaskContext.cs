@@ -1,32 +1,39 @@
-﻿using System.Runtime.Remoting.Messaging;
+﻿using System;
+using System.Diagnostics;
+using System.Runtime.Remoting.Messaging;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Revo.Core.Core
 {
-    public sealed class TaskContext
+    public sealed class TaskContext : IDisposable
     {
-        private const string ContextKey = "{C67AAD63-703A-4EC5-B0D7-1E3A7D95B616}";
+        private static readonly AsyncLocal<TaskContext> CurrentLocal = new AsyncLocal<TaskContext>();
+        private bool disposed = false;
 
-        public TaskContext(Task task)
+        private TaskContext()
         {
-            this.Task = task;
         }
 
-        public Task Task { get; private set; }
+        public static TaskContext Current => CurrentLocal.Value;
 
-        public static TaskContext Current
+        public static TaskContext Enter()
         {
-            get => (TaskContext)CallContext.LogicalGetData(ContextKey);
-            internal set
+            if (Current != null)
             {
-                if (value == null)
-                {
-                    CallContext.FreeNamedDataSlot(ContextKey);
-                }
-                else
-                {
-                    CallContext.LogicalSetData(ContextKey, value);
-                }
+                throw new InvalidOperationException("A different TaskContext is already active.s");
+            }
+
+            CurrentLocal.Value = new TaskContext();
+            return Current;
+        }
+
+        public void Dispose()
+        {
+            if (!disposed)
+            {
+                Debug.Assert(CurrentLocal.Value == this);
+                CurrentLocal.Value = null;
             }
         }
     }

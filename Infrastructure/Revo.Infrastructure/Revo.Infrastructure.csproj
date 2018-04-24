@@ -272,6 +272,7 @@
     <Compile Include="EventSourcing\AggregateEventStreamMetadataNames.cs" />
     <Compile Include="EventSourcing\EntityDeletedException.cs" />
     <Compile Include="EventSourcing\EventSourcedAggregateRepository.cs" />
+    <Compile Include="Jobs\Hangfire\HangfireJobEntryPoint.cs" />
     <Compile Include="Repositories\EntityFactory.cs" />
     <Compile Include="EventStore\EventStoreEventMessage.cs" />
     <Compile Include="EventStore\EventStreamInfo.cs" />
@@ -337,7 +338,6 @@
     <Compile Include="Globalization\Messages\Database\MessageRepositoryReloader.cs" />
     <Compile Include="Jobs\EnqueueJobCommand.cs" />
     <Compile Include="Jobs\EnqueueJobCommandHandler.cs" />
-    <Compile Include="Jobs\HangfireJobEntryPoint.cs" />
     <Compile Include="Jobs\Hangfire\HangfireJobScheduler.cs" />
     <Compile Include="Jobs\IJob.cs" />
     <Compile Include="Jobs\IJobHandler.cs" />

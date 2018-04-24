@@ -12,15 +12,9 @@ namespace Revo.Core.Core
 
             task = new Task(() =>
             {
-                Debug.Assert(TaskContext.Current == null);
-                TaskContext.Current = new TaskContext(task);
-                try
+                using (TaskContext.Enter())
                 {
                     action();
-                }
-                finally
-                {
-                    TaskContext.Current = null;
                 }
             });
 
@@ -35,15 +29,9 @@ namespace Revo.Core.Core
 
             task = new Task<TResult>(() =>
             {
-                Debug.Assert(TaskContext.Current == null);
-                TaskContext.Current = new TaskContext(task);
-                try
+                using (TaskContext.Enter())
                 {
                     return function();
-                }
-                finally
-                {
-                    TaskContext.Current = null;
                 }
             });
 
@@ -58,15 +46,9 @@ namespace Revo.Core.Core
 
             task = new Task<Task>(async () =>
             {
-                Debug.Assert(TaskContext.Current == null);
-                TaskContext.Current = new TaskContext(task);
-                try
+                using (TaskContext.Enter())
                 {
                     await action();
-                }
-                finally
-                {
-                    TaskContext.Current = null;
                 }
             });
 
@@ -81,20 +63,13 @@ namespace Revo.Core.Core
 
             task = new Task<Task<TResult>>(async () =>
             {
-                Debug.Assert(TaskContext.Current == null);
-                TaskContext.Current = new TaskContext(task);
-                try
+                using (TaskContext.Enter())
                 {
                     return await function();
-                }
-                finally
-                {
-                    TaskContext.Current = null;
                 }
             });
 
             task.Start();
-
             return task.Unwrap();
         }
     }
