@@ -52,7 +52,7 @@ namespace Revo.Infrastructure.Tests.Sagas
             await sut.DispatchEventsToSagas(events);
 
             saga.HandledEvents.ShouldBeEquivalentTo(events);
-            sagaRepository.Received(1).SaveChangesAsync();
+            sagaRepository.Received(1).SendSagaCommandsAsync();
         }
 
         [Fact]
@@ -71,7 +71,7 @@ namespace Revo.Infrastructure.Tests.Sagas
             await sut.DispatchEventsToSagas(events);
 
             saga.HandledEvents.ShouldBeEquivalentTo(events);
-            sagaRepository.Received(1).SaveChangesAsync();
+            sagaRepository.Received(1).SendSagaCommandsAsync();
         }
 
         [Fact]
@@ -93,7 +93,7 @@ namespace Revo.Infrastructure.Tests.Sagas
 
             saga.Should().NotBeNull();
             saga.HandledEvents.ShouldBeEquivalentTo(events);
-            sagaRepository.Received(1).SaveChangesAsync();
+            sagaRepository.Received(1).SendSagaCommandsAsync();
         }
 
         public class Event1 : DomainEvent

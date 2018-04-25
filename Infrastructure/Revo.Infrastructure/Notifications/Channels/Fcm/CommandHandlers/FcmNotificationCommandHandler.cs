@@ -52,8 +52,7 @@ namespace Revo.Infrastructure.Notifications.Channels.Fcm.CommandHandlers
             token = new FcmUserDeviceToken(Guid.NewGuid(), await userContext.GetUserAsync(),
                 normalizedDeviceToken, message.AppId);
             repository.Add(token);
-
-            await repository.SaveChangesAsync();
+            
             Logger.Debug($"Added external FCM user device registaration for user ID {userContext.UserId}");
         }
 
@@ -68,8 +67,6 @@ namespace Revo.Infrastructure.Notifications.Channels.Fcm.CommandHandlers
             {
                 repository.Remove(token);
             }
-
-            await repository.SaveChangesAsync();
         }
     }
 }

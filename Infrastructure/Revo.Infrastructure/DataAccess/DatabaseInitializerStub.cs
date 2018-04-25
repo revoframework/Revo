@@ -1,18 +1,21 @@
-﻿namespace Revo.Infrastructure.DataAccess
+﻿using System.Threading.Tasks;
+using Revo.Infrastructure.Repositories;
+
+namespace Revo.Infrastructure.DataAccess
 {
     public abstract class DatabaseInitializerStub : IDatabaseInitializer
     {
         private bool isInitialized = false;
 
-        public void Initialize()
+        public async Task InitializeAsync(IRepository repository)
         {
             if (!isInitialized)
             {
-                DoInitialize();
+                await DoInitializeAsync(repository);
                 isInitialized = true;
             }
         }
 
-        protected abstract void DoInitialize();
+        protected abstract Task DoInitializeAsync(IRepository repository);
     }
 }

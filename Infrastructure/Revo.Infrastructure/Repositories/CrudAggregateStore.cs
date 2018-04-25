@@ -4,36 +4,34 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Revo.Core.Events;
-using Revo.DataAccess.EF6.Model;
 using Revo.DataAccess.Entities;
 using Revo.Domain.Entities;
 using Revo.Domain.Entities.Basic;
 using Revo.Domain.Events;
 using Revo.Infrastructure.Events;
-using Revo.Infrastructure.Repositories;
 
-namespace Revo.Infrastructure.EF6.Repositories
+namespace Revo.Infrastructure.Repositories
 {
-    public class EF6AggregateStore : IQueryableAggregateStore
+    internal class CrudAggregateStore : IQueryableAggregateStore
     {
         private readonly ICrudRepository crudRepository;
-        private readonly IModelMetadataExplorer modelMetadataExplorer;
         private readonly IEntityTypeManager entityTypeManager;
         private readonly IPublishEventBuffer publishEventBuffer;
         private readonly IEventMessageFactory eventMessageFactory;
 
-        public EF6AggregateStore(ICrudRepository crudRepository,
-            IModelMetadataExplorer modelMetadataExplorer,
+        public CrudAggregateStore(ICrudRepository crudRepository,
             IEntityTypeManager entityTypeManager,
             IPublishEventBuffer eventQueue,
             IEventMessageFactory eventMessageFactory)
         {
             this.crudRepository = crudRepository;
-            this.modelMetadataExplorer = modelMetadataExplorer;
             this.entityTypeManager = entityTypeManager;
             this.publishEventBuffer = eventQueue;
             this.eventMessageFactory = eventMessageFactory;
         }
+
+        public bool IsChanged => crudRepository
+            .GetEntities<object>(EntityState.Added, EntityState.Deleted, EntityState.Modified).Any();
 
         public void Add<T>(T aggregate) where T : class, IAggregateRoot
         {
@@ -67,7 +65,7 @@ namespace Revo.Infrastructure.EF6.Repositories
 
         public bool CanHandleAggregateType(Type aggregateType)
         {
-            return modelMetadataExplorer.IsTypeMapped(aggregateType);
+            return aggregateType.GetCustomAttributes(typeof(DatabaseEntityAttribute), true).Any();
         }
 
         public T FirstOrDefault<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
@@ -110,13 +108,6 @@ namespace Revo.Infrastructure.EF6.Repositories
             crudRepository.Remove(aggregate);
         }
 
-        public void SaveChanges()
-        {
-            InjectClassIds();
-            crudRepository.SaveChanges();
-            CommitAggregates();
-        }
-
         public async Task SaveChangesAsync()
         {
             InjectClassIds();
@@ -134,18 +125,6 @@ namespace Revo.Infrastructure.EF6.Repositories
                 if (entity.ClassId == Guid.Empty)
                 {
                     entity.ClassId = entityTypeManager.GetClassIdByClrType(entity.GetType());
-                }
-            }
-        }
-        private void CommitAggregates()
-        {
-            foreach (var aggregate in GetTrackedAggregates())
-            {
-                if (aggregate.IsChanged)
-                {
-                    var eventMessages = Task.Run(async () => await CreateEventMessagesAsync(aggregate, aggregate.UncommittedEvents)).Result; // TODO
-                    eventMessages.ForEach(publishEventBuffer.PushEvent);
-                    aggregate.Commit();
                 }
             }
         }

@@ -1,5 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Revo.Core.Core;
 using Revo.Core.Core.Lifecycle;
+using Revo.Core.Transactions;
+using Revo.Infrastructure.Repositories;
 
 namespace Revo.Infrastructure.DataAccess
 {
@@ -7,11 +12,17 @@ namespace Revo.Infrastructure.DataAccess
     {
         private readonly IDatabaseInitializerDiscovery databaseInitializerDiscovery;
         private readonly IDatabaseInitializerComparer comparer;
+        private readonly Func<IRepositoryFactory> repositoryFactoryFunc; // using func factories for late resolving in the scope of different tasks
+        private readonly Func<IUnitOfWorkFactory> unitOfWorkFactoryFunc;
 
-        public DatabaseInitializerLoader(IDatabaseInitializerDiscovery databaseInitializerDiscovery, IDatabaseInitializerComparer comparer)
+        public DatabaseInitializerLoader(IDatabaseInitializerDiscovery databaseInitializerDiscovery,
+            IDatabaseInitializerComparer comparer, Func<IRepositoryFactory> repositoryFactoryFunc,
+            Func<IUnitOfWorkFactory> unitOfWorkFactoryFunc)
         {
             this.databaseInitializerDiscovery = databaseInitializerDiscovery;
             this.comparer = comparer;
+            this.repositoryFactoryFunc = repositoryFactoryFunc;
+            this.unitOfWorkFactoryFunc = unitOfWorkFactoryFunc;
         }
 
         public void OnApplicationStarted()
@@ -19,9 +30,18 @@ namespace Revo.Infrastructure.DataAccess
             var initializers = databaseInitializerDiscovery.DiscoverDatabaseInitializers();
             var sortedInitializers = initializers.ToList();
             sortedInitializers.Sort(comparer);
-            for (int i = 0; i< sortedInitializers.Count; i++)
+
+            foreach (var initializer in sortedInitializers)
             {
-                sortedInitializers[i].Initialize();
+                Task.Factory.StartNewWithContext(async () =>
+                {
+                    using (IUnitOfWork uow = unitOfWorkFactoryFunc().CreateUnitOfWork())
+                    using (IRepository repository = repositoryFactoryFunc().CreateRepository(uow))
+                    {
+                        await initializer.InitializeAsync(repository);
+                        await uow.CommitAsync();
+                    }
+                });
             }
         }
     }

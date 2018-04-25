@@ -1,7 +1,10 @@
-﻿namespace Revo.Infrastructure.DataAccess
+﻿using System.Threading.Tasks;
+using Revo.Infrastructure.Repositories;
+
+namespace Revo.Infrastructure.DataAccess
 {
     public interface IDatabaseInitializer
     {
-        void Initialize();
+        Task InitializeAsync(IRepository repository);
     }
 }

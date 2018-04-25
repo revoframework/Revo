@@ -8,7 +8,7 @@ namespace Revo.Infrastructure.Repositories
     {
         public override void Load()
         {
-            Bind<IRepository, IUnitOfWorkProvider>()
+            Bind<IRepository>()
                 .To<Repository>()
                 .InRequestOrJobScope();
 
@@ -17,7 +17,19 @@ namespace Revo.Infrastructure.Repositories
                 .InTransientScope();
 
             Bind<IAggregateStore>()
+                .To<CrudAggregateStore>()
+                .InTransientScope();
+
+            Bind<IAggregateStoreFactory>()
+                .To<CrudAggregateStoreFactory>()
+                .InTransientScope();
+
+            Bind<IAggregateStore>()
                 .To<EventSourcedAggregateStore>()
+                .InTransientScope();
+
+            Bind<IAggregateStoreFactory>()
+                .To<EventSourcedAggregateStoreFactory>()
                 .InTransientScope();
 
             Bind<IEntityFactory>()

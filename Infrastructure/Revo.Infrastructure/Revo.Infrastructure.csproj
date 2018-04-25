@@ -273,12 +273,16 @@
     <Compile Include="EventSourcing\EntityDeletedException.cs" />
     <Compile Include="EventSourcing\EventSourcedAggregateRepository.cs" />
     <Compile Include="Jobs\Hangfire\HangfireJobEntryPoint.cs" />
+    <Compile Include="Repositories\CrudAggregateStore.cs" />
+    <Compile Include="Repositories\CrudAggregateStoreFactory.cs" />
     <Compile Include="Repositories\EntityFactory.cs" />
     <Compile Include="EventStore\EventStoreEventMessage.cs" />
     <Compile Include="EventStore\EventStreamInfo.cs" />
     <Compile Include="EventStore\EventStreamSlice.cs" />
     <Compile Include="EventSourcing\IEventSourcedAggregateRepository.cs" />
     <Compile Include="EventSourcing\EventSourcingInfrastructureModule.cs" />
+    <Compile Include="Repositories\EventSourcedAggregateStoreFactory.cs" />
+    <Compile Include="Repositories\IAggregateStoreFactory.cs" />
     <Compile Include="Repositories\IEntityFactory.cs" />
     <Compile Include="EventStore\IEventStore.cs" />
     <Compile Include="EventStore\IEventStoreEventMessage.cs" />
@@ -449,7 +453,6 @@
     <Compile Include="Repositories\IRepositoryFactory.cs" />
     <Compile Include="Repositories\Repository.cs" />
     <Compile Include="EventSourcing\EventSourcedRepository.cs" />
-    <Compile Include="EventSourcing\EventSourcedRepositoryTransaction.cs" />
     <Compile Include="EventSourcing\IEventSourcedRepository.cs" />
     <Compile Include="Projections\EntityEventToPocoProjector.cs" />
     <Compile Include="Projections\ICrudEntityProjector.cs" />

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Revo.Core.Events;
 using Revo.Core.Transactions;
 using Revo.Infrastructure.Repositories;
@@ -16,20 +17,32 @@ namespace Revo.Infrastructure.Tests.Repositories
     public class RepositoryTests
     {
         private readonly IPublishEventBuffer publishEventBuffer;
+        private readonly IUnitOfWork unitOfWork;
         private readonly IAggregateStore aggregateStore1;
         private readonly IAggregateStore aggregateStore2;
+        private readonly IAggregateStoreFactory aggregateStoreFactory1;
+        private readonly IAggregateStoreFactory aggregateStoreFactory2;
         private readonly Repository sut;
+
+        private ITransaction uowInnerTransaction = null;
 
         public RepositoryTests()
         {
             publishEventBuffer = Substitute.For<IPublishEventBuffer>();
+            unitOfWork = Substitute.For<IUnitOfWork>();
+            unitOfWork.EventBuffer.Returns(publishEventBuffer);
+            unitOfWork.When(x => x.AddInnerTransaction(Arg.Any<ITransaction>())).Do(ci => uowInnerTransaction = ci.ArgAt<ITransaction>(0));
 
             aggregateStore1 = Substitute.For<IAggregateStore>();
             aggregateStore1.CanHandleAggregateType(typeof(MyEntity1)).Returns(true);
+            aggregateStoreFactory1 = Substitute.For<IAggregateStoreFactory>();
+            aggregateStoreFactory1.CreateAggregateStore(unitOfWork).Returns(aggregateStore1);
 
             aggregateStore2 = Substitute.For<IAggregateStore>();
+            aggregateStoreFactory2 = Substitute.For<IAggregateStoreFactory>();
+            aggregateStoreFactory2.CreateAggregateStore(unitOfWork).Returns(aggregateStore2);
 
-            sut = Substitute.ForPartsOf<Repository>(new[] { aggregateStore2, aggregateStore1 }, publishEventBuffer);
+            sut = Substitute.ForPartsOf<Repository>(new[] { aggregateStoreFactory1, aggregateStoreFactory2 }, unitOfWork);
         }
 
         [Fact]
@@ -52,13 +65,12 @@ namespace Revo.Infrastructure.Tests.Repositories
         }
         
         [Fact]
-        public async Task CreateTransactionAndCommitAsync_CommitsRepository()
+        public async Task Constructor_AddsSaveTransactionToUoW()
         {
-            using (var tx = sut.CreateTransaction())
-            {
-                await tx.CommitAsync();
-            }
-            
+            unitOfWork.Received(1).AddInnerTransaction(Arg.Any<ITransaction>());
+            uowInnerTransaction.Should().NotBeNull();
+
+            await uowInnerTransaction.CommitAsync();
             sut.Received(1).SaveChangesAsync();
         }
 

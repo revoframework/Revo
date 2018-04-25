@@ -8,9 +8,9 @@ namespace Revo.Infrastructure.EventSourcing
     {
         public override void Load()
         {
-            Bind<IEventSourcedAggregateRepository, ITransactionProvider>()
+            Bind<IEventSourcedAggregateRepository>()
                 .To<EventSourcedAggregateRepository>()
-                .InRequestOrJobScope();
+                .InTransientScope();
         }
     }
 }

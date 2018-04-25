@@ -82,12 +82,7 @@ namespace Revo.Infrastructure.EF6.Sagas
                 crudRepository.Remove(key);
             }
         }
-
-        public void SaveChanges()
-        {
-            crudRepository.SaveChanges();
-        }
-
+        
         public Task SaveChangesAsync()
         {
             return crudRepository.SaveChangesAsync();

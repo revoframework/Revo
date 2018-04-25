@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Revo.Core.Commands;
 using Revo.Core.Events;
+using Revo.Core.Transactions;
 using Revo.Domain.Events;
 using Revo.Infrastructure.Events.Async;
 
@@ -9,12 +12,18 @@ namespace Revo.Infrastructure.Sagas
     public class SagaEventListener :
         IAsyncEventListener<DomainEvent>
     {
-        private readonly ISagaEventDispatcher sagaEventDispatcher;
+        private readonly Func<ISagaEventDispatcher> sagaEventDispatcherFunc;
+        private readonly CommandContextStack commandContextStack;
+        private readonly IUnitOfWorkFactory unitOfWorkFactory;
         private readonly List<IEventMessage<DomainEvent>> bufferedEvents = new List<IEventMessage<DomainEvent>>();
 
-        public SagaEventListener(ISagaEventDispatcher sagaEventDispatcher, SagaEventSequencer sagaEventSequencer)
+        public SagaEventListener(SagaEventSequencer sagaEventSequencer,
+            Func<ISagaEventDispatcher> sagaEventDispatcherFunc, CommandContextStack commandContextStack,
+            IUnitOfWorkFactory unitOfWorkFactory)
         {
-            this.sagaEventDispatcher = sagaEventDispatcher;
+            this.sagaEventDispatcherFunc = sagaEventDispatcherFunc;
+            this.commandContextStack = commandContextStack;
+            this.unitOfWorkFactory = unitOfWorkFactory;
             EventSequencer = sagaEventSequencer;
         }
 
@@ -33,8 +42,23 @@ namespace Revo.Infrastructure.Sagas
 
         private async Task DispatchSagaEvents()
         {
-            await sagaEventDispatcher.DispatchEventsToSagas(bufferedEvents);
-            bufferedEvents.Clear();
+            using (IUnitOfWork uow = unitOfWorkFactory.CreateUnitOfWork())
+            {
+                commandContextStack.Push(new CommandContext(null, uow));
+
+                try
+                {
+                    var sagaEventDispatcher = sagaEventDispatcherFunc();
+                    await sagaEventDispatcher.DispatchEventsToSagas(bufferedEvents);
+
+                    await uow.CommitAsync();
+                    bufferedEvents.Clear();
+                }
+                finally
+                {
+                    commandContextStack.Pop();
+                }
+            }
         }
 
         public class SagaEventSequencer : AsyncEventSequencer<DomainEvent>

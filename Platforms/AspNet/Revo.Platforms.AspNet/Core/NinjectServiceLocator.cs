@@ -19,9 +19,19 @@ namespace Revo.Platforms.AspNet.Core
             return kernel.Get(serviceType);
         }
 
+        public T Get<T>()
+        {
+            return kernel.Get<T>();
+        }
+
         public IEnumerable<object> GetAll(Type serviceType)
         {
             return kernel.GetAll(serviceType);
+        }
+
+        public IEnumerable<T> GetAll<T>()
+        {
+            return kernel.GetAll<T>();
         }
     }
 }

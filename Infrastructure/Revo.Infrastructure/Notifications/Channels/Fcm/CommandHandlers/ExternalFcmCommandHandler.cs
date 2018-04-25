@@ -52,8 +52,7 @@ namespace Revo.Infrastructure.Notifications.Channels.Fcm.CommandHandlers
             token = new FcmExternalUserDeviceToken(Guid.NewGuid(), message.UserId,
                 normalizedDeviceToken.Replace(" ", ""), message.AppId);
             repository.Add(token);
-
-            await repository.SaveChangesAsync();
+            
             Logger.Debug($"Added external APNS external user device token for user ID {message.UserId}");
         }
 
@@ -67,7 +66,6 @@ namespace Revo.Infrastructure.Notifications.Channels.Fcm.CommandHandlers
             if (token != null)
             {
                 repository.Remove(token);
-                await repository.SaveChangesAsync();
             }
         }
 

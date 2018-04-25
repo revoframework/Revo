@@ -7,6 +7,8 @@ namespace Revo.Domain.Tests.Entities
 {
     public class AggregateRootTests
     {
+
+
         [Fact]
         public void MarkDeleted_ChangesFlag()
         {

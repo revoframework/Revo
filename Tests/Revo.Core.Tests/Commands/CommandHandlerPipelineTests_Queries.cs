@@ -17,6 +17,7 @@ namespace Revo.Core.Tests.Commands
         private readonly List<IPostCommandFilter<MyQuery>> postFilters = new List<IPostCommandFilter<MyQuery>>();
         private readonly List<IExceptionCommandFilter<MyQuery>> exceptionFilters = new List<IExceptionCommandFilter<MyQuery>>();
         private readonly ICommandHandler<MyQuery, int> decorated;
+        private readonly Func<ICommandHandler<MyQuery, int>> decoratedFunc;
 
         public CommandHandlerPipelineTests_Queries()
         {
@@ -30,9 +31,11 @@ namespace Revo.Core.Tests.Commands
             exceptionFilters.Add(exceptionFilter);
 
             decorated = Substitute.For<ICommandHandler<MyQuery, int>>();
+            decoratedFunc = Substitute.For<Func<ICommandHandler<MyQuery, int>>>();
+            decoratedFunc().Returns(decorated);
 
             sut = new CommandHandlerPipeline<MyQuery, int>(preFilters.ToArray(),
-                postFilters.ToArray(), exceptionFilters.ToArray(), decorated);
+                postFilters.ToArray(), exceptionFilters.ToArray(), decoratedFunc);
         }
 
         [Fact]

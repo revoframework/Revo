@@ -11,7 +11,6 @@ namespace Revo.Infrastructure.Sagas
         Task<SagaMatch[]> FindSagasByKeyAsync(Guid classId, string keyName, string keyValue);
         Task<SagaMetadata> GetSagaMetadataAsync(Guid sagaId);
         Task SetSagaKeysAsync(Guid sagaId, IEnumerable<KeyValuePair<string, string>> keys);
-        void SaveChanges();
         Task SaveChangesAsync();
     }
 }

@@ -76,6 +76,12 @@
     <Reference Include="Ninject, Version=3.3.4.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
       <HintPath>..\..\Packages\Ninject.3.3.4\lib\net45\Ninject.dll</HintPath>
     </Reference>
+    <Reference Include="Ninject.Extensions.ContextPreservation, Version=3.3.1.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\..\Packages\Ninject.Extensions.ContextPreservation.3.3.1\lib\net45\Ninject.Extensions.ContextPreservation.dll</HintPath>
+    </Reference>
+    <Reference Include="Ninject.Extensions.Factory, Version=3.3.2.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\..\Packages\Ninject.Extensions.Factory.3.3.2\lib\net45\Ninject.Extensions.Factory.dll</HintPath>
+    </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\..\Packages\NLog.4.4.13\lib\net45\NLog.dll</HintPath>
     </Reference>
@@ -196,6 +202,8 @@
     <Compile Include="Core\CoreModule.cs" />
     <Compile Include="Core\IConfiguration.cs" />
     <Compile Include="Core\LocalConfiguration.cs" />
+    <Compile Include="Events\IPublishEventBufferFactory.cs" />
+    <Compile Include="Events\PublishEventBufferFactory.cs" />
     <Compile Include="Core\TaskContext.cs" />
     <Compile Include="Core\TaskFactoryExtensions.cs" />
     <Compile Include="Core\ThreadSleep.cs" />
@@ -255,7 +263,6 @@
     <Compile Include="Transactions\IUnitOfWork.cs" />
     <Compile Include="Transactions\IUnitOfWorkFactory.cs" />
     <Compile Include="Transactions\IUnitOfWorkListener.cs" />
-    <Compile Include="Transactions\IUnitOfWorkProvider.cs" />
     <Compile Include="Transactions\UnitOfWorkFactory.cs" />
     <Compile Include="Transactions\UnitOfWork.cs" />
     <Compile Include="Core\TypeExplorer.cs" />

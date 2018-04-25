@@ -52,8 +52,7 @@ namespace Revo.Infrastructure.Notifications.Channels.Apns.CommandHandlers
             token = new ApnsUserDeviceToken(Guid.NewGuid(), await userContext.GetUserAsync(),
                 normalizedDeviceToken, message.AppId);
             repository.Add(token);
-
-            await repository.SaveChangesAsync();
+            
             Logger.Debug($"Added external APNS user device token for user ID {userContext.UserId}");
         }
 
@@ -68,8 +67,6 @@ namespace Revo.Infrastructure.Notifications.Channels.Apns.CommandHandlers
             {
                 repository.Remove(token);
             }
-
-            await repository.SaveChangesAsync();
         }
     }
 }

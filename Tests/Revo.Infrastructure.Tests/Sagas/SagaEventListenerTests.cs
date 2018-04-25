@@ -9,6 +9,7 @@ using Revo.Core.Transactions;
 using Revo.Infrastructure.Sagas;
 using Revo.Testing.Infrastructure;
 using NSubstitute;
+using Revo.Core.Commands;
 using Revo.Domain.Events;
 using Xunit;
 
@@ -23,7 +24,8 @@ namespace Revo.Infrastructure.Tests.Sagas
         {
             sagaEventDispatcher = Substitute.For<ISagaEventDispatcher>();
 
-            sut = new SagaEventListener(sagaEventDispatcher, new SagaEventListener.SagaEventSequencer());
+            sut = new SagaEventListener(new SagaEventListener.SagaEventSequencer(), () => sagaEventDispatcher,
+                new CommandContextStack(), Substitute.For<IUnitOfWorkFactory>());
         }
 
         [Fact]

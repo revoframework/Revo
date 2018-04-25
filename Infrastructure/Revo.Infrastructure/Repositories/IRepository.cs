@@ -8,7 +8,7 @@ using Revo.Domain.Entities;
 
 namespace Revo.Infrastructure.Repositories
 {
-    public interface IRepository : IUnitOfWorkProvider, IDisposable
+    public interface IRepository : IDisposable
     {
         void Add<T>(T aggregate) where T : class, IAggregateRoot;
 
@@ -29,14 +29,6 @@ namespace Revo.Infrastructure.Repositories
         
         void Remove<T>(T aggregate) where T : class, IAggregateRoot;
 
-        /// <summary>
-        /// Saves the repository changes. Not needed when using unit of work.
-        /// </summary>
-        void SaveChanges();
-
-        /// <summary>
-        /// Asynchronously save the repository changes. Not needed when using unit of work.
-        /// </summary>
         Task SaveChangesAsync();
     }
 }

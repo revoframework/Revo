@@ -1,23 +1,22 @@
 ﻿using System;
+using System.Linq;
 using Revo.Core.Events;
+using Revo.Core.Transactions;
 
 namespace Revo.Infrastructure.Repositories
 {
     public class RepositoryFactory : IRepositoryFactory
     {
-        private readonly Func<IAggregateStore[]> aggregateStoresFunc;
-        private readonly Func<IPublishEventBuffer> eventQueueFunc;
+        private readonly IAggregateStoreFactory[] aggregateStoreFactories;
 
-        public RepositoryFactory(Func<IAggregateStore[]> aggregateStoresFunc,
-            Func<IPublishEventBuffer> eventQueueFunc)
+        public RepositoryFactory(IAggregateStoreFactory[] aggregateStoreFactories)
         {
-            this.aggregateStoresFunc = aggregateStoresFunc;
-            this.eventQueueFunc = eventQueueFunc;
+            this.aggregateStoreFactories = aggregateStoreFactories;
         }
 
-        public IRepository CreateRepository(IPublishEventBuffer eventQueue = null)
+        public IRepository CreateRepository(IUnitOfWork unitOfWork)
         {
-            return new Repository(aggregateStoresFunc(), eventQueue ?? eventQueueFunc());
+            return new Repository(aggregateStoreFactories, unitOfWork);
         }
     }
 }

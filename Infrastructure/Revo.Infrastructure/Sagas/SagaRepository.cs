@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Revo.Core.Commands;
 using Revo.Core.Events;
+using Revo.Core.Transactions;
 using Revo.DataAccess.Entities;
 using Revo.Domain.Entities;
 using Revo.Domain.Sagas;
@@ -27,12 +28,15 @@ namespace Revo.Infrastructure.Sagas
         public SagaRepository(ICommandBus commandBus,
             IRepository repository,
             ISagaMetadataRepository metadataRepository,
-            IEntityTypeManager entityTypeManager)
+            IEntityTypeManager entityTypeManager,
+            IUnitOfWork unitOfWork)
         {
             this.commandBus = commandBus;
             this.repository = repository;
-            MetadataRepository = metadataRepository;
             this.entityTypeManager = entityTypeManager;
+            MetadataRepository = metadataRepository;
+
+            unitOfWork.AddInnerTransaction(new SagaRepositoryTransaction(this));
         }
 
         public ISagaMetadataRepository MetadataRepository { get; }
@@ -83,15 +87,12 @@ namespace Revo.Infrastructure.Sagas
             return loadedSaga;
         }
 
-        public async Task SaveChangesAsync()
+        public async Task SendSagaCommandsAsync()
         {
             List<ICommandBase> bufferedCommands = new List<ICommandBase>();
 
             foreach (var sagaPair in sagas)
             {
-                await MetadataRepository.SetSagaKeysAsync(sagaPair.Value.Id,
-                    sagaPair.Value.Keys.SelectMany(x => x.Value.Select(y => new KeyValuePair<string, string>(x.Key, y))));
-
                 if (sagaPair.Value.IsChanged)
                 {
                     bufferedCommands.AddRange(sagaPair.Value.UncommitedCommands);
@@ -102,14 +103,40 @@ namespace Revo.Infrastructure.Sagas
             {
                 await commandBus.SendAsync(command);
             }
+        }
 
-            await repository.SaveChangesAsync();
-            await MetadataRepository.SaveChangesAsync();
+        public async Task UpdateSagaMetadatasAsync()
+        {
+            foreach (var sagaPair in sagas)
+            {
+                await MetadataRepository.SetSagaKeysAsync(sagaPair.Value.Id,
+                    sagaPair.Value.Keys.SelectMany(x => x.Value.Select(y => new KeyValuePair<string, string>(x.Key, y))));
+            }
         }
 
         private async Task<ISaga> GetAsyncInternal<T>(Guid id) where T : class, ISaga
         {
             return await GetAsync<T>(id);
+        }
+
+        protected class SagaRepositoryTransaction : ITransaction
+        {
+            private readonly SagaRepository repository;
+
+            public SagaRepositoryTransaction(SagaRepository repository)
+            {
+                this.repository = repository;
+            }
+
+            public async Task CommitAsync()
+            {
+                await repository.UpdateSagaMetadatasAsync();
+                await repository.MetadataRepository.SaveChangesAsync();
+            }
+
+            public void Dispose()
+            {
+            }
         }
     }
 }

@@ -16,6 +16,7 @@ using Revo.Infrastructure.EventSourcing;
 using Revo.Infrastructure.EventStore;
 using Revo.Infrastructure.Sagas;
 using NSubstitute;
+using Revo.Core.Transactions;
 using Revo.Domain.Entities;
 using Revo.Domain.Sagas;
 using Revo.Infrastructure.Repositories;
@@ -26,18 +27,21 @@ namespace Revo.Infrastructure.Tests.Sagas
 {
     public class SagaRepositoryTests
     {
+        private readonly IUnitOfWork unitOfWork;
         private readonly ICommandBus commandBus;
         private readonly ISagaMetadataRepository sagaMetadataRepository;
         private readonly IEntityTypeManager entityTypeManager;
         private readonly FakeRepository repository;
-
+        private readonly Guid saga1ClassId = Guid.NewGuid();
         private readonly SagaRepository sut;
 
-
-        private readonly Guid saga1ClassId = Guid.NewGuid();
+        private ITransaction uowInnerTransaction = null;
 
         public SagaRepositoryTests()
         {
+            unitOfWork = Substitute.For<IUnitOfWork>();
+            unitOfWork.When(x => x.AddInnerTransaction(Arg.Any<ITransaction>())).Do(ci => uowInnerTransaction = ci.ArgAt<ITransaction>(0));
+
             commandBus = Substitute.For<ICommandBus>();
             sagaMetadataRepository = Substitute.For<ISagaMetadataRepository>();
             entityTypeManager = Substitute.For<IEntityTypeManager>();
@@ -50,7 +54,7 @@ namespace Revo.Infrastructure.Tests.Sagas
             entityTypeManager.GetClassIdByClrType(typeof(Saga1))
                 .Returns(saga1ClassId);
             
-            sut = new SagaRepository(commandBus, repository, sagaMetadataRepository, entityTypeManager);
+            sut = new SagaRepository(commandBus, repository, sagaMetadataRepository, entityTypeManager, unitOfWork);
         }
 
         [Fact]
@@ -122,7 +126,7 @@ namespace Revo.Infrastructure.Tests.Sagas
         }
 
         [Fact]
-        public async Task SaveChangesAsync_SendsCommands()
+        public async Task SendSagaCommandsAsync_SendsCommands()
         {
             Saga1 saga1 = new Saga1(Guid.NewGuid());
             saga1.Do();
@@ -130,30 +134,17 @@ namespace Revo.Infrastructure.Tests.Sagas
 
             ICommandBase command = saga1.UncommitedCommands.First();
 
-            await sut.SaveChangesAsync();
+            await sut.SendSagaCommandsAsync();
 
             commandBus.Received(1).SendAsync(command);
         }
 
         [Fact]
-        public async Task SaveChangesAsync_PublishesCommandsSavesSagasAndMetadataInOrder()
+        public async Task Constructor_AddsMetadataSaveTransactionToUoW()
         {
-            var saga = new Saga1(Guid.NewGuid());
-            saga.Do();
-            sut.Add(saga);
-            await sut.SaveChangesAsync();
+            unitOfWork.Received(1).AddInnerTransaction(Arg.Any<ITransaction>());
+            uowInnerTransaction.Should().NotBeNull();
 
-            Received.InOrder(() =>
-            {
-                commandBus.SendAsync(Arg.Any<ICommandBase>(), Arg.Any<CancellationToken>());
-                repository.SaveChangesAsync();
-                sagaMetadataRepository.SaveChangesAsync();
-            });
-        }
-
-        [Fact]
-        public async Task SaveChangesAsync_SetsAndSavesMetadata()
-        {
             Saga1 saga1 = new Saga1(Guid.NewGuid());
             saga1.Do();
             sut.Add(saga1);
@@ -162,7 +153,9 @@ namespace Revo.Infrastructure.Tests.Sagas
             sagaMetadataRepository.When(x => x.SetSagaKeysAsync(saga1.Id, Arg.Any<IEnumerable<KeyValuePair<string, string>>>())).Do(
                 ci => sagaKeys = ci.ArgAt<IEnumerable<KeyValuePair<string, string>>>(1));
 
-            await sut.SaveChangesAsync();
+            await uowInnerTransaction.CommitAsync();
+
+            sagaMetadataRepository.Received(1).SaveChangesAsync();
 
             Received.InOrder(() =>
             {

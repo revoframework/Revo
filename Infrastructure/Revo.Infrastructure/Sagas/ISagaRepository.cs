@@ -14,6 +14,6 @@ namespace Revo.Infrastructure.Sagas
         void Add(ISaga saga);
         Task<ISaga> GetAsync(Guid id, Guid classId);
         Task<T> GetAsync<T>(Guid id) where T : class, ISaga;
-        Task SaveChangesAsync();
+        Task SendSagaCommandsAsync();
     }
 }

@@ -60,7 +60,7 @@ namespace Revo.Infrastructure.Sagas
                 }
             }
 
-            await sagaRepository.SaveChangesAsync();
+            await sagaRepository.SendSagaCommandsAsync();
         }
 
         private async Task<ISaga> GetSagaAsync<T>(Guid id) where T : class, ISaga

@@ -21,7 +21,6 @@ namespace Revo.Infrastructure.Tests.DataAccess
         {
             repository = new FakeRepository();
             sut = new TestClassifierDatabaseInitializer();
-            sut.Repository = repository;
         }
 
         [Fact]
@@ -32,12 +31,12 @@ namespace Revo.Infrastructure.Tests.DataAccess
         }
 
         [Fact]
-        public void Initialize_AddsMissingEntities()
+        public async Task Initialize_AddsMissingEntities()
         {
             repository.Add(TestClassifierDatabaseInitializer.First);
             repository.SaveChanges();
 
-            sut.Initialize();
+            await sut.InitializeAsync(repository);
 
             Assert.Equal(2, repository.FindAll<TestClassifier>().Count());
             Assert.Contains(repository.FindAll<TestClassifier>(), x => x.Id == TestClassifierDatabaseInitializer.Second.Id);

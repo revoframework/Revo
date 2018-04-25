@@ -1,38 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using NSubstitute;
 using Revo.Core.Events;
 using Revo.DataAccess.EF6.Model;
-using Revo.Infrastructure.EF6.Repositories;
-using Revo.Infrastructure.Events;
-using Revo.Testing.Infrastructure;
-using NSubstitute;
 using Revo.DataAccess.InMemory;
 using Revo.Domain.Entities;
 using Revo.Domain.Entities.Attributes;
 using Revo.Domain.Entities.Basic;
 using Revo.Domain.Events;
+using Revo.Infrastructure.Events;
+using Revo.Infrastructure.Repositories;
 using Xunit;
 
-namespace Revo.Infrastructure.EF6.Tests.Repositories
+namespace Revo.Infrastructure.Tests.Repositories
 {
-    public class EF6AggregateStoreTests
+    public class CrudAggregateStoreTests
     {
         private const string TestAggregateClassId = "{4057D3AC-2D96-4C25-935D-F72BAC6BA626}";
 
-        private readonly EF6AggregateStore sut;
+        private readonly CrudAggregateStore sut;
         private readonly InMemoryCrudRepository crudRepository;
-        private readonly IModelMetadataExplorer modelMetadataExplorer;
         private readonly IEntityTypeManager entityTypeManager;
         private readonly IPublishEventBuffer publishEventBuffer;
         private readonly IEventMessageFactory eventMessageFactory;
 
-        public EF6AggregateStoreTests()
+        public CrudAggregateStoreTests()
         {
             crudRepository = new InMemoryCrudRepository();
-            modelMetadataExplorer = Substitute.For<IModelMetadataExplorer>();
             entityTypeManager = Substitute.For<IEntityTypeManager>();
             publishEventBuffer = Substitute.For<IPublishEventBuffer>();
 
@@ -49,27 +44,29 @@ namespace Revo.Infrastructure.EF6.Tests.Repositories
             }); // TODO something more lightweight?
 
 
-            sut = new EF6AggregateStore(crudRepository, modelMetadataExplorer, entityTypeManager, publishEventBuffer, eventMessageFactory);
+            sut = new CrudAggregateStore(crudRepository, entityTypeManager, publishEventBuffer, eventMessageFactory);
         }
 
         [Fact]
-        public void SaveChanges_InjectsClassIds()
+        public async Task SaveChanges_InjectsClassIds()
         {
             TestAggregate testAggregate = new TestAggregate(Guid.NewGuid());
             sut.Add(testAggregate);
-            sut.SaveChanges();
+
+            await sut.SaveChangesAsync();
 
             Assert.Equal(Guid.Parse(TestAggregateClassId), testAggregate.ClassId);
         }
 
         [Fact]
-        public void SaveChanges_PushesEventsForPublishing()
+        public async Task SaveChanges_PushesEventsForPublishing()
         {
             TestAggregate testAggregate = new TestAggregate(Guid.NewGuid());
             sut.Add(testAggregate);
             testAggregate.Do();
             var event1 = testAggregate.UncommittedEvents.First();
-            sut.SaveChanges();
+
+            await sut.SaveChangesAsync();
 
             publishEventBuffer.Received(1).PushEvent(Arg.Is<IEventMessage>(x => x.Event == event1));
         }
@@ -77,22 +74,24 @@ namespace Revo.Infrastructure.EF6.Tests.Repositories
         // TODO test pushed event metadata
 
         [Fact]
-        public void SaveChanges_CommitsAggregates()
+        public async Task SaveChanges_CommitsAggregates()
         {
             TestAggregate testAggregate = Substitute.ForPartsOf<TestAggregate>(new object[] { Guid.NewGuid() });
             sut.Add(testAggregate);
             testAggregate.Do();
-            sut.SaveChanges();
+
+            await sut.SaveChangesAsync();
 
             testAggregate.Received(1).Commit();
         }
         
         [Fact]
-        public void SaveChanges_CommitsOnlyChangedAggregates()
+        public async Task SaveChanges_CommitsOnlyChangedAggregates()
         {
             TestAggregate testAggregate = Substitute.ForPartsOf<TestAggregate>(new object[] {Guid.NewGuid()});
             sut.Add(testAggregate);
-            sut.SaveChanges();
+
+            await sut.SaveChangesAsync();
 
             testAggregate.Received(0).Commit();
         }

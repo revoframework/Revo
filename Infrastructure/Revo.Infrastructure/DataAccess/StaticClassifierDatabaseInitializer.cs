@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Ninject;
 using Revo.Domain.Entities;
 using Revo.Infrastructure.Repositories;
@@ -21,26 +22,16 @@ namespace Revo.Infrastructure.DataAccess
             }
         }
 
-        [Inject] // exceptionally not using constructor injection to make usage easier
-        public IRepository Repository { get; set; }
-
-        public void Initialize()
+        public async Task InitializeAsync(IRepository repository)
         {
-            if (Repository == null)
-            {
-                throw new InvalidOperationException($"Cannot initialize {this.GetType().FullName} without first setting Repository");
-            }
-
-            List<T> existing = Repository.FindAll<T>().ToList();
+            IList<T> existing = await repository.FindAllAsync<T>();
             IEnumerable<T> known = this.All;
 
             foreach (T entity in /*known.Except(existing)*/
                 known.Where(x => !existing.Any(y => y.Id == x.Id)))
             {
-                Repository.Add(entity);
+                repository.Add(entity);
             }
-
-            Repository.SaveChanges();
         }
     }
 }

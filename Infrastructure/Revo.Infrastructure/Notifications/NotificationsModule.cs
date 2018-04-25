@@ -37,7 +37,7 @@ namespace Revo.Infrastructure.Notifications
 
             Bind<ICrudRepository>()
                 //.To<CrudRepository>()
-                .ToMethod(ctx => ctx.Kernel.Get<Func<ICrudRepository>>()())
+                .ToMethod(ctx => ctx.Kernel.Get<Func<ICrudRepository>>()()) // TODO probably won't work & needs an explicit factory
                 .WhenInjectedInto<BufferedNotificationStore>()
                 .InTransientScope();
         }

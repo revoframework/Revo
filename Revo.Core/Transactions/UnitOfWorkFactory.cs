@@ -6,26 +6,20 @@ namespace Revo.Core.Transactions
 {
     public class UnitOfWorkFactory : IUnitOfWorkFactory
     {
-        private readonly IUnitOfWorkProvider[] transactionProviders;
         private readonly IUnitOfWorkListener[] unitOfWorkListeners;
-        private readonly Func<IPublishEventBuffer> publishEventBufferFunc;
+        private readonly IPublishEventBufferFactory publishEventBufferFactory;
 
-        public UnitOfWorkFactory(IUnitOfWorkProvider[] transactionProviders,
+        public UnitOfWorkFactory(
             IUnitOfWorkListener[] unitOfWorkListeners,
-            Func<IPublishEventBuffer> publishEventBufferFunc)
+            IPublishEventBufferFactory publishEventBufferFactory)
         {
-            this.transactionProviders = transactionProviders;
             this.unitOfWorkListeners = unitOfWorkListeners;
-            this.publishEventBufferFunc = publishEventBufferFunc;
+            this.publishEventBufferFactory = publishEventBufferFactory;
         }
 
         public IUnitOfWork CreateUnitOfWork()
         {
-            ITransaction[] transactions = transactionProviders
-                .Select(x => x.CreateTransaction())
-                .ToArray();
-
-            var tx = new UnitOfWork(transactions, unitOfWorkListeners, publishEventBufferFunc());
+            var tx = new UnitOfWork(unitOfWorkListeners, publishEventBufferFactory.CreatEventBuffer());
             return tx;
         }
     }

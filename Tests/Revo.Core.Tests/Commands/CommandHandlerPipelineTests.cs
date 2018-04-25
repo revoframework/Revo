@@ -16,6 +16,7 @@ namespace Revo.Core.Tests.Commands
         private readonly List<IPostCommandFilter<MyCommand>> postFilters = new List<IPostCommandFilter<MyCommand>>();
         private readonly List<IExceptionCommandFilter<MyCommand>> exceptionFilters = new List<IExceptionCommandFilter<MyCommand>>();
         private readonly ICommandHandler<MyCommand> decorated;
+        private readonly Func<ICommandHandler<MyCommand>> decoratedFunc;
 
         public CommandHandlerPipelineTests()
         {
@@ -29,9 +30,11 @@ namespace Revo.Core.Tests.Commands
             exceptionFilters.Add(exceptionFilter);
 
             decorated = Substitute.For<ICommandHandler<MyCommand>>();
+            decoratedFunc = Substitute.For<Func<ICommandHandler<MyCommand>>>();
+            decoratedFunc().Returns(decorated);
 
             sut = new CommandHandlerPipeline<MyCommand>(preFilters.ToArray(),
-                postFilters.ToArray(), exceptionFilters.ToArray(), decorated);
+                postFilters.ToArray(), exceptionFilters.ToArray(), decoratedFunc);
         }
 
         [Fact]
@@ -60,7 +63,8 @@ namespace Revo.Core.Tests.Commands
             await Assert.ThrowsAsync<Exception>(() =>
                 sut.HandleAsync(command, new CancellationToken()));
 
-            decorated.DidNotReceiveWithAnyArgs().HandleAsync(command, new CancellationToken());
+            decoratedFunc.DidNotReceive().Invoke();
+            decorated.DidNotReceiveWithAnyArgs().HandleAsync(command, new CancellationToken()); // probably redundant with previous line
         }
 
         [Fact]

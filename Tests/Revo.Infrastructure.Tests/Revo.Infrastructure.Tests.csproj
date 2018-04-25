@@ -180,6 +180,7 @@
     <Compile Include="Notifications\NotificationBusTests.cs" />
     <Compile Include="Notifications\NotificationPipelineTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repositories\CrudAggregateStoreTests.cs" />
     <Compile Include="Repositories\EventSourcedAggregateStoreTests.cs" />
     <Compile Include="Repositories\RepositoryExtensionsTests.cs" />
     <Compile Include="Repositories\RepositoryTests.cs" />

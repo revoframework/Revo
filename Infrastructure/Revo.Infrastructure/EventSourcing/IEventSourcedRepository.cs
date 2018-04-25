@@ -7,10 +7,11 @@ using Revo.Domain.Entities.EventSourcing;
 
 namespace Revo.Infrastructure.EventSourcing
 {
-    public interface IEventSourcedRepository<TBase> : ITransactionProvider
+    internal interface IEventSourcedRepository<TBase>
         where TBase : class, IEventSourcedAggregateRoot
     {
         IEnumerable<IRepositoryFilter> DefaultFilters { get; }
+        bool IsChanged { get; }
 
         void Add<T>(T aggregate) where T : class, TBase;
 
@@ -27,15 +28,7 @@ namespace Revo.Infrastructure.EventSourcing
         IEnumerable<TBase> GetLoadedAggregates();
 
         void Remove<T>(T aggregateRoot) where T : class, TBase;
-
-        /// <summary>
-        /// Saves the repository changes. Not needed when using unit of work.
-        /// </summary>
-        void SaveChanges();
-
-        /// <summary>
-        /// Asynchronously save the repository changes. Not needed when using unit of work.
-        /// </summary>
+        
         Task SaveChangesAsync();
     }
 }

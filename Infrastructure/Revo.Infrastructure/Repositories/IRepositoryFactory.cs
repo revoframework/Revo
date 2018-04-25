@@ -1,9 +1,10 @@
 ﻿using Revo.Core.Events;
+using Revo.Core.Transactions;
 
 namespace Revo.Infrastructure.Repositories
 {
     public interface IRepositoryFactory
     {
-        IRepository CreateRepository(IPublishEventBuffer eventQueue = null);
+        IRepository CreateRepository(IUnitOfWork unitOfWork);
     }
 }

@@ -3,6 +3,7 @@ using Ninject.Modules;
 using Revo.Core.Core;
 using Revo.Core.Core.Lifecycle;
 using Revo.Core.Events;
+using Revo.Core.Transactions;
 using Revo.Domain.Events;
 using Revo.Infrastructure.Events.Async;
 using Revo.Infrastructure.Repositories;
@@ -29,19 +30,18 @@ namespace Revo.Infrastructure.Sagas
                 .To<SagaConfigurationLoader>()
                 .InSingletonScope();
 
-            Bind<ISagaRepository>() //itransactionprovider?
+            Bind<ISagaRepository>()
                 .To<SagaRepository>()
-                .InRequestOrJobScope();
+                .InTransientScope();
 
             Bind<IRepository>()
-                .ToMethod(ctx =>
-                    ctx.Kernel.Get<IRepositoryFactory>().CreateRepository(ctx.Kernel.Get<IPublishEventBuffer>()))
+                .To<Repository>()
                 .WhenInjectedInto<SagaRepository>()
-                .InRequestOrJobScope();
-
+                .InTransientScope();
+            
             Bind<ISagaEventDispatcher>()
                 .To<SagaEventDispatcher>()
-                .InRequestOrJobScope();
+                .InTransientScope();
 
             Bind<IAsyncEventSequencer<DomainEvent>, SagaEventListener.SagaEventSequencer>()
                 .To<SagaEventListener.SagaEventSequencer>()

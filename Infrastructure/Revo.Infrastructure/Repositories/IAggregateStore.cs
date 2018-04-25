@@ -7,6 +7,8 @@ namespace Revo.Infrastructure.Repositories
 {
     public interface IAggregateStore
     {
+        bool IsChanged { get; }
+
         void Add<T>(T aggregate) where T : class, IAggregateRoot;
 
         bool CanHandleAggregateType(Type aggregateType);
@@ -21,7 +23,6 @@ namespace Revo.Infrastructure.Repositories
 
         void Remove<T>(T entity) where T : class, IAggregateRoot;
         
-        void SaveChanges();
         Task SaveChangesAsync();
     }
 }

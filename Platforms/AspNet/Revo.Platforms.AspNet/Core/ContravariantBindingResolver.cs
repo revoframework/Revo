@@ -31,7 +31,7 @@ namespace Revo.Platforms.AspNet.Core
                                                         && kvp.Key.GetGenericTypeDefinition() == genericType
                                                         && kvp.Key.GetGenericArguments().Single() != argument
                                                         && kvp.Key.GetGenericArguments().Single().IsAssignableFrom(argument))
-                                          .SelectMany(kvp => kvp.Value);
+                        .SelectMany(kvp => kvp.Value);
                     return matches;
                 }
             }

@@ -1,4 +1,6 @@
-﻿using Ninject;
+﻿using System;
+using Ninject;
+using Ninject.Extensions.ContextPreservation;
 using Ninject.Modules;
 using Revo.Core.Commands;
 using Revo.Core.Core.Lifecycle;
@@ -32,12 +34,16 @@ namespace Revo.Core.Core
                 .InRequestOrJobScope();
 
             Bind<IUnitOfWork>()
-                .ToMethod(ctx => ctx.Kernel.Get<ICommandContext>().UnitOfWork)
+                .ToMethod(ctx => ctx.ContextPreservingGet<ICommandContext>().UnitOfWork ?? throw new InvalidOperationException("Trying to resolve IUnitOfWork when there is no instance active in current command context"))
                 .InTransientScope();
 
-            Bind<IPublishEventBuffer>()
-                .To<PublishEventBuffer>()
+            Bind<IPublishEventBufferFactory>()
+                .To<PublishEventBufferFactory>()
                 .InRequestOrJobScope();
+
+            Bind<IPublishEventBuffer>()
+                .ToMethod(ctx => ctx.ContextPreservingGet<IUnitOfWork>().EventBuffer)
+                .InTransientScope();
         }
     }
 }

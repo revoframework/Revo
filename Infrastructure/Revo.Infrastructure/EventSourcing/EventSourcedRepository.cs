@@ -14,7 +14,7 @@ using Revo.Infrastructure.Repositories;
 
 namespace Revo.Infrastructure.EventSourcing
 {
-    public class EventSourcedRepository<TBase> : IEventSourcedRepository<TBase>,
+    internal class EventSourcedRepository<TBase> : IEventSourcedRepository<TBase>,
         IFilteringRepository<IEventSourcedRepository<TBase>>
         where TBase : class, IEventSourcedAggregateRoot
     {
@@ -54,14 +54,10 @@ namespace Revo.Infrastructure.EventSourcing
         }
 
         public IEnumerable<IRepositoryFilter> DefaultFilters => repositoryFilters;
+        public bool IsChanged => aggregates.Values.Any(x => x.IsChanged);
 
         protected virtual IEntityFactory EntityFactory { get; }
-
-        public ITransaction CreateTransaction()
-        {
-            return new EventSourcedRepositoryTransaction<TBase>(this);
-        }
-
+        
         public void Add<T>(T aggregate) where T : class, TBase
         {
             if (aggregates.ContainsKey(aggregate.Id))
@@ -158,50 +154,10 @@ namespace Revo.Infrastructure.EventSourcing
                 eventMessageFactory,
                 aggregates);
         }
-
-        public virtual void SaveChanges()
-        {
-            // TODO refactor with async version
-
-            List<TBase> savedAggregates = aggregates.Values.Where(x => x.UncommittedEvents.Any()).ToList();
-            if (savedAggregates.Any())
-            {
-                foreach (var aggregate in savedAggregates)
-                {
-                    CheckEvents(aggregate, aggregate.UncommittedEvents);
-
-                    if (aggregate.Version == 0)
-                    {
-                        FilterAdded(aggregate);
-                    }
-                    else
-                    {
-                        FilterModified(aggregate);
-                    }
-                }
-
-                List<IEventMessageDraft> allEventMessages = new List<IEventMessageDraft>();
-
-                foreach (var aggregate in savedAggregates)
-                {
-                    var eventMessages = CreateEventMessages(aggregate, aggregate.UncommittedEvents);
-                    var eventRecords = eventMessages.Select(x => new UncommitedEventStoreRecord(x.Event, x.Metadata)).ToList();
-
-                    eventStore.PushEvents(aggregate.Id, eventRecords, aggregate.Version);
-
-                    allEventMessages.AddRange(eventMessages);
-                }
-
-                eventStore.CommitChanges();
-                allEventMessages.ForEach(publishEventBuffer.PushEvent);
-            }
-
-            CommitAggregates();
-        }
-
+        
         public virtual async Task SaveChangesAsync()
         {
-            List<TBase> savedAggregates = aggregates.Values.Where(x => x.UncommittedEvents.Any()).ToList();
+            List<TBase> savedAggregates = aggregates.Values.Where(x => x.IsChanged).ToList();
             if (savedAggregates.Any())
             {
                 foreach (var aggregate in savedAggregates)
@@ -270,12 +226,7 @@ namespace Revo.Infrastructure.EventSourcing
                 }
             }
         }
-
-        private List<IEventMessageDraft> CreateEventMessages(TBase aggregate, IReadOnlyCollection<DomainAggregateEvent> events)
-        {
-            return Task.Run(() => CreateEventMessagesAsync(aggregate, events)).GetAwaiter().GetResult(); // TODO?
-        }
-
+        
         private async Task<List<IEventMessageDraft>> CreateEventMessagesAsync(TBase aggregate, IReadOnlyCollection<DomainAggregateEvent> events)
         {
             var messages = new List<IEventMessageDraft>();

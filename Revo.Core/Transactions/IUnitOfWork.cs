@@ -5,5 +5,6 @@ namespace Revo.Core.Transactions
     public interface IUnitOfWork : ITransaction
     {
         IPublishEventBuffer EventBuffer { get; }
+        void AddInnerTransaction(ITransaction innerTransaction);
     }
 }

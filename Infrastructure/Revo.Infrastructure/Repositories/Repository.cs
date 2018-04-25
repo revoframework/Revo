@@ -12,12 +12,11 @@ namespace Revo.Infrastructure.Repositories
     public class Repository : IRepository
     {
         private readonly IAggregateStore[] aggregateStores;
-        private readonly IPublishEventBuffer eventQueue; 
 
-        public Repository(IAggregateStore[] aggregateStores, IPublishEventBuffer eventQueue)
+        public Repository(IAggregateStoreFactory[] aggregateStoreFactories, IUnitOfWork unitOfWork)
         {
-            this.aggregateStores = aggregateStores;
-            this.eventQueue = eventQueue;
+            aggregateStores = aggregateStoreFactories.Select(x => x.CreateAggregateStore(unitOfWork)).ToArray();
+            unitOfWork.AddInnerTransaction(new RepositoryTransaction(this));
         }
 
         public IAggregateStore GetAggregateStore(Type entityType)
@@ -46,47 +45,19 @@ namespace Revo.Infrastructure.Repositories
 
         public void Add<T>(T aggregate) where T : class, IAggregateRoot
         {
-            /*if (aggregates.ContainsKey(aggregate.Id))
-            {
-                throw new ArgumentException($"Duplicate aggregate root with ID '{aggregate.Id}' and type '{typeof(T).FullName}'");
-            }*/
-
             var aggregateStore = GetAggregateStore<T>();
             aggregateStore.Add(aggregate);
-            //AddTrackedAggregate(aggregate, aggregateStore);
         }
-
-        public ITransaction CreateTransaction()
-        {
-            return new RepositoryTransaction(this);
-        }
-
+        
         public void Dispose()
         {
             // TODO ?
-        }
-
-        public void SaveChanges()
-        {
-            foreach (var aggregateStore in aggregateStores)
-            {
-                aggregateStore.SaveChanges();
-            }
-        }
-
-        public async Task SaveChangesAsync()
-        {
-            foreach (var aggregateStore in aggregateStores)
-            {
-                await aggregateStore.SaveChangesAsync();
-            }
         }
 
         public T FirstOrDefault<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
         {
             var aggregateStore = GetQueyrableAggregateStore<T>();
             T aggregate = aggregateStore.FirstOrDefault(predicate);
-            //AddTrackedAggregate(aggregate, aggregateStore);
             return aggregate;
         }
 
@@ -94,7 +65,6 @@ namespace Revo.Infrastructure.Repositories
         {
             var aggregateStore = GetQueyrableAggregateStore<T>();
             T aggregate = aggregateStore.First(predicate);
-            //AddTrackedAggregate(aggregate, aggregateStore);
             return aggregate;
         }
 
@@ -102,7 +72,6 @@ namespace Revo.Infrastructure.Repositories
         {
             var aggregateStore = GetQueyrableAggregateStore<T>();
             T aggregate = await aggregateStore.FirstOrDefaultAsync(predicate);
-            //AddTrackedAggregate(aggregate, aggregateStore);
             return aggregate;
         }
 
@@ -110,7 +79,6 @@ namespace Revo.Infrastructure.Repositories
         {
             var aggregateStore = GetQueyrableAggregateStore<T>();
             T aggregate = await aggregateStore.FirstAsync(predicate);
-            //AddTrackedAggregate(aggregate, aggregateStore);
             return aggregate;
         }
 
@@ -118,7 +86,6 @@ namespace Revo.Infrastructure.Repositories
         {
             var aggregateStore = GetAggregateStore<T>();
             T aggregate = aggregateStore.Find<T>(id);
-            //AddTrackedAggregate(aggregate, aggregateStore);
             return aggregate;
         }
 
@@ -126,7 +93,6 @@ namespace Revo.Infrastructure.Repositories
         {
             var aggregateStore = GetAggregateStore<T>();
             T aggregate = await aggregateStore.FindAsync<T>(id);
-            //AddTrackedAggregate(aggregate, aggregateStore);
             return aggregate;
         }
 
@@ -146,7 +112,6 @@ namespace Revo.Infrastructure.Repositories
         {
             var aggregateStore = GetAggregateStore<T>();
             T aggregate = aggregateStore.Get<T>(id);
-            //AddTrackedAggregate(aggregate, aggregateStore);
             return aggregate;
         }
 
@@ -154,7 +119,6 @@ namespace Revo.Infrastructure.Repositories
         {
             var aggregateStore = GetAggregateStore<T>();
             T aggregate = await aggregateStore.GetAsync<T>(id);
-            //AddTrackedAggregate(aggregate, aggregateStore);
             return aggregate;
         }
 
@@ -168,23 +132,23 @@ namespace Revo.Infrastructure.Repositories
         {
             var aggregateStore = GetQueyrableAggregateStore<T>();
             aggregateStore.Remove(aggregate);
-            //RemoveTrackedAggregate(aggregate, aggregateStore);
         }
-
-        /*private void AddTrackedAggregate(IAggregateRoot aggregate, IAggregateStore aggregateStore)
+        
+        public async Task SaveChangesAsync()
         {
-            aggregates.Add(aggregate.Id, aggregate);
-            aggregateStores[aggregateStore].Add(aggregate);
-        }
+            var modifiedStores = aggregateStores.Where(x => x.IsChanged).ToArray();
 
-        private void RemoveTrackedAggregate(IAggregateRoot aggregate, IAggregateStore aggregateStore)
-        {
-            if (aggregateStore != null)
+            if (modifiedStores.Length > 1)
             {
-                aggregates.Remove(aggregate.Id);
-                aggregateStores[aggregateStore].Remove(aggregate);
+                throw new InvalidOperationException($"It is forbidden to modify aggregates from more than one aggregate store ("
+                                                    + $"{string.Join(", ", modifiedStores.Select(x => x.GetType().Name))}) within a single save operation.");
             }
-        }*/
+
+            if (modifiedStores.Length > 0)
+            {
+                await modifiedStores.First().SaveChangesAsync();
+            }
+        }
 
         protected class RepositoryTransaction : ITransaction
         {
@@ -194,12 +158,7 @@ namespace Revo.Infrastructure.Repositories
             {
                 this.repository = repository;
             }
-
-            public void Commit()
-            {
-                repository.SaveChanges();
-            }
-
+            
             public async Task CommitAsync()
             {
                 await repository.SaveChangesAsync();
