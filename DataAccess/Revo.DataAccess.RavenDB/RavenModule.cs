@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,14 +24,18 @@ namespace Revo.DataAccess.RavenDB
             Bind<IDocumentStore>()
                 .ToMethod(ctx =>
                 {
+                    var connectionString =  ConfigurationManager.ConnectionStrings["RavenDB"].ConnectionString;
+                    Dictionary<string, string> connectionParams = connectionString.Split(';')
+                        .Select(value => value.Split('='))
+                        .ToDictionary(pair => pair[0].Trim(), pair => pair.Length > 0 ? pair[1].Trim() : null);
+
                     var store = new DocumentStore()
                     {
                         Urls = new []
                         {
-                            "http://192.168.2.111:8998"
+                            connectionParams.TryGetValue("Url", out string url) ? url : "http://localhost:8998"
                         },
-                        Database = "DEV_AnyBounty"
-                        // = "RavenDB"
+                        Database = connectionParams.TryGetValue("Database", out string database) ? database : "Revo"
                     };
 
                     store.Conventions.FindIdentityProperty = memberInfo => memberInfo.Name == "DocumentId";
