@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using LinqKit;
 using Revo.Domain.Entities;
 
@@ -8,7 +9,7 @@ namespace Revo.Infrastructure.Repositories
 {
     public static class RepositoryExtensions
     {
-        public static T AddIfNew<T, TKey>(this IRepository repository, Expression<Func<T, TKey>> keyExpression, T entity) where T : class, IQueryableEntity, IAggregateRoot
+        public static async Task<T> AddIfNewAsync<T, TKey>(this IRepository repository, Expression<Func<T, TKey>> keyExpression, T entity) where T : class, IQueryableEntity, IAggregateRoot
         {
             var entityParam = Expression.Constant(entity);
             var entityKeyExpression = Expression.Invoke(keyExpression, entityParam);
@@ -18,7 +19,7 @@ namespace Revo.Infrastructure.Repositories
             var comparisonExpression = Expression.Equal(entityKeyExpression, xKeyExpression);
             var whereExpression = Expression.Lambda<Func<T, bool>>(comparisonExpression, xParam);
 
-            T old = repository.FirstOrDefault<T>(whereExpression.Expand()); // TODO optimize for ID keys
+            T old = await repository.FirstOrDefaultAsync<T>(whereExpression.Expand());
             if (old == null)
             {
                 repository.Add(entity);
@@ -30,25 +31,40 @@ namespace Revo.Infrastructure.Repositories
             }
         }
 
-        public static T AddIfNew<T>(this IRepository repository, T entity) where T : class, IQueryableEntity, IAggregateRoot
+        public static async Task<T> AddIfNewAsync<T>(this IRepository repository, T entity) where T : class, IAggregateRoot
         {
-            return AddIfNew(repository, x => x.Id, entity);
+            T old = await repository.FindAsync<T>(entity.Id);
+            if (old == null)
+            {
+                repository.Add(entity);
+                return entity;
+            }
+            else
+            {
+                return old;
+            }
         }
 
-        public static List<T> AddIfNew<T, TKey>(this IRepository repository, Expression<Func<T, TKey>> keyExpression, params T[] entities) where T : class, IQueryableEntity, IAggregateRoot
+        public static async Task<List<T>> AddIfNewAsync<T, TKey>(this IRepository repository, Expression<Func<T, TKey>> keyExpression, params T[] entities) where T : class, IQueryableEntity, IAggregateRoot
         {
             List<T> result = new List<T>();
             foreach (T entity in entities)
             {
-                result.Add(AddIfNew(repository, keyExpression, entity));
+                result.Add(await AddIfNewAsync(repository, keyExpression, entity));
             }
 
             return result;
         }
 
-        public static List<T> AddIfNew<T>(this IRepository repository, params T[] entities) where T : class, IQueryableEntity, IAggregateRoot
+        public static async Task<List<T>> AddIfNewAsync<T>(this IRepository repository, params T[] entities) where T : class, IQueryableEntity, IAggregateRoot
         {
-            return AddIfNew(repository, x => x.Id, entities);
+            List<T> result = new List<T>();
+            foreach (T entity in entities)
+            {
+                result.Add(await AddIfNewAsync(repository, entity));
+            }
+
+            return result;
         }
     }
 }

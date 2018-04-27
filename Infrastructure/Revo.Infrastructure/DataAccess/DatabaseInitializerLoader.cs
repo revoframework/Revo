@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Revo.Core.Commands;
 using Revo.Core.Core;
 using Revo.Core.Core.Lifecycle;
 using Revo.Core.Transactions;
@@ -12,17 +13,19 @@ namespace Revo.Infrastructure.DataAccess
     {
         private readonly IDatabaseInitializerDiscovery databaseInitializerDiscovery;
         private readonly IDatabaseInitializerComparer comparer;
-        private readonly Func<IRepositoryFactory> repositoryFactoryFunc; // using func factories for late resolving in the scope of different tasks
+        private readonly Func<IRepository> repositoryFunc; // using func factories for late resolving in the scope of different tasks
         private readonly Func<IUnitOfWorkFactory> unitOfWorkFactoryFunc;
+        private readonly Func<CommandContextStack> commandContextStackFunc;
 
         public DatabaseInitializerLoader(IDatabaseInitializerDiscovery databaseInitializerDiscovery,
-            IDatabaseInitializerComparer comparer, Func<IRepositoryFactory> repositoryFactoryFunc,
-            Func<IUnitOfWorkFactory> unitOfWorkFactoryFunc)
+            IDatabaseInitializerComparer comparer, Func<IRepository> repositoryFunc,
+            Func<IUnitOfWorkFactory> unitOfWorkFactoryFunc, Func<CommandContextStack> commandContextStackFunc)
         {
             this.databaseInitializerDiscovery = databaseInitializerDiscovery;
             this.comparer = comparer;
-            this.repositoryFactoryFunc = repositoryFactoryFunc;
+            this.repositoryFunc = repositoryFunc;
             this.unitOfWorkFactoryFunc = unitOfWorkFactoryFunc;
+            this.commandContextStackFunc = commandContextStackFunc;
         }
 
         public void OnApplicationStarted()
@@ -36,12 +39,20 @@ namespace Revo.Infrastructure.DataAccess
                 Task.Factory.StartNewWithContext(async () =>
                 {
                     using (IUnitOfWork uow = unitOfWorkFactoryFunc().CreateUnitOfWork())
-                    using (IRepository repository = repositoryFactoryFunc().CreateRepository(uow))
                     {
-                        await initializer.InitializeAsync(repository);
-                        await uow.CommitAsync();
+                        var commandContextStack = commandContextStackFunc();
+                        commandContextStack.Push(new CommandContext(null, uow));
+                        try
+                        {
+                            await initializer.InitializeAsync(repositoryFunc());
+                            await uow.CommitAsync();
+                        }
+                        finally
+                        {
+                            commandContextStack.Pop();
+                        }
                     }
-                });
+                }).GetAwaiter().GetResult();
             }
         }
     }

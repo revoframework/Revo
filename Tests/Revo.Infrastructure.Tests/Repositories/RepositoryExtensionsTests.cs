@@ -20,10 +20,10 @@ namespace Revo.Infrastructure.Tests.Repositories
         }
 
         [Fact]
-        public void AddIfNew_AddsSingleById()
+        public async Task AddIfNew_AddsSingleById()
         {
             TestEntity entity = new TestEntity(Guid.NewGuid());
-            TestEntity result = RepositoryExtensions.AddIfNew(repository, entity);
+            TestEntity result = await RepositoryExtensions.AddIfNewAsync(repository, entity);
             repository.SaveChanges();
 
             Assert.Equal(entity, result);
@@ -33,14 +33,14 @@ namespace Revo.Infrastructure.Tests.Repositories
         }
 
         [Fact]
-        public void AddIfNew_DoesntAddSingleDuplicateById()
+        public async Task AddIfNew_DoesntAddSingleDuplicateById()
         {
             TestEntity entity1 = new TestEntity(Guid.NewGuid());
             repository.Add(entity1);
             repository.SaveChanges();
 
             TestEntity entity2 = new TestEntity(entity1.Id);
-            TestEntity result = RepositoryExtensions.AddIfNew(repository, entity2);
+            TestEntity result = await RepositoryExtensions.AddIfNewAsync(repository, entity2);
             repository.SaveChanges();
 
             Assert.Equal(entity1, result);
@@ -50,14 +50,14 @@ namespace Revo.Infrastructure.Tests.Repositories
         }
         
         [Fact]
-        public void AddIfNew_DoesntAddSingleDuplicateByProperty()
+        public async Task AddIfNew_DoesntAddSingleDuplicateByProperty()
         {
             TestEntity entity1 = new TestEntity(Guid.NewGuid()) { Value = "Foo" };
             repository.Add(entity1);
             repository.SaveChanges();
 
             TestEntity entity2 = new TestEntity(Guid.NewGuid()) { Value = "Foo" };
-            TestEntity result = RepositoryExtensions.AddIfNew(repository, x => x.Value, entity2);
+            TestEntity result = await RepositoryExtensions.AddIfNewAsync(repository, x => x.Value, entity2);
             repository.SaveChanges();
 
             Assert.Equal(entity1, result);
@@ -67,14 +67,14 @@ namespace Revo.Infrastructure.Tests.Repositories
         }
 
         [Fact]
-        public void AddIfNew_AddsSecondByProperty()
+        public async Task AddIfNew_AddsSecondByProperty()
         {
             TestEntity entity1 = new TestEntity(Guid.NewGuid()) { Value = "Foo" };
             repository.Add(entity1);
             repository.SaveChanges();
 
             TestEntity entity2 = new TestEntity(Guid.NewGuid()) { Value = "Bar" };
-            TestEntity result = RepositoryExtensions.AddIfNew(repository, x => x.Value, entity2);
+            TestEntity result = await RepositoryExtensions.AddIfNewAsync(repository, x => x.Value, entity2);
             repository.SaveChanges();
 
             Assert.Equal(entity2, result);

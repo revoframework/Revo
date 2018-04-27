@@ -37,6 +37,7 @@ namespace Revo.Infrastructure.Tests.DataAccess
             repository.SaveChanges();
 
             await sut.InitializeAsync(repository);
+            repository.SaveChanges();
 
             Assert.Equal(2, repository.FindAll<TestClassifier>().Count());
             Assert.Contains(repository.FindAll<TestClassifier>(), x => x.Id == TestClassifierDatabaseInitializer.Second.Id);
