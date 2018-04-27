@@ -74,7 +74,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.DataAccess.EF6.Tests",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integrations", "Integrations", "{F041BB96-87BD-4123-9B2E-B1B8FAA536EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.Integrations.Rebus", "Revo.Integrations.Rebus\Revo.Integrations.Rebus.csproj", "{BD92BE2D-24ED-405F-A85A-1110BBC9B778}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.Integrations.Rebus", "Integrations\Revo.Integrations.Rebus\Revo.Integrations.Rebus.csproj", "{BD92BE2D-24ED-405F-A85A-1110BBC9B778}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
