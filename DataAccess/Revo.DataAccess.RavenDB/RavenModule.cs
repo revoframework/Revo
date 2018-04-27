@@ -24,7 +24,7 @@ namespace Revo.DataAccess.RavenDB
             Bind<IDocumentStore>()
                 .ToMethod(ctx =>
                 {
-                    var connectionString =  ConfigurationManager.ConnectionStrings["RavenDB"].ConnectionString;
+                    var connectionString = ConfigurationManager.ConnectionStrings["RavenDB"].ConnectionString;
                     Dictionary<string, string> connectionParams = connectionString.Split(';')
                         .Select(value => value.Split('='))
                         .ToDictionary(pair => pair[0].Trim(), pair => pair.Length > 0 ? pair[1].Trim() : null);

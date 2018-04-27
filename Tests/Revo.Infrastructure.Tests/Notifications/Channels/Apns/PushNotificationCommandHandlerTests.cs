@@ -43,6 +43,8 @@ namespace Revo.Infrastructure.Tests.Notifications.Channels.Apns
                 DeviceToken = deviceToken
             }, CancellationToken.None);
 
+            await repository.SaveChangesAsync();
+
             Assert.Equal(1, repository.FindAll<ApnsUserDeviceToken>().Count());
             Assert.Contains(repository.FindAll<ApnsUserDeviceToken>(),
                 x => x.UserId == userContext.UserId
@@ -61,6 +63,8 @@ namespace Revo.Infrastructure.Tests.Notifications.Channels.Apns
                 AppId = "My.AppId",
                 DeviceToken = deviceToken
             },  CancellationToken.None);
+
+            await repository.SaveChangesAsync();
 
             Assert.Equal(1, repository.FindAll<ApnsUserDeviceToken>().Count());
             Assert.Contains(repository.FindAll<ApnsUserDeviceToken>(),
@@ -87,6 +91,8 @@ namespace Revo.Infrastructure.Tests.Notifications.Channels.Apns
                 AppId = "My.AppId",
                 DeviceToken = oldToken.DeviceToken
             }, CancellationToken.None);
+
+            await repository.SaveChangesAsync();
 
             Assert.Equal(1, repository.FindAll<ApnsUserDeviceToken>().Count());
             Assert.Contains(repository.FindAll<ApnsUserDeviceToken>(),

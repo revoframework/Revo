@@ -1,4 +1,5 @@
 ﻿using System.Data.Entity;
+using System.Linq;
 using Ninject.Modules;
 using Revo.Core.Core;
 using Revo.Core.Core.Lifecycle;
@@ -18,10 +19,14 @@ namespace Revo.DataAccess.EF6
                  .InTransientScope()
                  .WithConstructorArgument("connectionName", "EntityContext");
 
-            Bind(typeof(ICrudRepository), typeof(IReadRepository), typeof(IEF6CrudRepository),
-                    typeof(IEF6ReadRepository))
-                .To<EF6CrudRepository>()
-                .InRequestOrJobScope();
+            if (!Bindings.Any(x => x.Service == typeof(IEF6CrudRepository)))
+            {
+
+                Bind(typeof(ICrudRepository), typeof(IReadRepository), typeof(IEF6CrudRepository),
+                        typeof(IEF6ReadRepository))
+                    .To<EF6CrudRepository>()
+                    .InRequestOrJobScope();
+            }
 
             Bind<IDatabaseAccess>().To<DatabaseAccess>()
                 .InRequestOrJobScope();

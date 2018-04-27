@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data.Common;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
@@ -51,7 +52,10 @@ namespace Revo.DataAccess.EF6.Entities
             foreach (string schemaSpace in schemaSpacesToEntities.Keys)
             {
                 DbModel model = BuildDbModel(schemaSpace);
-                dbModels.Add(schemaSpace, model.Compile());
+                if (model != null)
+                {
+                    dbModels.Add(schemaSpace, model.Compile());
+                }
             }
         }
 
@@ -81,9 +85,15 @@ namespace Revo.DataAccess.EF6.Entities
             {
                 modelDefinition.OnModelCreating(modelBuilder);
             }
-            
-            DbConnection dbConnection = Database.DefaultConnectionFactory.CreateConnection("EFConnectionString");
-            return modelBuilder.Build(dbConnection);
+
+            var connectionString = ConfigurationManager.ConnectionStrings["EFConnectionString"]?.ConnectionString;
+            if (connectionString?.Length > 0)
+            {
+                DbConnection dbConnection = Database.DefaultConnectionFactory.CreateConnection(connectionString);
+                return modelBuilder.Build(dbConnection);
+            }
+
+            return null;
         }
 
         private void EnsureLoaded()

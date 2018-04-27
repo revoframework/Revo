@@ -247,7 +247,7 @@ namespace Revo.Infrastructure.EventSourcing
             return messages;
         }
 
-        private async Task<T> DoFindAsync<T>(Guid id, bool shouldThrow) where T : class, TBase
+        private async Task<T> DoFindAsync<T>(Guid id, bool throwOnError) where T : class, TBase
         {
             TBase aggregate = FindLoadedAggregate(id);
             if (aggregate == null)
@@ -266,7 +266,7 @@ namespace Revo.Infrastructure.EventSourcing
 
             if (aggregate == null)
             {
-                if (shouldThrow)
+                if (throwOnError)
                 {
                     throw new EntityNotFoundException($"Event sourced aggregate with ID {id} was not found");
                 }
@@ -276,7 +276,7 @@ namespace Revo.Infrastructure.EventSourcing
 
             if (aggregate.IsDeleted)
             {
-                if (shouldThrow)
+                if (throwOnError)
                 {
                     throw new EntityDeletedException(
                         $"Cannot get event sourced {aggregate.GetType().FullName} aggregate with ID {id} because it has been previously deleted");
@@ -288,8 +288,12 @@ namespace Revo.Infrastructure.EventSourcing
             T typedAggregate = aggregate as T;
             if (typedAggregate == null)
             {
-                //always throw
-                throw new ArgumentException($"Aggregate root with ID '{id}' is not of requested type '{typeof(T).FullName}'");
+                if (throwOnError)
+                {
+                    throw new EntityNotFoundException($"Aggregate root with ID '{id}' is not of requested type '{typeof(T).FullName}'");
+                }
+
+                return null;
             }
 
             return typedAggregate;
@@ -353,6 +357,16 @@ namespace Revo.Infrastructure.EventSourcing
 
         private async Task<TBase> LoadAggregateAsync(Guid aggregateId)
         {
+            IReadOnlyDictionary<string, string> eventStreamMetadata;
+            try
+            {
+                eventStreamMetadata = await eventStore.GetStreamMetadataAsync(aggregateId);
+            }
+            catch (EntityNotFoundException e)
+            {
+                return null;
+            }
+            
             var eventRecords = await eventStore.GetEventsAsync(aggregateId);
             int version = (int) (eventRecords.LastOrDefault()?.StreamSequenceNumber ?? 0);
             var events = eventRecords.Select(x => x.Event as DomainAggregateEvent
@@ -361,8 +375,6 @@ namespace Revo.Infrastructure.EventSourcing
                                                       .ToList();
 
             AggregateState state = new AggregateState(version, events);
-
-            var eventStreamMetadata = await eventStore.GetStreamMetadataAsync(aggregateId);
 
             if (!eventStreamMetadata.TryGetValue(AggregateEventStreamMetadataNames.ClassId, out string classIdString))
             {
@@ -378,25 +390,11 @@ namespace Revo.Infrastructure.EventSourcing
             return aggregate;
         }
 
-        private TBase FindLoadedAggregate(Guid id, Type entityType = null)
+        private TBase FindLoadedAggregate(Guid id)
         {
             TBase aggregate;
-            if (aggregates.TryGetValue(id, out aggregate))
-            {
-                if (entityType != null)
-                {
-                    if (entityType.IsAssignableFrom(aggregate.GetType()))
-                    {
-                        throw new ArgumentException($"Aggregate root with ID '{id}' is not of requested type '{entityType.FullName}'");
-                    }
-                }
-
-                return aggregate;
-            }
-            else
-            {
-                return null;
-            }
+            aggregates.TryGetValue(id, out aggregate);
+            return aggregate;
         }
     }
 }

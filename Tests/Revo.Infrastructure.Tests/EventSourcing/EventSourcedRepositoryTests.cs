@@ -11,6 +11,7 @@ using Revo.Infrastructure.EventSourcing;
 using Revo.Infrastructure.EventStore;
 using Revo.Testing.Core;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using Revo.Domain.Entities;
 using Revo.Domain.Entities.EventSourcing;
 using Revo.Domain.Events;
@@ -114,6 +115,24 @@ namespace Revo.Infrastructure.Tests.EventSourcing
             sut = new EventSourcedAggregateRepository(eventStore,
                 entityTypeManager, publishEventBuffer, new IRepositoryFilter[] {}, eventMessageFactory, new EntityFactory());
         }
+        
+        [Fact]
+        public async Task FindAsync_ReturnsNullIfNotFound()
+        {
+            Guid nonexistentId = Guid.Parse("E9C6FCB7-A832-4534-921D-843B6E910CBD");
+            eventStore.GetEventsAsync(nonexistentId).Throws(new EntityNotFoundException());
+            eventStore.GetStreamMetadataAsync(nonexistentId).Throws(new EntityNotFoundException());
+
+            var result = await sut.FindAsync(nonexistentId);
+            result.Should().BeNull();
+        }
+        
+        [Fact]
+        public async Task FindAsync_ReturnsNullIfDifferentType()
+        {
+            var result = await sut.FindAsync<MyEntity3LoadsAsDeleted>(entity2Id);
+            result.Should().BeNull();
+        }
 
         [Fact]
         public async Task GetAsync_ReturnsCorrectAggregate()
@@ -175,6 +194,28 @@ namespace Revo.Infrastructure.Tests.EventSourcing
             await Assert.ThrowsAsync<EntityDeletedException>(async () =>
             {
                 await sut.GetAsync<MyEntity2>(entity2Id);
+            });
+        }
+
+        [Fact]
+        public async Task GetAsync_ThrowsIfNotFound()
+        {
+            Guid nonexistentId = Guid.Parse("E9C6FCB7-A832-4534-921D-843B6E910CBD");
+            eventStore.GetEventsAsync(nonexistentId).Throws(new EntityNotFoundException());
+            eventStore.GetStreamMetadataAsync(nonexistentId).Throws(new EntityNotFoundException());
+            
+            await Assert.ThrowsAsync<EntityNotFoundException>(async () =>
+            {
+                await sut.GetAsync(nonexistentId);
+            });
+        }
+
+        [Fact]
+        public async Task GetAsync_ThrowsIfDifferentType()
+        {
+            await Assert.ThrowsAsync<EntityNotFoundException>(async () =>
+            {
+                await sut.GetAsync<MyEntity3LoadsAsDeleted>(entity2Id);
             });
         }
 

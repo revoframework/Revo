@@ -19,7 +19,7 @@ namespace Revo.Domain.Tests.Events
             
             sut.RegisterEvents(entity, router);
             var ev1 = new Event1();
-            router.ApplyEvent(ev1);
+            router.Publish(ev1);
 
             Assert.Equal(ev1, entity.Events[0]);
         }

@@ -35,6 +35,7 @@ namespace Revo.Infrastructure.EF6.Tests.EventStore
             eventStreams = new[]
             {
                 new EventStream(Guid.NewGuid()),
+                new EventStream(Guid.NewGuid()),
                 new EventStream(Guid.NewGuid())
             };
             inMemoryCrudRepository.AttachRange(eventStreams);
@@ -74,6 +75,20 @@ namespace Revo.Infrastructure.EF6.Tests.EventStore
             var records = await sut.GetEventsAsync(eventStreams[eventStreamIndex].Id);
 
             records.ShouldBeEquivalentTo(rowsIndices.Select(x => eventStreamRows[x]));
+        }
+
+        [Fact]
+        public async Task GetEventsAsync_DoesntThrowAndReturnsEmptyWhenNoEvents()
+        {
+            var records = await sut.GetEventsAsync(eventStreams[2].Id);
+            records.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task GetEventsAsync_ThrowsWhenStreamNotExists()
+        {
+            await Assert.ThrowsAsync<EntityNotFoundException>(()
+                => sut.GetEventsAsync(Guid.Parse("6E1CBB11-FB24-41AB-80F2-B79635CD960B")));
         }
 
         [Theory]

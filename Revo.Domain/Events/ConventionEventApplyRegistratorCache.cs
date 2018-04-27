@@ -17,7 +17,7 @@ namespace Revo.Domain.Events
 
         static ConventionEventApplyRegistratorCache()
         {
-            componentTypeDelegates = new Lazy<Dictionary<Type, EventTypeApplyDelegates>>(CreateAggregateEventDelegates);
+            ClearCache();
         }
 
         public ConventionEventApplyRegistratorCache(ITypeExplorer typeExplorer)
@@ -36,15 +36,25 @@ namespace Revo.Domain.Events
             EventTypeApplyDelegates delegates;
             if (!componentTypeDelegates.Value.TryGetValue(componentType, out delegates))
             {
+                ClearCache();    
+            }
+
+            if (!componentTypeDelegates.Value.TryGetValue(componentType, out delegates))
+            {
                 throw new ArgumentException($"Unknown component type to get apply delegates for: " + componentType.FullName);
             }
 
             return delegates;
         }
 
-        public void OnApplicationStarted()
+        public static void ClearCache()
         {
             componentTypeDelegates = new Lazy<Dictionary<Type, EventTypeApplyDelegates>>(CreateAggregateEventDelegates);
+        }
+
+        public void OnApplicationStarted()
+        {
+            ClearCache();
             var delegates = componentTypeDelegates.Value; //explicit recreating
         }
 
