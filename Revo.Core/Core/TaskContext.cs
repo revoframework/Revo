@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,23 +9,21 @@ namespace Revo.Core.Core
 {
     public sealed class TaskContext : IDisposable
     {
-        private static readonly AsyncLocal<TaskContext> CurrentLocal = new AsyncLocal<TaskContext>();
+        private static readonly AsyncLocal<TaskContext[]> CurrentLocal = new AsyncLocal<TaskContext[]>();
         private bool disposed = false;
 
         private TaskContext()
         {
         }
 
-        public static TaskContext Current => CurrentLocal.Value;
+        public static TaskContext Current => CurrentLocal.Value?.LastOrDefault();
 
         public static TaskContext Enter()
         {
-            if (Current != null)
-            {
-                throw new InvalidOperationException("A different TaskContext is already active.s");
-            }
+            var newContexts = CurrentLocal.Value;
+            newContexts = newContexts != null ? newContexts.Append(new TaskContext()).ToArray() : new[] {new TaskContext()};
 
-            CurrentLocal.Value = new TaskContext();
+            CurrentLocal.Value = newContexts;
             return Current;
         }
 
@@ -32,8 +31,11 @@ namespace Revo.Core.Core
         {
             if (!disposed)
             {
-                Debug.Assert(CurrentLocal.Value == this);
-                CurrentLocal.Value = null;
+                Debug.Assert(Current == this);
+
+                CurrentLocal.Value = CurrentLocal.Value.Length == 1
+                    ? null
+                    : CurrentLocal.Value.Take(CurrentLocal.Value.Length - 1).ToArray();
             }
         }
     }
