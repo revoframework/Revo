@@ -82,7 +82,7 @@ namespace Revo.Infrastructure.Tests.Repositories
 
             public void Do()
             {
-                ApplyEvent(new EventA() {});
+                Publish(new EventA() {});
             }
         }
 

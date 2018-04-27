@@ -19,7 +19,7 @@ namespace Revo.Domain.Tests.Entities
         }
 
         [Fact]
-        public void ApplyEvent_ThrowsIfDeleted()
+        public void Publish_ThrowsIfDeleted()
         {
             TestAggregate sut = new TestAggregate(Guid.NewGuid());
             sut.Delete();
@@ -43,7 +43,7 @@ namespace Revo.Domain.Tests.Entities
 
             public void Do()
             {
-                ApplyEvent(new TestEvent());
+                Publish(new TestEvent());
             }
         }
 

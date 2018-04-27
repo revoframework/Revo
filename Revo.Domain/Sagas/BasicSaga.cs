@@ -45,7 +45,7 @@ namespace Revo.Domain.Sagas
             uncommitedCommands.Clear();
         }
 
-        protected void SendCommand(ICommandBase command)
+        protected void Send(ICommandBase command)
         {
             uncommitedCommands.Add(command);
         }

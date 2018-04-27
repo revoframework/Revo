@@ -7,7 +7,7 @@ namespace Revo.Domain.Events
     {
         IReadOnlyCollection<DomainAggregateEvent> UncommitedEvents { get; }
 
-        void ApplyEvent<T>(T evt) where T : DomainAggregateEvent;
+        void Publish<T>(T evt) where T : DomainAggregateEvent;
         void CommitEvents();
         void Register(Type eventType, Action<DomainAggregateEvent> handler);
         void Register<T>(Action<DomainAggregateEvent> handler) where T : DomainAggregateEvent;

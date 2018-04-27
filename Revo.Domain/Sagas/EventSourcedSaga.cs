@@ -51,13 +51,13 @@ namespace Revo.Domain.Sagas
             var newKeys = new MultiValueDictionary<string, string>(keys);
             newKeys.Add(name, value);
 
-            ApplyEvent(new SagaKeysChangedEvent(
+            Publish(new SagaKeysChangedEvent(
                 newKeys
                     .Select(x => new KeyValuePair<string, ImmutableList<string>>(x.Key, x.Value.ToImmutableList()))
                     .ToImmutableDictionary()));
         }
 
-        protected void SendCommand(ICommandBase command)
+        protected void Send(ICommandBase command)
         {
             uncommitedCommands.Add(command);
         }
@@ -100,7 +100,7 @@ namespace Revo.Domain.Sagas
 
             if (changed)
             {
-                ApplyEvent(new SagaKeysChangedEvent(newKeys));
+                Publish(new SagaKeysChangedEvent(newKeys));
             }
         }
 
@@ -108,7 +108,7 @@ namespace Revo.Domain.Sagas
         {
             if (keys.ContainsKey(name))
             {
-                ApplyEvent(new SagaKeysChangedEvent(
+                Publish(new SagaKeysChangedEvent(
                    keys
                     .Where(x => x.Key != name)
                     .Select(x => new KeyValuePair<string, ImmutableList<string>>(x.Key, x.Value.ToImmutableList()))
@@ -122,7 +122,7 @@ namespace Revo.Domain.Sagas
             newKeys.Remove(name);
             newKeys.Add(name, value);
 
-            ApplyEvent(new SagaKeysChangedEvent(
+            Publish(new SagaKeysChangedEvent(
                 newKeys
                     .Select(x => new KeyValuePair<string, ImmutableList<string>>(x.Key, x.Value.ToImmutableList()))
                     .ToImmutableDictionary()));

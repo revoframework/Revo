@@ -47,15 +47,15 @@ namespace Revo.Domain.Entities
             return $"{GetType().FullName} (ID: {Id})";
         }
 
-        protected virtual void ApplyEvent<T>(T evt) where T : DomainAggregateEvent
+        protected virtual void Publish<T>(T evt) where T : DomainAggregateEvent
         {
             if (IsDeleted)
             {
                 throw new InvalidOperationException(
-                    $"Cannot apply new {typeof(T).FullName} event on {GetType().FullName} aggregate because it is currently in deleted state");
+                    $"Cannot publish new {typeof(T).FullName} event on {GetType().FullName} aggregate because it is currently in deleted state");
             }
 
-            EventRouter.ApplyEvent(evt);
+            EventRouter.Publish(evt);
         }
 
         protected void MarkDeleted()

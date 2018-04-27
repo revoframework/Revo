@@ -22,13 +22,13 @@ namespace Revo.Domain.Tests.Events
         }
 
         [Fact]
-        public void ApplyEvent_PushesEventToUncomittedEvents()
+        public void Publish_PushesEventToUncomittedEvents()
         {
             var ev1 = new Event1();
             var ev2 = new Event2();
 
-            sut.ApplyEvent(ev1);
-            sut.ApplyEvent(ev2);
+            sut.Publish(ev1);
+            sut.Publish(ev2);
 
             Assert.Equal(2, sut.UncommitedEvents.Count());
             Assert.Equal(ev1, sut.UncommitedEvents.ElementAt(0));
@@ -36,9 +36,9 @@ namespace Revo.Domain.Tests.Events
         }
 
         [Fact]
-        public void ApplyEvent_SetsAggregateId()
+        public void Publish_SetsAggregateId()
         {
-            sut.ApplyEvent(new Event1());
+            sut.Publish(new Event1());
             
             Assert.Equal(aggregate.Id, sut.UncommitedEvents.ElementAt(0).AggregateId);
         }
@@ -46,7 +46,7 @@ namespace Revo.Domain.Tests.Events
         [Fact]
         public void CommitEvents_ClearsUncomittedEvents()
         {
-            sut.ApplyEvent(new Event1());
+            sut.Publish(new Event1());
             sut.CommitEvents();
 
             Assert.Equal(0, sut.UncommitedEvents.Count());
@@ -62,7 +62,7 @@ namespace Revo.Domain.Tests.Events
 
             sut.Register<Event1>(ev => events1.Add(ev));
             sut.Register<Event1>(ev => events2.Add(ev));
-            sut.ApplyEvent(ev1);
+            sut.Publish(ev1);
 
             Assert.Equal(events1[0], ev1);
             Assert.Equal(events2[0], ev1);
@@ -76,7 +76,7 @@ namespace Revo.Domain.Tests.Events
             var ev1 = new Event1();
 
             sut.Register<Event1>(ev => events.Add(ev));
-            sut.ApplyEvent(ev1);
+            sut.Publish(ev1);
 
             Assert.Equal(events[0], ev1);
         }

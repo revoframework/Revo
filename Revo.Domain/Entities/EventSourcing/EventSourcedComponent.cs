@@ -12,9 +12,9 @@ namespace Revo.Domain.Entities.EventSourcing
 
         protected IAggregateEventRouter EventRouter { get; }
 
-        protected virtual void ApplyEvent<T>(T evt) where T : DomainAggregateEvent
+        protected virtual void Publish<T>(T evt) where T : DomainAggregateEvent
         {
-            EventRouter.ApplyEvent(evt);
+            EventRouter.Publish(evt);
         }
     }
 }

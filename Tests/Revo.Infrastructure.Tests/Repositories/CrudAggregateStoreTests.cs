@@ -109,7 +109,7 @@ namespace Revo.Infrastructure.Tests.Repositories
 
             public void Do()
             {
-                ApplyEvent(new Event1());
+                Publish(new Event1());
             }
         }
 

@@ -8,7 +8,7 @@ namespace Revo.Domain.Tenancy
     {
         public TenantEventSourcedAggregateRoot(Guid id, ITenant tenant) : base(id)
         {
-            ApplyEvent(new TenantAggregateRootCreated(tenant?.Id));
+            Publish(new TenantAggregateRootCreated(tenant?.Id));
         }
 
         protected TenantEventSourcedAggregateRoot(Guid id) : base(id)

@@ -25,9 +25,9 @@ namespace Revo.Domain.Entities.Basic
             set { base.Version = value;  }
         }
 
-        protected sealed override void ApplyEvent<T>(T evt)
+        protected sealed override void Publish<T>(T evt)
         {
-            base.ApplyEvent(evt);
+            base.Publish(evt);
         }
     }
 }

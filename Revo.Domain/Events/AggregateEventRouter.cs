@@ -21,7 +21,7 @@ namespace Revo.Domain.Events
 
         public virtual IReadOnlyCollection<DomainAggregateEvent> UncommitedEvents => uncommittedEvents;
 
-        public virtual void ApplyEvent<T>(T evt) where T : DomainAggregateEvent
+        public virtual void Publish<T>(T evt) where T : DomainAggregateEvent
         {
             evt.AggregateId = aggregate.Id;
 

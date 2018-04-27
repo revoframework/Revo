@@ -176,7 +176,7 @@ namespace Revo.Infrastructure.Tests.Sagas
 
             public void Do()
             {
-                SendCommand(new Command1());
+                Send(new Command1());
                 SetSagaKey("key", "value");
             }
         }

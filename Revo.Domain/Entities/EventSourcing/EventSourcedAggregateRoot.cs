@@ -7,7 +7,7 @@ namespace Revo.Domain.Entities.EventSourcing
 {
     /// <summary>
     /// Aggregate root that uses event-sourcing to define its state.
-    /// As such, it should only modify its state by publishing events using the protected ApplyEvent method.
+    /// As such, it should only modify its state by publishing events using the protected Publish method.
     /// After publishing an event or loading its state from a repository, the applied events can be observed
     /// and acted upon by implementing private void Apply(EVENT_TYPE) methods (uses convention-based method discovery).
     /// </summary>
@@ -37,9 +37,9 @@ namespace Revo.Domain.Entities.EventSourcing
             EventRouter.ReplayEvents(events);
         }
 
-        protected sealed override void ApplyEvent<T>(T evt)
+        protected sealed override void Publish<T>(T evt)
         {
-            base.ApplyEvent(evt);
+            base.Publish(evt);
         }
     }
 }

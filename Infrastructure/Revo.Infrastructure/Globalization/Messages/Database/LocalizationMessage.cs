@@ -29,7 +29,7 @@ namespace Revo.Infrastructure.Globalization.Messages.Database
         public void SetMessage(string message)
         {
             Message = message;
-            ApplyEvent(new LocalizationMessageModifiedEvent(
+            Publish(new LocalizationMessageModifiedEvent(
                 className: ClassName,
                 key: Key,
                 message: Message,
@@ -39,7 +39,7 @@ namespace Revo.Infrastructure.Globalization.Messages.Database
 
         public void Delete()
         {
-            ApplyEvent(new LocalizationMessageDeletedEvent()); //automatically checks if already is deleted
+            Publish(new LocalizationMessageDeletedEvent()); //automatically checks if already is deleted
             MarkDeleted();
         }
     }
