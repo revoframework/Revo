@@ -6,12 +6,12 @@ namespace Revo.Infrastructure.Tenancy
 {
     public class SingleTenantContextResolver : ITenantContextResolver
     {
-        private readonly ITenantManager tenantManager;
+        private readonly ITenantProvider tenantProvider;
 
-        public SingleTenantContextResolver(ITenantManager tenantManager, Guid tenantId)
+        public SingleTenantContextResolver(ITenantProvider tenantProvider, Guid tenantId)
         {
-            this.tenantManager = tenantManager;
-            Tenant = tenantManager.GetTenant(tenantId);
+            this.tenantProvider = tenantProvider;
+            Tenant = tenantProvider.GetTenant(tenantId);
         }
 
         public ITenant Tenant { get; private set; }

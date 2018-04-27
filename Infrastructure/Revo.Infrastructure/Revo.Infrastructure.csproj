@@ -505,10 +505,10 @@
     <Compile Include="Security\ServiceToken.cs" />
     <Compile Include="Security\TokenValidator.cs" />
     <Compile Include="Tenancy\DefaultTenantContext.cs" />
-    <Compile Include="Tenancy\DefaultTenantManager.cs" />
+    <Compile Include="Tenancy\DefaultTenantProvider.cs" />
     <Compile Include="Tenancy\ITenantContext.cs" />
     <Compile Include="Tenancy\ITenantContextResolver.cs" />
-    <Compile Include="Tenancy\ITenantManager.cs" />
+    <Compile Include="Tenancy\ITenantProvider.cs" />
     <Compile Include="Tenancy\NullTenantContextResolver.cs" />
     <Compile Include="Tenancy\SingleTenantContextResolver.cs" />
     <Compile Include="Tenancy\TenancyModule.cs" />

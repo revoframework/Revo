@@ -13,16 +13,16 @@ namespace Revo.Infrastructure.Tests.Tenancy
     public class SingleTenantContextResolverTests
     {
         private readonly SingleTenantContextResolver sut;
-        private readonly ITenantManager tenantManager;
+        private readonly ITenantProvider tenantProvider;
         private readonly ITenant tenant;
 
         public SingleTenantContextResolverTests()
         {
-            tenantManager = Substitute.For<ITenantManager>();
+            tenantProvider = Substitute.For<ITenantProvider>();
             tenant = Substitute.For<ITenant>();
-            tenantManager.GetTenant(tenant.Id).Returns(tenant);
+            tenantProvider.GetTenant(tenant.Id).Returns(tenant);
 
-            sut = new SingleTenantContextResolver(tenantManager, tenant.Id);
+            sut = new SingleTenantContextResolver(tenantProvider, tenant.Id);
         }
 
         [Fact]

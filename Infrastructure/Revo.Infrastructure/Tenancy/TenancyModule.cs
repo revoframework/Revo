@@ -18,10 +18,11 @@ namespace Revo.Infrastructure.Tenancy
 
             Bind<IRepositoryFilter>()
                 .To<TenantRepositoryFilter>()
+                .WhenNoAncestorMatches(ctx => typeof(ITenantProvider).IsAssignableFrom(ctx.Request.Service))
                 .InTransientScope();
 
-            Bind<ITenantManager>()
-                .To<DefaultTenantManager>()
+            Bind<ITenantProvider>()
+                .To<DefaultTenantProvider>()
                 .InTransientScope();
         }
     }
