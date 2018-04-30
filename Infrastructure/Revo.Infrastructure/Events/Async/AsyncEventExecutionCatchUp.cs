@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using NLog;
 using Revo.Core.Core;
 using Revo.Core.Core.Lifecycle;
+using Revo.DataAccess.Entities;
 
 namespace Revo.Infrastructure.Events.Async
 {
     public class AsyncEventExecutionCatchUp : IApplicationStartListener
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         private readonly IEventSourceCatchUp[] eventSourceCatchUps;
         private readonly IAsyncEventQueueManager asyncEventQueueManager;
         private readonly Func<IAsyncEventQueueBacklogWorker> asyncEventQueueBacklogWorkerFunc;
@@ -36,7 +40,15 @@ namespace Revo.Infrastructure.Events.Async
         {
             foreach (var eventSourceCatchUp in eventSourceCatchUps)
             {
-                await eventSourceCatchUp.CatchUpAsync();
+                try
+                {
+                    await eventSourceCatchUp.CatchUpAsync();
+                }
+                catch (Exception e)
+                {
+                    // TODO reschedule?
+                    Logger.Error(e, $"Failed to catch-up an event source {eventSourceCatchUp} during startup");
+                }
             }
         }
         
@@ -45,10 +57,18 @@ namespace Revo.Infrastructure.Events.Async
             var backloggedQueueNames = await asyncEventQueueManager.GetNonemptyQueueNamesAsync();
 
             await Task.WhenAll(backloggedQueueNames.Select(queueName =>
-                Task.Factory.StartNewWithContext(() =>
+                Task.Factory.StartNewWithContext(async () =>
                 {
                     var asyncEventQueueBacklogWorker = asyncEventQueueBacklogWorkerFunc();
-                    return asyncEventQueueBacklogWorker.RunQueueBacklogAsync(queueName);
+                    try
+                    {
+                        await asyncEventQueueBacklogWorker.RunQueueBacklogAsync(queueName);
+                    }
+                    catch (AsyncEventProcessingException e)
+                    {
+                        // TODO reschedule?
+                        Logger.Error(e, $"AsyncEventProcessingException occurred while processing async event queue {queueName} during startup");
+                    }
                 }))); //using new Task because we want a new context (parallelization on ASP.NET 4 + fresh DI lifetime scope)
         }
     }

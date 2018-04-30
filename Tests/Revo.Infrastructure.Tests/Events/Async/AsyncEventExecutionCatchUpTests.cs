@@ -76,5 +76,37 @@ namespace Revo.Infrastructure.Tests.Events.Async
             processedQueues.Select(x => x.Item1).Should().BeEquivalentTo(asyncEventQueueBacklogWorkers);
             processedQueues.Select(x => x.Item2).Should().BeEquivalentTo("first", "second");
         }
+
+        [Fact]
+        public void OnApplicationStarted_RunsQueues()
+        {
+            asyncEventQueueManager.GetNonemptyQueueNamesAsync().Returns(
+                new List<string>() { "throwing", "okay" });
+
+            sut = new AsyncEventExecutionCatchUp(
+                eventSourceCatchUps,
+                asyncEventQueueManager,
+                () =>
+                {
+                    var worker = Substitute.For<IAsyncEventQueueBacklogWorker>();
+
+                    worker.When(x => x.RunQueueBacklogAsync("okay")).Do(ci =>
+                    {
+                        lock (processedQueues)
+                        {
+                            processedQueues.Add((worker, ci.ArgAt<string>(0)));
+                        }
+                    });
+
+                    worker.RunQueueBacklogAsync("throwing")
+                        .Returns(Task.FromException(new AsyncEventProcessingException()));
+                    return worker;
+                });
+
+            sut.OnApplicationStarted();
+
+            processedQueues.Should().HaveCount(1);
+            processedQueues.Select(x => x.Item2).Should().BeEquivalentTo("okay");
+        }
     }
 }
