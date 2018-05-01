@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using NLog;
 using Revo.Core.Core;
-using Revo.Core.Core.Lifecycle;
+using Revo.Core.Lifecycle;
 using Revo.DataAccess.Entities;
 
 namespace Revo.Infrastructure.Events.Async

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Revo.Core.Core;
-using Revo.Core.Core.Lifecycle;
 using Revo.Core.IO;
+using Revo.Core.Lifecycle;
 
 namespace Revo.Platforms.AspNet.Core
 {

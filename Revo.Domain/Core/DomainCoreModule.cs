@@ -1,5 +1,5 @@
 ﻿using Ninject.Modules;
-using Revo.Core.Core.Lifecycle;
+using Revo.Core.Lifecycle;
 using Revo.Domain.Events;
 using Revo.Domain.Sagas;
 

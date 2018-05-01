@@ -92,6 +92,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Lifecycle\ApplicationConfigurerInitializerTests.cs" />
     <Compile Include="Collections\DoubleDictinaryTests.cs" />
     <Compile Include="Commands\CommandBusTests.cs" />
     <Compile Include="Commands\CommandContextStackTests.cs" />
@@ -102,6 +103,7 @@
     <Compile Include="Core\ParamsComparerTests.cs" />
     <Compile Include="Events\EventBusTests.cs" />
     <Compile Include="Events\PublishEventBufferTests.cs" />
+    <Compile Include="Lifecycle\ApplicationStartListenerInitializerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Transactions\UnitOfWorkFactoryTests.cs" />
     <Compile Include="Transactions\UnitOfWorkTests.cs" />

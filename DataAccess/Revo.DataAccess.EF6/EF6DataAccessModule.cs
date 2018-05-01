@@ -2,8 +2,8 @@
 using System.Linq;
 using Ninject.Modules;
 using Revo.Core.Core;
-using Revo.Core.Core.Lifecycle;
 using Revo.Core.IO.OData;
+using Revo.Core.Lifecycle;
 using Revo.DataAccess.EF6.Entities;
 using Revo.DataAccess.EF6.IO.OData;
 using Revo.DataAccess.EF6.Model;

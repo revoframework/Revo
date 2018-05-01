@@ -14,6 +14,7 @@ using Ninject.Web.Mvc;
 using Ninject.Web.Mvc.Filter;
 using Ninject.Web.WebApi;
 using Revo.Core.Core;
+using Revo.Core.Lifecycle;
 using Revo.Platforms.AspNet.Core.Lifecycle;
 using GlobalConfiguration = System.Web.Http.GlobalConfiguration;
 using NinjectFilterProvider = Ninject.Web.Mvc.Filter.NinjectFilterProvider;
@@ -29,6 +30,17 @@ namespace Revo.Platforms.AspNet.Core
         }
 
         public static RevoHttpApplication Current => (RevoHttpApplication) HttpContext.Current.ApplicationInstance;
+
+        public T Resolve<T>()
+        {
+            if (Kernel == null)
+            {
+                throw new InvalidOperationException("Kernel has not been initialized yet");
+            }
+
+            var kernel = (StandardKernel)Kernel;
+            return kernel.Get<T>();
+        }
 
         public IEnumerable<T> ResolveAll<T>()
         {
@@ -64,6 +76,9 @@ namespace Revo.Platforms.AspNet.Core
 
             DependencyResolver.SetResolver(Kernel.Get<IDependencyResolver>());
             GlobalConfiguration.Configuration.DependencyResolver = Kernel.Get<Ninject.Web.WebApi.NinjectDependencyResolver>();
+
+            var configurer = kernel.Get<IApplicationConfigurerInitializer>();
+            configurer.ConfigureAll();
         }
 
         protected override void OnApplicationStarted()

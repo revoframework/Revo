@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Revo.Core.Core;
-using Revo.Core.Core.Lifecycle;
+using Revo.Core.Lifecycle;
 
 namespace Revo.Domain.Sagas
 {

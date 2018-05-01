@@ -6,7 +6,7 @@ using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Linq;
-using Revo.Core.Core.Lifecycle;
+using Revo.Core.Lifecycle;
 using Revo.DataAccess.EF6.Model;
 
 namespace Revo.DataAccess.EF6.Entities

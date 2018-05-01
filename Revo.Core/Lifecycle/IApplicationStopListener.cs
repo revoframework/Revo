@@ -1,4 +1,4 @@
-﻿namespace Revo.Core.Core.Lifecycle
+﻿namespace Revo.Core.Lifecycle
 {
     public interface IApplicationStopListener
     {

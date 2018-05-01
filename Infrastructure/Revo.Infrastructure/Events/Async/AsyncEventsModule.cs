@@ -1,7 +1,7 @@
 ﻿using Ninject.Modules;
 using Revo.Core.Core;
-using Revo.Core.Core.Lifecycle;
 using Revo.Core.Events;
+using Revo.Core.Lifecycle;
 using Revo.Core.Transactions;
 using Revo.Infrastructure.Jobs;
 

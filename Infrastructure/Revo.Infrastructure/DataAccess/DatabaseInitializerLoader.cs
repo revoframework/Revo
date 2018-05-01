@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Revo.Core.Commands;
 using Revo.Core.Core;
-using Revo.Core.Core.Lifecycle;
+using Revo.Core.Lifecycle;
 using Revo.Core.Transactions;
 using Revo.Infrastructure.Repositories;
 

@@ -2,7 +2,7 @@
 using Ninject.Modules;
 using PushSharp.Google;
 using Revo.Core.Core;
-using Revo.Core.Core.Lifecycle;
+using Revo.Core.Lifecycle;
 
 namespace Revo.Infrastructure.Notifications.Channels.Fcm
 {

@@ -4,11 +4,11 @@ using System.Linq;
 using Ninject;
 using NLog;
 using Revo.Core.Core;
-using Revo.Core.Core.Lifecycle;
+using Revo.Core.Lifecycle;
 
 namespace Revo.Core.Commands
 {
-    public class CommandHandlerDiscovery : IApplicationStartListener
+    public class CommandHandlerDiscovery : IApplicationConfigurer
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -21,7 +21,7 @@ namespace Revo.Core.Commands
             this.kernel = kernel;
         }
 
-        public void OnApplicationStarted()
+        public void Configure()
         {
             DiscoverCommandHandlers();
         }

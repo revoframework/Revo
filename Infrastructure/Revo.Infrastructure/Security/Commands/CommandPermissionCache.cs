@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Revo.Core.Commands;
 using Revo.Core.Core;
-using Revo.Core.Core.Lifecycle;
+using Revo.Core.Lifecycle;
 using Revo.Core.Security;
 
 namespace Revo.Infrastructure.Security.Commands

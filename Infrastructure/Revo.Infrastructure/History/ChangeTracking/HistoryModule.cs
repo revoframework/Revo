@@ -1,6 +1,6 @@
 ﻿using Ninject.Modules;
 using Revo.Core.Core;
-using Revo.Core.Core.Lifecycle;
+using Revo.Core.Lifecycle;
 
 namespace Revo.Infrastructure.History.ChangeTracking
 {

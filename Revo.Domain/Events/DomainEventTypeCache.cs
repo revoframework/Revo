@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Revo.Core.Core;
-using Revo.Core.Core.Lifecycle;
+using Revo.Core.Events;
+using Revo.Core.Lifecycle;
 using Revo.Domain.Events.Attributes;
 
 namespace Revo.Domain.Events
@@ -28,7 +29,7 @@ namespace Revo.Domain.Events
             Type eventType;
             if (!eventNamesToTypes.TryGetValue((eventName, eventVersion), out eventType))
             {
-                throw new ArgumentException($"Could not find a domain event type named '{eventName}' (version {eventVersion})");
+                throw new ArgumentException($"Could not find an event type named '{eventName}' (version {eventVersion})");
             }
 
             return eventType;
@@ -38,7 +39,7 @@ namespace Revo.Domain.Events
         {
             if (!eventTypesToNames.TryGetValue(clrEventType, out var eventNameAndVersion))
             {
-                throw new ArgumentException($"Could not find a domain event for type name '{clrEventType.FullName}'");
+                throw new ArgumentException($"Could not find an event type for name '{clrEventType.FullName}'");
             }
 
             return eventNameAndVersion;
@@ -47,7 +48,7 @@ namespace Revo.Domain.Events
         private void ExploreEventTypes()
         {
             var eventTypes = typeExplorer.GetAllTypes()
-                .Where(x => typeof(DomainEvent).IsAssignableFrom(x))
+                .Where(x => typeof(IEvent).IsAssignableFrom(x))
                 .Where(x => !x.IsAbstract && !x.IsGenericTypeDefinition);
 
             foreach (Type eventType in eventTypes)

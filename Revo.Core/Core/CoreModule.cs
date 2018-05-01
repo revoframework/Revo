@@ -3,8 +3,8 @@ using Ninject;
 using Ninject.Extensions.ContextPreservation;
 using Ninject.Modules;
 using Revo.Core.Commands;
-using Revo.Core.Core.Lifecycle;
 using Revo.Core.Events;
+using Revo.Core.Lifecycle;
 using Revo.Core.Transactions;
 
 namespace Revo.Core.Core
@@ -17,7 +17,7 @@ namespace Revo.Core.Core
                 .ToMethod(ctx => Clock.Current)
                 .InTransientScope();
 
-            Bind<IApplicationStartListener>()
+            Bind<IApplicationConfigurer>()
                 .To<CommandHandlerDiscovery>()
                 .InSingletonScope();
 

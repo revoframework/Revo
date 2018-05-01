@@ -223,8 +223,6 @@
     <Compile Include="Events\IEventListener.cs" />
     <Compile Include="Events\IPublishEventBuffer.cs" />
     <Compile Include="Core\INinjectBindingExtension.cs" />
-    <Compile Include="Core\Lifecycle\IApplicationStartListener.cs" />
-    <Compile Include="Core\Lifecycle\IApplicationStopListener.cs" />
     <Compile Include="Core\IClock.cs" />
     <Compile Include="Core\ITypeExplorer.cs" />
     <Compile Include="Core\MemoryUtils.cs" />
@@ -240,6 +238,14 @@
     <Compile Include="IO\OData\ODataResult.cs" />
     <Compile Include="IO\OData\ODataResultWithCount.cs" />
     <Compile Include="IO\Resources\IResourceManager.cs" />
+    <Compile Include="Lifecycle\ApplicationConfigurerInitializer.cs" />
+    <Compile Include="Lifecycle\ApplicationStartListenerInitializer.cs" />
+    <Compile Include="Lifecycle\IApplicationConfigurer.cs" />
+    <Compile Include="Lifecycle\IApplicationConfigurerInitializer.cs" />
+    <Compile Include="Lifecycle\IApplicationStartListener.cs" />
+    <Compile Include="Lifecycle\IApplicationStartListenerInitializer.cs" />
+    <Compile Include="Lifecycle\IApplicationStopListener.cs" />
+    <Compile Include="Lifecycle\LifecycleModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\StringExtensions.cs" />
     <Compile Include="Core\SystemClock.cs" />

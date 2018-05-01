@@ -1,8 +1,9 @@
-﻿using Revo.Domain.Events;
+﻿using Revo.Core.Events;
+using Revo.Domain.Events;
 
 namespace Revo.Infrastructure.Globalization.Messages.Database
 {
-    public class DbMessageCacheReloadedEvent : DomainEvent
+    public class DbMessageCacheReloadedEvent : IEvent
     {
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Knoema.Localization;
-using Revo.Core.Core.Lifecycle;
+using Revo.Core.Lifecycle;
 
 namespace Revo.Infrastructure.Globalization
 {

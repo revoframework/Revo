@@ -3,7 +3,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
 using Ninject.Modules;
 using Revo.Core.Core;
-using Revo.Core.Core.Lifecycle;
+using Revo.Core.Lifecycle;
 using Revo.Core.Security;
 using Revo.Platforms.AspNet.Security.Identity;
 

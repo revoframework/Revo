@@ -2,7 +2,7 @@
 using Ninject;
 using Ninject.Modules;
 using Revo.Core.Core;
-using Revo.Core.Core.Lifecycle;
+using Revo.Core.Lifecycle;
 using Revo.DataAccess.Entities;
 
 namespace Revo.Infrastructure.Notifications

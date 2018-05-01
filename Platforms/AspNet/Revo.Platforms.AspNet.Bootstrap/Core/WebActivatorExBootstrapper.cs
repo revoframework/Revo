@@ -1,6 +1,6 @@
 ﻿using System.Linq;
+using Revo.Core.Lifecycle;
 using Revo.Platforms.AspNet.Boostrap.Core;
-using Revo.Core.Core.Lifecycle;
 using Revo.Platforms.AspNet.Core;
 using Revo.Platforms.AspNet.Core.Lifecycle;
 
@@ -27,20 +27,15 @@ namespace Revo.Platforms.AspNet.Boostrap.Core
             {
                 appInitializer.OnPostApplicationStart();
             }
-            
-            foreach (IApplicationStartListener startListener in RevoHttpApplication.Current.ResolveAll<IApplicationStartListener>())
-            {
-                startListener.OnApplicationStarted();
-            }
+
+            var initializer = RevoHttpApplication.Current.Resolve<IApplicationStartListenerInitializer>();
+            initializer.InitializeStarted();
         }
 
         public static void OnApplicationShutdown()
         {
-
-            foreach (IApplicationStopListener stopListener in RevoHttpApplication.Current.ResolveAll<IApplicationStopListener>())
-            {
-                stopListener.OnApplicationStopping();
-            }
+            var initializer = RevoHttpApplication.Current.Resolve<IApplicationStartListenerInitializer>();
+            initializer.DeinitializeStopping();
 
             foreach (IWebActivatorExHooks appInitializer in RevoHttpApplication.Current.ResolveAll<IWebActivatorExHooks>())
             {

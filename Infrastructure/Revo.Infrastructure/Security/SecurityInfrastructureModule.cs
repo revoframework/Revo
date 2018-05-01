@@ -1,7 +1,7 @@
 ﻿using Ninject.Modules;
 using Revo.Core.Commands;
 using Revo.Core.Core;
-using Revo.Core.Core.Lifecycle;
+using Revo.Core.Lifecycle;
 using Revo.DataAccess.Entities;
 using Revo.Infrastructure.Security.Commands;
 
