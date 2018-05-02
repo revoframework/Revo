@@ -76,31 +76,9 @@ namespace Revo.Infrastructure.Tests.Events.Async
         }
 
         [Fact]
-        public async Task DispatchToQueuesAsync_EnqueuesEvents()
+        public async Task DispatchToQueuesAsync_EnqueuesAndSetsCheckpointThenCommits()
         {
-            List<EventSequencing> event1Sequencing = new List<EventSequencing>();
-            List<EventSequencing> event2Sequencing = new List<EventSequencing>();
-
-            asyncEventQueueManager.When(x => x.EnqueueEventAsync(eventMessages[0], Arg.Any<IEnumerable<EventSequencing>>()))
-                .Do(ci => event1Sequencing.AddRange(ci.ArgAt<IEnumerable<EventSequencing>>(1)));
-            asyncEventQueueManager.When(x => x.EnqueueEventAsync(eventMessages[1], Arg.Any<IEnumerable<EventSequencing>>()))
-                .Do(ci => event2Sequencing.AddRange(ci.ArgAt<IEnumerable<EventSequencing>>(1)));
-
-            asyncEventQueueManager.CommitAsync().Returns(new List<IAsyncEventQueueRecord>()
-            {
-                new FakeAsyncEventQueueRecord()
-                {
-                    EventId = Guid.NewGuid(), EventMessage = eventMessages[0],
-                    Id = Guid.NewGuid(), QueueName = "queue2", SequenceNumber = 1
-                },
-                new FakeAsyncEventQueueRecord()
-                {
-                    EventId = Guid.NewGuid(), EventMessage = eventMessages[1],
-                    Id = Guid.NewGuid(), QueueName = "queue3", SequenceNumber = 1
-                }
-            });
-
-            QueueDispatchResult result = await sut.DispatchToQueuesAsync(eventMessages, "eventSource", "checkpoint");
+            await sut.DispatchToQueuesAsync(eventMessages, "eventSource", "checkpoint");
 
             Received.InOrder(() =>
             {
@@ -116,15 +94,65 @@ namespace Revo.Infrastructure.Tests.Events.Async
             });
 
             asyncEventQueueManager.Received(1).CommitAsync();
+        }
 
-            event1Sequencing.Should().HaveCount(2);
-            event1Sequencing.Should().Contain(x => x.SequenceName == "queue1" && x.EventSequenceNumber == 1);
-            event1Sequencing.Should().Contain(x => x.SequenceName == "queue2" && x.EventSequenceNumber == 1);
+        [Fact]
+        public async Task DispatchToQueuesAsync_EnqueuesToCorrectQueues()
+        {
+            List<EventSequencing> event1Sequencing = new List<EventSequencing>();
+            List<EventSequencing> event2Sequencing = new List<EventSequencing>();
 
-            event2Sequencing.Should().HaveCount(3);
-            event2Sequencing.Should().Contain(x => x.SequenceName == "queue1" && x.EventSequenceNumber == 2);
-            event2Sequencing.Should().Contain(x => x.SequenceName == "queue2" && x.EventSequenceNumber == 2);
-            event2Sequencing.Should().Contain(x => x.SequenceName == "queue3" && x.EventSequenceNumber == 3);
+            asyncEventQueueManager.When(x => x.EnqueueEventAsync(eventMessages[0], Arg.Any<IEnumerable<EventSequencing>>()))
+                .Do(ci => event1Sequencing.AddRange(ci.ArgAt<IEnumerable<EventSequencing>>(1)));
+            asyncEventQueueManager.When(x => x.EnqueueEventAsync(eventMessages[1], Arg.Any<IEnumerable<EventSequencing>>()))
+                .Do(ci => event2Sequencing.AddRange(ci.ArgAt<IEnumerable<EventSequencing>>(1)));
+
+            await sut.DispatchToQueuesAsync(eventMessages, "eventSource", "checkpoint");
+
+            event1Sequencing.Should().BeEquivalentTo(new[]
+            {
+                new EventSequencing() { SequenceName = "queue1", EventSequenceNumber = 1 },
+                new EventSequencing() { SequenceName = "queue2", EventSequenceNumber = 1 }
+            });
+
+            event2Sequencing.Should().BeEquivalentTo(new[]
+            {
+                new EventSequencing() { SequenceName = "queue1", EventSequenceNumber = 2 },
+                new EventSequencing() { SequenceName = "queue2", EventSequenceNumber = 2 },
+                new EventSequencing() { SequenceName = "queue3", EventSequenceNumber = 3 }
+            });
+        }
+
+        [Fact]
+        public async Task DispatchToQueuesAsync_DoesNotEnqueueWhenNoQueues()
+        {
+            await sut.DispatchToQueuesAsync(new[]
+                {
+                    new EventMessage<Event1>(new Event1(), new Dictionary<string, string>())
+                },
+                "eventSource", "checkpoint");
+
+            asyncEventQueueManager.DidNotReceiveWithAnyArgs().EnqueueEventAsync(null, null);
+        }
+
+        [Fact]
+        public async Task DispatchToQueuesAsync_ReturnsEventRecords()
+        {
+            asyncEventQueueManager.CommitAsync().Returns(new List<IAsyncEventQueueRecord>()
+            {
+                new FakeAsyncEventQueueRecord()
+                {
+                    EventId = Guid.NewGuid(), EventMessage = eventMessages[0],
+                    Id = Guid.NewGuid(), QueueName = "queue2", SequenceNumber = 1
+                },
+                new FakeAsyncEventQueueRecord()
+                {
+                    EventId = Guid.NewGuid(), EventMessage = eventMessages[1],
+                    Id = Guid.NewGuid(), QueueName = "queue3", SequenceNumber = 1
+                }
+            });
+
+            QueueDispatchResult result = await sut.DispatchToQueuesAsync(eventMessages, "eventSource", "checkpoint");
             
             result.EnqueuedEventsAsyncProcessed.Should().HaveCount(1);
             result.EnqueuedEventsAsyncProcessed.Should().Contain(x => x.EventMessage == eventMessages[1]

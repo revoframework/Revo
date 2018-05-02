@@ -33,9 +33,12 @@ namespace Revo.Infrastructure.Events.Async
             foreach (var message in eventMessages)
             {
                 var queues = GetEventQueues(message);
-                await asyncEventQueueManager.EnqueueEventAsync(message, queues.Select(x => x.sequencing));
-                queues.Where(x => !x.synchronousDispatch).ForEach(x => queuesForAsyncDispatch.Add(x.sequencing.SequenceName));
-                queues.Where(x => x.synchronousDispatch).ForEach(x => queuesForSyncDispatch.Add(x.sequencing.SequenceName));
+                if (queues.Count > 0)
+                {
+                    await asyncEventQueueManager.EnqueueEventAsync(message, queues.Select(x => x.Sequencing));
+                    queues.Where(x => !x.SynchronousDispatch).ForEach(x => queuesForAsyncDispatch.Add(x.Sequencing.SequenceName));
+                    queues.Where(x => x.SynchronousDispatch).ForEach(x => queuesForSyncDispatch.Add(x.Sequencing.SequenceName));
+                }
             }
 
             if (eventSourceName != null)
@@ -52,7 +55,7 @@ namespace Revo.Infrastructure.Events.Async
             };
         }
 
-        private IEnumerable<(EventSequencing sequencing, bool synchronousDispatch)> GetEventQueues(IEventMessage message)
+        private IReadOnlyCollection<(EventSequencing Sequencing, bool SynchronousDispatch)> GetEventQueues(IEventMessage message)
         {
             Type eventSequencerType = typeof(IAsyncEventSequencer<>).MakeGenericType(message.Event.GetType());
             IEnumerable<IAsyncEventSequencer> eventSequencers = serviceLocator.GetAll(eventSequencerType).Cast<IAsyncEventSequencer>();
