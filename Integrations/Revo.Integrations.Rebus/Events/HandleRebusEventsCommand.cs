@@ -11,11 +11,11 @@ namespace Revo.Integrations.Rebus.Events
 {
     public class HandleRebusEventsCommand : ICommand
     {
-        public HandleRebusEventsCommand(ImmutableList<RebusEventMessage<IEvent>> messages)
+        public HandleRebusEventsCommand(ImmutableList<IEventMessage<IEvent>> messages)
         {
             Messages = messages;
         }
 
-        public ImmutableList<RebusEventMessage<IEvent>> Messages { get; }
+        public ImmutableList<IEventMessage<IEvent>> Messages { get; }
     }
 }

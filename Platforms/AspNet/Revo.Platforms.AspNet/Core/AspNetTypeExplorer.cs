@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using Revo.Core.Core;
+using Revo.Core.Types;
 
 namespace Revo.Platforms.AspNet.Core
 {

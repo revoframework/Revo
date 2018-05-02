@@ -16,6 +16,7 @@ using Revo.Domain.Entities;
 using Revo.Domain.Entities.EventSourcing;
 using Revo.Domain.Events;
 using Revo.Infrastructure.Repositories;
+using Revo.Testing.Infrastructure;
 using Xunit;
 
 namespace Revo.Infrastructure.Tests.EventSourcing

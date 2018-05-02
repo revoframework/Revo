@@ -9,10 +9,6 @@ namespace Revo.Domain.Core
     {
         public override void Load()
         {
-            Bind<IDomainEventTypeCache, IApplicationStartListener>()
-                .To<DomainEventTypeCache>()
-                .InSingletonScope();
-
             Bind<IApplicationStartListener>()
                 .To<ConventionEventApplyRegistratorCache>()
                 .InSingletonScope();

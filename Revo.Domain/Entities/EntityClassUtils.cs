@@ -35,7 +35,7 @@ namespace Revo.Domain.Entities
             Guid? classId = TryGetEntityClassId(type);
             if (classId == null)
             {
-                throw new ArgumentException($"Type {type.FullName} doesn't have an attribute with class ID");
+                throw new ArgumentException($"ClrType {type.FullName} doesn't have an attribute with class ID");
             }
 
             return classId.Value;

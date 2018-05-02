@@ -25,7 +25,7 @@ namespace Revo.Core.Commands
             return bindingRoot
                 .Bind(handlerInterfaces.Concat(services).Concat(new[] {typeof(T)}).ToArray())
                 .To<T>()
-                //.When(x => x.Target?.Type.Name.StartsWith("CommandHandlerPipeline") ?? false);
+                //.When(x => x.Target?.ClrType.Name.StartsWith("CommandHandlerPipeline") ?? false);
                 .WhenInjectedInto(decoratorTypes.Values.ToArray());
         }
 
@@ -46,7 +46,7 @@ namespace Revo.Core.Commands
             return bindingRoot
                 .Bind(handlerInterfaces.Concat(services).Concat(new[] {commandHandlerType}).ToArray())
                 .To(commandHandlerType)
-                //.When(x => x.Target?.Type.Name.StartsWith("CommandHandlerPipeline") ?? false);
+                //.When(x => x.Target?.ClrType.Name.StartsWith("CommandHandlerPipeline") ?? false);
                 .WhenInjectedInto(decoratorTypes.Values.ToArray());
         }
 

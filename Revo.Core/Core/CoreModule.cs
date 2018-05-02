@@ -6,6 +6,7 @@ using Revo.Core.Commands;
 using Revo.Core.Events;
 using Revo.Core.Lifecycle;
 using Revo.Core.Transactions;
+using Revo.Core.Types;
 
 namespace Revo.Core.Core
 {
@@ -44,6 +45,18 @@ namespace Revo.Core.Core
             Bind<IPublishEventBuffer>()
                 .ToMethod(ctx => ctx.ContextPreservingGet<IUnitOfWork>().EventBuffer)
                 .InTransientScope();
+
+            Rebind<ITypeExplorer>()
+                .To<TypeExplorer>()
+                .InSingletonScope();
+
+            Rebind<ITypeIndexer>()
+                .To<TypeIndexer>()
+                .InSingletonScope();
+
+            Rebind<IVersionedTypeRegistry>()
+                .To<VersionedTypeRegistry>()
+                .InSingletonScope();
         }
     }
 }

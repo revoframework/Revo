@@ -4,6 +4,7 @@ using System.Linq;
 using Ninject;
 using Revo.Core.Core;
 using Revo.Core.IO;
+using Revo.Core.Types;
 
 namespace Revo.Platforms.AspNet.Core
 {

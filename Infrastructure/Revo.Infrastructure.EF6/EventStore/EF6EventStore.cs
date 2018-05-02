@@ -4,8 +4,10 @@ using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using Revo.Core.Core;
+using Revo.Core.Types;
 using Revo.DataAccess.Entities;
 using Revo.Domain.Events;
+using Revo.Infrastructure.EF6.Events;
 using Revo.Infrastructure.EF6.EventStore.Model;
 using Revo.Infrastructure.EventStore;
 
@@ -15,15 +17,23 @@ namespace Revo.Infrastructure.EF6.EventStore
     {
         private const string EventSourceName = "EF6EventStore";
 
+        private static readonly string[] FilteredMetadataKeys =
+        {
+            BasicEventMetadataNames.EventId,
+            BasicEventMetadataNames.StreamSequenceNumber,
+            BasicEventMetadataNames.StoreDate,
+            BasicEventMetadataNames.PublishDate,
+        };
+
         private readonly ICrudRepository crudRepository;
-        private readonly IDomainEventTypeCache domainEventTypeCache;
+        private readonly IEventSerializer eventSerializer;
         private readonly Dictionary<Guid, StreamBuffer> streams = new Dictionary<Guid, StreamBuffer>();
 
         public EF6EventStore(ICrudRepository crudRepository,
-            IDomainEventTypeCache domainEventTypeCache)
+            IEventSerializer eventSerializer)
         {
             this.crudRepository = crudRepository;
-            this.domainEventTypeCache = domainEventTypeCache;
+            this.eventSerializer = eventSerializer;
         }
 
         public async Task<EventStreamInfo> GetStreamInfoAsync(Guid streamId)
@@ -231,18 +241,27 @@ namespace Revo.Infrastructure.EF6.EventStore
             {
                 Guid eventId = x.Metadata.GetEventId() ?? Guid.NewGuid();
                 var metadata = CreateRowMetadata(x.Metadata);
-                return new EventStreamRow(domainEventTypeCache, eventId, x.Event, streamId,
-                    ++version, storeDate, metadata);
+                var metadataJson = eventSerializer.SerializeEventMetadata(x.Metadata);
+
+                string eventJson;
+                VersionedTypeId typeId;
+                (eventJson, typeId) = eventSerializer.SerializeEvent(x.Event);
+
+                return new EventStreamRow(eventId, eventJson, typeId.Name, typeId.Version,
+                    streamId, ++version, storeDate, metadataJson);
             }).ToList();
 
             rows.ForEach(x => streamBuffer.UncommitedRows.Add(x.StreamSequenceNumber, x));
             crudRepository.AddRange(rows);
-            return rows;
+
+            return rows.Select(SelectEventRecordFromRow).ToList();
         }
 
         private IReadOnlyDictionary<string, string> CreateRowMetadata(IReadOnlyDictionary<string, string> metadata)
         {
-            Dictionary<string, string> newMetadata = metadata.ToDictionary(x => x.Key, x => x.Value);
+            Dictionary<string, string> newMetadata = metadata
+                .Where(x => !FilteredMetadataKeys.Contains(x.Key))
+                .ToDictionary(x => x.Key, x => x.Value);
             newMetadata.ReplaceMetadata(BasicEventMetadataNames.EventSourceName, EventSourceName);
 
             return newMetadata;
@@ -308,8 +327,7 @@ namespace Revo.Infrastructure.EF6.EventStore
 
         private IEventStoreRecord SelectEventRecordFromRow(EventStreamRow row)
         {
-            row.DomainEventTypeCache = domainEventTypeCache;
-            return row;
+            return new EventStoreRecordAdapter(row, eventSerializer);
         }
 
         private async Task<long> GetStreamVersionAsync(Guid streamId)

@@ -4,8 +4,10 @@ using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using Revo.Core.Events;
+using Revo.Core.Types;
 using Revo.DataAccess.Entities;
 using Revo.Domain.Events;
+using Revo.Infrastructure.EF6.EventStore;
 using Revo.Infrastructure.EF6.EventStore.Model;
 using Revo.Infrastructure.Events.Async;
 using Revo.Infrastructure.EventStore;
@@ -16,22 +18,24 @@ namespace Revo.Infrastructure.EF6.Events.Async
     public class AsyncEventQueueManager : IAsyncEventQueueManager
     {
         private readonly ICrudRepository crudRepository;
-        private readonly IDomainEventTypeCache domainEventTypeCache;
+        private readonly IEventSerializer eventSerializer;
 
         private readonly List<(ExternalEventRecord externalEventRecord, List<QueuedAsyncEvent> queuedEvents)>
             externalEvents = new List<(ExternalEventRecord externalEventRecord, List<QueuedAsyncEvent> queuedEvents)>();
 
-        public AsyncEventQueueManager(ICrudRepository crudRepository, IDomainEventTypeCache domainEventTypeCache)
+        public AsyncEventQueueManager(ICrudRepository crudRepository, IEventSerializer eventSerializer)
         {
             this.crudRepository = crudRepository;
-            this.domainEventTypeCache = domainEventTypeCache;
+            this.eventSerializer = eventSerializer;
         }
 
         public async Task<IReadOnlyCollection<IAsyncEventQueueRecord>> FindQueuedEventsAsync(Guid[] asyncEventQueueRecordIds)
         {
-            return await QueryQueuedEvents()
+            return (await QueryQueuedEvents()
                 .Where(x => asyncEventQueueRecordIds.Contains(x.Id))
-                .ToListAsync();
+                .ToListAsync())
+                .Select(SelectRecordFromQueuedEvent)
+                .ToList();
         }
 
         public async Task<IReadOnlyCollection<string>> GetNonemptyQueueNamesAsync()
@@ -56,22 +60,12 @@ namespace Revo.Infrastructure.EF6.Events.Async
                 return new List<IAsyncEventQueueRecord>();
             }
 
-            var events = await QueryQueuedEvents()
+            var events = (await QueryQueuedEvents()
                 .Where(x => x.QueueId == queue.Id)
-                .ToListAsync();
-
-            foreach (var @event in events)
-            {
-                if (@event.EventStreamRow != null && @event.EventStreamRow.DomainEventTypeCache == null)
-                {
-                    @event.EventStreamRow.DomainEventTypeCache = domainEventTypeCache;
-                }
-                else if (@event.ExternalEventRecord != null && @event.ExternalEventRecord.DomainEventTypeCache == null)
-                {
-                    @event.ExternalEventRecord.DomainEventTypeCache = domainEventTypeCache;
-                }
-            }
-
+                .ToListAsync())
+                .Select(SelectRecordFromQueuedEvent)
+                .ToList();
+            
             return events;
         }
 
@@ -80,7 +74,7 @@ namespace Revo.Infrastructure.EF6.Events.Async
             QueuedAsyncEvent queuedEvent = await crudRepository.FindAsync<QueuedAsyncEvent>(asyncEventQueueRecordId);
             if (queuedEvent != null)
             {
-                AsyncEventQueue queue = await GetOrCreateQueueAsync(queuedEvent.QueueName, null);
+                AsyncEventQueue queue = await GetOrCreateQueueAsync(queuedEvent.QueueId, null);
                 if (queuedEvent.SequenceNumber != null)
                 {
                     queue.LastSequenceNumberProcessed = queuedEvent.SequenceNumber;
@@ -96,7 +90,7 @@ namespace Revo.Infrastructure.EF6.Events.Async
             ExternalEventRecord externalEventRecord = null;
             if (eventMessage is IEventStoreEventMessage eventStoreEventMessage)
             {
-                eventStreamRow = eventStoreEventMessage.Record as EventStreamRow;
+                eventStreamRow = ((EventStoreRecordAdapter)eventStoreEventMessage.Record).EventStreamRow;
                 if (eventStreamRow.IsDispatchedToAsyncQueues)
                 {
                     return; // TODO might want to return existing queue records instead?
@@ -112,8 +106,7 @@ namespace Revo.Infrastructure.EF6.Events.Async
             }
             else
             {
-                externalEventRecord = new ExternalEventRecord(domainEventTypeCache,
-                    eventMessage.Event, eventMessage.Metadata);
+                externalEventRecord = CreateExternalEventRecord(eventMessage);
             }
 
             List<QueuedAsyncEvent> externalQueuedEvents = new List<QueuedAsyncEvent>();
@@ -141,7 +134,7 @@ namespace Revo.Infrastructure.EF6.Events.Async
                 externalEvents.Add((externalEventRecord, externalQueuedEvents));
             }
         }
-
+        
         public async Task<string> GetEventSourceCheckpointAsync(string eventSourceName)
         {
             EventSourceState eventSourceState = await crudRepository.FindAsync<EventSourceState>(eventSourceName);
@@ -165,7 +158,16 @@ namespace Revo.Infrastructure.EF6.Events.Async
             await ResolveExternalEvents();
             List<QueuedAsyncEvent> queueRecords = crudRepository.GetEntities<QueuedAsyncEvent>(EntityState.Added).ToList();
             await crudRepository.SaveChangesAsync();
-            return queueRecords;
+            return queueRecords.Select(SelectRecordFromQueuedEvent).ToList();
+        }
+
+        private ExternalEventRecord CreateExternalEventRecord(IEventMessage eventMessage)
+        {
+            Guid eventId = eventMessage.Metadata.GetEventId() ?? throw new InvalidOperationException($"Cannot queue an external async event ({eventMessage}) without ID");
+            (string eventJson, VersionedTypeId typeId) = eventSerializer.SerializeEvent(eventMessage.Event);
+            string metadataJson = eventSerializer.SerializeEventMetadata(eventMessage.Metadata);
+
+            return new ExternalEventRecord(eventId, eventJson, typeId.Name, typeId.Version, metadataJson);
         }
 
         private async Task ResolveExternalEvents()
@@ -214,5 +216,11 @@ namespace Revo.Infrastructure.EF6.Events.Async
                 .Include(x => x.EventStreamRow)
                 .Include(x => x.ExternalEventRecord);
         }
+
+        private AsyncEventQueueRecordAdapter SelectRecordFromQueuedEvent(QueuedAsyncEvent queuedEvent)
+        {
+            return new AsyncEventQueueRecordAdapter(queuedEvent, eventSerializer);
+        }
     }
 }
+

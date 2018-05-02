@@ -8,6 +8,6 @@
         }
 
         public ICommand Command { get; private set; }
-        public IDictionary<Type, object> Data { get; private set; } = new Dictionary<Type, object>();
+        public IDictionary<ClrType, object> Data { get; private set; } = new Dictionary<ClrType, object>();
     }*/
 }

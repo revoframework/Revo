@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Revo.Core.Core;
 using Revo.Core.Lifecycle;
+using Revo.Core.Types;
 using Revo.Domain.Entities.Attributes;
 
 namespace Revo.Domain.Entities

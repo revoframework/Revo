@@ -2,7 +2,7 @@
 {
     /*public interface ICrudEntityProjector
     {
-        Type ProjectedAggregateType { get; }
+        ClrType ProjectedAggregateType { get; }
     }
 
     public interface ICrudEntityProjector<in T> : ICrudEntityProjector

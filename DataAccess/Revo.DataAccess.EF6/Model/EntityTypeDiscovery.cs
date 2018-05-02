@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Revo.Core.Core;
+using Revo.Core.Types;
 using Revo.DataAccess.Entities;
 
 namespace Revo.DataAccess.EF6.Model

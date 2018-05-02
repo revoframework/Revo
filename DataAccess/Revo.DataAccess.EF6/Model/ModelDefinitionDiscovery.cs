@@ -4,6 +4,7 @@ using System.Linq;
 using Ninject;
 using NLog;
 using Revo.Core.Core;
+using Revo.Core.Types;
 
 namespace Revo.DataAccess.EF6.Model
 {

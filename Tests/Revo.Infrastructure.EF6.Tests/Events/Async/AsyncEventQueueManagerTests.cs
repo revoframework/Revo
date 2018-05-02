@@ -8,6 +8,7 @@ using Revo.Infrastructure.EF6.Events.Async;
 using NSubstitute;
 using Revo.DataAccess.InMemory;
 using Revo.Domain.Events;
+using Revo.Infrastructure.EF6.Events;
 using Xunit;
 
 namespace Revo.Infrastructure.EF6.Tests.Events.Async
@@ -16,14 +17,14 @@ namespace Revo.Infrastructure.EF6.Tests.Events.Async
     {
         private AsyncEventQueueManager sut;
         private InMemoryCrudRepository crudRepository;
-        private IDomainEventTypeCache domainEventTypeCache;
+        private IEventSerializer eventSerializer;
 
         public AsyncEventQueueManagerTests()
         {
             crudRepository = new InMemoryCrudRepository();
-            domainEventTypeCache = Substitute.For<IDomainEventTypeCache>();
+            eventSerializer = Substitute.For<IEventSerializer>();
 
-            sut = new AsyncEventQueueManager(crudRepository, domainEventTypeCache);
+            sut = new AsyncEventQueueManager(crudRepository, eventSerializer);
         }
 
         [Fact]

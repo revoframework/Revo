@@ -83,7 +83,7 @@
       <HintPath>..\..\Packages\Ninject.Extensions.Factory.3.3.2\lib\net45\Ninject.Extensions.Factory.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\..\Packages\NLog.4.4.13\lib\net45\NLog.dll</HintPath>
+      <HintPath>..\..\Packages\NLog.4.5.3\lib\net45\NLog.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Collections.Immutable, Version=1.2.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -104,6 +104,7 @@
       <HintPath>..\..\Packages\System.IO.4.3.0\lib\net462\System.IO.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.IO.FileSystem">
       <HintPath>..\..\Packages\System.IO.FileSystem.4.3.0\lib\net46\System.IO.FileSystem.dll</HintPath>
@@ -146,10 +147,13 @@
       <HintPath>..\..\Packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Text.RegularExpressions">
       <HintPath>..\..\Packages\System.Text.RegularExpressions.4.3.0\lib\net463\System.Text.RegularExpressions.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Transactions" />
     <Reference Include="System.ValueTuple">
       <HintPath>..\..\Packages\System.ValueTuple.4.4.0\lib\net47\System.ValueTuple.dll</HintPath>
       <Private>True</Private>
@@ -224,7 +228,6 @@
     <Compile Include="Events\IPublishEventBuffer.cs" />
     <Compile Include="Core\INinjectBindingExtension.cs" />
     <Compile Include="Core\IClock.cs" />
-    <Compile Include="Core\ITypeExplorer.cs" />
     <Compile Include="Core\MemoryUtils.cs" />
     <Compile Include="Core\NinjectBindingExtensions.cs" />
     <Compile Include="Events\JsonMetadata.cs" />
@@ -272,7 +275,15 @@
     <Compile Include="Transactions\IUnitOfWorkListener.cs" />
     <Compile Include="Transactions\UnitOfWorkFactory.cs" />
     <Compile Include="Transactions\UnitOfWork.cs" />
-    <Compile Include="Core\TypeExplorer.cs" />
+    <Compile Include="Types\ITypeExplorer.cs" />
+    <Compile Include="Types\ITypeIndexer.cs" />
+    <Compile Include="Types\IVersionedTypeRegistry.cs" />
+    <Compile Include="Types\TypeExplorer.cs" />
+    <Compile Include="Types\TypeIndexer.cs" />
+    <Compile Include="Types\TypeVersionAttribute.cs" />
+    <Compile Include="Types\VersionedType.cs" />
+    <Compile Include="Types\VersionedTypeId.cs" />
+    <Compile Include="Types\VersionedTypeRegistry.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">

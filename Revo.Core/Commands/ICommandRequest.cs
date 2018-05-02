@@ -3,6 +3,6 @@
     /*public interface ICommandRequest
     {
         ICommand Command { get; }
-        IDictionary<Type, object> Data { get; }
+        IDictionary<ClrType, object> Data { get; }
     }*/
 }

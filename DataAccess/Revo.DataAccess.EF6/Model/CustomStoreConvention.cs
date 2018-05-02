@@ -244,9 +244,9 @@ namespace Revo.DataAccess.EF6.Model
             public string EntityName { get; set; }
         }
 
-        /*private Type GetRealDeclaringType(PropertyInfo propertyInfo)
+        /*private ClrType GetRealDeclaringType(PropertyInfo propertyInfo)
         {
-            Stack<Type> typeHierarchy = new Stack<Type>();
+            Stack<ClrType> typeHierarchy = new Stack<ClrType>();
             typeHierarchy.Push(propertyInfo.ReflectedType);
 
             while (typeHierarchy.First() != propertyInfo.DeclaringType)
@@ -254,7 +254,7 @@ namespace Revo.DataAccess.EF6.Model
                 typeHierarchy.Push(typeHierarchy.First().BaseType);
             }
 
-            Type type;
+            ClrType type;
             do
             {
                 type = typeHierarchy.First();

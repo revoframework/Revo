@@ -52,7 +52,7 @@ namespace Revo.Infrastructure.History.ChangeTracking
             }
         }
 
-        /*public async Task ChangeAttributes(Dictionary<string, Tuple<Type, object>> newAttributeValues,
+        /*public async Task ChangeAttributes(Dictionary<string, Tuple<ClrType, object>> newAttributeValues,
             Guid? aggregateId = null, Guid? aggregateClassId = null,
             Guid? entityId = null, Guid? entityClassId = null)
         {

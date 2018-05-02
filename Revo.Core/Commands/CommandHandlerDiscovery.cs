@@ -5,6 +5,7 @@ using Ninject;
 using NLog;
 using Revo.Core.Core;
 using Revo.Core.Lifecycle;
+using Revo.Core.Types;
 
 namespace Revo.Core.Commands
 {

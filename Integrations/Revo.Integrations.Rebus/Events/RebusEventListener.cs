@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Rebus.Bus;
 using Revo.Core.Events;
+using Revo.Domain.Events;
 using Revo.Infrastructure.Events.Async;
 
 namespace Revo.Integrations.Rebus.Events
@@ -39,6 +40,11 @@ namespace Revo.Integrations.Rebus.Events
 
             protected override IEnumerable<EventSequencing> GetEventSequencing(IEventMessage<IEvent> message)
             {
+                if (!message.Metadata.GetEventId().HasValue)
+                {
+                    yield break;
+                }
+
                 yield return new EventSequencing()
                 {
                     SequenceName = QueueNamePrefix,

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Newtonsoft.Json.Linq;
 using Revo.Core.Core;
 using Revo.Core.Events;
 using Revo.DataAccess.Entities;
@@ -10,9 +11,13 @@ using Revo.Infrastructure.EF6.EventStore;
 using Revo.Infrastructure.EF6.EventStore.Model;
 using Revo.Infrastructure.EventStore;
 using NSubstitute;
+using Revo.Core.Types;
 using Revo.DataAccess.EF6.InMemory;
 using Revo.DataAccess.InMemory;
 using Revo.Domain.Events;
+using Revo.Infrastructure.EF6.Events;
+using Revo.Testing.Core;
+using Revo.Testing.Infrastructure;
 using Xunit;
 
 namespace Revo.Infrastructure.EF6.Tests.EventStore
@@ -21,16 +26,17 @@ namespace Revo.Infrastructure.EF6.Tests.EventStore
     {
         private readonly EF6EventStore sut;
         private readonly EF6InMemoryCrudRepository inMemoryCrudRepository;
-        private readonly IDomainEventTypeCache domainEventTypeCache;
+        private readonly IEventSerializer eventSerializer;
         private readonly EventStream[] eventStreams;
         private readonly EventStreamRow[] eventStreamRows;
+        private readonly IEventStoreRecord[] storeRecords;
 
         public EF6EventStoreTests()
         {
             inMemoryCrudRepository = new EF6InMemoryCrudRepository();
-            domainEventTypeCache = Substitute.For<IDomainEventTypeCache>();
+            eventSerializer = Substitute.For<IEventSerializer>();
 
-            sut = new EF6EventStore(inMemoryCrudRepository, domainEventTypeCache);
+            sut = new EF6EventStore(inMemoryCrudRepository, eventSerializer);
 
             eventStreams = new[]
             {
@@ -40,15 +46,36 @@ namespace Revo.Infrastructure.EF6.Tests.EventStore
             };
             inMemoryCrudRepository.AttachRange(eventStreams);
 
+            eventSerializer.SerializeEvent(Arg.Any<Event1>())
+                .Returns(ci => ("{\"bar\":" + ci.ArgAt<Event1>(0).Foo + "}", new VersionedTypeId("EventName", 5)));
+            eventSerializer.DeserializeEvent(Arg.Any<string>(), new VersionedTypeId("EventName", 5))
+                .Returns(ci =>
+                    new Event1((int) JObject.Parse(ci.ArgAt<string>(0))["bar"]));
+            eventSerializer.SerializeEventMetadata(Arg.Is<IReadOnlyDictionary<string, string>>(x => x.Count == 1
+                && x["doh"] == "42")).ReturnsForAnyArgs("doh");
+            eventSerializer.DeserializeEventMetadata("doh").ReturnsForAnyArgs(new JsonMetadata(JObject.Parse("{\"doh\":42}")));
+
+            FakeClock.Setup();
+
             eventStreamRows = new[]
             {
-                new EventStreamRow(domainEventTypeCache, Guid.NewGuid(), new Event1(), eventStreams[0].Id, 1, Clock.Current.Now, new Dictionary<string, string>()),
-                new EventStreamRow(domainEventTypeCache, Guid.NewGuid(), new Event1(), eventStreams[0].Id, 2, Clock.Current.Now, new Dictionary<string, string>()),
-                new EventStreamRow(domainEventTypeCache, Guid.NewGuid(), new Event1(), eventStreams[1].Id, 3, Clock.Current.Now, new Dictionary<string, string>()),
-                new EventStreamRow(domainEventTypeCache, Guid.NewGuid(), new Event1(), eventStreams[1].Id, 2, Clock.Current.Now, new Dictionary<string, string>()),
-                new EventStreamRow(domainEventTypeCache, Guid.NewGuid(), new Event1(), eventStreams[1].Id, 4, Clock.Current.Now, new Dictionary<string, string>()),
-                new EventStreamRow(domainEventTypeCache, Guid.NewGuid(), new Event1(), eventStreams[1].Id, 5, Clock.Current.Now, new Dictionary<string, string>())
+                new EventStreamRow(Guid.NewGuid(), "{\"bar\":1}", "EventName", 5, eventStreams[0].Id, 1, Clock.Current.Now, "{\"doh\":42}"),
+                new EventStreamRow(Guid.NewGuid(), "{\"bar\":2}", "EventName", 5, eventStreams[0].Id, 2, Clock.Current.Now, "{\"doh\":42}"),
+                new EventStreamRow(Guid.NewGuid(), "{\"bar\":3}", "EventName", 5, eventStreams[1].Id, 3, Clock.Current.Now, "{\"doh\":42}"),
+                new EventStreamRow(Guid.NewGuid(), "{\"bar\":4}", "EventName", 5, eventStreams[1].Id, 2, Clock.Current.Now, "{\"doh\":42}"),
+                new EventStreamRow(Guid.NewGuid(), "{\"bar\":5}", "EventName", 5, eventStreams[1].Id, 4, Clock.Current.Now, "{\"doh\":42}"),
+                new EventStreamRow(Guid.NewGuid(), "{\"bar\":6}", "EventName", 5, eventStreams[1].Id, 5, Clock.Current.Now, "{\"doh\":42}")
             };
+
+            storeRecords = eventStreamRows.Select((x, i) =>
+                    new FakeEventStoreRecord()
+                    {
+                        Event = new Event1(i + 1),
+                        AdditionalMetadata = new Dictionary<string, string>() {{"doh", "42"}},
+                        EventId = eventStreamRows[i].Id,
+                        StreamSequenceNumber = eventStreamRows[i].StreamSequenceNumber
+                    })
+                .ToArray();
 
             inMemoryCrudRepository.AttachRange(eventStreamRows);
         }
@@ -58,7 +85,7 @@ namespace Revo.Infrastructure.EF6.Tests.EventStore
         {
             IEventStoreRecord record = await sut.GetEventAsync(eventStreams[0].Id, 1);
 
-            record.Should().Be(eventStreamRows[0]);
+            record.ShouldBeEquivalentTo(storeRecords[0]);
         }
 
         [Fact]
@@ -74,7 +101,7 @@ namespace Revo.Infrastructure.EF6.Tests.EventStore
         {
             var records = await sut.GetEventsAsync(eventStreams[eventStreamIndex].Id);
 
-            records.ShouldBeEquivalentTo(rowsIndices.Select(x => eventStreamRows[x]));
+            records.ShouldBeEquivalentTo(rowsIndices.Select(x => storeRecords[x]));
         }
 
         [Fact]
@@ -101,7 +128,7 @@ namespace Revo.Infrastructure.EF6.Tests.EventStore
             var records = await sut.GetEventRangeAsync(eventStreams[eventStreamIndex].Id,
                 minSequenceNumber, maxSequenceNumber, maxCount);
 
-            records.ShouldBeEquivalentTo(rowsIndices.Select(x => eventStreamRows[x]));
+            records.ShouldBeEquivalentTo(rowsIndices.Select(x => storeRecords[x]));
         }
 
         [Fact]
@@ -132,6 +159,12 @@ namespace Revo.Infrastructure.EF6.Tests.EventStore
 
         public class Event1 : IEvent
         {
+            public Event1(int foo)
+            {
+                Foo = foo;
+            }
+
+            public int Foo { get; private set; }
         }
     }
 }

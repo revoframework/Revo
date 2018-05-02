@@ -55,7 +55,7 @@
       <HintPath>..\..\Packages\Ninject.3.3.4\lib\net45\Ninject.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\..\Packages\NLog.4.4.13\lib\net45\NLog.dll</HintPath>
+      <HintPath>..\..\Packages\NLog.4.5.3\lib\net45\NLog.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Collections.Immutable, Version=1.2.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -69,12 +69,15 @@
       <HintPath>..\..\Packages\System.IO.4.3.0\lib\net462\System.IO.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.Net" />
     <Reference Include="System.Runtime">
       <HintPath>..\..\Packages\System.Runtime.4.3.0\lib\net462\System.Runtime.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.ValueTuple">
       <HintPath>..\..\Packages\System.ValueTuple.4.4.0\lib\net47\System.ValueTuple.dll</HintPath>
       <Private>True</Private>
@@ -116,15 +119,12 @@
     <Compile Include="Entities\IEntityTypeManager.cs" />
     <Compile Include="Entities\IQueryableEntity.cs" />
     <Compile Include="Events\AggregateEventRouter.cs" />
-    <Compile Include="Events\Attributes\EventVersionAttribute.cs" />
     <Compile Include="Events\BasicEventMetadataNames.cs" />
     <Compile Include="Events\ConventionEventApplyRegistrator.cs" />
     <Compile Include="Events\ConventionEventApplyRegistratorCache.cs" />
     <Compile Include="Events\DomainAggregateEvent.cs" />
     <Compile Include="Events\DomainEvent.cs" />
-    <Compile Include="Events\DomainEventTypeCache.cs" />
     <Compile Include="Events\IAggregateEventRouter.cs" />
-    <Compile Include="Events\IDomainEventTypeCache.cs" />
     <Compile Include="Events\IEventRouterRegistrator.cs" />
     <Compile Include="Events\MetadataExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

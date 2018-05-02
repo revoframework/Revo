@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Revo.Core.Core;
 using Revo.Core.Events;
-using Revo.Infrastructure.EventSourcing;
 using Revo.Infrastructure.EventStore;
 
-namespace Revo.Infrastructure.Tests.EventSourcing
+namespace Revo.Testing.Infrastructure
 {
     public class FakeEventStoreRecord : IEventStoreRecord
     {

@@ -2,9 +2,10 @@
 using Revo.Core.Core;
 using Revo.DataAccess.EF6.Entities;
 using Revo.DataAccess.Entities;
+using Revo.Infrastructure.EF6.Events.Async;
 using Revo.Infrastructure.Events.Async;
 
-namespace Revo.Infrastructure.EF6.Events.Async
+namespace Revo.Infrastructure.EF6.Events
 {
     public class EF6AsyncEventsModule : NinjectModule
     {
@@ -18,6 +19,10 @@ namespace Revo.Infrastructure.EF6.Events.Async
                 .To<EF6CrudRepository>()
                 .WhenInjectedInto<AsyncEventQueueManager>()
                 .InTransientScope();
+
+            Bind<IEventSerializer>()
+                .To<EventSerializer>()
+                .InSingletonScope();
         }
     }
 }

@@ -4,6 +4,7 @@ using Revo.Core.Core;
 using Revo.Core.IO;
 using Revo.Core.IO.Resources;
 using Revo.Core.Lifecycle;
+using Revo.Core.Types;
 using Revo.Platforms.AspNet.Core.Lifecycle;
 using Revo.Platforms.AspNet.IO.Resources;
 using Revo.Platforms.AspNet.IO.Stache;
@@ -20,7 +21,7 @@ namespace Revo.Platforms.AspNet.Core
                 .ToMethod(ctx => HttpContext.Current)
                 .InTransientScope();*/
 
-            Bind<ITypeExplorer>()
+            Rebind<ITypeExplorer>()
                 .To<AspNetTypeExplorer>()
                 .InSingletonScope();
 

@@ -158,7 +158,6 @@
   <ItemGroup>
     <Compile Include="DataAccess\DatabaseInitializerLoaderTests.cs" />
     <Compile Include="DataAccess\StaticClassifierDatabaseInitializerTests.cs" />
-    <Compile Include="EventSourcing\FakeEventStoreRecord.cs" />
     <Compile Include="Events\Async\AsyncEventExecutionCatchUpTests.cs" />
     <Compile Include="Events\Async\AsyncEventProcessorTests.cs" />
     <Compile Include="Events\Async\AsyncEventQueueBacklogWorkerTests.cs" />

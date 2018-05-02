@@ -57,7 +57,7 @@ namespace Revo.Platforms.AspNet.Web
         /// <summary>
         /// Returns a list of controllers available for the application.
         /// </summary>
-        /// <returns>An <see cref="ICollection{Type}"/> of controllers.</returns>
+        /// <returns>An <see cref="ICollection{ClrType}"/> of controllers.</returns>
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Catching all exceptions in this case is the right to do.")]
         public virtual ICollection<Type> GetControllerTypes(IAssembliesResolver assembliesResolver)
         {

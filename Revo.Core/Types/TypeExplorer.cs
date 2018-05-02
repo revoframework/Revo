@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Revo.Core.Core
+namespace Revo.Core.Types
 {
     public class TypeExplorer : ITypeExplorer
     {

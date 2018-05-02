@@ -10,10 +10,8 @@ namespace Revo.Infrastructure.EF6.Events.Async
 {
     [TablePrefix(NamespacePrefix = "RAE", ColumnPrefix = "QAE")]
     [DatabaseEntity]
-    public class QueuedAsyncEvent : IAsyncEventQueueRecord
+    public class QueuedAsyncEvent
     {
-        private IEventMessage @event;
-
         public QueuedAsyncEvent(string queueId, EventStreamRow eventStreamRow, long? sequenceNumber)
         {
             QueueId = queueId;
@@ -37,33 +35,11 @@ namespace Revo.Infrastructure.EF6.Events.Async
         }
 
         public Guid Id { get; private set; }
-        public Guid EventId => EventStreamRowId ?? ExternalEventRecordId ?? throw new InvalidOperationException("QueuedAsyncEvent has no event id");
+        
         public long? SequenceNumber { get; private set; }
-
-        [NotMapped]
-        public IEventMessage EventMessage
-        {
-            get
-            {
-                if (@event == null)
-                {
-                    if (EventStreamRow != null)
-                    {
-                        @event = EventStoreEventMessage.FromRecord(EventStreamRow);
-                    }
-                    else
-                    {
-                        @event = Revo.Core.Events.EventMessage.FromEvent(ExternalEventRecord.Event, ExternalEventRecord.Metadata);
-                    }
-                }
-
-                return @event;
-            }
-        }
-
+        
         public AsyncEventQueue Queue { get; private set; }
         public string QueueId { get; private set; }
-        public string QueueName => QueueId;
         public EventStreamRow EventStreamRow { get; private set; }
         public Guid? EventStreamRowId { get; private set; }
         public ExternalEventRecord ExternalEventRecord { get; private set; }

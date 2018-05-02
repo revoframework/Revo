@@ -39,7 +39,7 @@ namespace Revo.Domain.Events
         {
             if (messageDraft.Metadata.TryGetValue(key, out string oldValue))
             {
-                messageDraft.SetMetadata("Original" + key, oldValue);
+                messageDraft.SetMetadata("Original-" + key, oldValue);
             }
 
             messageDraft.SetMetadata(key, newValue);
@@ -49,7 +49,7 @@ namespace Revo.Domain.Events
         {
             if (metadata.TryGetValue(key, out string oldValue))
             {
-                metadata["Original" + key] = oldValue;
+                metadata["Original-" + key] = oldValue;
             }
 
             metadata[key] = newValue;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Revo.Core.Core
+namespace Revo.Core.Types
 {
     public interface ITypeExplorer
     {

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Web;
 using Revo.Core.Core;
+using Revo.Core.Types;
 using Revo.Platforms.AspNet.Core;
 using Revo.Platforms.AspNet.Core.Lifecycle;
 
