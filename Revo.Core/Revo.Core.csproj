@@ -233,6 +233,7 @@
     <Compile Include="Events\NativeBackedMetadata.cs" />
     <Compile Include="Globalization\ITranslatable.cs" />
     <Compile Include="Commands\IPreCommandFilter.cs" />
+    <Compile Include="Globalization\TranslateAsAttribute.cs" />
     <Compile Include="IO\IAutoMapperDefinition.cs" />
     <Compile Include="IO\OData\IQueryableToODataResultConverter.cs" />
     <Compile Include="IO\OData\ODataQueryableExtensions.cs" />

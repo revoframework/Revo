@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using Revo.Core.Core;
 using Revo.Core.Core.Lifecycle;
+using Revo.Domain.Entities.Attributes;
 
 namespace Revo.Domain.Entities
 {
     public class EntityTypeManager : IEntityTypeManager, IApplicationStartListener
     {
         private readonly ITypeExplorer typeExplorer;
-        private Dictionary<Type, Guid?> typesToIds;
+        private Dictionary<Type, DomainClassIdAttribute> typesToClassIds;
         private Dictionary<Guid, Type> idsToTypes;
 
         public EntityTypeManager(ITypeExplorer typeExplorer)
@@ -17,7 +18,7 @@ namespace Revo.Domain.Entities
             this.typeExplorer = typeExplorer;
         }
 
-        public IEnumerable<Type> DomainEntities => typesToIds.Keys;
+        public IEnumerable<Type> DomainEntities => typesToClassIds.Keys;
 
         public virtual void OnApplicationStarted()
         {
@@ -26,31 +27,31 @@ namespace Revo.Domain.Entities
 
         protected virtual void EnsureLoaded()
         {
-            if (typesToIds == null)
+            if (typesToClassIds == null)
             {
                 var entities = typeExplorer.GetAllTypes()
                     .Where(x => typeof(IEntity).IsAssignableFrom(x))
                     .Where(x => x.IsClass && !x.IsAbstract && !x.IsGenericTypeDefinition)
                     .ToList();
 
-                typesToIds = entities.ToDictionary(x => x,
-                    x => EntityClassUtils.TryGetEntityClassId(x));
+                typesToClassIds = entities.ToDictionary(x => x,
+                    EntityClassUtils.GetClassIdAttribute);
 
-                idsToTypes = typesToIds
-                    .Where(x => x.Value.HasValue)
-                    .ToDictionary(x => x.Value.Value, x => x.Key);
+                idsToTypes = typesToClassIds
+                    .Where(x => x.Value != null)
+                    .ToDictionary(x => x.Value.ClassId, x => x.Key);
             }
         }
 
-        public virtual Guid GetClassIdByClrType(Type clrType)
+        public virtual DomainClassIdAttribute GetClassIdByClrType(Type clrType)
         {
-            Guid? classId = TryGetClassIdByClrType(clrType);
-            if (classId == null)
+            var res = TryGetClassIdByClrType(clrType);
+            if (res == null)
             {
                 throw new ArgumentException("Domain class ID not found for CLR type: " + clrType.FullName);
             }
 
-            return classId.Value;
+            return res;
         }
 
         public virtual Type GetClrTypeByClassId(Guid classId)
@@ -64,12 +65,11 @@ namespace Revo.Domain.Entities
             return clrType;
         }
         
-        public Guid? TryGetClassIdByClrType(Type clrType)
+        public DomainClassIdAttribute TryGetClassIdByClrType(Type clrType)
         {
             EnsureLoaded();
-            Guid? classId = null;
-            typesToIds.TryGetValue(clrType, out classId);
-            return classId;
+            typesToClassIds.TryGetValue(clrType, out DomainClassIdAttribute res);
+            return res;
         }
 
         public Type TryGetClrTypeByClassId(Guid classId)

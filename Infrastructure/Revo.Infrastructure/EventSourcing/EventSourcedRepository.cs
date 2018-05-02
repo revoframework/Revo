@@ -230,7 +230,7 @@ namespace Revo.Infrastructure.EventSourcing
         private async Task<List<IEventMessageDraft>> CreateEventMessagesAsync(TBase aggregate, IReadOnlyCollection<DomainAggregateEvent> events)
         {
             var messages = new List<IEventMessageDraft>();
-            Guid? aggregateClassId = entityTypeManager.TryGetClassIdByClrType(aggregate.GetType());
+            Guid? aggregateClassId = entityTypeManager.TryGetClassIdByClrType(aggregate.GetType()).ClassId;
 
             if (aggregateClassId == null)
             {

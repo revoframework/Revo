@@ -13,10 +13,16 @@ namespace Revo.Domain.Entities
 
         public static Guid? TryGetEntityClassId(Type type)
         {
-            DomainClassIdAttribute idAttribute =
-                (DomainClassIdAttribute) type.GetCustomAttributes(typeof(DomainClassIdAttribute), false)
-                    .FirstOrDefault();
+            var idAttribute = GetClassIdAttribute(type);
             return idAttribute?.ClassId;
+        }
+
+        public static DomainClassIdAttribute GetClassIdAttribute(Type type)
+        {
+            DomainClassIdAttribute idAttribute =
+                (DomainClassIdAttribute)type.GetCustomAttributes(typeof(DomainClassIdAttribute), false)
+                    .FirstOrDefault();
+            return idAttribute;
         }
 
         public static Guid GetEntityClassId<T>() where T : class

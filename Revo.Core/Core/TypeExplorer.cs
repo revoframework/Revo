@@ -18,5 +18,15 @@ namespace Revo.Core.Core
             var assemblies = GetAllReferencedAssemblies();
             return assemblies.SelectMany(x => x.GetTypes());
         }
+
+        public Type FindType(string typeName)
+        {
+            foreach (var type in GetAllTypes())
+            {
+                if (type.FullName == typeName)
+                    return type;
+            }
+            return null;
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Revo.Domain.Entities.Attributes;
 
 namespace Revo.Domain.Entities
 {
@@ -7,9 +8,9 @@ namespace Revo.Domain.Entities
     {
         IEnumerable<Type> DomainEntities { get; }
 
-        Guid GetClassIdByClrType(Type clrType);
+        DomainClassIdAttribute GetClassIdByClrType(Type clrType);
         Type GetClrTypeByClassId(Guid classId);
-        Guid? TryGetClassIdByClrType(Type clrType);
+        DomainClassIdAttribute TryGetClassIdByClrType(Type clrType);
         Type TryGetClrTypeByClassId(Guid classId);
     }
 }

@@ -8,5 +8,6 @@ namespace Revo.Core.Core
     {
         IEnumerable<Type> GetAllTypes();
         IEnumerable<Assembly> GetAllReferencedAssemblies();
+        Type FindType(string typeName);
     }
 }

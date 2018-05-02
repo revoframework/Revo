@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
+using Castle.Core.Internal;
 using Knoema.Localization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -14,7 +16,10 @@ namespace Revo.Platforms.AspNet.Globalization
             JToken t = JToken.FromObject(value);
             var code = (string)t[nameof(ITranslatable.Code)];
             var culture = (string)t[nameof(ITranslatable.Culture)];
-            t[nameof(ITranslatable.Name)] = Translate($"{value.GetType().FullName}.{code}", culture);
+            var translatedTypeName =
+                value.GetType().GetAttributes<TranslateAsAttribute>().FirstOrDefault()?.Type.FullName ??
+                value.GetType().FullName;
+            t[nameof(ITranslatable.Name)] = Translate($"{translatedTypeName}.{code}", culture ?? "cs-CZ");
             t.WriteTo(writer);
         }
 

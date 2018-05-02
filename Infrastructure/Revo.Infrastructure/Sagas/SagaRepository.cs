@@ -55,7 +55,7 @@ namespace Revo.Infrastructure.Sagas
 
             repository.Add(saga);
 
-            Guid sagaClassId = entityTypeManager.GetClassIdByClrType(saga.GetType());
+            Guid sagaClassId = entityTypeManager.GetClassIdByClrType(saga.GetType()).ClassId;
             MetadataRepository.AddSaga(saga.Id, sagaClassId);
 
             sagas[saga.Id] = saga;
