@@ -124,7 +124,7 @@ namespace Revo.Infrastructure.Repositories
             {
                 if (entity.ClassId == Guid.Empty)
                 {
-                    entity.ClassId = entityTypeManager.GetClassIdByClrType(entity.GetType()).ClassId;
+                    entity.ClassId = entityTypeManager.GetClassInfoByClrType(entity.GetType()).Id;
                 }
             }
         }
@@ -145,7 +145,7 @@ namespace Revo.Infrastructure.Repositories
         private async Task<List<IEventMessageDraft>> CreateEventMessagesAsync(IAggregateRoot aggregate, IReadOnlyCollection<DomainAggregateEvent> events)
         {
             var messages = new List<IEventMessageDraft>();
-            Guid? aggregateClassId = entityTypeManager.TryGetClassIdByClrType(aggregate.GetType()).ClassId;
+            Guid? aggregateClassId = entityTypeManager.TryGetClassInfoByClrType(aggregate.GetType()).Id;
 
             foreach (DomainAggregateEvent ev in events)
             {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
@@ -17,13 +18,15 @@ namespace Revo.Infrastructure.Tests.Repositories
 {
     public class CrudAggregateStoreTests
     {
-        private const string TestAggregateClassId = "{4057D3AC-2D96-4C25-935D-F72BAC6BA626}";
+        private const string TestAggregateClassIdString = "{4057D3AC-2D96-4C25-935D-F72BAC6BA626}";
+        private static readonly Guid TestAggregateClassId = Guid.Parse(TestAggregateClassIdString);
 
         private readonly CrudAggregateStore sut;
         private readonly InMemoryCrudRepository crudRepository;
         private readonly IEntityTypeManager entityTypeManager;
         private readonly IPublishEventBuffer publishEventBuffer;
         private readonly IEventMessageFactory eventMessageFactory;
+        private readonly List<DomainClassInfo> domainClasses;
 
         public CrudAggregateStoreTests()
         {
@@ -31,8 +34,18 @@ namespace Revo.Infrastructure.Tests.Repositories
             entityTypeManager = Substitute.For<IEntityTypeManager>();
             publishEventBuffer = Substitute.For<IPublishEventBuffer>();
 
-            entityTypeManager.GetClassIdByClrType(typeof(TestAggregate)).Returns(Guid.Parse(TestAggregateClassId));
-            
+            domainClasses = new List<DomainClassInfo>()
+            {
+                new DomainClassInfo(TestAggregateClassId, null, typeof(TestAggregate))
+            };
+
+            entityTypeManager.GetClassInfoByClassId(Guid.Empty)
+                .ReturnsForAnyArgs(ci => domainClasses.Single(x => x.Id == ci.Arg<Guid>()));
+            entityTypeManager.TryGetClassInfoByClrType(null)
+                .ReturnsForAnyArgs(ci => domainClasses.SingleOrDefault(x => x.ClrType == ci.Arg<Type>()));
+            entityTypeManager.GetClassInfoByClrType(null)
+                .ReturnsForAnyArgs(ci => domainClasses.Single(x => x.ClrType == ci.Arg<Type>()));
+
             eventMessageFactory = Substitute.For<IEventMessageFactory>();
             eventMessageFactory.CreateMessageAsync(null).ReturnsForAnyArgs(ci =>
             {
@@ -55,7 +68,7 @@ namespace Revo.Infrastructure.Tests.Repositories
 
             await sut.SaveChangesAsync();
 
-            Assert.Equal(Guid.Parse(TestAggregateClassId), testAggregate.ClassId);
+            Assert.Equal(TestAggregateClassId, testAggregate.ClassId);
         }
 
         [Fact]
@@ -77,6 +90,8 @@ namespace Revo.Infrastructure.Tests.Repositories
         public async Task SaveChanges_CommitsAggregates()
         {
             TestAggregate testAggregate = Substitute.ForPartsOf<TestAggregate>(new object[] { Guid.NewGuid() });
+            domainClasses.Add(new DomainClassInfo(TestAggregateClassId, null, testAggregate.GetType()));
+
             sut.Add(testAggregate);
             testAggregate.Do();
 
@@ -89,6 +104,8 @@ namespace Revo.Infrastructure.Tests.Repositories
         public async Task SaveChanges_CommitsOnlyChangedAggregates()
         {
             TestAggregate testAggregate = Substitute.ForPartsOf<TestAggregate>(new object[] {Guid.NewGuid()});
+            domainClasses.Add(new DomainClassInfo(TestAggregateClassId, null, testAggregate.GetType()));
+
             sut.Add(testAggregate);
 
             await sut.SaveChangesAsync();
@@ -96,7 +113,7 @@ namespace Revo.Infrastructure.Tests.Repositories
             testAggregate.Received(0).Commit();
         }
 
-        [DomainClassId(TestAggregateClassId)]
+        [DomainClassId(TestAggregateClassIdString)]
         public class TestAggregate : BasicClassAggregateRoot
         {
             public TestAggregate(Guid id) : base(id)

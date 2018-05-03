@@ -52,7 +52,7 @@ namespace Revo.Infrastructure.Projections
             {
                 var events = entityEvents.Value;
                 Guid classId = events.First().Metadata.GetAggregateClassId() ?? throw new InvalidOperationException($"Cannot create projection for aggregate ID {entityEvents.Key} because event metadata don't contain aggregate class ID");
-                Type entityType = entityTypeManager.GetClrTypeByClassId(classId);
+                Type entityType = entityTypeManager.GetClassInfoByClassId(classId).ClrType;
 
                 Guid aggregateId = entityEvents.Key;
                 IEnumerable<IEntityEventProjector> projectors = GetProjectors(entityType);

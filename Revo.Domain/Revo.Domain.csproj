@@ -106,6 +106,7 @@
     <Compile Include="Entities\Basic\Dto\EntityDto.cs" />
     <Compile Include="Entities\Basic\Entity.cs" />
     <Compile Include="Entities\Basic\IBasicClassIdEntity.cs" />
+    <Compile Include="Entities\DomainClassInfo.cs" />
     <Compile Include="Entities\EntityClassUtils.cs" />
     <Compile Include="Entities\EntityTypeManager.cs" />
     <Compile Include="Entities\EventSourcing\AggregateState.cs" />

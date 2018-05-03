@@ -55,7 +55,7 @@ namespace Revo.Infrastructure.Sagas
 
             repository.Add(saga);
 
-            Guid sagaClassId = entityTypeManager.GetClassIdByClrType(saga.GetType()).ClassId;
+            Guid sagaClassId = entityTypeManager.GetClassInfoByClrType(saga.GetType()).Id;
             MetadataRepository.AddSaga(saga.Id, sagaClassId);
 
             sagas[saga.Id] = saga;
@@ -63,7 +63,7 @@ namespace Revo.Infrastructure.Sagas
 
         public Task<ISaga> GetAsync(Guid id, Guid classId)
         {
-            Type clrType = entityTypeManager.GetClrTypeByClassId(classId);
+            Type clrType = entityTypeManager.GetClassInfoByClassId(classId).ClrType;
             return (Task<ISaga>) GetType().GetMethod(nameof(GetAsyncInternal), BindingFlags.Instance | BindingFlags.NonPublic)
                 .MakeGenericMethod(new[] {clrType}).Invoke(this, new object[] { id });
         }

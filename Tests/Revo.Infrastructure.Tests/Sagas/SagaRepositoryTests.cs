@@ -48,11 +48,11 @@ namespace Revo.Infrastructure.Tests.Sagas
             repository = Substitute.ForPartsOf<FakeRepository>();
             entityTypeManager = Substitute.For<IEntityTypeManager>();
 
-            entityTypeManager.GetClrTypeByClassId(saga1ClassId)
-                .Returns(typeof(Saga1));
+            entityTypeManager.GetClassInfoByClassId(saga1ClassId)
+                .Returns(new DomainClassInfo(saga1ClassId, null, typeof(Saga1)));
 
-            entityTypeManager.GetClassIdByClrType(typeof(Saga1))
-                .Returns(saga1ClassId);
+            entityTypeManager.GetClassInfoByClrType(typeof(Saga1))
+                .Returns(new DomainClassInfo(saga1ClassId, null, typeof(Saga1)));
             
             sut = new SagaRepository(commandBus, repository, sagaMetadataRepository, entityTypeManager, unitOfWork);
         }

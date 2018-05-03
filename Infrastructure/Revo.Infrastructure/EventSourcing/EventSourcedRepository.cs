@@ -66,7 +66,7 @@ namespace Revo.Infrastructure.EventSourcing
             }
 
             aggregates.Add(aggregate.Id, aggregate);
-            var classId = entityTypeManager.GetClassIdByClrType(aggregate.GetType());
+            Guid classId = entityTypeManager.GetClassInfoByClrType(aggregate.GetType()).Id;
             eventStore.AddStream(aggregate.Id);
             eventStore.SetStreamMetadataAsync(aggregate.Id,
                 new Dictionary<string, string>()
@@ -230,7 +230,7 @@ namespace Revo.Infrastructure.EventSourcing
         private async Task<List<IEventMessageDraft>> CreateEventMessagesAsync(TBase aggregate, IReadOnlyCollection<DomainAggregateEvent> events)
         {
             var messages = new List<IEventMessageDraft>();
-            Guid? aggregateClassId = entityTypeManager.TryGetClassIdByClrType(aggregate.GetType()).ClassId;
+            Guid? aggregateClassId = entityTypeManager.TryGetClassInfoByClrType(aggregate.GetType())?.Id;
 
             if (aggregateClassId == null)
             {
@@ -382,7 +382,7 @@ namespace Revo.Infrastructure.EventSourcing
             }
 
             Guid classId = Guid.Parse(classIdString);
-            Type entityType = entityTypeManager.GetClrTypeByClassId(classId);
+            Type entityType = entityTypeManager.GetClassInfoByClassId(classId).ClrType;
 
             TBase aggregate = (TBase) ConstructEntity(entityType, aggregateId);
             aggregate.LoadState(state);

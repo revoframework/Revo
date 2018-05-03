@@ -89,19 +89,19 @@ namespace Revo.Infrastructure.Tests.EventSourcing
                 }).ToList();
             });
 
-            entityTypeManager.GetClrTypeByClassId(entityClassId)
-                .Returns(typeof(MyEntity));
-            entityTypeManager.GetClrTypeByClassId(entity2ClassId)
-                .Returns(typeof(MyEntity2));
-            entityTypeManager.GetClrTypeByClassId(entity3ClassId)
-                .Returns(typeof(MyEntity3LoadsAsDeleted));
+            DomainClassInfo[] domainClasses = new[]
+            {
+                new DomainClassInfo(entityClassId, null, typeof(MyEntity)),
+                new DomainClassInfo(entity2ClassId, null, typeof(MyEntity2)),
+                new DomainClassInfo(entity3ClassId, null, typeof(MyEntity3LoadsAsDeleted))
+            };
 
-            entityTypeManager.TryGetClassIdByClrType(typeof(MyEntity))
-                .Returns(entityClassId);
-            entityTypeManager.TryGetClassIdByClrType(typeof(MyEntity2))
-                .Returns(entity2ClassId);
-            entityTypeManager.TryGetClassIdByClrType(typeof(MyEntity3LoadsAsDeleted))
-                .Returns(entity3ClassId);
+            entityTypeManager.GetClassInfoByClassId(Guid.Empty)
+                .ReturnsForAnyArgs(ci => domainClasses.Single(x => x.Id == ci.Arg<Guid>()));
+            entityTypeManager.TryGetClassInfoByClrType(null)
+                .ReturnsForAnyArgs(ci => domainClasses.SingleOrDefault(x => x.ClrType == ci.Arg<Type>()));
+            entityTypeManager.GetClassInfoByClrType(null)
+                .ReturnsForAnyArgs(ci => domainClasses.Single(x => x.ClrType == ci.Arg<Type>()));
 
             eventMessageFactory = Substitute.For<IEventMessageFactory>();
             eventMessageFactory.CreateMessageAsync(null).ReturnsForAnyArgs(ci =>
@@ -117,6 +117,16 @@ namespace Revo.Infrastructure.Tests.EventSourcing
                 entityTypeManager, publishEventBuffer, new IRepositoryFilter[] {}, eventMessageFactory, new EntityFactory());
         }
         
+        [Fact]
+        public async Task AddThenGet_ReturnsTheSame()
+        {
+            var entity = new MyEntity(entityId, 5);
+            sut.Add(entity);
+            var entity2 = await sut.GetAsync<MyEntity>(entity.Id);
+
+            Assert.Equal(entity, entity2);
+        }
+
         [Fact]
         public async Task FindAsync_ReturnsNullIfNotFound()
         {
@@ -229,16 +239,6 @@ namespace Revo.Infrastructure.Tests.EventSourcing
             var entity2 = new MyEntity(entityId, 5);
 
             Assert.Throws<ArgumentException>(() => sut.Add(entity2));
-        }
-
-        [Fact]
-        public async Task AddThenGetReturnsTheSame()
-        {
-            var entity = new MyEntity(entityId, 5);
-            sut.Add(entity);
-            var entity2 = await sut.GetAsync<MyEntity>(entity.Id);
-
-            Assert.Equal(entity, entity2);
         }
 
         [Fact]

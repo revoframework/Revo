@@ -31,8 +31,8 @@ namespace Revo.Infrastructure.Tests.Projections
         public ProjectionEventListenerTests()
         {
             entityTypeManager = Substitute.For<IEntityTypeManager>();
-            entityTypeManager.GetClrTypeByClassId(MyEntity1.ClassId).Returns(typeof(MyEntity1));
-            entityTypeManager.GetClrTypeByClassId(MyEntity2.ClassId).Returns(typeof(MyEntity2));
+            entityTypeManager.GetClassInfoByClassId(MyEntity1.ClassId).Returns(new DomainClassInfo(MyEntity1.ClassId, null, typeof(MyEntity1)));
+            entityTypeManager.GetClassInfoByClassId(MyEntity2.ClassId).Returns(new DomainClassInfo(MyEntity2.ClassId, null, typeof(MyEntity2)));
 
             myEntity1Projector = Substitute.For<IEntityEventProjector<MyEntity1>>();
             myEntity1Projector.ProjectedAggregateType.Returns(typeof(MyEntity1));

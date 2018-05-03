@@ -6,11 +6,12 @@ namespace Revo.Domain.Entities
 {
     public interface IEntityTypeManager
     {
-        IEnumerable<Type> DomainEntities { get; }
+        IEnumerable<DomainClassInfo> DomainEntities { get; }
 
-        DomainClassIdAttribute GetClassIdByClrType(Type clrType);
-        Type GetClrTypeByClassId(Guid classId);
-        DomainClassIdAttribute TryGetClassIdByClrType(Type clrType);
-        Type TryGetClrTypeByClassId(Guid classId);
+        void ClearCache();
+        DomainClassInfo GetClassInfoByClrType(Type clrType);
+        DomainClassInfo GetClassInfoByClassId(Guid classId);
+        DomainClassInfo TryGetClassInfoByClrType(Type clrType);
+        DomainClassInfo TryGetClassInfoByClassId(Guid classId);
     }
 }

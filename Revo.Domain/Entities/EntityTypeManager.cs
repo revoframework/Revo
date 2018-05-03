@@ -11,74 +11,78 @@ namespace Revo.Domain.Entities
     public class EntityTypeManager : IEntityTypeManager, IApplicationStartListener
     {
         private readonly ITypeExplorer typeExplorer;
-        private Dictionary<Type, DomainClassIdAttribute> typesToClassIds;
-        private Dictionary<Guid, Type> idsToTypes;
+        private Lazy<Dictionary<Type, DomainClassInfo>> typesToClassIds;
+        private Lazy<Dictionary<Guid, DomainClassInfo>> idsToTypes;
 
         public EntityTypeManager(ITypeExplorer typeExplorer)
         {
             this.typeExplorer = typeExplorer;
         }
 
-        public IEnumerable<Type> DomainEntities => typesToClassIds.Keys;
+        public IEnumerable<DomainClassInfo> DomainEntities => typesToClassIds.Value.Values;
 
         public virtual void OnApplicationStarted()
         {
-            EnsureLoaded();
+            ClearCache();
         }
 
-        protected virtual void EnsureLoaded()
+        public void ClearCache()
         {
-            if (typesToClassIds == null)
+            typesToClassIds = new Lazy<Dictionary<Type,DomainClassInfo>>(() =>
             {
                 var entities = typeExplorer.GetAllTypes()
                     .Where(x => typeof(IEntity).IsAssignableFrom(x))
-                    .Where(x => x.IsClass && !x.IsAbstract && !x.IsGenericTypeDefinition)
+                    .Where(x => x.IsClass && !x.IsAbstract && !x.IsGenericTypeDefinition && x.IsConstructedGenericType)
+                    .Select(x => new { Type = x, ClassIdAttribute = EntityClassUtils.GetClassIdAttribute(x) })
+                    .Where(x => x.ClassIdAttribute != null)
                     .ToList();
 
-                typesToClassIds = entities.ToDictionary(x => x,
-                    EntityClassUtils.GetClassIdAttribute);
+                return entities.ToDictionary(x => x.Type,
+                    x =>
+                    {
+                        return new DomainClassInfo(x.ClassIdAttribute.ClassId, x.ClassIdAttribute.Code, x.Type);
+                    });
+            });
 
-                idsToTypes = typesToClassIds
-                    .Where(x => x.Value != null)
-                    .ToDictionary(x => x.Value.ClassId, x => x.Key);
-            }
-        }
-
-        public virtual DomainClassIdAttribute GetClassIdByClrType(Type clrType)
-        {
-            var res = TryGetClassIdByClrType(clrType);
-            if (res == null)
+            idsToTypes = new Lazy<Dictionary<Guid, DomainClassInfo>>(() =>
             {
-                throw new ArgumentException("Domain class ID not found for CLR type: " + clrType.FullName);
-            }
-
-            return res;
+                return typesToClassIds.Value
+                    .ToDictionary(x => x.Value.Id, x => x.Value);
+            });
         }
 
-        public virtual Type GetClrTypeByClassId(Guid classId)
+        public virtual DomainClassInfo GetClassInfoByClrType(Type clrType)
         {
-            Type clrType = TryGetClrTypeByClassId(classId);
-            if (clrType == null)
+            DomainClassInfo classInfo = TryGetClassInfoByClrType(clrType);
+            if (classInfo == null)
+            {
+                throw new ArgumentException("Domain class info not found for CLR type: " + clrType.FullName);
+            }
+
+            return classInfo;
+        }
+
+        public virtual DomainClassInfo GetClassInfoByClassId(Guid classId)
+        {
+            DomainClassInfo classInfo = TryGetClassInfoByClassId(classId);
+            if (classInfo == null)
             {
                 throw new ArgumentException("Domain class not found for class ID: " + classId);
             }
 
-            return clrType;
+            return classInfo;
         }
         
-        public DomainClassIdAttribute TryGetClassIdByClrType(Type clrType)
+        public DomainClassInfo TryGetClassInfoByClrType(Type clrType)
         {
-            EnsureLoaded();
-            typesToClassIds.TryGetValue(clrType, out DomainClassIdAttribute res);
+            typesToClassIds.Value.TryGetValue(clrType, out DomainClassInfo res);
             return res;
         }
 
-        public Type TryGetClrTypeByClassId(Guid classId)
+        public DomainClassInfo TryGetClassInfoByClassId(Guid classId)
         {
-            EnsureLoaded();
-            Type clrType = null;
-            idsToTypes.TryGetValue(classId, out clrType);
-            return clrType;
+            idsToTypes.Value.TryGetValue(classId, out var classInfo);
+            return classInfo;
         }
     }
 }
