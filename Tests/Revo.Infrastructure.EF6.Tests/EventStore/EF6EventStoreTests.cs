@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Revo.Core.Core;
 using Revo.Core.Events;
@@ -29,15 +31,12 @@ namespace Revo.Infrastructure.EF6.Tests.EventStore
         private readonly IEventSerializer eventSerializer;
         private readonly EventStream[] eventStreams;
         private readonly EventStreamRow[] eventStreamRows;
-        private readonly IEventStoreRecord[] storeRecords;
+        private readonly IEventStoreRecord[] expectedStoreRecords;
 
         public EF6EventStoreTests()
         {
-            inMemoryCrudRepository = new EF6InMemoryCrudRepository();
-            eventSerializer = Substitute.For<IEventSerializer>();
-
-            sut = new EF6EventStore(inMemoryCrudRepository, eventSerializer);
-
+            inMemoryCrudRepository = Substitute.ForPartsOf<EF6InMemoryCrudRepository>();
+            
             eventStreams = new[]
             {
                 new EventStream(Guid.NewGuid()),
@@ -46,38 +45,56 @@ namespace Revo.Infrastructure.EF6.Tests.EventStore
             };
             inMemoryCrudRepository.AttachRange(eventStreams);
 
-            eventSerializer.SerializeEvent(Arg.Any<Event1>())
-                .Returns(ci => ("{\"bar\":" + ci.ArgAt<Event1>(0).Foo + "}", new VersionedTypeId("EventName", 5)));
+            eventSerializer = Substitute.For<IEventSerializer>();
+
+            eventSerializer.SerializeEvent(null)
+                .ReturnsForAnyArgs(ci => ("{\"bar\":" + ci.ArgAt<Event1>(0).Foo + "}", new VersionedTypeId("EventName", 5)));
             eventSerializer.DeserializeEvent(Arg.Any<string>(), new VersionedTypeId("EventName", 5))
-                .Returns(ci =>
-                    new Event1((int) JObject.Parse(ci.ArgAt<string>(0))["bar"]));
-            eventSerializer.SerializeEventMetadata(Arg.Is<IReadOnlyDictionary<string, string>>(x => x.Count == 1
-                && x["doh"] == "42")).ReturnsForAnyArgs("doh");
-            eventSerializer.DeserializeEventMetadata("doh").ReturnsForAnyArgs(new JsonMetadata(JObject.Parse("{\"doh\":42}")));
+                .Returns(ci => new Event1((int) JObject.Parse(ci.ArgAt<string>(0))["bar"]));
+            eventSerializer.SerializeEventMetadata(null)
+                .ReturnsForAnyArgs(ci => JsonConvert.SerializeObject(ci.Arg<IReadOnlyDictionary<string, string>>()
+                    .Append(new KeyValuePair<string, string>("fakeSer", "true"))
+                    .ToDictionary(x => x.Key, x => x.Value)));
+            eventSerializer.DeserializeEventMetadata(null)
+                .ReturnsForAnyArgs(ci =>
+                {
+                    var json = JObject.Parse(ci.Arg<string>());
+                    json["fakeDeser"] = "true";
+                    return new JsonMetadata(json);
+                });
 
             FakeClock.Setup();
 
             eventStreamRows = new[]
             {
-                new EventStreamRow(Guid.NewGuid(), "{\"bar\":1}", "EventName", 5, eventStreams[0].Id, 1, Clock.Current.Now, "{\"doh\":42}"),
-                new EventStreamRow(Guid.NewGuid(), "{\"bar\":2}", "EventName", 5, eventStreams[0].Id, 2, Clock.Current.Now, "{\"doh\":42}"),
-                new EventStreamRow(Guid.NewGuid(), "{\"bar\":3}", "EventName", 5, eventStreams[1].Id, 3, Clock.Current.Now, "{\"doh\":42}"),
-                new EventStreamRow(Guid.NewGuid(), "{\"bar\":4}", "EventName", 5, eventStreams[1].Id, 2, Clock.Current.Now, "{\"doh\":42}"),
-                new EventStreamRow(Guid.NewGuid(), "{\"bar\":5}", "EventName", 5, eventStreams[1].Id, 4, Clock.Current.Now, "{\"doh\":42}"),
-                new EventStreamRow(Guid.NewGuid(), "{\"bar\":6}", "EventName", 5, eventStreams[1].Id, 5, Clock.Current.Now, "{\"doh\":42}")
+                new EventStreamRow(Guid.NewGuid(), "{\"bar\":1}", "EventName", 5, eventStreams[0].Id, 1, Clock.Current.Now, "{\"doh\":\"1\"}"),
+                new EventStreamRow(Guid.NewGuid(), "{\"bar\":2}", "EventName", 5, eventStreams[0].Id, 2, Clock.Current.Now, "{\"doh\":\"2\"}"),
+                new EventStreamRow(Guid.NewGuid(), "{\"bar\":3}", "EventName", 5, eventStreams[1].Id, 3, Clock.Current.Now, "{\"doh\":\"3\"}"),
+                new EventStreamRow(Guid.NewGuid(), "{\"bar\":4}", "EventName", 5, eventStreams[1].Id, 2, Clock.Current.Now, "{\"doh\":\"4\"}"),
+                new EventStreamRow(Guid.NewGuid(), "{\"bar\":5}", "EventName", 5, eventStreams[1].Id, 4, Clock.Current.Now, "{\"doh\":\"5\"}"),
+                new EventStreamRow(Guid.NewGuid(), "{\"bar\":6}", "EventName", 5, eventStreams[1].Id, 5, Clock.Current.Now, "{\"doh\":\"6\"}")
             };
 
-            storeRecords = eventStreamRows.Select((x, i) =>
+            expectedStoreRecords = eventStreamRows.Select((x, i) =>
                     new FakeEventStoreRecord()
                     {
-                        Event = new Event1(i + 1),
-                        AdditionalMetadata = new Dictionary<string, string>() {{"doh", "42"}},
+                        Event = eventSerializer.DeserializeEvent(x.EventJson, new VersionedTypeId(x.EventName, x.EventVersion)),
+                        AdditionalMetadata = new Dictionary<string, string>() { { "doh", (i + 1).ToString() }, { "fakeDeser", "true" } },
                         EventId = eventStreamRows[i].Id,
                         StreamSequenceNumber = eventStreamRows[i].StreamSequenceNumber
                     })
                 .ToArray();
 
             inMemoryCrudRepository.AttachRange(eventStreamRows);
+
+            sut = new EF6EventStore(inMemoryCrudRepository, eventSerializer);
+        }
+        
+        [Fact]
+        public async Task CommitChangesAsync_SavesRepository()
+        {
+            await sut.CommitChangesAsync();
+            inMemoryCrudRepository.ReceivedWithAnyArgs(1).SaveChangesAsync();
         }
 
         [Fact]
@@ -85,7 +102,7 @@ namespace Revo.Infrastructure.EF6.Tests.EventStore
         {
             IEventStoreRecord record = await sut.GetEventAsync(eventStreams[0].Id, 1);
 
-            record.ShouldBeEquivalentTo(storeRecords[0]);
+            record.ShouldBeEquivalentTo(expectedStoreRecords[0]);
         }
 
         [Fact]
@@ -101,7 +118,7 @@ namespace Revo.Infrastructure.EF6.Tests.EventStore
         {
             var records = await sut.GetEventsAsync(eventStreams[eventStreamIndex].Id);
 
-            records.ShouldBeEquivalentTo(rowsIndices.Select(x => storeRecords[x]));
+            records.ShouldBeEquivalentTo(rowsIndices.Select(x => expectedStoreRecords[x]));
         }
 
         [Fact]
@@ -128,7 +145,7 @@ namespace Revo.Infrastructure.EF6.Tests.EventStore
             var records = await sut.GetEventRangeAsync(eventStreams[eventStreamIndex].Id,
                 minSequenceNumber, maxSequenceNumber, maxCount);
 
-            records.ShouldBeEquivalentTo(rowsIndices.Select(x => storeRecords[x]));
+            records.ShouldBeEquivalentTo(rowsIndices.Select(x => expectedStoreRecords[x]));
         }
 
         [Fact]
@@ -155,6 +172,100 @@ namespace Revo.Infrastructure.EF6.Tests.EventStore
             result.Id.Should().Be(eventStreams[1].Id);
             result.EventCount.Should().Be(4);
             result.Version.Should().Be(5);
+        }
+
+        [Fact]
+        public async Task PushEventsAsync_AddsToRepository()
+        {
+            await sut.PushEventsAsync(eventStreams[0].Id, new[]
+            {
+                new UncommitedEventStoreRecord(new Event1(5), new Dictionary<string, string>() { {"doh", "42"}}), 
+            }, null);
+
+            var newRows = inMemoryCrudRepository.GetEntities<EventStreamRow>(EntityState.Added).ToList();
+            newRows.Should().HaveCount(1);
+            newRows[0].EventJson.Should().Be("{\"bar\":5}");
+            newRows[0].EventName.Should().Be("EventName");
+            newRows[0].EventVersion.Should().Be(5);
+            newRows[0].Id.Should().NotBeEmpty();
+            newRows[0].StoreDate.Should().Be(Clock.Current.Now);
+            newRows[0].IsDispatchedToAsyncQueues.Should().BeFalse();
+            newRows[0].StreamSequenceNumber.Should().Be(3);
+            newRows[0].StreamId.Should().Be(eventStreams[0].Id);
+
+            JObject jsonMetadata = JObject.Parse(newRows[0].AdditionalMetadataJson);
+            jsonMetadata.Should().Contain("doh", "42");
+            jsonMetadata.Should().Contain("fakeSer", "true");
+        }
+
+        [Fact]
+        public async Task PushEventsAsync_ReturnsRecords()
+        {
+            var uncommittedRecords = new[]
+            {
+                new UncommitedEventStoreRecord(new Event1(5), new Dictionary<string, string>() {{"doh", "42"}}),
+            };
+
+            var records = await sut.PushEventsAsync(eventStreams[0].Id, uncommittedRecords, null);
+
+            records.Should().HaveCount(1);
+            records.ElementAt(0).AdditionalMetadata.Should().Contain(uncommittedRecords[0].Metadata);
+            records.ElementAt(0).Event.ShouldBeEquivalentTo(uncommittedRecords[0].Event, cfg => cfg.RespectingRuntimeTypes());
+            records.ElementAt(0).EventId.Should().NotBeEmpty();
+            records.ElementAt(0).StoreDate.Should().Be(Clock.Current.Now);
+            records.ElementAt(0).StreamSequenceNumber.Should().Be(3);
+        }
+        
+        [Fact]
+        public async Task PushEventsAsync_HasEventSourceNameMetadata()
+        {
+            await sut.PushEventsAsync(eventStreams[0].Id, new[]
+            {
+                new UncommitedEventStoreRecord(new Event1(1), new Dictionary<string, string>() { {"doh", "42"}})
+            }, 10);
+
+            var newRows = inMemoryCrudRepository.GetEntities<EventStreamRow>(EntityState.Added).ToList();
+            newRows.Should().HaveCount(1);
+
+            JObject jsonMetadata = JObject.Parse(newRows[0].AdditionalMetadataJson);
+            jsonMetadata.Should().ContainKey(BasicEventMetadataNames.EventSourceName);
+            jsonMetadata[BasicEventMetadataNames.EventSourceName]?.ToString().Should().NotBeNullOrEmpty();
+        }
+
+        [Fact]
+        public async Task PushEventsAsync_MultipleHaveCorrectStreamSequenceNumbers()
+        {
+            await sut.PushEventsAsync(eventStreams[0].Id, new[]
+            {
+                new UncommitedEventStoreRecord(new Event1(1), new Dictionary<string, string>() { {"doh", "42"}}), 
+                new UncommitedEventStoreRecord(new Event1(2), new Dictionary<string, string>() { {"doh", "42"}}),
+            }, null);
+
+            await sut.PushEventsAsync(eventStreams[0].Id, new[]
+            {
+                new UncommitedEventStoreRecord(new Event1(3), new Dictionary<string, string>() { {"doh", "42"}})
+            }, null);
+
+            var newRows = inMemoryCrudRepository.GetEntities<EventStreamRow>(EntityState.Added).ToList();
+            newRows.Should().HaveCount(3);
+
+            newRows.Should().Contain(x => x.EventJson == "{\"bar\":1}" && x.StreamSequenceNumber == 3);
+            newRows.Should().Contain(x => x.EventJson == "{\"bar\":2}" && x.StreamSequenceNumber == 4);
+            newRows.Should().Contain(x => x.EventJson == "{\"bar\":3}" && x.StreamSequenceNumber == 5);
+        }
+
+        [Fact]
+        public async Task PushEventsAsync_WithExpectedVersionSpecified()
+        {
+            await sut.PushEventsAsync(eventStreams[0].Id, new[]
+            {
+                new UncommitedEventStoreRecord(new Event1(1), new Dictionary<string, string>() { {"doh", "42"}})
+            }, 10);
+
+            var newRows = inMemoryCrudRepository.GetEntities<EventStreamRow>(EntityState.Added).ToList();
+            newRows.Should().HaveCount(1);
+
+            newRows.Should().Contain(x => x.StreamSequenceNumber == 11);
         }
 
         public class Event1 : IEvent

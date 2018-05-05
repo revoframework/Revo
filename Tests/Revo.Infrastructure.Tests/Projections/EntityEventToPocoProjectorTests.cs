@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Revo.Core.Events;
 using Revo.Domain.ReadModel;
 using Revo.Infrastructure.Events;
@@ -74,13 +75,13 @@ namespace Revo.Infrastructure.Tests.Projections
             var subProjector = Substitute.ForPartsOf<TestSubProjector>(new object[] {sut.AppliedEvents});
             sut.AddSubProjector(subProjector);
             await sut.ProjectEventsAsync(aggregate.Id, eventMessages);
-            
-            Assert.True(sut.AppliedEvents.SequenceEqual(new List<IEventMessage<DomainAggregateEvent>>()
+
+            sut.AppliedEvents.Should().BeEquivalentTo(new List<IEventMessage<DomainAggregateEvent>>()
             {
                 eventMessages[0],
                 eventMessages[1],
                 eventMessages[2]
-            }));
+            });
 
             subProjector.Received(1).Apply((IEventMessage<TestEvent3>)eventMessages[2], aggregate.Id, sut.LastTarget);
         }

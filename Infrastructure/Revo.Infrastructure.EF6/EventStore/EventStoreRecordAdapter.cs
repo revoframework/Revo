@@ -28,8 +28,7 @@ namespace Revo.Infrastructure.EF6.EventStore
                                    new VersionedTypeId(row.EventName, row.EventVersion)));
 
         public IReadOnlyDictionary<string, string> AdditionalMetadata => additionalMetadata
-                                                                         ?? (additionalMetadata = new JsonMetadata(row.AdditionalMetadataJson?.Length > 0
-                                                                                 ? JObject.Parse(row.AdditionalMetadataJson) : new JObject()));
+                                                                         ?? (additionalMetadata = eventSerializer.DeserializeEventMetadata(row.AdditionalMetadataJson));
 
         public Guid EventId => row.Id;
         public long StreamSequenceNumber => row.StreamSequenceNumber;

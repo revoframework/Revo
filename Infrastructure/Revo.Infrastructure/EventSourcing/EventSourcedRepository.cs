@@ -68,7 +68,7 @@ namespace Revo.Infrastructure.EventSourcing
             aggregates.Add(aggregate.Id, aggregate);
             Guid classId = entityTypeManager.GetClassInfoByClrType(aggregate.GetType()).Id;
             eventStore.AddStream(aggregate.Id);
-            eventStore.SetStreamMetadataAsync(aggregate.Id,
+            eventStore.SetStreamMetadata(aggregate.Id,
                 new Dictionary<string, string>()
                 {
                     {AggregateEventStreamMetadataNames.ClassId, classId.ToString()}

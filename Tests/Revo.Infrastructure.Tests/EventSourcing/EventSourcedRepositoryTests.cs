@@ -116,7 +116,17 @@ namespace Revo.Infrastructure.Tests.EventSourcing
             sut = new EventSourcedAggregateRepository(eventStore,
                 entityTypeManager, publishEventBuffer, new IRepositoryFilter[] {}, eventMessageFactory, new EntityFactory());
         }
-        
+
+        [Fact]
+        public void Add_CreatesStreamAndMetadata()
+        {
+            var entity = new MyEntity(entityId, 5);
+            sut.Add(entity);
+            eventStore.Received(1).AddStream(entity.Id);
+            eventStore.Received(1).SetStreamMetadata(entity.Id,
+                Arg.Is<IReadOnlyDictionary<string, string>>(x => x[AggregateEventStreamMetadataNames.ClassId] == entityClassId.ToString()));
+        }
+
         [Fact]
         public async Task AddThenGet_ReturnsTheSame()
         {

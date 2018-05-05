@@ -27,15 +27,11 @@ namespace Revo.Infrastructure.EventStore
             long? maxSequenceNumber = null, int? maxCount = null);
         Task<IReadOnlyDictionary<string, string>> GetStreamMetadataAsync(Guid streamId);
         Task<EventStreamInfo> GetStreamInfoAsync(Guid streamId);
+        
+        void SetStreamMetadata(Guid streamId, IReadOnlyDictionary<string, string> metadata);
 
-        // TODO: reading without metadata
-
-        Task SetStreamMetadataAsync(Guid streamId, IReadOnlyDictionary<string, string> metadata);
-
-        IReadOnlyCollection<IEventStoreRecord> PushEvents(Guid streamId, IEnumerable<IUncommittedEventStoreRecord> events, long? expectedVersion);
         Task<IReadOnlyCollection<IEventStoreRecord>> PushEventsAsync(Guid streamId, IEnumerable<IUncommittedEventStoreRecord> events, long? expectedVersion);
-
-        void CommitChanges();
+        
         Task CommitChangesAsync();
     }
 }

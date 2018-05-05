@@ -35,6 +35,7 @@ namespace Revo.Infrastructure.EF6.Tests.Events
             var result = sut.SerializeEvent(new Event1(123));
 
             JObject json = JObject.Parse(result.EventJson);
+            json.Should().HaveCount(1);
             json.Should().Contain("foo", 123);
             result.TypeId.Should().Be(new VersionedTypeId("Event1", 1));
         }
@@ -52,7 +53,9 @@ namespace Revo.Infrastructure.EF6.Tests.Events
         public void SerializeEventMetadata()
         {
             var result = sut.SerializeEventMetadata(new Dictionary<string, string>() { { "Bar", "123" } });
-            result.Should().Be("{\"Bar\":\"123\"}");
+            JObject json = JObject.Parse(result);
+            json.Should().HaveCount(1);
+            json.Should().Contain("Bar", "123");
         }
 
         [Fact]

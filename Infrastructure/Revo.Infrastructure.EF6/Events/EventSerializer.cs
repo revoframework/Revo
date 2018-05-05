@@ -29,10 +29,8 @@ namespace Revo.Infrastructure.EF6.Events
         {
             try
             {
-                JObject eventObject = JObject.Parse(eventJson);
                 Type clrType = versionedTypeRegistry.GetTypeInfo<IEvent>(typeId).ClrType;
-
-                return (IEvent)eventObject.ToObject(clrType);
+                return (IEvent)JsonConvert.DeserializeObject(eventJson, clrType);
             }
             catch (JsonException e)
             {
@@ -48,14 +46,13 @@ namespace Revo.Infrastructure.EF6.Events
 
         public string SerializeEventMetadata(IReadOnlyDictionary<string, string> metadata)
         {
-            JObject json = new JObject();
-            metadata.ForEach(x => json[x.Key] = x.Value);
-            return json.ToString(Formatting.None);
+            return JsonConvert.SerializeObject(metadata, Formatting.None);
         }
 
         public JsonMetadata DeserializeEventMetadata(string metadataJson)
         {
-            return new JsonMetadata(JObject.Parse(metadataJson));
+            return new JsonMetadata(metadataJson?.Length > 0
+                ? JObject.Parse(metadataJson) : new JObject());
         }
     }
 }
