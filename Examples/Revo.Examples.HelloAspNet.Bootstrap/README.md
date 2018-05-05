@@ -4,8 +4,8 @@ This is a sample Hello World application for the Revo framework.
 It saves to-do notes and consists of an Web API controller, one command, one query and one aggregate root.
 
 Run the application, browse to the index page and try sending a HTTP request:
- * GET /todos
- * POST /todos {title:string}
+ * GET /api/todos
+ * POST /api/todos {title:string}
 
 How to get started:
  * Create a new MSSQL database.
