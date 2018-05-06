@@ -1,11 +1,11 @@
-﻿using Revo.Platforms.AspNet.Boostrap;
-using Microsoft.Owin;
+﻿using Microsoft.Owin;
 using Owin;
+using Revo.Examples.HelloAspNet.Bootstrap;
 using Revo.Platforms.AspNet.Core;
 using Revo.Platforms.AspNet.Core.Lifecycle;
 
 [assembly: OwinStartup(typeof(Startup))]
-namespace Revo.Platforms.AspNet.Boostrap
+namespace Revo.Examples.HelloAspNet.Bootstrap
 {
     public class Startup
     {

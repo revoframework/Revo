@@ -1,186 +1,22 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{558603AE-BECF-4F72-86B4-AD832D2453AB}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Revo.Domain</RootNamespace>
-    <AssemblyName>Revo.Domain</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <TargetFrameworkProfile />
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Configurations>Debug;Release</Configurations>
+    <Authors>Revo Framework</Authors>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+  
   <ItemGroup>
-    <Reference Include="Castle.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-      <HintPath>..\..\Packages\Castle.Core.4.2.1\lib\net45\Castle.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Experimental.Collections, Version=1.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\Packages\Microsoft.Experimental.Collections.1.0.3-alpha\lib\portable-net45+win8+wp8\Microsoft.Experimental.Collections.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Threading.Tasks, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\Packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Threading.Tasks.Extensions, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\Packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Threading.Tasks.Extensions.Desktop, Version=1.0.168.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\Packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.Desktop.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\Packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="Ninject, Version=3.3.4.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
-      <HintPath>..\..\Packages\Ninject.3.3.4\lib\net45\Ninject.dll</HintPath>
-    </Reference>
-    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\..\Packages\NLog.4.5.3\lib\net45\NLog.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Collections.Immutable, Version=1.2.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\Packages\System.Collections.Immutable.1.4.0\lib\netstandard2.0\System.Collections.Immutable.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.IO">
-      <HintPath>..\..\Packages\System.IO.4.3.0\lib\net462\System.IO.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.Net" />
-    <Reference Include="System.Runtime">
-      <HintPath>..\..\Packages\System.Runtime.4.3.0\lib\net462\System.Runtime.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Transactions" />
-    <Reference Include="System.ValueTuple">
-      <HintPath>..\..\Packages\System.ValueTuple.4.4.0\lib\net47\System.ValueTuple.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <ProjectReference Include="..\DataAccess\Revo.DataAccess\Revo.DataAccess.csproj" />
+    <ProjectReference Include="..\Revo.Core\Revo.Core.csproj" />
   </ItemGroup>
+  
   <ItemGroup>
-    <Compile Include="Core\DomainCoreModule.cs" />
-    <Compile Include="Core\DomainException.cs" />
-    <Compile Include="Core\IClassifier.cs" />
-    <Compile Include="Core\IHasClassId.cs" />
-    <Compile Include="Core\IHasId.cs" />
-    <Compile Include="Entities\AggregateRoot.cs" />
-    <Compile Include="Entities\Attributes\DomainClassIdAttribute.cs" />
-    <Compile Include="Entities\Basic\BasicAggregateRoot.cs" />
-    <Compile Include="Entities\Basic\BasicClassAggregateRoot.cs" />
-    <Compile Include="Entities\Basic\BasicClassEntity.cs" />
-    <Compile Include="Entities\Basic\BasicClassifier.cs" />
-    <Compile Include="Entities\Basic\BasicEntity.cs" />
-    <Compile Include="Entities\Basic\DataType.cs" />
-    <Compile Include="Entities\Basic\Dto\ClassEntityDto.cs" />
-    <Compile Include="Entities\Basic\Dto\EntityDto.cs" />
-    <Compile Include="Entities\Basic\Entity.cs" />
-    <Compile Include="Entities\Basic\IBasicClassIdEntity.cs" />
-    <Compile Include="Entities\DomainClassInfo.cs" />
-    <Compile Include="Entities\EntityClassUtils.cs" />
-    <Compile Include="Entities\EntityTypeManager.cs" />
-    <Compile Include="Entities\EventSourcing\AggregateState.cs" />
-    <Compile Include="Entities\EventSourcing\EventSourcedAggregateRoot.cs" />
-    <Compile Include="Entities\EventSourcing\EventSourcedComponent.cs" />
-    <Compile Include="Entities\EventSourcing\EventSourcedEntity.cs" />
-    <Compile Include="Entities\EventSourcing\IEventSourcedAggregateRoot.cs" />
-    <Compile Include="Entities\IAggregateRoot.cs" />
-    <Compile Include="Entities\IComponent.cs" />
-    <Compile Include="Entities\IEntity.cs" />
-    <Compile Include="Entities\IEntityTypeManager.cs" />
-    <Compile Include="Entities\IQueryableEntity.cs" />
-    <Compile Include="Events\AggregateEventRouter.cs" />
-    <Compile Include="Events\BasicEventMetadataNames.cs" />
-    <Compile Include="Events\ConventionEventApplyRegistrator.cs" />
-    <Compile Include="Events\ConventionEventApplyRegistratorCache.cs" />
-    <Compile Include="Events\DomainAggregateEvent.cs" />
-    <Compile Include="Events\DomainEvent.cs" />
-    <Compile Include="Events\IAggregateEventRouter.cs" />
-    <Compile Include="Events\IEventRouterRegistrator.cs" />
-    <Compile Include="Events\MetadataExtensions.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReadModel\ClassEntityReadModel.cs" />
-    <Compile Include="ReadModel\ClassEntityView.cs" />
-    <Compile Include="ReadModel\EntityReadModel.cs" />
-    <Compile Include="ReadModel\EntityView.cs" />
-    <Compile Include="ReadModel\IClassEntityReadModel.cs" />
-    <Compile Include="ReadModel\IEntityReadModel.cs" />
-    <Compile Include="ReadModel\ITenantReadModel.cs" />
-    <Compile Include="ReadModel\ReadModelBase.cs" />
-    <Compile Include="ReadModel\ReadModelForEntityAttribute.cs" />
-    <Compile Include="Sagas\Attributes\SagaEventAttribute.cs" />
-    <Compile Include="Sagas\BasicSaga.cs" />
-    <Compile Include="Sagas\Events\SagaKeysChangedEvent.cs" />
-    <Compile Include="Sagas\IConventionBasedSaga.cs" />
-    <Compile Include="Sagas\ISaga.cs" />
-    <Compile Include="Sagas\ISagaConventionConfigurationCache.cs" />
-    <Compile Include="Sagas\EventSourcedSaga.cs" />
-    <Compile Include="Sagas\SagaConfigurationException.cs" />
-    <Compile Include="Sagas\SagaConventionConfigurationCache.cs" />
-    <Compile Include="Sagas\SagaConventionConfigurationInfo.cs" />
-    <Compile Include="Sagas\SagaConventionConfigurationScanner.cs" />
-    <Compile Include="Sagas\SagaConventionEventInfo.cs" />
-    <Compile Include="Tenancy\ITenant.cs" />
-    <Compile Include="Tenancy\ITenantOwned.cs" />
-    <Compile Include="Tenancy\Events\TenantAggregateRootCreated.cs" />
-    <Compile Include="Tenancy\TenantBasicAggregateRoot.cs" />
-    <Compile Include="Tenancy\TenantBasicClassAggregateRoot.cs" />
-    <Compile Include="Tenancy\TenantClassEntityReadModel.cs" />
-    <Compile Include="Tenancy\TenantClassifier.cs" />
-    <Compile Include="Tenancy\TenantEntityReadModel.cs" />
-    <Compile Include="Tenancy\TenantEntityView.cs" />
-    <Compile Include="Tenancy\TenantEventSourcedAggregateRoot.cs" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="Ninject" Version="3.3.4" />
+    <PackageReference Include="NLog" Version="4.5.3" />
+    <PackageReference Include="System.Collections.Generic.MultiValueDictionary" Version="0.1.0-preview2-180503-2" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.4.1" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\DataAccess\Revo.DataAccess\Revo.DataAccess.csproj">
-      <Project>{fa942fe7-71fd-4cf5-8959-309583fe7903}</Project>
-      <Name>Revo.DataAccess</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Revo.Core\Revo.Core.csproj">
-      <Project>{1015ba79-4241-4221-9d27-0db033ea624b}</Project>
-      <Name>Revo.Core</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\..\Packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\Packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\Packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\Packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
-  </Target>
+  
 </Project>

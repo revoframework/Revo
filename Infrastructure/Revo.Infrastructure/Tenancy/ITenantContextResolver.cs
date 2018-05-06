@@ -5,6 +5,6 @@ namespace Revo.Infrastructure.Tenancy
 {
     public interface ITenantContextResolver
     {
-        ITenant ResolveTenant(HttpContext httpContext);
+        ITenant ResolveTenant();
     }
 }

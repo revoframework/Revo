@@ -5,7 +5,7 @@ namespace Revo.Infrastructure.Tenancy
 {
     public class NullTenantContextResolver : ITenantContextResolver
     {
-        public ITenant ResolveTenant(HttpContext httpContext)
+        public ITenant ResolveTenant()
         {
             return null;
         }

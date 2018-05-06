@@ -21,10 +21,6 @@ namespace Revo.Infrastructure.Globalization
                 .InRequestOrJobScope();
 
             Bind<IApplicationStartListener>()
-                .To<LocalizationAppInitializer>()
-                .InSingletonScope();
-
-            Bind<IApplicationStartListener>()
                 .To<LocaleLoader>()
                 .InSingletonScope();
         }

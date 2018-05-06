@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using System.Web.Http;
-using Revo.Infrastructure.Notifications.Channels.Apns.Commands;
+using Revo.Extensions.Notifications.Channels.Apns.Commands;
 using Revo.Platforms.AspNet.Web;
 
 namespace Revo.Extensions.AspNet.Interop.Notifications.Apns

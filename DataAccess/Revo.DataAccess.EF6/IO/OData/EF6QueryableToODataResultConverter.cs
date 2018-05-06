@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web.OData.Query;
 using Revo.Core.IO.OData;
+using Revo.Platforms.AspNet.IO.OData;
 
 namespace Revo.DataAccess.EF6.IO.OData
 {

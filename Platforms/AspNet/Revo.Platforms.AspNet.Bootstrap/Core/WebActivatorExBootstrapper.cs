@@ -1,13 +1,12 @@
-﻿using System.Linq;
-using Revo.Core.Lifecycle;
-using Revo.Platforms.AspNet.Boostrap.Core;
+﻿using Revo.Core.Lifecycle;
+using Revo.Examples.HelloAspNet.Bootstrap.Core;
 using Revo.Platforms.AspNet.Core;
 using Revo.Platforms.AspNet.Core.Lifecycle;
 
 [assembly: WebActivatorEx.PreApplicationStartMethod(typeof(WebActivatorExBootstrapper), "OnPreApplicationStart")]
 [assembly: WebActivatorEx.PostApplicationStartMethod(typeof(WebActivatorExBootstrapper), "OnPostApplicationStart")]
 [assembly: WebActivatorEx.ApplicationShutdownMethod(typeof(WebActivatorExBootstrapper), "OnApplicationShutdown")]
-namespace Revo.Platforms.AspNet.Boostrap.Core
+namespace Revo.Examples.HelloAspNet.Bootstrap.Core
 {
     public static class WebActivatorExBootstrapper
     {

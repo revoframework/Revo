@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FluentAssertions;
 using NSubstitute;
 using Revo.Domain.Entities;
 using Revo.Domain.Events;
@@ -49,7 +50,7 @@ namespace Revo.Domain.Tests.Events
             sut.Publish(new Event1());
             sut.CommitEvents();
 
-            Assert.Equal(0, sut.UncommitedEvents.Count());
+            sut.UncommitedEvents.Should().BeEmpty();
         }
 
         [Fact]
@@ -85,7 +86,7 @@ namespace Revo.Domain.Tests.Events
         public void ReplayEvents_DoesntAddUncomittedEvents()
         {
             sut.ReplayEvents(new []{ new Event1() });
-            Assert.Equal(0, sut.UncommitedEvents.Count());
+            sut.UncommitedEvents.Should().BeEmpty();
         }
 
         public class Event1 : DomainAggregateEvent

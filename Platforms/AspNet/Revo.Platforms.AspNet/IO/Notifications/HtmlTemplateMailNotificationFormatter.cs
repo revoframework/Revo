@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using RazorEngine.Templating;
-using Revo.Infrastructure.Notifications;
-using Revo.Infrastructure.Notifications.Channels.Mail;
+using Revo.Extensions.Notifications;
+using Revo.Extensions.Notifications.Channels.Mail;
 using Revo.Platforms.AspNet.IO.Templates;
 
 namespace Revo.Platforms.AspNet.IO.Notifications

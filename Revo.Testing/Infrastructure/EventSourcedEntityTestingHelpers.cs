@@ -178,7 +178,7 @@ namespace Revo.Testing.Infrastructure
                         if (expectedEvent.ev.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
                             .Count(x => !excludedProps.Contains(x.Name)) > 0)
                         {
-                            newEvents[i].ShouldBeEquivalentTo(expectedEvent.ev,
+                            newEvents[i].Should().BeEquivalentTo(expectedEvent.ev,
                                 config => config
                                     //.IncludingAllRuntimeProperties()
                                     .RespectingRuntimeTypes()

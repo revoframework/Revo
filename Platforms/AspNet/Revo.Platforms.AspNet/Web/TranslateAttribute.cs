@@ -100,7 +100,7 @@ namespace Revo.Platforms.AspNet.Web
 
         private static readonly Dictionary<Type, List<List<PathItem>>> TranslatablePathCache = new Dictionary<Type, List<List<PathItem>>>();
         
-        internal List<List<PathItem>> GetPathsToTranslatables(Type type,Stack<Type> visited)
+        internal List<List<PathItem>> GetPathsToTranslatables(Type type, Stack<Type> visited)
         {
             if (typeof(ITranslatable).IsAssignableFrom(type))
                 return new List<List<PathItem>>{new List<PathItem>()};

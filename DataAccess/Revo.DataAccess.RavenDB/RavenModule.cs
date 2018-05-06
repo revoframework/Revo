@@ -14,6 +14,7 @@ using Raven.Client.Documents.Session;
 using Revo.Core.IO.OData;
 using Revo.DataAccess.RavenDB.IO.OData;
 using Revo.Platforms.AspNet.Core.Lifecycle;
+using Revo.Platforms.AspNet.IO.OData;
 
 namespace Revo.DataAccess.RavenDB
 {

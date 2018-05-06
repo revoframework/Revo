@@ -1,4 +1,4 @@
-﻿namespace Revo.Platforms.AspNet.Boostrap.Core
+﻿namespace Revo.Examples.HelloAspNet.Bootstrap.Core
 {
     public class ModuleLoader
     {

@@ -8,6 +8,7 @@ using Revo.DataAccess.EF6.Entities;
 using Revo.DataAccess.EF6.IO.OData;
 using Revo.DataAccess.EF6.Model;
 using Revo.DataAccess.Entities;
+using Revo.Platforms.AspNet.IO.OData;
 
 namespace Revo.DataAccess.EF6
 {

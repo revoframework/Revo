@@ -14,21 +14,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Platforms", "Platforms", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{C12D8D59-79D5-4F07-B7FB-79B1BEB3DCB1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.Core", "Revo.Core\Revo.Core.csproj", "{1015BA79-4241-4221-9D27-0DB033EA624B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.Core", "Revo.Core\Revo.Core.csproj", "{1015BA79-4241-4221-9D27-0DB033EA624B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AspNet", "AspNet", "{142C4562-9067-43ED-845D-DE6D689465C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.Platforms.AspNet", "Platforms\AspNet\Revo.Platforms.AspNet\Revo.Platforms.AspNet.csproj", "{42CDFAD0-CB40-433E-AC6E-874F3F58E77D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.Platforms.AspNet", "Platforms\AspNet\Revo.Platforms.AspNet\Revo.Platforms.AspNet.csproj", "{42CDFAD0-CB40-433E-AC6E-874F3F58E77D}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Revo.Platforms.AspNet.Bootstrap", "Platforms\AspNet\Revo.Platforms.AspNet.Bootstrap\Revo.Platforms.AspNet.Bootstrap.shproj", "{1445B1E4-B562-41CB-91C9-866ED34E38D5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.Domain", "Revo.Domain\Revo.Domain.csproj", "{558603AE-BECF-4F72-86B4-AD832D2453AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.Domain", "Revo.Domain\Revo.Domain.csproj", "{558603AE-BECF-4F72-86B4-AD832D2453AB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.Infrastructure", "Infrastructure\Revo.Infrastructure\Revo.Infrastructure.csproj", "{6F893B4E-8119-41F8-B1C9-28EEA56946A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.Infrastructure", "Infrastructure\Revo.Infrastructure\Revo.Infrastructure.csproj", "{6F893B4E-8119-41F8-B1C9-28EEA56946A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.Infrastructure.EF6", "Infrastructure\Revo.Infrastructure.EF6\Revo.Infrastructure.EF6.csproj", "{49959901-1DD0-41FD-8352-7F9C6BB811A7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.Infrastructure.EF6", "Infrastructure\Revo.Infrastructure.EF6\Revo.Infrastructure.EF6.csproj", "{49959901-1DD0-41FD-8352-7F9C6BB811A7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.Testing", "Revo.Testing\Revo.Testing.csproj", "{A95BFBAD-E0F3-4631-A873-BC03B66182DA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.Testing", "Revo.Testing\Revo.Testing.csproj", "{A95BFBAD-E0F3-4631-A873-BC03B66182DA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3_Examples", "3_Examples", "{1D1A12B3-9916-430C-8ACB-B7243FF6B656}"
 EndProject
@@ -40,25 +40,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1_Core", "1_Core", "{FB1689
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{72197100-932A-45EF-B394-31F2C86CEC0E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.DataAccess", "DataAccess\Revo.DataAccess\Revo.DataAccess.csproj", "{FA942FE7-71FD-4CF5-8959-309583FE7903}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.DataAccess", "DataAccess\Revo.DataAccess\Revo.DataAccess.csproj", "{FA942FE7-71FD-4CF5-8959-309583FE7903}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.DataAccess.EF6", "DataAccess\Revo.DataAccess.EF6\Revo.DataAccess.EF6.csproj", "{A8DE2F53-E404-48DD-B11F-B6A3302CE163}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.DataAccess.EF6", "DataAccess\Revo.DataAccess.EF6\Revo.DataAccess.EF6.csproj", "{A8DE2F53-E404-48DD-B11F-B6A3302CE163}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.Core.Tests", "Tests\Revo.Core.Tests\Revo.Core.Tests.csproj", "{4053DE6B-225B-42E1-8336-F031FE1CFE77}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.Core.Tests", "Tests\Revo.Core.Tests\Revo.Core.Tests.csproj", "{4053DE6B-225B-42E1-8336-F031FE1CFE77}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.DataAccess.Tests", "Tests\Revo.DataAccess.Tests\Revo.DataAccess.Tests.csproj", "{CA3FCE6B-2D81-4C42-A960-A976E06051DC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.DataAccess.RavenDB", "DataAccess\Revo.DataAccess.RavenDB\Revo.DataAccess.RavenDB.csproj", "{4FF04362-9B93-4BC2-9A64-7AFCA20D3A6C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.Infrastructure.EF6.Tests", "Tests\Revo.Infrastructure.EF6.Tests\Revo.Infrastructure.EF6.Tests.csproj", "{1CB9CCB8-144D-40E1-87B4-3474625D5CD2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.Infrastructure.Tests", "Tests\Revo.Infrastructure.Tests\Revo.Infrastructure.Tests.csproj", "{0CEEB2F8-0B3C-4E8A-A4A1-0842F680CB99}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.Platforms.AspNet.Tests", "Tests\Revo.Platforms.AspNet.Tests\Revo.Platforms.AspNet.Tests.csproj", "{368BF029-76E0-43C9-930B-70915DC2B11A}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.DataAccess.RavenDB", "DataAccess\Revo.DataAccess.RavenDB\Revo.DataAccess.RavenDB.csproj", "{4FF04362-9B93-4BC2-9A64-7AFCA20D3A6C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.Extensions.AspNet.Interop", "Extensions\Revo.Extensions.AspNet.Interop\Revo.Extensions.AspNet.Interop.csproj", "{BF63237A-187F-40F8-8EEA-616E960A5E62}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.Extensions.AspNet.Interop.Tests", "Tests\Revo.Extensions.AspNet.Interop.Tests\Revo.Extensions.AspNet.Interop.Tests.csproj", "{8262F3E3-8683-44AA-A3E7-98020A76F52A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.Extensions.AspNet.Interop", "Extensions\Revo.Extensions.AspNet.Interop\Revo.Extensions.AspNet.Interop.csproj", "{BF63237A-187F-40F8-8EEA-616E960A5E62}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{9F4CC1E8-6D73-46B2-A987-D030C8B4BFA1}"
 EndProject
@@ -68,13 +58,31 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Platforms", "Platforms", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataAccess", "DataAccess", "{6C549156-DDEC-4F9F-8E75-9E07A55833E1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.Domain.Tests", "Tests\Revo.Domain.Tests\Revo.Domain.Tests.csproj", "{F612C5E1-F09C-4038-810C-96D9D627F17C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.DataAccess.EF6.Tests", "Tests\Revo.DataAccess.EF6.Tests\Revo.DataAccess.EF6.Tests.csproj", "{6C2BB5EE-4DDA-4D15-AB1D-7BF30B7B7725}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.Domain.Tests", "Tests\Revo.Domain.Tests\Revo.Domain.Tests.csproj", "{F612C5E1-F09C-4038-810C-96D9D627F17C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integrations", "Integrations", "{F041BB96-87BD-4123-9B2E-B1B8FAA536EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.Integrations.Rebus", "Integrations\Revo.Integrations.Rebus\Revo.Integrations.Rebus.csproj", "{BD92BE2D-24ED-405F-A85A-1110BBC9B778}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.Integrations.Rebus", "Integrations\Revo.Integrations.Rebus\Revo.Integrations.Rebus.csproj", "{BD92BE2D-24ED-405F-A85A-1110BBC9B778}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.Extensions.Notifications", "Extensions\Revo.Extensions.Notifications\Revo.Extensions.Notifications.csproj", "{08551AFE-2113-4602-B030-7089B778EDA7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.Extensions.History", "Extensions\Revo.Extensions.History\Revo.Extensions.History.csproj", "{144DAED3-5A0F-4756-9411-04258D893530}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.Extensions.History.Tests", "Tests\Extensions\Revo.Extensions.History.Tests\Revo.Extensions.History.Tests.csproj", "{38D75F5F-0DD9-4986-B5EC-A562350FD84F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.Extensions.Notifications.Tests", "Tests\Extensions\Revo.Extensions.Notifications.Tests\Revo.Extensions.Notifications.Tests.csproj", "{C90D80C0-0E09-4ED4-A49A-B2C214D65631}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.Infrastructure.Tests", "Tests\Infrastructure\Revo.Infrastructure.Tests\Revo.Infrastructure.Tests.csproj", "{0CEEB2F8-0B3C-4E8A-A4A1-0842F680CB99}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.Infrastructure.EF6.Tests", "Tests\Infrastructure\Revo.Infrastructure.EF6.Tests\Revo.Infrastructure.EF6.Tests.csproj", "{C1B0A4FB-1088-49D3-BE19-61EC45E7BC23}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.Platforms.AspNet.Tests", "Tests\Platforms\Revo.Platforms.AspNet.Tests\Revo.Platforms.AspNet.Tests.csproj", "{FCE5FDE2-7208-445C-B192-6B62E51E4A34}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.DataAccess.EF6.Tests", "Tests\DataAccess\Revo.DataAccess.EF6.Tests\Revo.DataAccess.EF6.Tests.csproj", "{2A4EFD89-4766-4DA9-99E9-F6D4754EEEA3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.DataAccess.Tests", "Tests\DataAccess\Revo.DataAccess.Tests\Revo.DataAccess.Tests.csproj", "{9CC81610-00CE-4CB4-A550-34FB489110A5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.Extensions.AspNet.Interop.Tests", "Tests\Extensions\Revo.Extensions.AspNet.Interop.Tests\Revo.Extensions.AspNet.Interop.Tests.csproj", "{8262F3E3-8683-44AA-A3E7-98020A76F52A}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -126,22 +134,6 @@ Global
 		{4053DE6B-225B-42E1-8336-F031FE1CFE77}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4053DE6B-225B-42E1-8336-F031FE1CFE77}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4053DE6B-225B-42E1-8336-F031FE1CFE77}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CA3FCE6B-2D81-4C42-A960-A976E06051DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CA3FCE6B-2D81-4C42-A960-A976E06051DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CA3FCE6B-2D81-4C42-A960-A976E06051DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CA3FCE6B-2D81-4C42-A960-A976E06051DC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1CB9CCB8-144D-40E1-87B4-3474625D5CD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1CB9CCB8-144D-40E1-87B4-3474625D5CD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1CB9CCB8-144D-40E1-87B4-3474625D5CD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1CB9CCB8-144D-40E1-87B4-3474625D5CD2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0CEEB2F8-0B3C-4E8A-A4A1-0842F680CB99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0CEEB2F8-0B3C-4E8A-A4A1-0842F680CB99}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0CEEB2F8-0B3C-4E8A-A4A1-0842F680CB99}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0CEEB2F8-0B3C-4E8A-A4A1-0842F680CB99}.Release|Any CPU.Build.0 = Release|Any CPU
-		{368BF029-76E0-43C9-930B-70915DC2B11A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{368BF029-76E0-43C9-930B-70915DC2B11A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{368BF029-76E0-43C9-930B-70915DC2B11A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{368BF029-76E0-43C9-930B-70915DC2B11A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4FF04362-9B93-4BC2-9A64-7AFCA20D3A6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4FF04362-9B93-4BC2-9A64-7AFCA20D3A6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4FF04362-9B93-4BC2-9A64-7AFCA20D3A6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -149,22 +141,54 @@ Global
 		{BF63237A-187F-40F8-8EEA-616E960A5E62}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BF63237A-187F-40F8-8EEA-616E960A5E62}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BF63237A-187F-40F8-8EEA-616E960A5E62}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8262F3E3-8683-44AA-A3E7-98020A76F52A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8262F3E3-8683-44AA-A3E7-98020A76F52A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8262F3E3-8683-44AA-A3E7-98020A76F52A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8262F3E3-8683-44AA-A3E7-98020A76F52A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F612C5E1-F09C-4038-810C-96D9D627F17C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F612C5E1-F09C-4038-810C-96D9D627F17C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F612C5E1-F09C-4038-810C-96D9D627F17C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F612C5E1-F09C-4038-810C-96D9D627F17C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6C2BB5EE-4DDA-4D15-AB1D-7BF30B7B7725}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6C2BB5EE-4DDA-4D15-AB1D-7BF30B7B7725}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6C2BB5EE-4DDA-4D15-AB1D-7BF30B7B7725}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6C2BB5EE-4DDA-4D15-AB1D-7BF30B7B7725}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BD92BE2D-24ED-405F-A85A-1110BBC9B778}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BD92BE2D-24ED-405F-A85A-1110BBC9B778}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD92BE2D-24ED-405F-A85A-1110BBC9B778}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD92BE2D-24ED-405F-A85A-1110BBC9B778}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08551AFE-2113-4602-B030-7089B778EDA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08551AFE-2113-4602-B030-7089B778EDA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08551AFE-2113-4602-B030-7089B778EDA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08551AFE-2113-4602-B030-7089B778EDA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{144DAED3-5A0F-4756-9411-04258D893530}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{144DAED3-5A0F-4756-9411-04258D893530}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{144DAED3-5A0F-4756-9411-04258D893530}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{144DAED3-5A0F-4756-9411-04258D893530}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38D75F5F-0DD9-4986-B5EC-A562350FD84F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38D75F5F-0DD9-4986-B5EC-A562350FD84F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38D75F5F-0DD9-4986-B5EC-A562350FD84F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38D75F5F-0DD9-4986-B5EC-A562350FD84F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C90D80C0-0E09-4ED4-A49A-B2C214D65631}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C90D80C0-0E09-4ED4-A49A-B2C214D65631}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C90D80C0-0E09-4ED4-A49A-B2C214D65631}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C90D80C0-0E09-4ED4-A49A-B2C214D65631}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0CEEB2F8-0B3C-4E8A-A4A1-0842F680CB99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CEEB2F8-0B3C-4E8A-A4A1-0842F680CB99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CEEB2F8-0B3C-4E8A-A4A1-0842F680CB99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0CEEB2F8-0B3C-4E8A-A4A1-0842F680CB99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1B0A4FB-1088-49D3-BE19-61EC45E7BC23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1B0A4FB-1088-49D3-BE19-61EC45E7BC23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1B0A4FB-1088-49D3-BE19-61EC45E7BC23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1B0A4FB-1088-49D3-BE19-61EC45E7BC23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCE5FDE2-7208-445C-B192-6B62E51E4A34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCE5FDE2-7208-445C-B192-6B62E51E4A34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCE5FDE2-7208-445C-B192-6B62E51E4A34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCE5FDE2-7208-445C-B192-6B62E51E4A34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A4EFD89-4766-4DA9-99E9-F6D4754EEEA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A4EFD89-4766-4DA9-99E9-F6D4754EEEA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A4EFD89-4766-4DA9-99E9-F6D4754EEEA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A4EFD89-4766-4DA9-99E9-F6D4754EEEA3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CC81610-00CE-4CB4-A550-34FB489110A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CC81610-00CE-4CB4-A550-34FB489110A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CC81610-00CE-4CB4-A550-34FB489110A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CC81610-00CE-4CB4-A550-34FB489110A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8262F3E3-8683-44AA-A3E7-98020A76F52A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8262F3E3-8683-44AA-A3E7-98020A76F52A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8262F3E3-8683-44AA-A3E7-98020A76F52A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8262F3E3-8683-44AA-A3E7-98020A76F52A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -186,21 +210,25 @@ Global
 		{FA942FE7-71FD-4CF5-8959-309583FE7903} = {3FCA615C-32A7-4AD7-8F97-23299F266902}
 		{A8DE2F53-E404-48DD-B11F-B6A3302CE163} = {3FCA615C-32A7-4AD7-8F97-23299F266902}
 		{4053DE6B-225B-42E1-8336-F031FE1CFE77} = {25A48354-8863-4FC8-B85D-EDE6E2974EE5}
-		{CA3FCE6B-2D81-4C42-A960-A976E06051DC} = {6C549156-DDEC-4F9F-8E75-9E07A55833E1}
-		{1CB9CCB8-144D-40E1-87B4-3474625D5CD2} = {9F4CC1E8-6D73-46B2-A987-D030C8B4BFA1}
-		{0CEEB2F8-0B3C-4E8A-A4A1-0842F680CB99} = {9F4CC1E8-6D73-46B2-A987-D030C8B4BFA1}
-		{368BF029-76E0-43C9-930B-70915DC2B11A} = {1B940646-6559-47CE-8381-EB232DC98734}
 		{4FF04362-9B93-4BC2-9A64-7AFCA20D3A6C} = {3FCA615C-32A7-4AD7-8F97-23299F266902}
 		{BF63237A-187F-40F8-8EEA-616E960A5E62} = {72197100-932A-45EF-B394-31F2C86CEC0E}
-		{8262F3E3-8683-44AA-A3E7-98020A76F52A} = {B6E2BF61-054B-4923-9F49-A11DE72DA2E6}
 		{9F4CC1E8-6D73-46B2-A987-D030C8B4BFA1} = {25A48354-8863-4FC8-B85D-EDE6E2974EE5}
 		{B6E2BF61-054B-4923-9F49-A11DE72DA2E6} = {25A48354-8863-4FC8-B85D-EDE6E2974EE5}
 		{1B940646-6559-47CE-8381-EB232DC98734} = {25A48354-8863-4FC8-B85D-EDE6E2974EE5}
 		{6C549156-DDEC-4F9F-8E75-9E07A55833E1} = {25A48354-8863-4FC8-B85D-EDE6E2974EE5}
 		{F612C5E1-F09C-4038-810C-96D9D627F17C} = {25A48354-8863-4FC8-B85D-EDE6E2974EE5}
-		{6C2BB5EE-4DDA-4D15-AB1D-7BF30B7B7725} = {6C549156-DDEC-4F9F-8E75-9E07A55833E1}
 		{F041BB96-87BD-4123-9B2E-B1B8FAA536EC} = {FB1689F5-32FB-46A9-AA47-647A7F4A1686}
 		{BD92BE2D-24ED-405F-A85A-1110BBC9B778} = {F041BB96-87BD-4123-9B2E-B1B8FAA536EC}
+		{08551AFE-2113-4602-B030-7089B778EDA7} = {72197100-932A-45EF-B394-31F2C86CEC0E}
+		{144DAED3-5A0F-4756-9411-04258D893530} = {72197100-932A-45EF-B394-31F2C86CEC0E}
+		{38D75F5F-0DD9-4986-B5EC-A562350FD84F} = {B6E2BF61-054B-4923-9F49-A11DE72DA2E6}
+		{C90D80C0-0E09-4ED4-A49A-B2C214D65631} = {B6E2BF61-054B-4923-9F49-A11DE72DA2E6}
+		{0CEEB2F8-0B3C-4E8A-A4A1-0842F680CB99} = {9F4CC1E8-6D73-46B2-A987-D030C8B4BFA1}
+		{C1B0A4FB-1088-49D3-BE19-61EC45E7BC23} = {9F4CC1E8-6D73-46B2-A987-D030C8B4BFA1}
+		{FCE5FDE2-7208-445C-B192-6B62E51E4A34} = {1B940646-6559-47CE-8381-EB232DC98734}
+		{2A4EFD89-4766-4DA9-99E9-F6D4754EEEA3} = {6C549156-DDEC-4F9F-8E75-9E07A55833E1}
+		{9CC81610-00CE-4CB4-A550-34FB489110A5} = {6C549156-DDEC-4F9F-8E75-9E07A55833E1}
+		{8262F3E3-8683-44AA-A3E7-98020A76F52A} = {B6E2BF61-054B-4923-9F49-A11DE72DA2E6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C98B2018-4C0A-4011-94CB-77D70109215F}

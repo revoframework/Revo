@@ -16,7 +16,7 @@ namespace Revo.Infrastructure.Tenancy
 
         public ITenant Tenant { get; private set; }
 
-        public ITenant ResolveTenant(HttpContext httpContext)
+        public ITenant ResolveTenant()
         {
             return Tenant;
         }

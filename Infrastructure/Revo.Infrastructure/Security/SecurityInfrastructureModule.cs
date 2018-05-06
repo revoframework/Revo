@@ -11,10 +11,6 @@ namespace Revo.Infrastructure.Security
     {
         public override void Load()
         {
-            Bind<IRepositoryFilter>()
-                .To<AuthorizingCrudRepositoryFilter>()
-                .InTransientScope();
-
             Bind<IEntityQueryAuthorizer>()
                 .To<EntityQueryAuthorizer>()
                 .InRequestOrJobScope();

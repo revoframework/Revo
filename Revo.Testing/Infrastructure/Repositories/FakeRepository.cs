@@ -150,7 +150,10 @@ namespace Revo.Testing.Infrastructure.Repositories
             }
 
             saveTransactions.Add(
-                new SaveTransaction(added, modified, removed, publishedEvents.AsLookup()));
+                new SaveTransaction(added, modified, removed,
+                    publishedEvents
+                        .SelectMany(x => x.Value.Select(y => new KeyValuePair<EntityEntry, DomainAggregateEvent>(x.Key, y)))
+                        .ToLookup(x => x.Key, x => x.Value)));
         }
 
         public virtual Task SaveChangesAsync()

@@ -18,6 +18,7 @@ using Microsoft.OData.Edm;
 using Newtonsoft.Json;
 using Ninject;
 using Revo.Core.IO.OData;
+using Revo.Platforms.AspNet.IO.OData;
 
 namespace Revo.Platforms.AspNet.Web
 {

@@ -9,6 +9,7 @@ using Raven.Client.Documents;
 using Raven.Client.Documents.Linq;
 using Raven.Client.Documents.Session;
 using Revo.Core.IO.OData;
+using Revo.Platforms.AspNet.IO.OData;
 
 namespace Revo.DataAccess.RavenDB.IO.OData
 {
