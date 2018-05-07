@@ -2,8 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Configurations>Debug;Release</Configurations>
-    <Company>Revo Framework</Company>
     <Authors>Revo Framework</Authors>
   </PropertyGroup>
   
