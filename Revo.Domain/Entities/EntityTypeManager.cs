@@ -17,6 +17,7 @@ namespace Revo.Domain.Entities
         public EntityTypeManager(ITypeExplorer typeExplorer)
         {
             this.typeExplorer = typeExplorer;
+            ClearCache();
         }
 
         public IEnumerable<DomainClassInfo> DomainEntities => typesToClassIds.Value.Values;
@@ -32,7 +33,7 @@ namespace Revo.Domain.Entities
             {
                 var entities = typeExplorer.GetAllTypes()
                     .Where(x => typeof(IEntity).IsAssignableFrom(x))
-                    .Where(x => x.IsClass && !x.IsAbstract && !x.IsGenericTypeDefinition && x.IsConstructedGenericType)
+                    .Where(x => x.IsClass && !x.IsAbstract && !x.IsGenericTypeDefinition && !x.IsConstructedGenericType)
                     .Select(x => new { Type = x, ClassIdAttribute = EntityClassUtils.GetClassIdAttribute(x) })
                     .Where(x => x.ClassIdAttribute != null)
                     .ToList();
