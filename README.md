@@ -25,8 +25,8 @@ Revo is an application framework for modern server C\#/.NET applications built w
 
 ## Features
 
-The framework combines the concepts of event sourcing, CQRS and DDD to provide support for building applications that are scalable, maintainable, can work in distributed environments and are easy to integrate with outside world. As such, it take some rather opinionated approaches on the design of certain parts of its architecture. Revo also incorporates some other features and infrastructure that is often necessary for building complete applications using the mentioned architectural patterns – for example, data-access, authorization, validation, messaging integration, multi-tenancy or testing.
- Its extensions can also provide other features like entity history change-tracking, auditing or user notifications.
+The framework combines the concepts of event sourcing, CQRS and DDD to provide support for building applications that are scalable, maintainable, can work in distributed environments and are easy to integrate with outside world. As such, it takes some rather opinionated approaches on the design of certain parts of its architecture. Revo also offers other common features and infrastructure that is often necessary for building complete applications – for example, authorizations, validations, messaging, integrations, multi-tenancy or testing.
+Furthermore, its extensions implement other useful features like entity history change-tracking, auditing or user notifications.
 
 [**Domain-Driven Design**](https://revoframework.gitbook.io/revo/reference-guide/domain-building-blocks)
 Building blocks for rich DDD-style domain models \(aggregates, entities, domain events, repositories...\).
@@ -79,7 +79,7 @@ For now, see the sample Hello World application in the examples folder (Examples
 
 ## Requirements
 
-The framework is written in C\# 7.1 and targets the .NET Standard 2.0 specification; some of its modules currently also require the .NET Framework 4.7.1 where needed \(e.g. Entity Framework 6 support\). Revo also makes a heavy use of the C\# async/await pattern and uses the TAP \(Task Asynchronous Pattern\) throughout its entire codebase \(i.e. _async all the way_ approach\).
+The framework is written in C\# 7.1 and targets the .NET Standard 2.0 specification; some of its modules currently also require the .NET Framework 4.7.1 where needed \(e.g. Entity Framework 6 support\). Revo also makes a heavy use of the C\# async/await pattern and uses the TAP \(Task Asynchronous Pattern\) throughout its entire codebase \(i.e. _async all the way_\).
 
 ## License
 > MIT License
