@@ -41,8 +41,8 @@ Segregating command and query responsibilities with:
 * Processing pipeline with filters for cross-cutting concerns \([authorization](https://revoframework.gitbook.io/revo/reference-guide/authorization), [validation](https://revoframework.gitbook.io/revo/reference-guide/validation)\)
 * [Different read/write models](https://revoframework.gitbook.io/revo/reference-guide/projections)
 
-[**A/synchronous event delivery**](https://revoframework.gitbook.io/revo/reference-guide/events)  
-Support for both [synchronous](https://revoframework.gitbook.io/revo/reference-guide/events#synchronous-event-processing) and [asynchronous](https://revoframework.gitbook.io/revo/reference-guide/events#asynchronous-event-processing) event delivery, guaranteed _at-least-once_ delivery, event queues with strict sequence ordering \(optionally\), event source catch-ups, optional [pseudo-synchronous event dispatch](https://revoframework.gitbook.io/revo/reference-guide/events#pseudo-synchronous-event-dispatch) for listeners \(projectors, for example\).
+[**A/synchronous event processing**](https://revoframework.gitbook.io/revo/reference-guide/events)
+Support for both [synchronous](https://revoframework.gitbook.io/revo/reference-guide/events#synchronous-event-processing) and [asynchronous](https://revoframework.gitbook.io/revo/reference-guide/events#asynchronous-event-processing) event processing, guaranteed _at-least-once_ delivery, event queues with strict sequence ordering \(optionally\), event source catch-ups, optional [pseudo-synchronous event dispatch](https://revoframework.gitbook.io/revo/reference-guide/events#pseudo-synchronous-event-dispatch) for listeners \(projectors, for example\).
 
 [**Data access**](https://revoframework.gitbook.io/revo/reference-guide/data-persistence)  
 Abstraction layer for _Entity Framework 6_, _RavenDB,_ testable _in-memory database_ or other data providers.
