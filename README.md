@@ -28,10 +28,10 @@ Revo is an application framework for modern server C\#/.NET applications built w
 The framework combines the concepts of event sourcing, CQRS and DDD to provide support for building applications that are scalable, maintainable, can work in distributed environments and are easy to integrate with outside world. As such, it takes some rather opinionated approaches on the design of certain parts of its architecture. Revo also offers other common features and infrastructure that is often necessary for building complete applications – for example, authorizations, validations, messaging, integrations, multi-tenancy or testing.
 Furthermore, its extensions implement other useful features like entity history change-tracking, auditing or user notifications.
 
-[**Domain-Driven Design**](https://revoframework.gitbook.io/revo/reference-guide/domain-building-blocks)
+[**Domain-Driven Design**](https://revoframework.gitbook.io/revo/reference-guide/domain-building-blocks)  
 Building blocks for rich DDD-style domain models \(aggregates, entities, domain events, repositories...\).
 
-[**Event Sourcing**](https://revoframework.gitbook.io/revo/reference-guide/events)
+[**Event Sourcing**](https://revoframework.gitbook.io/revo/reference-guide/events)  
 Implementing event-sourced entity persistence with multiple backends \(just _MSSQL_ for now\).
 
 [**CQRS**](https://revoframework.gitbook.io/revo/reference-guide/commands-and-queries)  
@@ -41,7 +41,7 @@ Segregating command and query responsibilities with:
 * Processing pipeline with filters for cross-cutting concerns \([authorization](https://revoframework.gitbook.io/revo/reference-guide/authorization), [validation](https://revoframework.gitbook.io/revo/reference-guide/validation)\)
 * [Different read/write models](https://revoframework.gitbook.io/revo/reference-guide/projections)
 
-[**A/synchronous event processing**](https://revoframework.gitbook.io/revo/reference-guide/events)
+[**A/synchronous event processing**](https://revoframework.gitbook.io/revo/reference-guide/events)  
 Support for both [synchronous](https://revoframework.gitbook.io/revo/reference-guide/events#synchronous-event-processing) and [asynchronous](https://revoframework.gitbook.io/revo/reference-guide/events#asynchronous-event-processing) event processing, guaranteed _at-least-once_ delivery, event queues with strict sequence ordering \(optionally\), event source catch-ups, optional [pseudo-synchronous event dispatch](https://revoframework.gitbook.io/revo/reference-guide/events#pseudo-synchronous-event-dispatch) for listeners \(projectors, for example\).
 
 [**Data access**](https://revoframework.gitbook.io/revo/reference-guide/data-persistence)  
@@ -74,7 +74,7 @@ TODO
 
 ## Examples
 
-TODO
+TODO  
 For now, see the sample Hello World application in the examples folder ([Examples/Revo.Examples.HelloAspNet.Bootstrap](https://github.com/revoframework/Revo/tree/develop/Examples/Revo.Examples.HelloAspNet.Bootstrap)) and the [reference guide](https://revoframework.gitbook.io/revo/).
 
 ## Requirements
