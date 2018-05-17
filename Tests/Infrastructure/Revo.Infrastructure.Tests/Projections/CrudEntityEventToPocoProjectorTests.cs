@@ -47,7 +47,7 @@ namespace Revo.Infrastructure.Tests.Projections
             public async Task CommitChangesAsync_SavesRepository()
             {
                 await sut.CommitChangesAsync();
-                crudRepository.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+                crudRepository.ReceivedWithAnyArgs(1).SaveChangesAsync();
             }
 
             [Fact]
