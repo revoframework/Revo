@@ -3,6 +3,10 @@ using Revo.Domain.Core;
 
 namespace Revo.Domain.Entities.Basic
 {
+    /// <summary>
+    /// Entity that is typically persisted to a RDBMS store using an ORM.
+    /// For convenience, it also automatically stores its ClassId as one of its properties.
+    /// </summary>
     public abstract class BasicClassEntity : BasicEntity, IBasicClassIdEntity, IHasClassId<Guid>
     {
         public BasicClassEntity(Guid id)

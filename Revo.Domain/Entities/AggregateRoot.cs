@@ -44,15 +44,25 @@ namespace Revo.Domain.Entities
 
         public override string ToString()
         {
-            return $"{GetType().FullName} (ID: {Id})";
+            return $"{GetType().Name} {{ Id = {Id} }}";
         }
 
+        /// <summary>
+        /// Publishes a new event.
+        /// <para>Upon calling this method, the event gets dispatched to aggregate's event router and
+        /// and processed only internally by the components (aggregate root, entities and other components, if registered)
+        /// of the aggregate itself (which should not trigger any side effects outside its boundaries).
+        /// The event does not get delivered to any external listeners until the aggregate gets completely
+        /// and fully saved by the repository.</para>
+        /// </summary>
+        /// <typeparam name="T">Event type.</typeparam>
+        /// <param name="evt">Event to publish.</param>
         protected virtual void Publish<T>(T evt) where T : DomainAggregateEvent
         {
             if (IsDeleted)
             {
                 throw new InvalidOperationException(
-                    $"Cannot publish new {typeof(T).FullName} event on {GetType().FullName} aggregate because it is currently in deleted state");
+                    $"Cannot publish new {typeof(T).FullName} event on {this} aggregate because it is currently in deleted state");
             }
 
             EventRouter.Publish(evt);

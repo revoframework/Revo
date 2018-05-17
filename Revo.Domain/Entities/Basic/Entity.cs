@@ -15,9 +15,20 @@ namespace Revo.Domain.Entities.Basic
 
         public Guid Id { get; private set; }
 
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            IEntity other = obj as IEntity;
+            return Id == other?.Id;
+        }
+
         public override string ToString()
         {
-            return $"{GetType().FullName} (ID: {Id})";
+            return $"{GetType().Name} {{ Id = {Id} }}";
         }
     }
 }

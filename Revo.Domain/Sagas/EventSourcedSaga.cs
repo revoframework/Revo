@@ -12,7 +12,7 @@ using Revo.Domain.Sagas.Events;
 namespace Revo.Domain.Sagas
 {
     /// <summary>
-    /// <para>Saga that uses event-sourcing to define its state.</para>
+    /// <para>Saga that uses event sourcing to define its state.</para>
     /// <seealso cref="EventSourcedAggregateRoot"/>
     /// </summary>
     public class EventSourcedSaga : EventSourcedAggregateRoot, IConventionBasedSaga

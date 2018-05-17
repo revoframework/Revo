@@ -4,7 +4,12 @@ using Revo.Domain.Tenancy.Events;
 
 namespace Revo.Domain.Tenancy
 {
-    public abstract class TenantEventSourcedAggregateRoot: EventSourcedAggregateRoot, ITenantOwned
+    /// <summary>
+    /// Event-sourced aggregate root that is owned by a tenant.
+    /// <para>Upon its creation, publishes a new TenantAggregateRootCreated that specified the tenant it belongs to.</para>
+    /// <para><see cref="EventSourcedAggregateRoot"/></para>
+    /// </summary>
+    public abstract class TenantEventSourcedAggregateRoot : EventSourcedAggregateRoot, ITenantOwned
     {
         public TenantEventSourcedAggregateRoot(Guid id, ITenant tenant) : base(id)
         {
