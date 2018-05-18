@@ -4,9 +4,16 @@ namespace Revo.Core.Security
 {
     public class Permission
     {
-        public string ResourceId { get; set; }
-        public string ContextId { get; set; }
-        public PermissionType PermissionType { get; set; }
+        public Permission(PermissionType permissionType, string resourceId, string contextId)
+        {
+            PermissionType = permissionType;
+            ResourceId = resourceId;
+            ContextId = contextId;
+        }
+
+        public string ContextId { get; }
+        public PermissionType PermissionType { get; }
+        public string ResourceId { get; }
 
         public override bool Equals(object obj)
         {
@@ -14,7 +21,7 @@ namespace Revo.Core.Security
             return other != null
                 && other.ResourceId == ResourceId
                 && other.ContextId == ContextId
-                && other.PermissionType?.Id == PermissionType?.Id;
+                && Equals(other.PermissionType, PermissionType);
         }
 
         public override int GetHashCode()
@@ -25,6 +32,12 @@ namespace Revo.Core.Security
             hash = hash * 23 + (ContextId?.GetHashCode() ?? -1);
             hash = hash * 23 + (PermissionType?.Id.GetHashCode() ?? -1);
             return hash;
+        }
+
+        public override string ToString()
+        {
+            return
+                $"Permission {{ PermissionType.Name = {PermissionType?.Name}, ResourceId = {ResourceId}, ContextId = {ContextId} }}";
         }
     }
 }

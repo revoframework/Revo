@@ -118,7 +118,7 @@ namespace Revo.Domain.ValueObjects
                 if (!Equals(x[i].Value, y[i].Value))
                 {
                     return false;
-                }   
+                }
             }
 
             return true;

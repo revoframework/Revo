@@ -19,7 +19,7 @@ namespace Revo.Core.Types
 
         public override string ToString()
         {
-            return $"VersionedType {{Id:{Id}, ClrType:{ClrType.FullName}}}";
+            return $"VersionedType {{ Id = {Id}, ClrType = {ClrType.FullName} }}";
         }
 
         public override bool Equals(object obj)

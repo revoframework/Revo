@@ -61,12 +61,8 @@ namespace Revo.Platforms.AspNet.Security.Identity
         {
             var rolePermissions = await ((IAppUserStore)Store).GetUserPermissionsAsync(user);
             return rolePermissions.Select(
-                x => new Permission()
-                {
-                    PermissionType = permissionTypeRegistry.GetPermissionTypeById(x.PermissionTypeId),
-                    ResourceId = x.ResourceId,
-                    ContextId = x.ContextId
-                });
+                x => new Permission(permissionTypeRegistry.GetPermissionTypeById(x.PermissionTypeId),
+                    x.ResourceId, x.ContextId));
         }
 
         public void Initialize()

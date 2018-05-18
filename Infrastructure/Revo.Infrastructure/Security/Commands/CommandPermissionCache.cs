@@ -55,12 +55,8 @@ namespace Revo.Infrastructure.Security.Commands
             IEnumerable<Permission> permissions = type
                 .GetCustomAttributes(typeof(AuthorizePermissionsAttribute), true)
                 .SelectMany(x => ((AuthorizePermissionsAttribute)x).PermissionIds)
-                .Select(x => new Permission()
-                {
-                    PermissionType = permissionTypeRegistry.GetPermissionTypeById(x),
-                    ResourceId = null,
-                    ContextId = null
-                });
+                .Select(x => new Permission(permissionTypeRegistry.GetPermissionTypeById(x),
+                    null, null));
             
             return permissions;
         }

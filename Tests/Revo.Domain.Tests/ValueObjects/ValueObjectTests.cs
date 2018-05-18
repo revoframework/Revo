@@ -94,7 +94,7 @@ namespace Revo.Domain.Tests.ValueObjects
         [InlineData(false, "one", "three")]
         public void Equals_WorksWithCustomTypes(bool shouldMatch, params string[] yElements)
         {
-            var x = new TestValue4(new[] {"one, two"}.ToImmutableList());
+            var x = new TestValue4(new[] {"one", "two"}.ToImmutableList());
             var y = new TestValue4(yElements.ToImmutableList());
 
             x.Equals(y).Should().Be(shouldMatch);
@@ -156,7 +156,7 @@ namespace Revo.Domain.Tests.ValueObjects
         [InlineData(false, "one", "three")]
         public void GetHashCode_WorksWithCustomTypes(bool shouldMatch, params string[] yElements)
         {
-            var x = new TestValue4(new[] { "one, two" }.ToImmutableList());
+            var x = new TestValue4(new[] { "one", "two" }.ToImmutableList());
             var y = new TestValue4(yElements.ToImmutableList());
 
             if (shouldMatch)
@@ -167,6 +167,15 @@ namespace Revo.Domain.Tests.ValueObjects
             {
                 x.GetHashCode().Should().NotBe(y.GetHashCode());
             }
+        }
+
+        [Theory]
+        [InlineData("hello", 1, "TestValue2 { Foo = hello, Bar = 1 }")]
+        [InlineData(null, 1, "TestValue2 { Foo = null, Bar = 1 }")]
+        public void ToString_FormatsComponents(string foo, int bar, string toString)
+        {
+            var x = new TestValue2(foo, bar);
+            x.ToString().Should().Be(toString);
         }
 
         public class TestValue : ValueObject<TestValue>

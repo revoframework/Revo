@@ -38,12 +38,8 @@ namespace Revo.Platforms.AspNet.Security.WebApi
 
             if (requiredPermissions == null)
             {
-                requiredPermissions = permissionIds.Select(x => new Permission()
-                {
-                    PermissionType = permissionCache.GetPermissionTypeById(x),
-                    ResourceId = null,
-                    ContextId = null
-                }).ToArray();
+                requiredPermissions = permissionIds.Select(x => new Permission(
+                    permissionCache.GetPermissionTypeById(x), null, null)).ToArray();
             }
 
             PermissionAuthorizer authorizer = kernel.Get<PermissionAuthorizer>();
