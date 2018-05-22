@@ -29,7 +29,7 @@ The framework combines the concepts of event sourcing, CQRS and DDD to provide s
 Furthermore, its extensions implement other useful features like entity history change-tracking, auditing or user notifications.
 
 [**Domain-Driven Design**](https://revoframework.gitbook.io/revo/reference-guide/domain-building-blocks)  
-Building blocks for rich DDD-style domain models \(aggregates, entities, domain events, repositories...\).
+Building blocks for rich DDD-style domain models \([aggregates](https://revoframework.gitbook.io/revo/reference-guide/domain-building-blocks#aggregates), [entities](https://revoframework.gitbook.io/revo/reference-guide/domain-building-blocks#entities), [value objects](https://revoframework.gitbook.io/revo/reference-guide/domain-building-blocks#value-objects), [domain events](https://revoframework.gitbook.io/revo/reference-guide/domain-building-blocks#domain-events), [repositories](https://revoframework.gitbook.io/revo/reference-guide/data-persistence#aggregate-repository)...\).
 
 [**Event Sourcing**](https://revoframework.gitbook.io/revo/reference-guide/events)  
 Implementing event-sourced entity persistence with multiple backends \(just _MSSQL_ for now\).
