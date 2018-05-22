@@ -6,7 +6,7 @@ using Revo.Core.Types;
 
 namespace Revo.Platforms.AspNet.Core
 {
-    public class AutoMapperInitializer : IApplicationStartListener
+    public class AutoMapperInitializer : IApplicationConfigurer
     {
         private readonly ITypeExplorer typeExplorer;
         private readonly AutoMapperDefinitionDiscovery autoMapperDefinitionDiscovery;
@@ -18,7 +18,7 @@ namespace Revo.Platforms.AspNet.Core
             this.autoMapperDefinitionDiscovery = autoMapperDefinitionDiscovery;
         }
 
-        public void OnApplicationStarted()
+        public void Configure()
         {
             Mapper.Initialize(config =>
             {

@@ -49,7 +49,7 @@ namespace Revo.Platforms.AspNet.Core
                 .To<SecurityAppInitializer>()
                 .InSingletonScope();
             
-            Bind<IApplicationStartListener>()
+            Bind<IApplicationConfigurer>()
                 .To<AutoMapperInitializer>()
                 .InSingletonScope();
 
