@@ -15,7 +15,7 @@ namespace Revo.DataAccess.RavenDB.IO.OData
 {
     public class RavenQueryableToODataResultConverter : IQueryableToODataResultConverter
     {
-        private static readonly ODataQuerySettings ODataQuerySettings = new ODataQuerySettings()
+        public static readonly ODataQuerySettings ODataQuerySettings = new ODataQuerySettings()
         {
             EnableConstantParameterization = false,
             HandleNullPropagation = HandleNullPropagationOption.False
