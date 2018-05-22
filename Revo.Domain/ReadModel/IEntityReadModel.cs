@@ -7,8 +7,8 @@ using Revo.Domain.Core;
 
 namespace Revo.Domain.ReadModel
 {
-    public interface IEntityReadModel
+    public interface IEntityReadModel : IHasId<Guid>
     {
-        Guid Id { get; set; }
+        new Guid Id { get; set; }
     }
 }
