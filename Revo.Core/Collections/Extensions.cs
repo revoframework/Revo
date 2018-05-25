@@ -1,4 +1,6 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Revo.Core.Collections
@@ -17,6 +19,11 @@ namespace Revo.Core.Collections
                 isFirst = false;
             }
             return sb.ToString();
+        }
+
+        public static IEnumerable<T> AsNotNull<T>(this IEnumerable<T> original)
+        {
+            return original ?? Enumerable.Empty<T>();
         }
     }
 }
