@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
-namespace Revo.Domain.ValueObjects
+namespace Revo.Core.ValueObjects
 {
-    public abstract class SingleValueObject<T, TValue> : ValueObject<T>
+    [JsonConverter(typeof(SingleValueObjectJsonConverter))]
+    public abstract class SingleValueObject<T, TValue> : ValueObject<T>, ISingleValueObject<TValue>
         where T : SingleValueObject<T, TValue>
     {
         public SingleValueObject(TValue value)
@@ -13,6 +13,7 @@ namespace Revo.Domain.ValueObjects
         }
 
         public TValue Value { get; private set; }
+        object ISingleValueObject.Value => Value;
 
         protected override IEnumerable<(string Name, object Value)> GetValueComponents()
         {

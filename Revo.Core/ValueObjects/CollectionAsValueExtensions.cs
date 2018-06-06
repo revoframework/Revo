@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Text;
 
-namespace Revo.Domain.ValueObjects
+namespace Revo.Core.ValueObjects
 {
     public static class CollectionAsValueExtensions
     {

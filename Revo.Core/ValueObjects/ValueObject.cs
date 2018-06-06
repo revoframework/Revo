@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace Revo.Domain.ValueObjects
+namespace Revo.Core.ValueObjects
 {
     /// <summary>
     /// Abstract base class for value objects.
