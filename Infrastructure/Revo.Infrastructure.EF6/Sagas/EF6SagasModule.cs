@@ -1,5 +1,6 @@
 ﻿using Ninject.Modules;
 using Revo.Core.Core;
+using Revo.DataAccess.EF6.Entities;
 using Revo.Infrastructure.Sagas;
 
 namespace Revo.Infrastructure.EF6.Sagas
@@ -11,6 +12,11 @@ namespace Revo.Infrastructure.EF6.Sagas
             Bind<ISagaMetadataRepository>()
                 .To<EF6SagaMetadataRepository>()
                 .InRequestOrJobScope();
+
+            Bind<IEF6CrudRepository>()
+                .To<EF6CrudRepository>()
+                .WhenInjectedInto<EF6SagaMetadataRepository>()
+                .InTransientScope();
         }
     }
 }

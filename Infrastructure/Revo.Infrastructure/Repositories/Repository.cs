@@ -45,7 +45,7 @@ namespace Revo.Infrastructure.Repositories
 
         public void Add<T>(T aggregate) where T : class, IAggregateRoot
         {
-            var aggregateStore = GetAggregateStore<T>();
+            var aggregateStore = GetAggregateStore(aggregate.GetType());
             aggregateStore.Add(aggregate);
         }
         

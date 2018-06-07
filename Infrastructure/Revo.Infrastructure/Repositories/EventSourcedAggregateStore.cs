@@ -20,7 +20,7 @@ namespace Revo.Infrastructure.Repositories
 
         public void Add<T>(T aggregate) where T : class, IAggregateRoot
         {
-            ((dynamic)eventSourcedRepository).Add<T>(aggregate);
+            ((dynamic)eventSourcedRepository).Add((dynamic)aggregate);
         }
 
         public T Find<T>(Guid id) where T : class, IAggregateRoot

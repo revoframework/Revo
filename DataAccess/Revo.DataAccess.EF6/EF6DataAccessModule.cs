@@ -22,10 +22,19 @@ namespace Revo.DataAccess.EF6
 
             if (!Bindings.Any(x => x.Service == typeof(IEF6CrudRepository)))
             {
-
                 Bind(typeof(ICrudRepository), typeof(IReadRepository), typeof(IEF6CrudRepository),
                         typeof(IEF6ReadRepository))
                     .To<EF6CrudRepository>()
+                    .InRequestOrJobScope();
+            }
+
+            if (!Bindings.Any(x => x.Service == typeof(ICrudRepositoryFactory<IEF6ReadRepository>)))
+            {
+                Bind(typeof(ICrudRepositoryFactory<ICrudRepository>),
+                        typeof(ICrudRepositoryFactory<IReadRepository>),
+                        typeof(ICrudRepositoryFactory<IEF6CrudRepository>),
+                        typeof(ICrudRepositoryFactory<IEF6ReadRepository>))
+                    .To<EF6CrudRepositoryFactory>()
                     .InRequestOrJobScope();
             }
 

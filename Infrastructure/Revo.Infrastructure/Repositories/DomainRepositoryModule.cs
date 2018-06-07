@@ -1,6 +1,8 @@
-﻿using Ninject.Modules;
+﻿using Ninject.Extensions.ContextPreservation;
+using Ninject.Modules;
 using Revo.Core.Core;
 using Revo.Core.Transactions;
+using Revo.DataAccess.Entities;
 
 namespace Revo.Infrastructure.Repositories
 {
@@ -18,6 +20,11 @@ namespace Revo.Infrastructure.Repositories
 
             Bind<IAggregateStore>()
                 .To<CrudAggregateStore>()
+                .InTransientScope();
+
+            Bind<ICrudRepository>()
+                .ToMethod(ctx => ctx.ContextPreservingGet<ICrudRepositoryFactory<ICrudRepository>>().Create())
+                .WhenInjectedInto<CrudAggregateStore>()
                 .InTransientScope();
 
             Bind<IAggregateStoreFactory>()
