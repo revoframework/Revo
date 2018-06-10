@@ -1,48 +1,53 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Revo.Core.Core;
 
 namespace Revo.Core.Commands
 {
     public class CommandHandlerPipeline<T> : ICommandHandler<T>
          where T : ICommand
     {
-        private readonly IPreCommandFilter<T>[] preCommandFilters;
-        private readonly IPostCommandFilter<T>[] postCommandFilters;
-        private readonly IExceptionCommandFilter<T>[] exceptionCommandFilters;
+        private readonly Func<IPreCommandFilter<T>[]> preCommandFiltersFunc;
+        private readonly Func<IPostCommandFilter<T>[]> postCommandFiltersFunc;
+        private readonly Func<IExceptionCommandFilter<T>[]> exceptionCommandFiltersFunc;
         private readonly Func<ICommandHandler<T>> commandHandlerFunc;
 
-        public CommandHandlerPipeline(IPreCommandFilter<T>[] preCommandFilters,
-            IPostCommandFilter<T>[] postCommandFilters,
-            IExceptionCommandFilter<T>[] exceptionCommandFilters,
+        public CommandHandlerPipeline(Func<IPreCommandFilter<T>[]> preCommandFiltersFunc,
+            Func<IPostCommandFilter<T>[]> postCommandFiltersFunc,
+            Func<IExceptionCommandFilter<T>[]> exceptionCommandFiltersFunc,
             Func<ICommandHandler<T>> commandHandlerFunc)
         {
-            this.preCommandFilters = preCommandFilters;
-            this.postCommandFilters = postCommandFilters;
-            this.exceptionCommandFilters = exceptionCommandFilters;
+            this.preCommandFiltersFunc = preCommandFiltersFunc;
+            this.postCommandFiltersFunc = postCommandFiltersFunc;
+            this.exceptionCommandFiltersFunc = exceptionCommandFiltersFunc;
             this.commandHandlerFunc = commandHandlerFunc;
         }
 
         public async Task HandleAsync(T message, CancellationToken cancellationToken)
         {
-            await PreFilterAsync(message);
-            
-            try
+            using (TaskContext.Enter())
             {
-                var commandHandler = commandHandlerFunc();
-                await commandHandler.HandleAsync(message, cancellationToken);
-            }
-            catch (Exception e)
-            {
-                await FilterExceptionAsync(message, e);
-                throw;
-            }
+                await PreFilterAsync(message);
 
-            await PostFilterAsync(message);
+                try
+                {
+                    var commandHandler = commandHandlerFunc();
+                    await commandHandler.HandleAsync(message, cancellationToken);
+                }
+                catch (Exception e)
+                {
+                    await FilterExceptionAsync(message, e);
+                    throw;
+                }
+
+                await PostFilterAsync(message);
+            } 
         }
 
         private async Task PreFilterAsync(T message)
         {
+            var preCommandFilters = preCommandFiltersFunc();
             foreach (var filter in preCommandFilters)
             {
                 await filter.PreFilterAsync(message);
@@ -51,6 +56,7 @@ namespace Revo.Core.Commands
 
         private async Task PostFilterAsync(T message)
         {
+            var postCommandFilters = postCommandFiltersFunc();
             foreach (var filter in postCommandFilters)
             {
                 await filter.PostFilterAsync(message, null);
@@ -59,6 +65,7 @@ namespace Revo.Core.Commands
 
         private async Task FilterExceptionAsync(T message, Exception e)
         {
+            var exceptionCommandFilters = exceptionCommandFiltersFunc();
             foreach (var filter in exceptionCommandFilters)
             {
                 await filter.FilterExceptionAsync(message, e);
@@ -69,44 +76,48 @@ namespace Revo.Core.Commands
     public class CommandHandlerPipeline<T, TResult> : ICommandHandler<T, TResult>
          where T : ICommand<TResult>
     {
-        private readonly IPreCommandFilter<T>[] preCommandFilters;
-        private readonly IPostCommandFilter<T>[] postCommandFilters;
-        private readonly IExceptionCommandFilter<T>[] exceptionCommandFilters;
+        private readonly Func<IPreCommandFilter<T>[]> preCommandFiltersFunc;
+        private readonly Func<IPostCommandFilter<T>[]> postCommandFiltersFunc;
+        private readonly Func<IExceptionCommandFilter<T>[]> exceptionCommandFiltersFunc;
         private readonly Func<ICommandHandler<T, TResult>> commandHandlerFunc;
 
-        public CommandHandlerPipeline(IPreCommandFilter<T>[] preCommandFilters,
-            IPostCommandFilter<T>[] postCommandFilters,
-            IExceptionCommandFilter<T>[] exceptionCommandFilters,
+        public CommandHandlerPipeline(Func<IPreCommandFilter<T>[]> preCommandFiltersFunc,
+            Func<IPostCommandFilter<T>[]> postCommandFiltersFunc,
+            Func<IExceptionCommandFilter<T>[]> exceptionCommandFiltersFunc,
             Func<ICommandHandler<T, TResult>> commandHandlerFunc)
         {
-            this.preCommandFilters = preCommandFilters;
-            this.postCommandFilters = postCommandFilters;
-            this.exceptionCommandFilters = exceptionCommandFilters;
+            this.preCommandFiltersFunc = preCommandFiltersFunc;
+            this.postCommandFiltersFunc = postCommandFiltersFunc;
+            this.exceptionCommandFiltersFunc = exceptionCommandFiltersFunc;
             this.commandHandlerFunc = commandHandlerFunc;
         }
 
         public async Task<TResult> HandleAsync(T message, CancellationToken cancellationToken)
         {
-            await PreFilterAsync(message);
-
-            TResult result;
-            try
+            using (TaskContext.Enter())
             {
-                var commandHandler = commandHandlerFunc();
-                result = await commandHandler.HandleAsync(message, cancellationToken);
-            }
-            catch (Exception e)
-            {
-                await FilterExceptionAsync(message, e);
-                throw;
-            }
+                await PreFilterAsync(message);
 
-            await PostFilterAsync(message, result);
-            return result;
+                TResult result;
+                try
+                {
+                    var commandHandler = commandHandlerFunc();
+                    result = await commandHandler.HandleAsync(message, cancellationToken);
+                }
+                catch (Exception e)
+                {
+                    await FilterExceptionAsync(message, e);
+                    throw;
+                }
+
+                await PostFilterAsync(message, result);
+                return result;
+            } 
         }
 
         private async Task PreFilterAsync(T message)
         {
+            var preCommandFilters = preCommandFiltersFunc();
             foreach (var filter in preCommandFilters)
             {
                 await filter.PreFilterAsync(message);
@@ -115,6 +126,7 @@ namespace Revo.Core.Commands
 
         private async Task PostFilterAsync(T message, object result)
         {
+            var postCommandFilters = postCommandFiltersFunc();
             foreach (var filter in postCommandFilters)
             {
                 await filter.PostFilterAsync(message, result);
@@ -123,6 +135,7 @@ namespace Revo.Core.Commands
 
         private async Task FilterExceptionAsync(T message, Exception e)
         {
+            var exceptionCommandFilters = exceptionCommandFiltersFunc();
             foreach (var filter in exceptionCommandFilters)
             {
                 await filter.FilterExceptionAsync(message, e);

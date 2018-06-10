@@ -28,14 +28,12 @@ namespace Revo.Core.Commands
         
         public async Task PostFilterAsync(ICommandBase command, object result)
         {
-
             try
             {
                 if (commandContextStack.UnitOfWork != null
                     && !command.GetType().GetInterfaces().Any(
                         x => x.IsConstructedGenericType && x.GetGenericTypeDefinition() == typeof(IQuery<>)))
                 {
-
                     await commandContextStack.UnitOfWork.CommitAsync();
                 }
             }
