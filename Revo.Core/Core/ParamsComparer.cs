@@ -23,7 +23,7 @@ namespace Revo.Core.Core
                     continue;
                 if ((args[i] != null && args[i + o] == null) ||
                     (args[i] == null && args[i + o] != null) ||
-                    (((args[i] is string)) && !args[i].Equals(args[i + o])) ||
+                    (((args[i] is string) || !(args[i] is string)) && !args[i].Equals(args[i + o])) ||
                     (args[i] is IEnumerable && !(args[i] is string) && args[i + o] is IEnumerable && !(args[i + o] is string) && SameCollections((IEnumerable)args[i], (IEnumerable)args[i + o]))
                 )
                     return false;

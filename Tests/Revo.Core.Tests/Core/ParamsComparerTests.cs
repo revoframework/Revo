@@ -86,5 +86,18 @@ namespace Revo.Core.Tests.Core
             var result = ParamsComparer.SamePairs(null, null, o, o);
             Assert.True(result);
         }
+
+        [Fact]
+        public void Test_NotSame()
+        {
+            DateTimeOffset? validFrom1 = new DateTimeOffset(new DateTime(2018,6,1,0,0,0));
+            DateTimeOffset? validFrom2 = new DateTimeOffset(new DateTime(2018, 6, 30, 0, 0, 0));
+            var guid1 = Guid.NewGuid();
+            var guid2 = Guid.NewGuid();
+            var result = ParamsComparer.Same("Name", "Description", validFrom1, null, guid1, guid2,
+                "Name", "Description", validFrom2, null, guid1, guid2);
+            Assert.False(result);
+        }
+
     }
 }
