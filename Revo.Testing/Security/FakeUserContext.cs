@@ -14,14 +14,14 @@ namespace Revo.Testing.Security
         public bool IsAuthenticated => FakeUser != null;
         public Guid? UserId => FakeUser?.Id;
 
+        public Task<IReadOnlyCollection<Permission>> GetPermissionsAsync()
+        {
+            return Task.FromResult<IReadOnlyCollection<Permission>>(FakePermissions ?? new List<Permission>());
+        }
+
         public Task<IUser> GetUserAsync()
         {
             return Task.FromResult(FakeUser);
-        }
-
-        public Task<IEnumerable<Permission>> GetPermissionsAsync()
-        {
-            return Task.FromResult<IEnumerable<Permission>>(FakePermissions ?? new List<Permission>());
         }
 
         public void SetFakeUser()

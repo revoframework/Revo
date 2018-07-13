@@ -17,10 +17,6 @@ namespace Revo.Platforms.AspNet.Core
     {
         public override void Load()
         {
-            /*Bind<HttpContext>()
-                .ToMethod(ctx => HttpContext.Current)
-                .InTransientScope();*/
-
             Rebind<ITypeExplorer>()
                 .To<AspNetTypeExplorer>()
                 .InSingletonScope();
@@ -43,10 +39,6 @@ namespace Revo.Platforms.AspNet.Core
 
             Bind<IResourceManager, IAspNetResourceManager, IWebActivatorExHooks>()
                 .To<AspNetResourceManager>()
-                .InSingletonScope();
-            
-            Bind<IOwinConfigurator>()
-                .To<SecurityAppInitializer>()
                 .InSingletonScope();
             
             Bind<IApplicationConfigurer>()

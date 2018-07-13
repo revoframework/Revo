@@ -2,14 +2,13 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
-using Revo.Platforms.AspNet.Security.Identity;
+using IUser = Revo.Core.Security.IUser;
 
-namespace Revo.Platforms.AspNet.Security
+namespace Revo.Platforms.AspNet.Security.Identity
 {
     public interface IIdentityUser : IUser<Guid>
     {
         string PasswordHash { get; set; }
-
-        Task<ClaimsIdentity> GenerateUserIdentityAsync(AppUserManager manager, string authenticationType);
+        IUser User { get; }
     }
 }

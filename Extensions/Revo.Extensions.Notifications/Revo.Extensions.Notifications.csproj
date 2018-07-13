@@ -13,7 +13,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="EntityFramework" Version="6.1.3" />
+    <PackageReference Include="EntityFramework" Version="6.2.0" />
     <PackageReference Include="PushSharp.Core" Version="1.0.0" />
   </ItemGroup>
   

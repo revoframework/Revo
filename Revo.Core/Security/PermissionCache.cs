@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Revo.Core.Security
 {
-    public class PermissionCache
+    public class PermissionCache : IPermissionCache
     {
         public PermissionCache()
         {

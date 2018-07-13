@@ -21,6 +21,6 @@ namespace Revo.Core.Security
         Guid? UserId { get; }
 
         Task<IUser> GetUserAsync();
-        Task<IEnumerable<Permission>> GetPermissionsAsync();
+        Task<IReadOnlyCollection<Permission>> GetPermissionsAsync();
     }
 }

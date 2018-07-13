@@ -7,8 +7,8 @@ using Revo.Core.Security;
 using Revo.Domain.Entities;
 using Revo.Examples.HelloAspNet.Bootstrap.Domain;
 using Revo.Examples.HelloAspNet.Bootstrap.ReadSide.Projections;
-using Revo.Examples.HelloAspNet.Bootstrap.Services;
 using Revo.Infrastructure.EF6.Projections;
+using Revo.Platforms.AspNet.Core.Lifecycle;
 using Revo.Platforms.AspNet.Security.Identity;
 
 namespace Revo.Examples.HelloAspNet.Bootstrap
@@ -20,18 +20,10 @@ namespace Revo.Examples.HelloAspNet.Bootstrap
             Bind<IEF6EntityEventProjector<Todo>>()
                 .To<TodoReadModelProjector>()
                 .InRequestOrJobScope();
-            
-            Bind<IAppUserStore>()
-                .To<AppUserStore>()
-                .InTransientScope();
 
-            Bind<IRolePermissionResolver>()
-                .To<RolePermissionResolver>()
-                .InTransientScope();
-
-            Bind<IEntityTypeManager, IApplicationStartListener>()
-                .To<EntityTypeManager>()
-                .InRequestOrJobScope();
+            Bind<IHttpApplicationInitializer>()
+                .To<AppStartHttpApplicationInitializer>()
+                .InSingletonScope();
 
             GlobalConfiguration.Configuration.UseMemoryStorage();
         }

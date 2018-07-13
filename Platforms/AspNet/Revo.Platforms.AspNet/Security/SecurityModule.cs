@@ -1,5 +1,8 @@
-﻿using System.Web;
+﻿using System;
+using System.Linq;
+using System.Web;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Ninject.Modules;
 using Revo.Core.Core;
@@ -13,20 +16,33 @@ namespace Revo.Platforms.AspNet.Security
     {
         public override void Load()
         {
-            Bind<AppUserManager>()
-                .To<AppUserManager>()
-                .InRequestOrJobScope();
+            if (!Kernel.GetBindings(typeof(SignInManager<IIdentityUser, Guid>)).Any())
+            {
+                Bind<SignInManager<IIdentityUser, Guid>>()
+                    .To<SignInManager<IIdentityUser, Guid>>()
+                    .InRequestOrJobScope();
+            }
 
-            Bind<AppSignInManager/*, SignInManager<IUser, Guid>*/>()
-                .To<AppSignInManager>()
-                .InRequestOrJobScope();
+            if (!Kernel.GetBindings(typeof(UserManager<IIdentityUser, Guid>)).Any())
+            {
+                Bind<UserManager<IIdentityUser, Guid>>()
+                    .To<UserManager<IIdentityUser, Guid>>()
+                    .InRequestOrJobScope();
+            }
+
+            if (!Kernel.GetBindings(typeof(IUserStore<IIdentityUser, Guid>)).Any())
+            {
+                Bind<IUserStore<IIdentityUser, Guid>>()
+                    .To<NullUserStore>()
+                    .InRequestOrJobScope();
+            }
 
             Bind<IAuthenticationManager>()
                 .ToMethod(ctx =>
                     HttpContext.Current?.TryGetOwinContext()?.Authentication);
 
             Bind<IUserContext>()
-                .To<DefaultUserContext>()
+                .To<AspNetUserContext>()
                 .InRequestOrJobScope();
 
             Bind<IPermissionTypeRegistry>()
@@ -36,25 +52,13 @@ namespace Revo.Platforms.AspNet.Security
             Bind<PermissionTypeIndexer, IApplicationStartListener>()
                 .To<PermissionTypeIndexer>()
                 .InSingletonScope();
-
-            Bind<IPasswordHasher>()
-                .To<ScryptPasswordHasher>()
-                .InSingletonScope();
-
-            Bind<IPasswordValidator>()
-                .To<DefaultPasswordValidator>()
+            
+            Bind<IPermissionAuthorizer>()
+                .To<PermissionAuthorizer>()
                 .InRequestOrJobScope();
 
-            Bind<IUserValidator>()
-                .To<DefaultUserValidator>()
-                .InRequestOrJobScope();
-
-            Bind<PermissionAuthorizer>()
-                .ToSelf()
-                .InRequestOrJobScope();
-
-            Bind<PermissionCache>()
-                .ToSelf()
+            Bind<IPermissionCache>()
+                .To<PermissionCache>()
                 .InSingletonScope();
         }
     }

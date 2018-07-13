@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Security.Principal;
 using System.Web.Http;
 using System.Web.Http.Controllers;
@@ -33,17 +34,25 @@ namespace Revo.Platforms.AspNet.Security.WebApi
                 return false;
             }
 
-            IKernel kernel = RevoHttpApplication.Current.Kernel;
-            PermissionTypeRegistry permissionCache = kernel.Get<PermissionTypeRegistry>();
-
-            if (requiredPermissions == null)
+            if (user.Identity is ClaimsIdentity claimsIdentity)
             {
-                requiredPermissions = permissionIds.Select(x => new Permission(
-                    permissionCache.GetPermissionTypeById(x), null, null)).ToArray();
-            }
+                IKernel kernel = RevoHttpApplication.Current.Kernel;
+                PermissionTypeRegistry permissionCache = kernel.Get<PermissionTypeRegistry>();
 
-            PermissionAuthorizer authorizer = kernel.Get<PermissionAuthorizer>();
-            return authorizer.CheckAuthorization(user.Identity, requiredPermissions);
+                if (requiredPermissions == null)
+                {
+                    requiredPermissions = permissionIds.Select(x => new Permission(
+                        permissionCache.GetPermissionTypeById(x), null, null)).ToArray();
+                }
+
+                IPermissionAuthorizer authorizer = kernel.Get<IPermissionAuthorizer>();
+                return authorizer.CheckAuthorization(claimsIdentity, requiredPermissions);
+            }
+            else
+            {
+                // only claim-based identities are supported for permission authorization
+                return false;
+            }
         }
     }
 }

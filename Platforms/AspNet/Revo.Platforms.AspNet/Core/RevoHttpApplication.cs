@@ -83,16 +83,15 @@ namespace Revo.Platforms.AspNet.Core
 
         protected override void OnApplicationStarted()
         {
-            AreaRegistration.RegisterAllAreas();
-            GlobalConfiguration.Configure(WebApiConfig.Register);
-            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
-            RouteConfig.RegisterRoutes(RouteTable.Routes);
-            BundleConfig.RegisterBundles(BundleTable.Bundles);
-
-            foreach (IHttpApplicationInitializer appInitializer in ResolveAll<IHttpApplicationInitializer>())
+            GlobalConfiguration.Configure(httpConfiguration =>
             {
-                appInitializer.OnApplicationStart(this);
-            }
+                WebApiConfig.Register(httpConfiguration);
+
+                foreach (IHttpApplicationInitializer appInitializer in ResolveAll<IHttpApplicationInitializer>())
+                {
+                    appInitializer.OnApplicationStart(this);
+                }
+            });
         }
 
         protected override void OnApplicationStopped()

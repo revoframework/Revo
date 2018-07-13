@@ -1,6 +1,6 @@
 ﻿using System.Web.Mvc;
 
-namespace Revo.Platforms.AspNet
+namespace Revo.Examples.HelloAspNet.Bootstrap
 {
     public class FilterConfig
     {

@@ -6,12 +6,12 @@ namespace Revo.Infrastructure.Security.Commands
 {
     public class CommandPermissionAuthorizer : CommandAuthorizer<ICommandBase>
     {
-        private readonly CommandPermissionCache commandPermissionCache;
-        private readonly PermissionAuthorizer permissionAuthorizer;
+        private readonly ICommandPermissionCache commandPermissionCache;
+        private readonly IPermissionAuthorizer permissionAuthorizer;
         private readonly IUserContext userContext;
 
-        public CommandPermissionAuthorizer(CommandPermissionCache commandPermissionCache,
-            PermissionAuthorizer permissionAuthorizer,
+        public CommandPermissionAuthorizer(ICommandPermissionCache commandPermissionCache,
+            IPermissionAuthorizer permissionAuthorizer,
             IUserContext userContext)
         {
             this.commandPermissionCache = commandPermissionCache;

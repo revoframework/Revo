@@ -9,7 +9,7 @@ using Revo.Core.Types;
 
 namespace Revo.Infrastructure.Security.Commands
 {
-    public class CommandPermissionCache : IApplicationStartListener
+    public class CommandPermissionCache : ICommandPermissionCache, IApplicationStartListener
     {
         private readonly IPermissionTypeRegistry permissionTypeRegistry;
         private readonly PermissionTypeIndexer permissionTypeIndexer;
@@ -38,7 +38,7 @@ namespace Revo.Infrastructure.Security.Commands
             }  
         }
 
-        public IEnumerable<Permission> GetCommandPermissions(ICommandBase command)
+        public IReadOnlyCollection<Permission> GetCommandPermissions(ICommandBase command)
         {
             List<Permission> permissions;
             if (commandTypePermissions.TryGetValue(command.GetType(), out permissions))

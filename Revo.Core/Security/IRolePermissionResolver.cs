@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Revo.Core.Security
 {
     public interface IRolePermissionResolver
     {
-        IEnumerable<Permission> GetRolePermissions(Guid roleId);
+        IReadOnlyCollection<Permission> GetRolePermissions(Guid roleId);
     }
 }

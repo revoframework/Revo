@@ -19,7 +19,7 @@ namespace Revo.Infrastructure.Security
                 .To<EntityQueryFilterFactory>()
                 .InRequestOrJobScope();
 
-            Bind<CommandPermissionCache, IApplicationStartListener>()
+            Bind<ICommandPermissionCache, IApplicationStartListener>()
                 .To<CommandPermissionCache>()
                 .InSingletonScope();
 

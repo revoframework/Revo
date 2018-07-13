@@ -11,19 +11,23 @@ using IUser = Revo.Core.Security.IUser;
 
 namespace Revo.Platforms.AspNet.Security
 {
-    public class DefaultUserContext : IUserContext
+    public class AspNetUserContext : IUserContext
     {
         private readonly IAuthenticationManager authenticationManager;
-        private readonly AppUserManager userManager;
+        private readonly IUserPermissionResolver userPermissionResolver;
+        private readonly IUserStore<IIdentityUser, Guid> userStore;
         private readonly Lazy<Guid?> userIdLazy;
         private IIdentityUser user;
-        private IEnumerable<Permission> userPermissions;
+        private IReadOnlyCollection<Permission> userPermissions;
 
-        public DefaultUserContext([Optional] IAuthenticationManager authenticationManager,
-            AppUserManager userManager)
+        public AspNetUserContext(
+            [Optional] IAuthenticationManager authenticationManager,
+            IUserPermissionResolver userPermissionResolver,
+            IUserStore<IIdentityUser, Guid> userStore)
         {
             this.authenticationManager = authenticationManager;
-            this.userManager = userManager;
+            this.userPermissionResolver = userPermissionResolver;
+            this.userStore = userStore;
 
             userIdLazy = new Lazy<Guid?>(() =>
             {
@@ -32,28 +36,22 @@ namespace Revo.Platforms.AspNet.Security
             });
         }
 
-        public bool IsAuthenticated
-        {
-            get
-            {
-                return authenticationManager?.User?.Identity?.IsAuthenticated ?? false;
-            }
-        }
+        public bool IsAuthenticated => authenticationManager?.User?.Identity?.IsAuthenticated ?? false;
 
         public Guid? UserId => userIdLazy.Value;
 
-        public async Task<IEnumerable<Permission>> GetPermissionsAsync()
+        public async Task<IReadOnlyCollection<Permission>> GetPermissionsAsync()
         {
             if (userPermissions == null)
             {
                 if (IsAuthenticated)
                 {
-                    IUser user = await GetUserAsync();
-                    userPermissions = await userManager.GetUserPermissionsAsync((IIdentityUser) user);
+                    IIdentityUser user = await GetUserInternalAsync();
+                    userPermissions = await userPermissionResolver.GetUserPermissionsAsync(user.User);
                 }
                 else
                 {
-                    userPermissions = Enumerable.Empty<Permission>();
+                    userPermissions = new List<Permission>();
                 }
             }
 
@@ -62,11 +60,16 @@ namespace Revo.Platforms.AspNet.Security
 
         public async Task<IUser> GetUserAsync()
         {
+            return (await GetUserInternalAsync()).User;
+        }
+
+        private async Task<IIdentityUser> GetUserInternalAsync()
+        {
             if (user == null)
             {
                 if (UserId != null)
                 {
-                    user = await userManager.FindByIdAsync(UserId.Value);
+                    user = await userStore.FindByIdAsync(UserId.Value);
                     if (user == null)
                     {
                         throw new InvalidOperationException($"GetUserAsync failed because the authenticated user with ID '{UserId.Value}' could not be found");
@@ -74,7 +77,7 @@ namespace Revo.Platforms.AspNet.Security
                 }
             }
 
-            return (IUser) user;
+            return user;
         }
     }
 }

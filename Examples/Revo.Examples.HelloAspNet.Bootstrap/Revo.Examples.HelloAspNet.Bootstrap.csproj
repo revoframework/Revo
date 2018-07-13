@@ -253,6 +253,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\TodosController.cs" />
+    <Compile Include="App_Start\AppStartHttpApplicationInitializer.cs" />
+    <Compile Include="App_Start\FilterConfig.cs" />
+    <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="CoreModule.cs" />
     <Compile Include="Domain\Events\TodoAddedEvent.cs" />
     <Compile Include="Domain\Todo.cs" />
@@ -268,8 +272,6 @@
     <Compile Include="ReadSide\Handlers\GetTodosQueryHandler.cs" />
     <Compile Include="ReadSide\Model\TodoReadModel.cs" />
     <Compile Include="ReadSide\Projections\TodoReadModelProjector.cs" />
-    <Compile Include="Services\AppUserStore.cs" />
-    <Compile Include="Services\RolePermissionResolver.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="database\01_REX_CREATE.sql" />
@@ -318,7 +320,9 @@
     <None Include="packages.config" />
     <Content Include="Views\Home\Index.cshtml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Services\" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

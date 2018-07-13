@@ -6,62 +6,47 @@ using System.Security.Principal;
 
 namespace Revo.Core.Security
 {
-    public class PermissionAuthorizer
+    public class PermissionAuthorizer : IPermissionAuthorizer
     {
-        private readonly PermissionCache permissionCache;
+        private readonly IPermissionCache permissionCache;
         private readonly IRolePermissionResolver rolePermissionResolver;
+        private readonly Dictionary<ClaimsIdentity, HashSet<Permission>> identityPermissions = new Dictionary<ClaimsIdentity, HashSet<Permission>>();
 
-        public PermissionAuthorizer(PermissionCache permissionCache,
+        public PermissionAuthorizer(IPermissionCache permissionCache,
             IRolePermissionResolver rolePermissionResolver)
         {
             this.permissionCache = permissionCache;
             this.rolePermissionResolver = rolePermissionResolver;
         }
 
-        public bool CheckAuthorization(IIdentity identity, IEnumerable<Permission> requiredPermissions)
+        public bool CheckAuthorization(ClaimsIdentity identity, IReadOnlyCollection<Permission> requiredPermissions)
         {
-            PermissionClaimsIdentity permissionClaimsIdentity = identity as PermissionClaimsIdentity;
-            ClaimsIdentity claimsIdentity;
-
-            if (permissionClaimsIdentity != null)
+            HashSet<Permission> permissions;
+            if (!identityPermissions.TryGetValue(identity, out permissions))
             {
-                claimsIdentity = permissionClaimsIdentity;
+                permissions = new HashSet<Permission>();
 
-                if (permissionClaimsIdentity.Permissions != null)
+                IEnumerable<Guid> roleIds = identity
+                    .FindAll(identity.RoleClaimType)
+                    .Select(x => Guid.Parse(x.Value));
+
+                foreach (Guid roleId in roleIds)
                 {
-                    return CheckAuthorization(permissionClaimsIdentity.Permissions, requiredPermissions);
+                    IEnumerable<Permission> rolePermissions = permissionCache.GetRolePermissions(roleId, rolePermissionResolver);
+                    foreach (Permission permission in rolePermissions)
+                    {
+                        permissions.Add(permission);
+                    }
                 }
-            }
-            else
-            {
-                claimsIdentity = (ClaimsIdentity)identity;
-            }
 
-            IEnumerable<Guid> roleIds = claimsIdentity
-                .FindAll(claimsIdentity.RoleClaimType)
-                .Select(x => Guid.Parse(x.Value));
-
-            HashSet<Permission> permissions = new HashSet<Permission>();
-
-            foreach (Guid roleId in roleIds)
-            {
-                IEnumerable<Permission> rolePermissions = permissionCache.GetRolePermissions(roleId, rolePermissionResolver);
-                foreach (Permission permission in rolePermissions)
-                {
-                    permissions.Add(permission);
-                }
-            }
-
-            if (permissionClaimsIdentity != null)
-            {
-                permissionClaimsIdentity.Permissions = permissions;
+                identityPermissions.Add(identity, permissions);
             }
 
             return CheckAuthorization(permissions, requiredPermissions);
         }
         
-        public bool CheckAuthorization(IEnumerable<Permission> availablePermissions,
-            IEnumerable<Permission> requiredPermissions)
+        public bool CheckAuthorization(IReadOnlyCollection<Permission> availablePermissions,
+            IReadOnlyCollection<Permission> requiredPermissions)
         {
             //TODO: this needs caching badly!
             PermissionTree permissionTree = new PermissionTree();

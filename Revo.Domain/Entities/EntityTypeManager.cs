@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Revo.Core.Core;
 using Revo.Core.Lifecycle;
 using Revo.Core.Types;
-using Revo.Domain.Entities.Attributes;
 
 namespace Revo.Domain.Entities
 {
@@ -29,7 +27,7 @@ namespace Revo.Domain.Entities
 
         public void ClearCache()
         {
-            typesToClassIds = new Lazy<Dictionary<Type,DomainClassInfo>>(() =>
+            typesToClassIds = new Lazy<Dictionary<Type, DomainClassInfo>>(() =>
             {
                 var entities = typeExplorer.GetAllTypes()
                     .Where(x => typeof(IEntity).IsAssignableFrom(x))
