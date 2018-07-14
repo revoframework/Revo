@@ -1,23 +1,13 @@
 ﻿using Revo.Core.Lifecycle;
-using Revo.Examples.HelloAspNet.Bootstrap.Core;
 using Revo.Platforms.AspNet.Core;
 using Revo.Platforms.AspNet.Core.Lifecycle;
 
-[assembly: WebActivatorEx.PreApplicationStartMethod(typeof(WebActivatorExBootstrapper), "OnPreApplicationStart")]
 [assembly: WebActivatorEx.PostApplicationStartMethod(typeof(WebActivatorExBootstrapper), "OnPostApplicationStart")]
 [assembly: WebActivatorEx.ApplicationShutdownMethod(typeof(WebActivatorExBootstrapper), "OnApplicationShutdown")]
-namespace Revo.Examples.HelloAspNet.Bootstrap.Core
+namespace Revo.Platforms.AspNet.Core
 {
     public static class WebActivatorExBootstrapper
     {
-        public static void OnPreApplicationStart()
-        {
-            /*foreach (IWebActivatorExHooks appInitializer in RevoHttpApplication.Current.ResolveAll<IWebActivatorExHooks>())
-            {
-                appInitializer.OnPreApplicationStart();
-            }*/
-        }
-
         public static void OnPostApplicationStart()
         {
             RevoHttpApplication.Current.PostStart();

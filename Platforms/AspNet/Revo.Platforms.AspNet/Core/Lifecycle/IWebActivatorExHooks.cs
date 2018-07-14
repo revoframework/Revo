@@ -2,7 +2,6 @@
 {
     public interface IWebActivatorExHooks
     {
-        void OnPreApplicationStart();
         void OnPostApplicationStart();
         void OnApplicationShutdown();
     }

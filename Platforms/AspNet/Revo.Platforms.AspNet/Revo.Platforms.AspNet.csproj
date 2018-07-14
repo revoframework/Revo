@@ -70,6 +70,7 @@
     <PackageReference Include="NLog" Version="4.5.3" />
     <PackageReference Include="Owin" Version="1.0" />
     <PackageReference Include="RazorEngine" Version="3.10.0" />
+    <PackageReference Include="WebActivatorEx" Version="2.2.0" />
   </ItemGroup>
   
   <ItemGroup>

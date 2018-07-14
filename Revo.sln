@@ -20,8 +20,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AspNet", "AspNet", "{142C45
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.Platforms.AspNet", "Platforms\AspNet\Revo.Platforms.AspNet\Revo.Platforms.AspNet.csproj", "{42CDFAD0-CB40-433E-AC6E-874F3F58E77D}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Revo.Platforms.AspNet.Bootstrap", "Platforms\AspNet\Revo.Platforms.AspNet.Bootstrap\Revo.Platforms.AspNet.Bootstrap.shproj", "{1445B1E4-B562-41CB-91C9-866ED34E38D5}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.Domain", "Revo.Domain\Revo.Domain.csproj", "{558603AE-BECF-4F72-86B4-AD832D2453AB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.Infrastructure", "Infrastructure\Revo.Infrastructure\Revo.Infrastructure.csproj", "{6F893B4E-8119-41F8-B1C9-28EEA56946A9}"
@@ -85,10 +83,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.Extensions.AspNet.Interop.Tests", "Tests\Extensions\Revo.Extensions.AspNet.Interop.Tests\Revo.Extensions.AspNet.Interop.Tests.csproj", "{8262F3E3-8683-44AA-A3E7-98020A76F52A}"
 EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		Platforms\AspNet\Revo.Platforms.AspNet.Bootstrap\Revo.Platforms.AspNet.Bootstrap.projitems*{1445b1e4-b562-41cb-91c9-866ed34e38d5}*SharedItemsImports = 13
-		Platforms\AspNet\Revo.Platforms.AspNet.Bootstrap\Revo.Platforms.AspNet.Bootstrap.projitems*{f2ced506-8d77-4547-84da-3f886c2a7ba2}*SharedItemsImports = 4
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -199,7 +193,6 @@ Global
 		{1015BA79-4241-4221-9D27-0DB033EA624B} = {FB1689F5-32FB-46A9-AA47-647A7F4A1686}
 		{142C4562-9067-43ED-845D-DE6D689465C5} = {301D06E8-4881-4E54-AE65-62A14F324C4E}
 		{42CDFAD0-CB40-433E-AC6E-874F3F58E77D} = {142C4562-9067-43ED-845D-DE6D689465C5}
-		{1445B1E4-B562-41CB-91C9-866ED34E38D5} = {142C4562-9067-43ED-845D-DE6D689465C5}
 		{558603AE-BECF-4F72-86B4-AD832D2453AB} = {FB1689F5-32FB-46A9-AA47-647A7F4A1686}
 		{6F893B4E-8119-41F8-B1C9-28EEA56946A9} = {C12D8D59-79D5-4F07-B7FB-79B1BEB3DCB1}
 		{49959901-1DD0-41FD-8352-7F9C6BB811A7} = {C12D8D59-79D5-4F07-B7FB-79B1BEB3DCB1}

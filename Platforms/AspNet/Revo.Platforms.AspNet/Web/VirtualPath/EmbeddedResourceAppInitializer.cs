@@ -10,11 +10,7 @@ namespace Revo.Platforms.AspNet.Web.VirtualPath
         }
 
         public static EmbeddedResourceVirtualPathProvider Provider { get; private set; }
-
-        public void OnPreApplicationStart()
-        {
-        }
-
+        
         public void OnPostApplicationStart()
         {
             System.Web.Hosting.HostingEnvironment.RegisterVirtualPathProvider(Provider);

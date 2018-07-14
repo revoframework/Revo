@@ -39,10 +39,6 @@ namespace Revo.Platforms.AspNet.IO.Resources
         public Func<EmbeddedResource, bool> UseLocalIfAvailable { get; set; }
         public IDictionary<string, List<EmbeddedResource>> Resources { get { return resources; } }
         
-        public void OnPreApplicationStart()
-        {
-        }
-
         public void OnPostApplicationStart()
         {
             var assemblies = typeExplorer.GetAllReferencedAssemblies();
