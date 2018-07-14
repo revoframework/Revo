@@ -4,6 +4,15 @@
     <TargetFramework>net471</TargetFramework>
     <Configurations>Debug;Release</Configurations>
     <Authors>Revo Framework</Authors>
+    <Version>1.2.0</Version>
+    <PackageTags>eventsourcing,cqrs,ddd,aspnet,webapi,framework,netstandard,aspnetcore,event-sourcing,domain-driven-design</PackageTags>
+    <Description>Event Sourcing, CQRS and DDD framework for modern C#/.NET applications.
+Entity Framework 6 (EF6) data-access layer implementation.</Description>
+    <Copyright>Copyright (c) 2017-2018 Martin Zima &amp; ASP a.s.</Copyright>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/revoframework/Revo/develop/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/revoframework/Revo</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/revoframework/Revo</RepositoryUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/revoframework/Revo/develop/res/revo-nuget-64.png</PackageIconUrl>
   </PropertyGroup>
   
   <ItemGroup>

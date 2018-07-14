@@ -2,14 +2,19 @@
   <PropertyGroup>
     <TargetFramework>net471</TargetFramework>
     <Configurations>Debug;Release</Configurations>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
-    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <Authors>Revo Framework</Authors>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageProjectUrl>https://github.com/revoframework/Revo</PackageProjectUrl>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/revoframework/Revo/develop/LICENSE</PackageLicenseUrl>
+    <Copyright>Copyright (c) 2017-2018 Martin Zima &amp; ASP a.s.</Copyright>
+    <Description>Event Sourcing, CQRS and DDD framework for modern C#/.NET applications.
+ASP.NET interop extension package.</Description>
+    <AssemblyVersion>1.2.0.0</AssemblyVersion>
+    <FileVersion>1.2.0.0</FileVersion>
+    <Version>1.2.0</Version>
+    <RepositoryUrl>https://github.com/revoframework/Revo</RepositoryUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/revoframework/Revo/develop/res/revo-nuget-64.png</PackageIconUrl>
+    <PackageTags>eventsourcing,cqrs,ddd,aspnet,webapi,framework,netstandard,aspnetcore,event-sourcing,domain-driven-design</PackageTags>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -43,6 +48,8 @@
   </PropertyGroup>
   <PropertyGroup>
     <Authors>Revo Framework</Authors>
+    <Version>1.2.0</Version>
+    <PackageId>Revo.Extensions.AspNet.Interop</PackageId>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\DataAccess\Revo.DataAccess.EF6\Revo.DataAccess.EF6.csproj" />

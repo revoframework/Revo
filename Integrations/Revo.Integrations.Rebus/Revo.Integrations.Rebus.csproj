@@ -2,7 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>net471</TargetFramework>
+    <Configurations>Debug;Release</Configurations>
     <Authors>Revo Framework</Authors>
+    <Version>1.2.0</Version>
+    <Description>Event Sourcing, CQRS and DDD framework for modern C#/.NET applications.
+Rebus (service bus) messaging integration package.</Description>
+    <Copyright>Copyright (c) 2017-2018 Martin Zima &amp; ASP a.s.</Copyright>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/revoframework/Revo/develop/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/revoframework/Revo</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/revoframework/Revo/develop/res/revo-nuget-64.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/revoframework/Revo</RepositoryUrl>
+    <PackageTags>eventsourcing,cqrs,ddd,aspnet,webapi,framework,netstandard,aspnetcore,event-sourcing,domain-driven-design</PackageTags>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
   
   <ItemGroup>
