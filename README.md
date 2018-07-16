@@ -4,6 +4,7 @@
 </p>
 <p align="center">
 <a href="https://ci.appveyor.com/project/revoframework/revo/"><img src="https://ci.appveyor.com/api/projects/status/uil4j7y3nlqkdmy1/branch/develop?svg=true" alt="Build status"></a>
+<a href="https://www.nuget.org/packages?q=revo"><img src="https://img.shields.io/nuget/v/Revo.Core.svg" alt="NuGet package version"></a>
 <a href="https://revoframework.gitbook.io/revo/"><img src="https://img.shields.io/badge/docs-GITBOOK-blue.svg" alt="Docs"></a>
 <a href="https://github.com/revoframework/Revo/issues"><img src="https://img.shields.io/github/issues/revoframework/Revo.svg" alt="GitHub issues"></a>
 <a href="https://github.com/revoframework/Revo/pulls"><img src="https://img.shields.io/badge/contributions-welcome-orange.svg" alt="Contributions"></a>
@@ -70,11 +71,147 @@ Basic permission/role-based ACL for commands and queries, fine-grained row filte
 * **ASP.NET support** \(ASP.NET Core coming soon...\)
 
 ## Getting started
-TODO
+
+(TODO)
+
+Binaries are up for grabs in form of NuGet packages:
+
+<div style="width:100%";>
+<table border="0" cellpadding="0" cellspacing="0" style="float:left;">
+  <tr>
+    <th colspan="2">
+      Core (.NET Standard 2.0)
+    </th>
+  </tr>
+  <tr>
+    <td>
+      Revo.Core
+    </td>
+    <td>
+      <a href="https://www.nuget.org/packages/Revo.Core/"><img src="https://img.shields.io/nuget/v/Revo.Core.svg" alt="NuGet package version"></a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Revo.DataAccess
+    </td>
+    <td>
+      <a href="https://www.nuget.org/packages/Revo.DataAccess/"><img src="https://img.shields.io/nuget/v/Revo.DataAccess.svg" alt="NuGet package version"></a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Revo.Domain
+    </td>
+    <td>
+      <a href="https://www.nuget.org/packages/Revo.Domain/"><img src="https://img.shields.io/nuget/v/Revo.Domain.svg" alt="NuGet package version"></a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Revo.Infrastructure
+    </td>
+    <td>
+      <a href="https://www.nuget.org/packages/Revo.Infrastructure/"><img src="https://img.shields.io/nuget/v/Revo.Infrastructure.svg" alt="NuGet package version"></a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Revo.Testing
+    </td>
+    <td>
+      <a href="https://www.nuget.org/packages/Revo.Testing/"><img src="https://img.shields.io/nuget/v/Revo.Testing.svg" alt="NuGet package version"></a>
+    </td>
+  </tr>
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" style="float:left;">
+  <tr>
+    <th colspan="2">
+      Entity Framework 6 (.NET Framework 4.7.1)
+    </th>
+  </tr>
+  <tr>
+    <td>
+      Revo.DataAccess.EF6
+    </td>
+    <td>
+      <a href="https://www.nuget.org/packages/Revo.DataAccess.EF6/"><img src="https://img.shields.io/nuget/v/Revo.DataAccess.EF6.svg" alt="NuGet package version"></a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Revo.Infrastructure.EF6
+    </td>
+    <td>
+      <a href="https://www.nuget.org/packages/Revo.Infrastructure.EF6/"><img src="https://img.shields.io/nuget/v/Revo.Infrastructure.EF6.svg" alt="NuGet package version"></a>
+    </td>
+  </tr>
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" style="float:left;">
+  <tr>
+    <th colspan="2">
+      ASP.NET (.NET Framework 4.7.1)
+    </th>
+  </tr>
+  <tr>
+    <td>
+      Revo.Platforms.AspNet
+    </td>
+    <td>
+      <a href="https://www.nuget.org/packages/Revo.Platforms.AspNet/"><img src="https://img.shields.io/nuget/v/Revo.Platforms.AspNet.svg" alt="NuGet package version"></a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Revo.Extensions.AspNet.Interop
+    </td>
+    <td>
+      <a href="https://www.nuget.org/packages/Revo.Extensions.AspNet.Interop/"><img src="https://img.shields.io/nuget/v/Revo.Extensions.AspNet.Interop.svg" alt="NuGet package version"></a>
+    </td>
+  </tr>
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" style="float:left;">
+  <tr>
+    <th colspan="2">
+      Other integrations & extensions
+    </th>
+  </tr>
+  <tr>
+    <td>
+      Revo.Integrations.Rebus
+    </td>
+    <td>
+      <a href="https://www.nuget.org/packages/Revo.Integrations.Rebus/"><img src="https://img.shields.io/nuget/v/Revo.Integrations.Rebus.svg" alt="NuGet package version"></a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Revo.Extensions.History
+    </td>
+    <td>
+      <a href="https://www.nuget.org/packages/Revo.Extensions.History/"><img src="https://img.shields.io/nuget/v/Revo.Extensions.History.svg" alt="NuGet package version"></a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Revo.Extensions.Notifications
+    </td>
+    <td>
+      <a href="https://www.nuget.org/packages/Revo.Extensions.Notifications/"><img src="https://img.shields.io/nuget/v/Revo.Extensions.Notifications.svg" alt="NuGet package version"></a>
+    </td>
+  </tr>
+</table>
+</div>
+
+Most applications will require at least **Revo.Core**, **Revo.DataAccess**, **Revo.Domain**, **Revo.Infrastructure** packages to get started with and then typically **Revo.Platforms.AspNet** package (ASP.NET platform implementation) and **Revo.DataAccess.EF6** with **Revo.Infrastructure.EF6** package (for Entity Framework 6 support).
 
 ## Examples
 
-TODO  
+(TODO)
+
 For now, see the sample Hello World application in the examples folder ([Examples/Revo.Examples.HelloAspNet.Bootstrap](https://github.com/revoframework/Revo/tree/develop/Examples/Revo.Examples.HelloAspNet.Bootstrap)) and the [reference guide](https://revoframework.gitbook.io/revo/).
 
 ## Requirements
@@ -82,6 +219,7 @@ For now, see the sample Hello World application in the examples folder ([Example
 The framework is written in C\# 7.1 and targets the .NET Standard 2.0 specification; some of its modules currently also require the .NET Framework 4.7.1 where needed \(e.g. Entity Framework 6 support\). Revo also makes a heavy use of the C\# async/await pattern and uses the TAP \(Task Asynchronous Pattern\) throughout its entire codebase \(i.e. _async all the way_\).
 
 ## License
+
 > MIT License
 > 
 > Copyright (c) 2017-2018 Martin Zima<br>
