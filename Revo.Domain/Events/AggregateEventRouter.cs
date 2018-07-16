@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Revo.Core.Collections;
 using Revo.Domain.Entities;
 
 namespace Revo.Domain.Events

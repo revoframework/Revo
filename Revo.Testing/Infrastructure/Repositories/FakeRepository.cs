@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Revo.Core.Collections;
 using Revo.Core.Transactions;
 using Revo.Domain.Entities;
 using Revo.Domain.Events;

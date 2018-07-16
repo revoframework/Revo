@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using Revo.Core.Collections;
 using Revo.Core.Core;
 using Revo.Core.Types;
 using Revo.DataAccess.Entities;

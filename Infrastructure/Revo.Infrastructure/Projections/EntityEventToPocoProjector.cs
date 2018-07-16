@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Revo.Core.Collections;
 using Revo.Core.Events;
 using Revo.DataAccess.Entities;
 using Revo.Domain.Entities.EventSourcing;
@@ -14,7 +15,8 @@ namespace Revo.Infrastructure.Projections
         IEntityEventProjector<TSource>
         where TSource : class, IEventSourcedAggregateRoot
     {
-        private readonly MultiValueDictionary<Type, Func<IEventMessage<DomainAggregateEvent>, Task>> applyHandlers = new MultiValueDictionary<Type, Func<IEventMessage<DomainAggregateEvent>, Task>>();
+        private readonly MultiValueDictionary<Type, Func<IEventMessage<DomainAggregateEvent>, Task>> applyHandlers =
+            new MultiValueDictionary<Type, Func<IEventMessage<DomainAggregateEvent>, Task>>();
 
         public EntityEventToPocoProjector()
         {

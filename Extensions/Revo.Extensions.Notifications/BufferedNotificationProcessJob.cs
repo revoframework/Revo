@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Revo.Core.Collections;
 using Revo.DataAccess.Entities;
 using Revo.Extensions.Notifications.Model;
 

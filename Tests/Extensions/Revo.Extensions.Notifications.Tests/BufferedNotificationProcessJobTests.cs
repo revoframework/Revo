@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
+using Revo.Core.Collections;
 using Revo.DataAccess.InMemory;
 using Revo.Extensions.Notifications.Model;
 using Xunit;

@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Revo.Core.Collections;
 using Revo.Core.Events;
 using Revo.Domain.Events;
 using Revo.Domain.Sagas.Attributes;
