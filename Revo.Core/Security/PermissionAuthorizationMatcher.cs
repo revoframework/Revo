@@ -6,13 +6,13 @@ using System.Security.Principal;
 
 namespace Revo.Core.Security
 {
-    public class PermissionAuthorizer : IPermissionAuthorizer
+    public class PermissionAuthorizationMatcher : IPermissionAuthorizationMatcher
     {
         private readonly IPermissionCache permissionCache;
         private readonly IRolePermissionResolver rolePermissionResolver;
         private readonly Dictionary<ClaimsIdentity, HashSet<Permission>> identityPermissions = new Dictionary<ClaimsIdentity, HashSet<Permission>>();
 
-        public PermissionAuthorizer(IPermissionCache permissionCache,
+        public PermissionAuthorizationMatcher(IPermissionCache permissionCache,
             IRolePermissionResolver rolePermissionResolver)
         {
             this.permissionCache = permissionCache;

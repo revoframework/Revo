@@ -73,6 +73,26 @@ namespace Revo.Core.Core
                     .To<NullRolePermissionResolver>()
                     .InSingletonScope();
             }
+
+            Bind<IPermissionTypeRegistry>()
+                .To<PermissionTypeRegistry>()
+                .InSingletonScope();
+
+            Bind<PermissionTypeIndexer, IApplicationStartListener>()
+                .To<PermissionTypeIndexer>()
+                .InSingletonScope();
+
+            Bind<IPermissionAuthorizationMatcher>()
+                .To<PermissionAuthorizationMatcher>()
+                .InRequestOrJobScope();
+
+            Bind<IPermissionCache>()
+                .To<PermissionCache>()
+                .InSingletonScope();
+
+            Bind<IUserPermissionAuthorizer>()
+                .To<UserPermissionAuthorizer>()
+                .InRequestOrJobScope();
         }
     }
 }

@@ -7,15 +7,15 @@ namespace Revo.Infrastructure.Security.Commands
     public class CommandPermissionAuthorizer : CommandAuthorizer<ICommandBase>
     {
         private readonly ICommandPermissionCache commandPermissionCache;
-        private readonly IPermissionAuthorizer permissionAuthorizer;
+        private readonly IPermissionAuthorizationMatcher permissionAuthorizationMatcher;
         private readonly IUserContext userContext;
 
         public CommandPermissionAuthorizer(ICommandPermissionCache commandPermissionCache,
-            IPermissionAuthorizer permissionAuthorizer,
+            IPermissionAuthorizationMatcher permissionAuthorizationMatcher,
             IUserContext userContext)
         {
             this.commandPermissionCache = commandPermissionCache;
-            this.permissionAuthorizer = permissionAuthorizer;
+            this.permissionAuthorizationMatcher = permissionAuthorizationMatcher;
             this.userContext = userContext;
         }
 
@@ -24,7 +24,7 @@ namespace Revo.Infrastructure.Security.Commands
             var requiredPermissions = commandPermissionCache.GetCommandPermissions(command);
             var userPermissions = await userContext.GetPermissionsAsync();
 
-            if (!permissionAuthorizer.CheckAuthorization(userPermissions, requiredPermissions))
+            if (!permissionAuthorizationMatcher.CheckAuthorization(userPermissions, requiredPermissions))
             {
                 throw new AuthorizationException(
                     $"User not authorized to access command of type '{command.GetType().FullName}'");

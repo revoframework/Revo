@@ -45,8 +45,8 @@ namespace Revo.Platforms.AspNet.Security.WebApi
                         permissionCache.GetPermissionTypeById(x), null, null)).ToArray();
                 }
 
-                IPermissionAuthorizer authorizer = kernel.Get<IPermissionAuthorizer>();
-                return authorizer.CheckAuthorization(claimsIdentity, requiredPermissions);
+                IPermissionAuthorizationMatcher authorizationMatcher = kernel.Get<IPermissionAuthorizationMatcher>();
+                return authorizationMatcher.CheckAuthorization(claimsIdentity, requiredPermissions);
             }
             else
             {

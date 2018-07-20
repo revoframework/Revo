@@ -44,22 +44,6 @@ namespace Revo.Platforms.AspNet.Security
             Bind<IUserContext>()
                 .To<AspNetUserContext>()
                 .InRequestOrJobScope();
-
-            Bind<IPermissionTypeRegistry>()
-                .To<PermissionTypeRegistry>()
-                .InSingletonScope();
-
-            Bind<PermissionTypeIndexer, IApplicationStartListener>()
-                .To<PermissionTypeIndexer>()
-                .InSingletonScope();
-            
-            Bind<IPermissionAuthorizer>()
-                .To<PermissionAuthorizer>()
-                .InRequestOrJobScope();
-
-            Bind<IPermissionCache>()
-                .To<PermissionCache>()
-                .InSingletonScope();
         }
     }
 }
