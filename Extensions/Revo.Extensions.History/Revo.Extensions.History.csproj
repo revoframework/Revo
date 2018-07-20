@@ -10,9 +10,9 @@
     <Copyright>Copyright (c) 2017-2018 Martin Zima &amp; ASP a.s.</Copyright>
     <Description>Event Sourcing, CQRS and DDD framework for modern C#/.NET applications.
 History-tracking extension package.</Description>
-    <AssemblyVersion>1.2.0.0</AssemblyVersion>
-    <FileVersion>1.2.0.0</FileVersion>
-    <Version>1.2.0</Version>
+    <AssemblyVersion>1.3.0.0</AssemblyVersion>
+    <FileVersion>1.3.0.0</FileVersion>
+    <Version>1.3.0</Version>
     <RepositoryUrl>https://github.com/revoframework/Revo</RepositoryUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/revoframework/Revo/develop/res/revo-nuget-64.png</PackageIconUrl>
     <PackageTags>eventsourcing,cqrs,ddd,aspnet,webapi,framework,netstandard,aspnetcore,event-sourcing,domain-driven-design</PackageTags>

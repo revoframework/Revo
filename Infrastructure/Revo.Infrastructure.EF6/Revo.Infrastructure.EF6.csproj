@@ -4,7 +4,7 @@
     <TargetFramework>net471</TargetFramework>
     <Configurations>Debug;Release</Configurations>
     <Authors>Revo Framework</Authors>
-    <Version>1.2.0</Version>
+    <Version>1.3.0</Version>
     <Description>Event Sourcing, CQRS and DDD framework for modern C#/.NET applications.
 Entity Framework 6 (EF6) implementation of infrastructure services.</Description>
     <Copyright>Copyright (c) 2017-2018 Martin Zima &amp; ASP a.s.</Copyright>
