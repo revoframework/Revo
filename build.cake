@@ -63,23 +63,30 @@ Task("Clean")
   .Does(() =>
   {
     CleanDirectories(new []{ PackagesDir, ReportsDir });
-    DotNetCoreClean(SolutionFile,
-    new DotNetCoreCleanSettings
-    {
-        Verbosity = DotNetCoreVerbosity.Minimal,
-        Configuration = Configuration
-    });
+
+    var msbuildSettings = new MSBuildSettings
+      {
+        Verbosity = Verbosity.Minimal,
+        ToolVersion = MSBuildToolVersion.VS2017,
+        Configuration = Configuration,
+        PlatformTarget = PlatformTarget.MSIL,
+        ArgumentCustomization = args => args
+      };
+
+    msbuildSettings.Targets.Add("Clean");
+
+    MSBuild(SolutionFile, msbuildSettings);
   });
 
 Task("Restore")
   .IsDependentOn("Clean")
   .Does(() =>
   {
-    DotNetCoreRestore(
-      SolutionDir,
-      new DotNetCoreRestoreSettings()
+    NuGetRestore(
+      SolutionFile,
+      new NuGetRestoreSettings ()
       {
-        Verbosity = DotNetCoreVerbosity.Minimal
+        Verbosity = NuGetVerbosity.Normal
       });
   });
 
@@ -99,6 +106,7 @@ Task("Build")
           .Append("/p:ci=true")
           .AppendSwitch("/p:DebugType", "=", "portable")
           .AppendSwitch("/p:ContinuousIntegrationBuild", "=", IsCiBuild ? "true" : "false")
+          .AppendSwitch("/p:DeterministicSourcePaths", "=", "false") // Temporary workaround for https://github.com/dotnet/sourcelink/issues/91
       });
   });
 
