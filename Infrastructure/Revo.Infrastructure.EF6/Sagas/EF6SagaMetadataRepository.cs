@@ -104,6 +104,7 @@ namespace Revo.Infrastructure.EF6.Sagas
         private async Task<SagaMatch[]> QuerySagaRecords(Expression<Func<SagaMetadataRecord, bool>> query)
         {
             var databaseKeys = (await crudRepository.FindAll<SagaMetadataRecord>()
+                    .Include(x => x.Keys)
                     .Where(query)
                     .ToArrayAsync())
                 .Where(x => (crudRepository.GetEntityState(x) & EntityState.Deleted) == 0);
