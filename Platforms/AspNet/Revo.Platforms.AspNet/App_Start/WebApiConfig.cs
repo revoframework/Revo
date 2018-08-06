@@ -22,7 +22,14 @@ namespace Revo.Platforms.AspNet
             config.Select().Expand().Filter().OrderBy().MaxTop(null).Count(); //enable common OData options
             config.EnableDependencyInjection();
 
-            config.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            config.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new DefaultContractResolver
+            {
+                NamingStrategy = new CamelCaseNamingStrategy
+                {
+                    ProcessDictionaryKeys = false
+                }
+            };
+
             config.Formatters.JsonFormatter.UseDataContractJsonSerializer = false;
             config.Formatters.JsonFormatter.SerializerSettings.Converters.Add(new BracesGuidJsonConverter());
             config.Formatters.JsonFormatter.SerializerSettings.Converters.Add(new TranslatingJsonConverter());

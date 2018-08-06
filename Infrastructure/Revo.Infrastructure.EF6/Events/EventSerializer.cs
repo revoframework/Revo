@@ -14,7 +14,13 @@ namespace Revo.Infrastructure.EF6.Events
     {
         private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings
         {
-            ContractResolver = new CamelCasePropertyNamesContractResolver(),
+            ContractResolver = new DefaultContractResolver
+            {
+                NamingStrategy = new CamelCaseNamingStrategy
+                {
+                    ProcessDictionaryKeys = false
+                }
+            },
             Formatting = Formatting.None
         };
 
