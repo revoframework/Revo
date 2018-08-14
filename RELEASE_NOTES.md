@@ -6,7 +6,8 @@
 - **EF6 saga keys** not being reloaded correctly due to JSON serialization changing dictionary key character cases
 
 ### Added
-- **UserPermissionAuthorizer**
+- **(I)UserPermissionAuthorizer** for manual and more fine-grained user action authorization
+- **EF6/EntityEventProjector** for more arbitrary projections
 
 ### Changed
 - **PermissionAuthorizer** renamed to PermissionAuthorizationMatcher

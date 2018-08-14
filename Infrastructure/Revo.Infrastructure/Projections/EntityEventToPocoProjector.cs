@@ -11,28 +11,42 @@ using Revo.Domain.Events;
 
 namespace Revo.Infrastructure.Projections
 {
+    /// <summary>
+    /// An event projector for an aggregate type with a single POCO read model for every aggregate.
+    /// A convention-based abstract base class that calls an Apply for every event type
+    /// and also supports sub-projectors.
+    /// </summary>
+    /// <remarks>
+    /// If TTarget is IManuallyRowVersioned, automatically handles read model versioning and projection
+    /// idempotency using event sequence numbers.
+    /// </remarks>
+    /// <typeparam name="TSource">Aggregate type.</typeparam>
+    /// <typeparam name="TTarget">Read model type.</typeparam>
     public abstract class EntityEventToPocoProjector<TSource, TTarget> :
-        IEntityEventProjector<TSource>
+        EntityEventProjector<TSource>
         where TSource : class, IEventSourcedAggregateRoot
     {
-        private readonly MultiValueDictionary<Type, Func<IEventMessage<DomainAggregateEvent>, Task>> applyHandlers =
-            new MultiValueDictionary<Type, Func<IEventMessage<DomainAggregateEvent>, Task>>();
-
-        public EntityEventToPocoProjector()
-        {
-            CreateApplyDelegates();
-        }
-
-        public Type ProjectedAggregateType => typeof(TSource);
-        
-        protected Guid AggregateId { get; private set; }
+        /// <summary>
+        /// Currently projected read-model instance.
+        /// </summary>
         protected TTarget Target { get; private set; }
 
-        public abstract Task CommitChangesAsync();
+        /// <summary>
+        /// Override to create a new TTarget instance.
+        /// Called when the sequence number of the first projected event is 1, i.e. typically for newly created aggregates.
+        /// </summary>
+        /// <returns></returns>
         protected abstract Task<TTarget> CreateProjectionTargetAsync(Guid aggregateId, IReadOnlyCollection<IEventMessage<DomainAggregateEvent>> events);
+
+        /// <summary>
+        /// Override to get an existing TTarget instance.
+        /// Called when the sequence number of the first projected event is >1, i.e. typically for updated aggregates.
+        /// </summary>
+        /// <param name="aggregateId"></param>
+        /// <returns></returns>
         protected abstract Task<TTarget> GetProjectionTargetAsync(Guid aggregateId);
         
-        public async Task ProjectEventsAsync(Guid aggregateId, IReadOnlyCollection<IEventMessage<DomainAggregateEvent>> events)
+        public override async Task ProjectEventsAsync(Guid aggregateId, IReadOnlyCollection<IEventMessage<DomainAggregateEvent>> events)
         {
             if (events.Count == 0)
             {
@@ -42,7 +56,7 @@ namespace Revo.Infrastructure.Projections
             TTarget target;
             long firstEventNumber = events.First().Metadata.GetStreamSequenceNumber()
                                     ?? throw new InvalidOperationException(
-                                        $"Cannot project events for aggregate with ID {aggregateId}, unknown StreamSequenceNumber for first events");
+                                        $"Cannot project events for aggregate with ID {aggregateId}, unknown StreamSequenceNumber for first batch of events");
             if (firstEventNumber == 1)
             {
                 target = await CreateProjectionTargetAsync(aggregateId, events);
@@ -56,29 +70,29 @@ namespace Revo.Infrastructure.Projections
             {
                 return; //skip
             }
-
-            AggregateId = aggregateId;
+            
             Target = target;
+            
+            var appliedEvents = events;
 
+            var targetRowVersioned = target as IManuallyRowVersioned;
+            if (targetRowVersioned != null)
+            {
+                appliedEvents = appliedEvents
+                    .SkipWhile(x =>
+                        x.Metadata.GetStreamSequenceNumber().HasValue && targetRowVersioned.Version >= x.Metadata.GetStreamSequenceNumber())
+                    .ToList();
+            }
+            
             try
             {
-                IEnumerable<IEventMessage<DomainAggregateEvent>> appliedEvents = events;
-
-                var targetRowVersioned = target as IManuallyRowVersioned;
-                if (targetRowVersioned != null) //refactor to derived type?
-                {
-                    appliedEvents = appliedEvents.SkipWhile(x =>
-                        targetRowVersioned.Version >= (x.Metadata.GetStreamSequenceNumber() ?? 0));
-                }
-
-                appliedEvents = appliedEvents.ToList();
                 if (appliedEvents.Any())
                 {
-                    await ApplyEvents(appliedEvents);
+                    await base.ProjectEventsAsync(aggregateId, appliedEvents);
 
                     if (targetRowVersioned != null)
                     {
-                        long newVersion = appliedEvents.Last().Metadata.GetStreamSequenceNumber()
+                        long newVersion = appliedEvents.LastOrDefault()?.Metadata?.GetStreamSequenceNumber()
                                           ?? targetRowVersioned.Version + appliedEvents.Count();
                         targetRowVersioned.Version = (int)newVersion;
                     }
@@ -86,66 +100,14 @@ namespace Revo.Infrastructure.Projections
             }
             finally
             {
-                AggregateId = default(Guid);
                 Target = default(TTarget);
             }
         }
-
-        protected void AddSubProjector(ISubEntityEventProjector projector)
+        
+        protected override IEnumerable<(Type EventType, Func<IEventMessage<DomainAggregateEvent>, Task> Delegate)> GetApplyDelegates(
+            Type projectorType, object instance)
         {
-            CreateApplyDelegates(projector.GetType(), projector);
-        }
-
-        protected async Task ExecuteHandler<T>(T evt) where T : IEventMessage<DomainAggregateEvent>
-        {
-            IReadOnlyCollection<Func<IEventMessage<DomainAggregateEvent>, Task>> handlers;
-            if (applyHandlers.TryGetValue(evt.Event.GetType(), out handlers))
-            {
-                foreach (var handler in handlers)
-                {
-                    await handler(evt);
-                }
-            }
-        }
-
-        private async Task ApplyEvents(IEnumerable<IEventMessage<DomainAggregateEvent>> events)
-        {
-            foreach (IEventMessage<DomainAggregateEvent> ev in events)
-            {
-                await ExecuteHandler(ev);
-            }
-        }
-
-        private void CreateApplyDelegates()
-        {
-            CreateApplyDelegates(GetType(), this);
-        }
-
-        private void CreateApplyDelegates(Type projectorType, object instance)
-        {
-            if (projectorType.BaseType != null)
-            {
-                CreateApplyDelegates(projectorType.BaseType, instance);
-            }
-
-            var actions = projectorType
-                .GetMethods(BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.Public |
-                            BindingFlags.NonPublic)
-                .Where(x => x.Name == "Apply"
-                            && x.GetBaseDefinition() == x //exclude overrides
-                            && x.GetParameters().Length == 1
-                            && typeof(IEventMessage<DomainAggregateEvent>).IsAssignableFrom(x.GetParameters()[0].ParameterType))
-                .Select(x => new Tuple<Type, Func<IEventMessage<DomainAggregateEvent>, Task>>(x.GetParameters()[0].ParameterType.GetGenericArguments()[0],
-                    ev =>
-                    {
-                        Task ret = x.Invoke(instance, new object[] {ev}) as Task;
-                        if (ret != null)
-                        {
-                            return ret;
-                        }
-
-                        return Task.FromResult(0);
-                    }));
+            var actions = base.GetApplyDelegates(projectorType, instance);
 
             actions = actions.Concat(
                 projectorType
@@ -154,25 +116,27 @@ namespace Revo.Infrastructure.Projections
                     .Where(x => x.Name == "Apply"
                                 && x.GetBaseDefinition() == x //exclude overrides
                                 && x.GetParameters().Length == 3
-                                && typeof(IEventMessage<DomainAggregateEvent>).IsAssignableFrom(x.GetParameters()[0].ParameterType)
+                                && typeof(IEventMessage<DomainAggregateEvent>).IsAssignableFrom(x.GetParameters()[0]
+                                    .ParameterType)
                                 && x.GetParameters()[1].ParameterType.IsAssignableFrom(typeof(Guid))
                                 && x.GetParameters()[2].ParameterType.IsAssignableFrom(typeof(TTarget)))
-                    .Select(x => new Tuple<Type, Func<IEventMessage<DomainAggregateEvent>, Task>>(x.GetParameters()[0].ParameterType.GetGenericArguments()[0],
-                        ev =>
-                        {
-                            Task ret = x.Invoke(instance, new object[] {ev, this.AggregateId, this.Target}) as Task;
-                            if (ret != null)
+                    .Select(x =>
+                        (
+                            EventType: x.GetParameters()[0].ParameterType.GetGenericArguments()[0],
+                            Delegate: (Func<IEventMessage<DomainAggregateEvent>, Task>) (ev =>
                             {
-                                return ret;
-                            }
+                                Task ret = x.Invoke(instance, new object[] {ev, this.AggregateId, this.Target}) as Task;
+                                if (ret != null)
+                                {
+                                    return ret;
+                                }
 
-                            return Task.FromResult(0);
-                        })));
-            
-            foreach (var action in actions)
-            {
-                applyHandlers.Add(action.Item1, action.Item2);
-            }
+                                return Task.FromResult(0);
+                            })
+                         )
+                    ));
+
+            return actions;
         }
     }
 }

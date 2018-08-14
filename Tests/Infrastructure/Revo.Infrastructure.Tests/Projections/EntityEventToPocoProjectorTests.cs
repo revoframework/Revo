@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Castle.Components.DictionaryAdapter;
 using FluentAssertions;
+using MoreLinq;
 using Revo.Core.Events;
 using Revo.Domain.ReadModel;
 using Revo.Infrastructure.Events;
 using Revo.Infrastructure.Projections;
 using Revo.Testing.Infrastructure;
 using NSubstitute;
+using Revo.DataAccess.Entities;
 using Revo.Domain.Entities.EventSourcing;
 using Revo.Domain.Events;
 using Xunit;
@@ -19,71 +22,147 @@ namespace Revo.Infrastructure.Tests.Projections
     public class EntityEventToPocoProjectorTests
     {
         private TestEntityEventToPocoProjector sut;
-        private TestAggregate aggregate;
+        private Guid aggregateId = Guid.Parse("7275CF99-C345-4360-B2F6-8F40DBBE47E4");
         private List<IEventMessageDraft<DomainAggregateEvent>> eventMessages;
 
         public EntityEventToPocoProjectorTests()
         {
-            aggregate = new TestAggregate(Guid.NewGuid());
-
             eventMessages = new DomainAggregateEvent[]
             {
                 new TestEvent1(),
-                new TestEvent2(),
-                new TestEvent3()
+                new TestEvent2()
             }.Select((x, i) =>
             {
                 var message = x.ToMessageDraft();
                 message.SetMetadata(BasicEventMetadataNames.StreamSequenceNumber, (i + 1).ToString());
                 return message;
             }).ToList();
-
-            aggregate.Commit();
         }
 
         [Fact]
-        public async Task ProjectEventsAsync_CallsApplyProjections()
+        public async Task ProjectEventsAsync_CallsApplyWithTargetParam()
         {
-            sut = new TestEntityEventToPocoProjector();
-            await sut.ProjectEventsAsync(aggregate.Id, eventMessages);
+            sut = Substitute.ForPartsOf<TestEntityEventToPocoProjector>();
+            await sut.ProjectEventsAsync(aggregateId, eventMessages);
 
-            Assert.True(sut.AppliedEvents.SequenceEqual(new List<IEventMessage<DomainAggregateEvent>>()
-            {
-                eventMessages[0],
-                eventMessages[1]
-            }));
+            sut.Received(1).Apply((IEventMessage<TestEvent1>) eventMessages[0], aggregateId, sut.LastCreatedTarget);
         }
 
         [Fact]
-        public async Task ProjectEventsAsync_CallsOverridesOnlyOnce()
+        public async Task ProjectEventsAsync_CreatesTargetOnFirstEvent()
         {
-            sut = new TestEntityEventToPocoProjectorWithOverrides();
-            await sut.ProjectEventsAsync(aggregate.Id, eventMessages);
+            sut = Substitute.ForPartsOf<TestEntityEventToPocoProjector>();
+            sut.WhenForAnyArgs(x => x.Apply(null, Guid.Empty, null))
+                .Do(ci =>
+                {
+                    sut.Target.Should().NotBeNull();
+                    sut.Target.Should().Be(sut.LastCreatedTarget);
+                    sut.Target.Should().Be(ci.ArgAt<TestReadModel>(2));
+                });
 
-            Assert.True(sut.AppliedEvents.SequenceEqual(new List<IEventMessage<DomainAggregateEvent>>()
-            {
-                eventMessages[0],
-                eventMessages[1],
-                eventMessages[1]
-            }));
+            await sut.ProjectEventsAsync(aggregateId, eventMessages);
+
+            sut.LastCreatedTarget.Should().NotBeNull();
+            sut.LastFoundTarget.Should().BeNull();
         }
 
         [Fact]
-        public async Task ProjectEventsAsync_WithSubProjector()
+        public async Task ProjectEventsAsync_FindTargetOnFollowingEvent()
         {
-            sut = new TestEntityEventToPocoProjector();
-            var subProjector = Substitute.ForPartsOf<TestSubProjector>(new object[] {sut.AppliedEvents});
-            sut.AddSubProjector(subProjector);
-            await sut.ProjectEventsAsync(aggregate.Id, eventMessages);
+            sut = Substitute.ForPartsOf<TestEntityEventToPocoProjector>();
+            sut.WhenForAnyArgs(x => x.Apply(null, Guid.Empty, null))
+                .Do(ci =>
+                {
+                    sut.Target.Should().NotBeNull();
+                    sut.Target.Should().Be(sut.LastFoundTarget);
+                    sut.Target.Should().Be(ci.ArgAt<TestReadModel>(2));
+                });
 
-            sut.AppliedEvents.Should().BeEquivalentTo(new List<IEventMessage<DomainAggregateEvent>>()
+            eventMessages.Select((x, i) => (x, i)).ForEach(p => p.Item1.SetMetadata(BasicEventMetadataNames.StreamSequenceNumber, (p.Item2 + 2).ToString())); //renumber
+            await sut.ProjectEventsAsync(aggregateId, eventMessages);
+
+            sut.LastFoundTarget.Should().NotBeNull();
+            sut.LastCreatedTarget.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task ProjectEventsAsync_SkipsProjectionIfTargetNotCreated()
+        {
+            sut = Substitute.ForPartsOf<TestEntityEventToPocoProjectorNullTarget>();
+            await sut.ProjectEventsAsync(aggregateId, eventMessages);
+
+            sut.DidNotReceiveWithAnyArgs().Apply(null, Guid.Empty, null);
+        }
+
+        [Fact]
+        public async Task ProjectEventsAsync_SkipsProjectionIfTargetNotFound()
+        {
+            sut = Substitute.ForPartsOf<TestEntityEventToPocoProjectorNullTarget>();
+            eventMessages.Select((x, i) => (x, i)).ForEach(p => p.Item1.SetMetadata(BasicEventMetadataNames.StreamSequenceNumber, (p.Item2 + 2).ToString())); //renumber
+            await sut.ProjectEventsAsync(aggregateId, eventMessages);
+
+            sut.DidNotReceiveWithAnyArgs().Apply(null, Guid.Empty, null);
+        }
+
+        [Fact]
+        public async Task ProjectEventsAsync_IdempotentSkipsEventsWithLowerNumber()
+        {
+            var sut2 = Substitute.ForPartsOf<TestEntityEventToPocoProjectorVersioning>();
+            sut2.CreatedTarget = new TestReadModelVersioned()
             {
-                eventMessages[0],
-                eventMessages[1],
-                eventMessages[2]
-            });
+                Version = 1
+            };
 
-            subProjector.Received(1).Apply((IEventMessage<TestEvent3>)eventMessages[2], aggregate.Id, sut.LastTarget);
+            await sut2.ProjectEventsAsync(aggregateId, eventMessages);
+
+            sut2.DidNotReceiveWithAnyArgs().Apply((IEventMessage<TestEvent1>) null);
+            sut2.ReceivedWithAnyArgs(1).Apply((IEventMessage<TestEvent2>) null);
+        }
+
+        [Fact]
+        public async Task ProjectEventsAsync_DoesNotSkipEventsWithoutNumber()
+        {
+            var sut2 = Substitute.ForPartsOf<TestEntityEventToPocoProjectorVersioning>();
+            sut2.CreatedTarget = new TestReadModelVersioned()
+            {
+                Version = 1
+            };
+
+            eventMessages[1].SetMetadata(BasicEventMetadataNames.StreamSequenceNumber, null);
+            await sut2.ProjectEventsAsync(aggregateId, eventMessages);
+
+            sut2.DidNotReceive().Apply((IEventMessage<TestEvent1>)eventMessages[0]);
+            sut2.ReceivedWithAnyArgs(1).Apply((IEventMessage<TestEvent2>) eventMessages[1]);
+        }
+
+        [Fact]
+        public async Task ProjectEventsAsync_UpdatesVersionFromEventNumber()
+        {
+            var sut2 = Substitute.ForPartsOf<TestEntityEventToPocoProjectorVersioning>();
+            sut2.CreatedTarget = new TestReadModelVersioned()
+            {
+                Version = 1
+            };
+
+            eventMessages.Last().SetMetadata(BasicEventMetadataNames.StreamSequenceNumber, 10.ToString());
+            await sut2.ProjectEventsAsync(aggregateId, eventMessages);
+
+            sut2.CreatedTarget.Version.Should().Be(10);
+        }
+
+        [Fact]
+        public async Task ProjectEventsAsync_UpdatesVersionFromEventCount()
+        {
+            var sut2 = Substitute.ForPartsOf<TestEntityEventToPocoProjectorVersioning>();
+            sut2.CreatedTarget = new TestReadModelVersioned()
+            {
+                Version = 1
+            };
+
+            eventMessages[1].SetMetadata(BasicEventMetadataNames.StreamSequenceNumber, null);
+            await sut2.ProjectEventsAsync(aggregateId, eventMessages);
+
+            sut2.CreatedTarget.Version.Should().Be(2);
         }
 
         public class TestAggregate : EventSourcedAggregateRoot
@@ -97,20 +176,16 @@ namespace Revo.Infrastructure.Tests.Projections
         {
         }
 
+        public class TestReadModelVersioned : ReadModelBase, IManuallyRowVersioned
+        {
+            public int Version { get; set; }
+        }
+
         public class TestEntityEventToPocoProjector : EntityEventToPocoProjector<TestAggregate, TestReadModel>
         {
-            public TestEntityEventToPocoProjector()
-            {
-            }
-            
-            public TestReadModel LastTarget { get; private set; }
-
-            public new void AddSubProjector(ISubEntityEventProjector projector)
-            {
-                base.AddSubProjector(projector);
-            }
-
-            public List<IEventMessage<DomainAggregateEvent>> AppliedEvents { get; private set; } = new List<IEventMessage<DomainAggregateEvent>>();
+            public new TestReadModel Target => base.Target;
+            public TestReadModel LastCreatedTarget { get; private set; }
+            public TestReadModel LastFoundTarget { get; private set; }
 
             public override async Task CommitChangesAsync()
             {
@@ -118,50 +193,57 @@ namespace Revo.Infrastructure.Tests.Projections
 
             protected override async Task<TestReadModel> CreateProjectionTargetAsync(Guid aggregateId, IReadOnlyCollection<IEventMessage<DomainAggregateEvent>> events)
             {
-                return LastTarget = new TestReadModel();
+                return LastCreatedTarget = new TestReadModel();
             }
 
-            protected override Task<TestReadModel> GetProjectionTargetAsync(Guid aggregateId)
+            protected override async Task<TestReadModel> GetProjectionTargetAsync(Guid aggregateId)
             {
-                throw new NotImplementedException();
+                return LastFoundTarget = new TestReadModel();
             }
 
-            protected virtual void Apply(IEventMessage<TestEvent1> ev)
+            public virtual void Apply(IEventMessage<TestEvent1> ev, Guid aggregateId, TestReadModel target)
             {
-                AppliedEvents.Add(ev);
-            }
-
-            protected virtual void Apply(IEventMessage<TestEvent2> ev)
-            {
-                AppliedEvents.Add(ev);
             }
         }
 
-        public class TestEntityEventToPocoProjectorWithOverrides : TestEntityEventToPocoProjector
+        public class TestEntityEventToPocoProjectorNullTarget : TestEntityEventToPocoProjector
         {
-            protected override void Apply(IEventMessage<TestEvent1> ev)
+            protected override async Task<TestReadModel> CreateProjectionTargetAsync(Guid aggregateId, IReadOnlyCollection<IEventMessage<DomainAggregateEvent>> events)
             {
-                base.Apply(ev);
+                return null;
             }
 
-            protected new virtual void Apply(IEventMessage<TestEvent2> ev)
+            protected override async Task<TestReadModel> GetProjectionTargetAsync(Guid aggregateId)
             {
-                base.Apply(ev);
+                return null;
             }
         }
 
-        public class TestSubProjector : ISubEntityEventProjector
+        public class TestEntityEventToPocoProjectorVersioning : EntityEventToPocoProjector<TestAggregate, TestReadModelVersioned>
         {
-            public TestSubProjector(List<IEventMessage<DomainAggregateEvent>> appliedEvents)
+            public TestReadModelVersioned CreatedTarget { get; set; }
+            public TestReadModelVersioned FoundTarget { get; set; }
+
+            public override async Task CommitChangesAsync()
             {
-                AppliedEvents = appliedEvents;
             }
 
-            public List<IEventMessage<DomainAggregateEvent>> AppliedEvents { get; private set; }
-
-            public virtual void Apply(IEventMessage<TestEvent3> ev, Guid aggregateId, TestReadModel target)
+            protected override async Task<TestReadModelVersioned> CreateProjectionTargetAsync(Guid aggregateId, IReadOnlyCollection<IEventMessage<DomainAggregateEvent>> events)
             {
-                AppliedEvents.Add(ev);
+                return CreatedTarget;
+            }
+
+            protected override async Task<TestReadModelVersioned> GetProjectionTargetAsync(Guid aggregateId)
+            {
+                return FoundTarget;
+            }
+
+            public virtual void Apply(IEventMessage<TestEvent1> ev)
+            {
+            }
+
+            public virtual void Apply(IEventMessage<TestEvent2> ev)
+            {
             }
         }
 
@@ -170,10 +252,6 @@ namespace Revo.Infrastructure.Tests.Projections
         }
 
         public class TestEvent2 : DomainAggregateEvent
-        {
-        }
-
-        public class TestEvent3 : DomainAggregateEvent
         {
         }
     }

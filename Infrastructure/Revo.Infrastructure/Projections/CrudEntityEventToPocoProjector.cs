@@ -14,8 +14,19 @@ using Revo.Domain.Tenancy.Events;
 namespace Revo.Infrastructure.Projections
 {
     /// <summary>
-    /// Common stub for EF6 single-read-model entity projections.
+    /// A CRUD repository-backed event projector for an aggregate type with a single POCO read model for every aggregate.
+    /// A convention-based abstract base class that calls an Apply for every event type
+    /// and also supports sub-projectors.
     /// </summary>
+    /// <remarks>
+    /// Automatically creates, loads and saves read model instances using the repository.
+    /// If TTarget is IManuallyRowVersioned, automatically handles read model versioning and projection
+    /// idempotency using event sequence numbers.
+    /// Furthermore, automatically sets read model IDs for IEntityReadModel,
+    /// class IDs for IClassEntityReadModel and tenant IDs for ITenantReadModel.
+    /// </remarks>
+    /// <typeparam name="TSource">Aggregate type.</typeparam>
+    /// <typeparam name="TTarget">Read model type. Should have a parameterless constructor.</typeparam>
     public abstract class CrudEntityEventToPocoProjector<TSource, TTarget> :
         EntityEventToPocoProjector<TSource, TTarget>
         where TSource : class, IEventSourcedAggregateRoot
@@ -28,9 +39,9 @@ namespace Revo.Infrastructure.Projections
 
         protected ICrudRepository Repository { get; }
 
-        public override Task CommitChangesAsync()
+        public override async Task CommitChangesAsync()
         {
-            return Repository.SaveChangesAsync();
+            await Repository.SaveChangesAsync();
         }
 
         protected override async Task<TTarget> CreateProjectionTargetAsync(Guid aggregateId, IReadOnlyCollection<IEventMessage<DomainAggregateEvent>> events)
