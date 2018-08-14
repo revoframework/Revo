@@ -41,6 +41,17 @@ namespace Revo.Core.Collections
             AddRange(enumerable);
         }
 
+        public MultiValueDictionary(IEnumerable<IGrouping<TKey, TValue>> values) : this()
+        {
+            AddRange(values);
+        }
+
+        public MultiValueDictionary(IEnumerable<IGrouping<TKey, TValue>> values,
+            IEqualityComparer<TKey> comparer) : this(comparer)
+        {
+            AddRange(values);
+        }
+
         public IReadOnlyCollection<TValue> this[TKey key]
         {
             get
@@ -88,6 +99,19 @@ namespace Revo.Core.Collections
                 }
 
                 list.AddRange(pair.Value);
+            }
+        }
+
+        public void AddRange(IEnumerable<IGrouping<TKey, TValue>> values)
+        {
+            foreach (var pair in values)
+            {
+                if (!dictionary.TryGetValue(pair.Key, out var list))
+                {
+                    list = dictionary[pair.Key] = new List<TValue>();
+                }
+
+                list.AddRange(pair);
             }
         }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using FluentAssertions;
 using Revo.Core.Collections;
@@ -10,7 +11,7 @@ namespace Revo.Core.Tests.Collections
 {
     public class MultiValueDictionaryTests
     {
-        private readonly MultiValueDictionary<string, string> sut = new MultiValueDictionary<string, string>();
+        private MultiValueDictionary<string, string> sut = new MultiValueDictionary<string, string>();
 
         [Fact]
         public void Ctor_NewIsEmpty()
@@ -19,6 +20,35 @@ namespace Revo.Core.Tests.Collections
             sut.Should().BeEmpty();
             sut.Keys.Should().BeEmpty();
             sut.Values.Should().BeEmpty();
+        }
+
+        [Fact]
+        public void Ctor_FromKeyValuePairs()
+        {
+            var list = new List<KeyValuePair<string, IReadOnlyCollection<string>>>()
+            {
+                new KeyValuePair<string, IReadOnlyCollection<string>>("a", new List<string>() {"1", "2"})
+            };
+
+            sut = new MultiValueDictionary<string, string>(list);
+            sut.Should().BeEquivalentTo(list);
+        }
+
+        [Fact]
+        public void Ctor_FromGroupings()
+        {
+            var groupings = new List<KeyValuePair<string, string>>()
+            {
+                new KeyValuePair<string, string>("a", "1"),
+                new KeyValuePair<string, string>("a", "2")
+            }.GroupBy(x => x.Key, x => x.Value);
+
+            sut = new MultiValueDictionary<string, string>(groupings);
+
+            sut.Should().BeEquivalentTo(new List<KeyValuePair<string, IReadOnlyCollection<string>>>()
+            {
+                new KeyValuePair<string, IReadOnlyCollection<string>>("a", new List<string>() {"1", "2"})
+            });
         }
 
         [Fact]
@@ -66,6 +96,23 @@ namespace Revo.Core.Tests.Collections
             sut.AddRange(list);
             
             sut.Should().BeEquivalentTo(list);
+        }
+
+        [Fact]
+        public void AddRange_Grouping()
+        {
+            var groupings = new List<KeyValuePair<string, string>>()
+            {
+                new KeyValuePair<string, string>("a", "1"),
+                new KeyValuePair<string, string>("a", "2")
+            }.GroupBy(x => x.Key, x => x.Value);
+
+            sut.AddRange(groupings);
+            
+            sut.Should().BeEquivalentTo(new List<KeyValuePair<string, IReadOnlyCollection<string>>>()
+            {
+                new KeyValuePair<string, IReadOnlyCollection<string>>("a", new List<string>() {"1", "2"})
+            });
         }
 
         [Fact]
