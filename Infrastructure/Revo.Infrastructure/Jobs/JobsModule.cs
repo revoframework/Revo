@@ -12,7 +12,7 @@ namespace Revo.Infrastructure.Jobs
                 .To<HangfireJobScheduler>()
                 .InRequestOrJobScope();
 
-            Bind<IJobHandler<ExecuteCommandJob>>()
+            Bind<IJobHandler<IExecuteCommandJob>>()
                 .To<ExecuteCommandJobHandler>()
                 .InRequestOrJobScope();
 

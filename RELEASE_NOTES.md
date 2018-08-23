@@ -4,6 +4,7 @@
 ### Fixed
 - **EF6SagaMetadataRepository** bug not including the keys in a query
 - **EF6 saga keys** not being reloaded correctly due to JSON serialization changing dictionary key character cases
+- **ExecuteCommandJob** is now resolved correctly by Hangfire
 
 ### Added
 - **(I)UserPermissionAuthorizer** for manual and more fine-grained user action authorization

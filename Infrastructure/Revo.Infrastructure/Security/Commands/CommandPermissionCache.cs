@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Revo.Core.Collections;
 using Revo.Core.Commands;
 using Revo.Core.Core;
 using Revo.Core.Lifecycle;
@@ -14,7 +15,7 @@ namespace Revo.Infrastructure.Security.Commands
         private readonly IPermissionTypeRegistry permissionTypeRegistry;
         private readonly PermissionTypeIndexer permissionTypeIndexer;
         private readonly ITypeExplorer typeExplorer;
-        private readonly Dictionary<Type, List<Permission>> commandTypePermissions = new Dictionary<Type, List<Permission>>();
+        private Lazy<MultiValueDictionary<Type, Permission>> commandTypePermissions;
 
         public CommandPermissionCache(IPermissionTypeRegistry permissionTypeRegistry,
             PermissionTypeIndexer permissionTypeIndexer,
@@ -23,31 +24,43 @@ namespace Revo.Infrastructure.Security.Commands
             this.permissionTypeRegistry = permissionTypeRegistry;
             this.permissionTypeIndexer = permissionTypeIndexer;
             this.typeExplorer = typeExplorer;
+
+            Clear();
         }
 
         public void OnApplicationStarted()
         {
-            permissionTypeIndexer.EnsureIndexed();
-
-            foreach (var commandType in typeExplorer
-                                            .GetAllTypes()
-                                            .Where(x => x.IsClass && !x.IsAbstract && !x.IsGenericTypeDefinition)
-                                            .Where(x => typeof(ICommandBase).IsAssignableFrom(x)))
-            {
-                commandTypePermissions[commandType] = GetCommandTypePermissions(commandType).ToList();
-            }  
+            Clear();
         }
 
         public IReadOnlyCollection<Permission> GetCommandPermissions(ICommandBase command)
         {
-            List<Permission> permissions;
-            if (commandTypePermissions.TryGetValue(command.GetType(), out permissions))
+            if (commandTypePermissions.Value.TryGetValue(command.GetType(), out var permissions))
             {
                 return permissions;
             }
 
             throw new ArgumentException(
                 $"Unknown command type to GetCommandPermissions for: {command.GetType().FullName}");
+        }
+
+        private void Clear()
+        {
+            commandTypePermissions = new Lazy<MultiValueDictionary<Type, Permission>>(() =>
+            {
+                var dict = new MultiValueDictionary<Type, Permission>();
+                permissionTypeIndexer.EnsureIndexed();
+
+                foreach (var commandType in typeExplorer
+                    .GetAllTypes()
+                    .Where(x => x.IsClass && !x.IsAbstract && !x.IsGenericTypeDefinition)
+                    .Where(x => typeof(ICommandBase).IsAssignableFrom(x)))
+                {
+                    dict.AddRange(commandType, GetCommandTypePermissions(commandType));
+                }
+
+                return dict;
+            });
         }
 
         private IEnumerable<Permission> GetCommandTypePermissions(Type type)

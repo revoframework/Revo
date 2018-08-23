@@ -4,7 +4,7 @@ using Revo.Core.Commands;
 
 namespace Revo.Infrastructure.Jobs
 {
-    public class ExecuteCommandJobHandler : IJobHandler<ExecuteCommandJob>
+    public class ExecuteCommandJobHandler : IJobHandler<IExecuteCommandJob>
     {
         private readonly ICommandBus commandBus;
 
@@ -13,7 +13,7 @@ namespace Revo.Infrastructure.Jobs
             this.commandBus = commandBus;
         }
 
-        public Task HandleAsync(ExecuteCommandJob job, CancellationToken cancellationToken)
+        public Task HandleAsync(IExecuteCommandJob job, CancellationToken cancellationToken)
         {
             return commandBus.SendAsync(job.Command, cancellationToken);
         }

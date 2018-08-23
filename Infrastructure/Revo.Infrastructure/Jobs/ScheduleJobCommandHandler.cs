@@ -15,7 +15,12 @@ namespace Revo.Infrastructure.Jobs
 
         public Task HandleAsync(ScheduleJobCommand command, CancellationToken cancellationToken)
         {
-            return jobScheduler.ScheduleJobAsync(new ExecuteCommandJob(command.Command), command.EnqueueAt);
+            return jobScheduler.ScheduleJobAsync(GetCommandJob((dynamic)command.Command), command.EnqueueAt);
+        }
+
+        protected IExecuteCommandJob GetCommandJob<T>(T command) where T : ICommandBase
+        {
+            return new ExecuteCommandJob<T>(command);
         }
     }
 }

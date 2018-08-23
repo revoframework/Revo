@@ -4,7 +4,7 @@ using Revo.Core.Commands;
 
 namespace Revo.Infrastructure.Jobs
 {
-    public class EnqueueJobCommandHandler : ICommandHandler<EnqueueJobCommand>
+    public class EnqueueJobCommandHandler : ICommandHandler<IEnqueueJobCommand>
     {
         private readonly IJobScheduler jobScheduler;
 
@@ -13,9 +13,14 @@ namespace Revo.Infrastructure.Jobs
             this.jobScheduler = jobScheduler;
         }
 
-        public Task HandleAsync(EnqueueJobCommand command, CancellationToken cancellationToken)
+        public Task HandleAsync(IEnqueueJobCommand command, CancellationToken cancellationToken)
         {
-            return jobScheduler.EnqeueJobAsync(new ExecuteCommandJob(command.Command), command.TimeDelay);
+            return jobScheduler.EnqeueJobAsync(GetCommandJob((dynamic)command.Command), command.TimeDelay);
+        }
+
+        protected IExecuteCommandJob GetCommandJob<T>(T command) where T : ICommandBase
+        {
+            return new ExecuteCommandJob<T>(command);
         }
     }
 }

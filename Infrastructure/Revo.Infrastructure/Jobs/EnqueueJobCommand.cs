@@ -3,15 +3,18 @@ using Revo.Core.Commands;
 
 namespace Revo.Infrastructure.Jobs
 {
-    public class EnqueueJobCommand : ICommand
+    public class EnqueueJobCommand<T> : IEnqueueJobCommand
+        where T : ICommandBase
     {
-        public EnqueueJobCommand(ICommandBase command, TimeSpan? timeDelay = null)
+        public EnqueueJobCommand(T command, TimeSpan? timeDelay = null)
         {
             Command = command;
             TimeDelay = timeDelay;
         }
 
-        public ICommandBase Command { get; }
+        public T Command { get; }
         public TimeSpan? TimeDelay { get; }
+
+        ICommandBase IEnqueueJobCommand.Command => Command;
     }
 }
