@@ -59,21 +59,7 @@ namespace Revo.Core.Core
             Rebind<IVersionedTypeRegistry>()
                 .To<VersionedTypeRegistry>()
                 .InSingletonScope();
-
-            if (Kernel.GetBindings(typeof(IUserPermissionResolver)).Count() == 0)
-            {
-                Bind<IUserPermissionResolver>()
-                    .To<NullUserPermissionResolver>()
-                    .InSingletonScope();
-            }
-
-            if (Kernel.GetBindings(typeof(IRolePermissionResolver)).Count() == 0)
-            {
-                Bind<IRolePermissionResolver>()
-                    .To<NullRolePermissionResolver>()
-                    .InSingletonScope();
-            }
-
+            
             Bind<IPermissionTypeRegistry>()
                 .To<PermissionTypeRegistry>()
                 .InSingletonScope();

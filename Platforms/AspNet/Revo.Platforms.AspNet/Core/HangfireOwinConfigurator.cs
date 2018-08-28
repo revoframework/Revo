@@ -1,27 +1,35 @@
 ﻿using Hangfire;
 using Hangfire.MemoryStorage;
 using Owin;
+using Revo.Infrastructure.Hangfire;
 using Revo.Platforms.AspNet.Core.Lifecycle;
 
 namespace Revo.Platforms.AspNet.Core
 {
     public class HangfireOwinConfigurator : IOwinConfigurator
     {
+        private readonly HangfireConfigurationSection hangfireConfigurationSection;
+
+        public HangfireOwinConfigurator(HangfireConfigurationSection hangfireConfigurationSection)
+        {
+            this.hangfireConfigurationSection = hangfireConfigurationSection;
+        }
+        
         public void ConfigureApp(IAppBuilder app)
         {
-#if DEBUG
-            GlobalConfiguration.Configuration.UseStorage<MemoryStorage>(new MemoryStorage());
-#else
-            GlobalConfiguration.Configuration.UseSqlServerStorage("EntityContext");
-#endif
+            GlobalConfiguration.Configuration.UseStorage(hangfireConfigurationSection.JobStorage);
 
-            app.UseHangfireDashboard();
+            if (hangfireConfigurationSection.UseDashboard)
+            {
+                app.UseHangfireDashboard();
+            }
 
-            /*var options = new BackgroundJobServerOptions { WorkerCount = 1 };
+            app.UseHangfireServer();
 
-            CrawlerServiceProcess crawlerServiceProcess =
-                (CrawlerServiceProcess)System.Web.Mvc.DependencyResolver.Current.GetService(typeof(CrawlerServiceProcess));*/
-            app.UseHangfireServer(/*options, crawlerServiceProcess*/);
+            foreach (var action in hangfireConfigurationSection.ConfigurationActions)
+            {
+                action(GlobalConfiguration.Configuration);
+            }
         }
     }
 }

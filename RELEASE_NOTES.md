@@ -11,9 +11,11 @@
 - **EF6/EntityEventProjector** for more arbitrary projections
 
 ### Changed
+- framework configuration - framework and its module parameters now need to be programmatically configured and set-up using the newly introduced **RevoConfiguration** 
 - **PermissionAuthorizer** renamed to PermissionAuthorizationMatcher
 - **Default ASP.NET Web API JSON ContractResolver** switched to DefaultContractResolver with CamelCaseNamingStrategy from CamelCasePropertyNamesContractResolver
 (matches default ASP.NET Core behavior and does not change dictionary key character cases)
+- Hangfire integration for background job processing got its own **Revo.Infrastructure.Hangfire** package
 
 ## [1.2.0] - 2018-07-16
 - First public version released.

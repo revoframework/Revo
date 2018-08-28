@@ -8,7 +8,7 @@ namespace Revo.Platforms.AspNet.Security.Identity
 {
     public interface IIdentityUser : IUser<Guid>
     {
-        string PasswordHash { get; set; }
+        string PasswordHash { get; }
         IUser User { get; }
     }
 }

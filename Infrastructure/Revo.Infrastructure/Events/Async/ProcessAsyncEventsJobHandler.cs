@@ -12,12 +12,15 @@ namespace Revo.Infrastructure.Events.Async
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly IAsyncEventQueueBacklogWorker asyncEventQueueBacklogWorker;
+        private readonly IAsyncEventPipelineConfiguration asyncEventPipelineConfiguration;
         private readonly IJobScheduler jobScheduler;
 
         public ProcessAsyncEventsJobHandler(IAsyncEventQueueBacklogWorker asyncEventQueueBacklogWorker,
+            IAsyncEventPipelineConfiguration asyncEventPipelineConfiguration,
             IJobScheduler jobScheduler)
         {
             this.asyncEventQueueBacklogWorker = asyncEventQueueBacklogWorker;
+            this.asyncEventPipelineConfiguration = asyncEventPipelineConfiguration;
             this.jobScheduler = jobScheduler;
         }
 
@@ -44,12 +47,12 @@ namespace Revo.Infrastructure.Events.Async
             if (job.AttemptsLeft > 1)
             {
                 ProcessAsyncEventsJob newJob = new ProcessAsyncEventsJob(job.QueueName, job.AttemptsLeft - 1,
-                    TimeSpan.FromTicks(job.RetryTimeout.Ticks * AsyncEventPipelineConfiguration.Current.AsyncProcessRetryTimeoutMultiplier));
+                    TimeSpan.FromTicks(job.RetryTimeout.Ticks * asyncEventPipelineConfiguration.AsyncProcessRetryTimeoutMultiplier));
                 await jobScheduler.EnqeueJobAsync(newJob, job.RetryTimeout);
             }
             else
             {
-                Logger.Error($"Not able to finish {job.QueueName} async event queue even with {AsyncEventPipelineConfiguration.Current.AsyncProcessAttemptCount} attempts, giving up");
+                Logger.Error($"Not able to finish {job.QueueName} async event queue even with {asyncEventPipelineConfiguration.AsyncProcessAttemptCount} attempts, giving up");
             }
         }
     }

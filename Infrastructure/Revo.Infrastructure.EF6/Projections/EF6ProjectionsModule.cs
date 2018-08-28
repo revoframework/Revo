@@ -5,6 +5,7 @@ using Revo.Infrastructure.Events.Async;
 
 namespace Revo.Infrastructure.EF6.Projections
 {
+    [AutoLoadModule(false)]
     public class EF6ProjectionsModule : NinjectModule
     {
         public override void Load()

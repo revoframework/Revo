@@ -24,11 +24,23 @@ namespace Revo.Infrastructure.Tests.Events.Async
         private IJobScheduler jobScheduler;
         private List<IAsyncEventQueueRecord> events;
         private List<(string queueName, Exception e)> queueExceptions;
+        private AsyncEventPipelineConfiguration asyncEventPipelineConfiguration;
 
         public AsyncEventProcessorTests()
         {
             asyncEventQueueManager = Substitute.For<IAsyncEventQueueManager>();
             jobScheduler = Substitute.For<IJobScheduler>();
+
+            asyncEventPipelineConfiguration = new AsyncEventPipelineConfiguration()
+            {
+                AsyncProcessAttemptCount = 3,
+                SyncProcessAttemptCount = 3,
+                AsyncRescheduleDelayAfterSyncProcessFailure = TimeSpan.FromMinutes(1),
+                AsyncProcessRetryTimeout = TimeSpan.FromMilliseconds(500),
+                AsyncProcessRetryTimeoutMultiplier = 6,
+                SyncProcessRetryTimeout = TimeSpan.FromMilliseconds(600),
+                SyncProcessRetryTimeoutMultiplier = 4
+            };
 
             IAsyncEventQueueBacklogWorker AsyncEventQueueBacklogWorkerFunc()
             {
@@ -70,7 +82,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
             }
 
             sut = new AsyncEventProcessor(AsyncEventQueueBacklogWorkerFunc,
-                asyncEventQueueManager, jobScheduler);
+                asyncEventQueueManager, jobScheduler, asyncEventPipelineConfiguration);
 
             var sleep = Substitute.For<ISleep>();
             Sleep.SetSleep(() => sleep); // TODO use a thread var
@@ -105,17 +117,6 @@ namespace Revo.Infrastructure.Tests.Events.Async
             });
 
             queueExceptions = new List<(string queueName, Exception e)>();
-
-            AsyncEventPipelineConfiguration.Current = new AsyncEventPipelineConfiguration()
-            {
-                AsyncProcessAttemptCount = 3,
-                SyncProcessAttemptCount = 3,
-                AsyncRescheduleDelayAfterSyncProcessFailure = TimeSpan.FromMinutes(1),
-                AsyncProcessRetryTimeout = TimeSpan.FromMilliseconds(500),
-                AsyncProcessRetryTimeoutMultiplier = 6,
-                SyncProcessRetryTimeout = TimeSpan.FromMilliseconds(600),
-                SyncProcessRetryTimeoutMultiplier = 4
-            };
         }
 
         [Fact]
@@ -145,7 +146,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
             Received.InOrder(() =>
             {
                 queue1Processors[0].RunQueueBacklogAsync("Queue1");
-                Sleep.Current.SleepAsync(AsyncEventPipelineConfiguration.Current.SyncProcessRetryTimeout);
+                Sleep.Current.SleepAsync(asyncEventPipelineConfiguration.SyncProcessRetryTimeout);
                 queue1Processors[1].RunQueueBacklogAsync("Queue1");
             });
 
@@ -168,7 +169,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
             Received.InOrder(() =>
             {
                 queue1Processors[0].RunQueueBacklogAsync("Queue1");
-                Sleep.Current.SleepAsync(AsyncEventPipelineConfiguration.Current.SyncProcessRetryTimeout);
+                Sleep.Current.SleepAsync(asyncEventPipelineConfiguration.SyncProcessRetryTimeout);
                 queue1Processors[1].RunQueueBacklogAsync("Queue1");
             });
 
@@ -192,10 +193,10 @@ namespace Revo.Infrastructure.Tests.Events.Async
             Received.InOrder(() =>
             {
                 queue1Processors[0].RunQueueBacklogAsync("Queue1");
-                Sleep.Current.SleepAsync(AsyncEventPipelineConfiguration.Current.SyncProcessRetryTimeout);
+                Sleep.Current.SleepAsync(asyncEventPipelineConfiguration.SyncProcessRetryTimeout);
                 queue1Processors[1].RunQueueBacklogAsync("Queue1");
-                Sleep.Current.SleepAsync(new TimeSpan(AsyncEventPipelineConfiguration.Current.SyncProcessRetryTimeout.Ticks
-                    * AsyncEventPipelineConfiguration.Current.SyncProcessRetryTimeoutMultiplier));
+                Sleep.Current.SleepAsync(new TimeSpan(asyncEventPipelineConfiguration.SyncProcessRetryTimeout.Ticks
+                    * asyncEventPipelineConfiguration.SyncProcessRetryTimeoutMultiplier));
                 queue1Processors[2].RunQueueBacklogAsync("Queue1");
             });
 
@@ -220,16 +221,16 @@ namespace Revo.Infrastructure.Tests.Events.Async
             Received.InOrder(() =>
             {
                 queue1Processors[0].RunQueueBacklogAsync("Queue1");
-                Sleep.Current.SleepAsync(AsyncEventPipelineConfiguration.Current.SyncProcessRetryTimeout);
+                Sleep.Current.SleepAsync(asyncEventPipelineConfiguration.SyncProcessRetryTimeout);
                 queue1Processors[1].RunQueueBacklogAsync("Queue1");
-                Sleep.Current.SleepAsync(new TimeSpan(AsyncEventPipelineConfiguration.Current.SyncProcessRetryTimeout.Ticks
-                    * AsyncEventPipelineConfiguration.Current.SyncProcessRetryTimeoutMultiplier));
+                Sleep.Current.SleepAsync(new TimeSpan(asyncEventPipelineConfiguration.SyncProcessRetryTimeout.Ticks
+                    * asyncEventPipelineConfiguration.SyncProcessRetryTimeoutMultiplier));
                 queue1Processors[2].RunQueueBacklogAsync("Queue1");
                 jobScheduler.EnqeueJobAsync(Arg.Is<ProcessAsyncEventsJob>(x =>
-                    x.AttemptsLeft == AsyncEventPipelineConfiguration.Current.AsyncProcessAttemptCount
-                    && x.QueueName == "Queue1"
-                    && x.RetryTimeout == AsyncEventPipelineConfiguration.Current.AsyncProcessRetryTimeout),
-                    AsyncEventPipelineConfiguration.Current.AsyncRescheduleDelayAfterSyncProcessFailure);
+                        x.AttemptsLeft == asyncEventPipelineConfiguration.AsyncProcessAttemptCount
+                        && x.QueueName == "Queue1"
+                        && x.RetryTimeout == asyncEventPipelineConfiguration.AsyncProcessRetryTimeout),
+                    asyncEventPipelineConfiguration.AsyncRescheduleDelayAfterSyncProcessFailure);
             });
 
             Sleep.Current.Received(2).SleepAsync(Arg.Any<TimeSpan>());
@@ -276,15 +277,15 @@ namespace Revo.Infrastructure.Tests.Events.Async
             jobs.Should().Contain(x =>
                 x.Item2 == TimeSpan.FromSeconds(42)
                 && x.Item1 is ProcessAsyncEventsJob
-                && ((ProcessAsyncEventsJob)x.Item1).AttemptsLeft == AsyncEventPipelineConfiguration.Current.AsyncProcessAttemptCount
+                && ((ProcessAsyncEventsJob)x.Item1).AttemptsLeft == asyncEventPipelineConfiguration.AsyncProcessAttemptCount
                 && ((ProcessAsyncEventsJob)x.Item1).QueueName == "Queue1"
-                && ((ProcessAsyncEventsJob)x.Item1).RetryTimeout == AsyncEventPipelineConfiguration.Current.AsyncProcessRetryTimeout);
+                && ((ProcessAsyncEventsJob)x.Item1).RetryTimeout == asyncEventPipelineConfiguration.AsyncProcessRetryTimeout);
             jobs.Should().Contain(x =>
                 x.Item2 == TimeSpan.FromSeconds(42)
                 && x.Item1 is ProcessAsyncEventsJob
-                && ((ProcessAsyncEventsJob)x.Item1).AttemptsLeft == AsyncEventPipelineConfiguration.Current.AsyncProcessAttemptCount
+                && ((ProcessAsyncEventsJob)x.Item1).AttemptsLeft == asyncEventPipelineConfiguration.AsyncProcessAttemptCount
                 && ((ProcessAsyncEventsJob)x.Item1).QueueName == "Queue2"
-                && ((ProcessAsyncEventsJob)x.Item1).RetryTimeout == AsyncEventPipelineConfiguration.Current.AsyncProcessRetryTimeout);
+                && ((ProcessAsyncEventsJob)x.Item1).RetryTimeout == asyncEventPipelineConfiguration.AsyncProcessRetryTimeout);
         }
 
         public class Event1 : IEvent

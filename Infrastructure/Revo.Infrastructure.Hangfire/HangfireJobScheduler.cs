@@ -2,8 +2,9 @@
 using System.Reflection;
 using System.Threading.Tasks;
 using Hangfire;
+using Revo.Infrastructure.Jobs;
 
-namespace Revo.Infrastructure.Jobs.Hangfire
+namespace Revo.Infrastructure.Hangfire
 {
     public class HangfireJobScheduler : IJobScheduler
     {

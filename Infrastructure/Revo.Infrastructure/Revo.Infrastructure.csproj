@@ -18,10 +18,6 @@ Framework infrastruture package - event stores, projections, jobs, etc.</Descrip
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="6.2.2" />
     <PackageReference Include="Castle.Core" Version="4.2.1" />
-    <PackageReference Include="Hangfire" Version="1.6.14" />
-    <PackageReference Include="Hangfire.Core" Version="1.6.14" />
-    <PackageReference Include="Hangfire.MemoryStorage" Version="1.5.2" />
-    <PackageReference Include="Hangfire.SqlServer" Version="1.6.14" />
     <PackageReference Include="LINQKit.Core" Version="1.1.15" />
     <PackageReference Include="morelinq" Version="2.10.0" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />

@@ -17,52 +17,60 @@ namespace Revo.Integrations.Rebus
 {
     public class RebusModule : NinjectModule
     {
+        private readonly RebusConnectionConfiguration connectionConfiguration;
+
+        public RebusModule(RebusConnectionConfiguration connectionConfiguration)
+        {
+            this.connectionConfiguration = connectionConfiguration;
+        }
+
         public override void Load()
         {
-            var connectionString = ConfigurationManager.ConnectionStrings["RabbitMQ"]?.ConnectionString;
-            if (connectionString?.Length > 0)
-            {
-                Bind<IAsyncEventListener<IEvent>>()
-                    .To<RebusEventListener>()
-                    .InRequestOrJobScope();
+            var connectionString = connectionConfiguration.ConnectionString
+                                   ?? (connectionConfiguration.ConnectionName != null
+                                       ? ConfigurationManager.ConnectionStrings[connectionConfiguration.ConnectionName]?.ConnectionString
+                                       : null);
 
-                Bind<IAsyncEventSequencer<IEvent>, RebusEventListener.RebusEventSequencer>()
-                    .To<RebusEventListener.RebusEventSequencer>()
-                    .InRequestOrJobScope();
+            Dictionary<string, string> connectionParams = connectionString?.Split(';')
+                .Select(value => value.Split('='))
+                .ToDictionary(pair => pair[0].Trim(), pair => pair.Length > 0 ? pair[1].Trim() : null);
 
-                Bind<IHandleMessages<IEvent>>()
-                    .To<RebusEventMessageHandler>()
-                    .InTransientScope();
+            Bind<IAsyncEventListener<IEvent>>()
+                .To<RebusEventListener>()
+                .InRequestOrJobScope();
 
-                Bind<IContainerAdapter>()
-                    .To<NinjectContainerAdapter>()
-                    .InSingletonScope();
+            Bind<IAsyncEventSequencer<IEvent>, RebusEventListener.RebusEventSequencer>()
+                .To<RebusEventListener.RebusEventSequencer>()
+                .InRequestOrJobScope();
 
-                Bind<RebusUnitOfWork>()
-                    .ToSelf()
-                    .InTransientScope();
+            Bind<IHandleMessages<IEvent>>()
+                .To<RebusEventMessageHandler>()
+                .InTransientScope();
 
-                Dictionary<string, string> connectionParams = connectionString.Split(';')
-                    .Select(value => value.Split('='))
-                    .ToDictionary(pair => pair[0].Trim(), pair => pair.Length > 0 ? pair[1].Trim() : null);
+            Bind<IContainerAdapter>()
+                .To<NinjectContainerAdapter>()
+                .InSingletonScope();
 
-                var bus = Configure.With(Kernel.Get<IContainerAdapter>())
-                    .Logging(l => l.NLog())
-                    .Transport(t =>
-                        t.UseRabbitMq(
-                            connectionParams.TryGetValue("Url", out string url) ? url : "amqp://localhost",
-                            connectionParams.TryGetValue("InputQueue", out string database) ? database : "Revo"))
-                    .Routing(r => r.TypeBasedRoutingFromAppConfig())
-                    .Options(c => c.EnableUnitOfWork(
-                        mc =>
-                        {
-                            var uow = Kernel.Get<RebusUnitOfWork>();
-                            mc.TransactionContext.Items["uow"] = uow;
-                            return uow;
-                        },
-                        async (mc, uow) => await uow.RunAsync()))
-                    .Start();
-            }
+            Bind<RebusUnitOfWork>()
+                .ToSelf()
+                .InTransientScope();
+
+            var bus = Configure.With(Kernel.Get<IContainerAdapter>())
+                .Logging(l => l.NLog())
+                .Transport(t =>
+                    t.UseRabbitMq(
+                        connectionParams != null && connectionParams.TryGetValue("Url", out string url) ? url : "amqp://localhost",
+                        connectionParams != null && connectionParams.TryGetValue("InputQueue", out string database) ? database : "Revo"))
+                .Routing(r => r.TypeBasedRoutingFromAppConfig())
+                .Options(c => c.EnableUnitOfWork(
+                    mc =>
+                    {
+                        var uow = Kernel.Get<RebusUnitOfWork>();
+                        mc.TransactionContext.Items["uow"] = uow;
+                        return uow;
+                    },
+                    async (mc, uow) => await uow.RunAsync()))
+                .Start();
         }
     }
 }

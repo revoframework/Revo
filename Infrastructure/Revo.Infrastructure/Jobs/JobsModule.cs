@@ -1,6 +1,5 @@
 ﻿using Ninject.Modules;
 using Revo.Core.Core;
-using Revo.Infrastructure.Jobs.Hangfire;
 
 namespace Revo.Infrastructure.Jobs
 {
@@ -8,10 +7,6 @@ namespace Revo.Infrastructure.Jobs
     {
         public override void Load()
         {
-            Bind<IJobScheduler>()
-                .To<HangfireJobScheduler>()
-                .InRequestOrJobScope();
-
             Bind<IJobHandler<IExecuteCommandJob>>()
                 .To<ExecuteCommandJobHandler>()
                 .InRequestOrJobScope();

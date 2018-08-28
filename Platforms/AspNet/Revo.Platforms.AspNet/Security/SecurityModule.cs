@@ -12,30 +12,18 @@ using Revo.Platforms.AspNet.Security.Identity;
 
 namespace Revo.Platforms.AspNet.Security
 {
+    [AutoLoadModule(false)]
     public class SecurityModule : NinjectModule
     {
         public override void Load()
         {
-            if (!Kernel.GetBindings(typeof(SignInManager<IIdentityUser, Guid>)).Any())
-            {
-                Bind<SignInManager<IIdentityUser, Guid>>()
-                    .To<SignInManager<IIdentityUser, Guid>>()
-                    .InRequestOrJobScope();
-            }
+            Bind<SignInManager<IIdentityUser, Guid>>()
+                .To<SignInManager<IIdentityUser, Guid>>()
+                .InRequestOrJobScope();
 
-            if (!Kernel.GetBindings(typeof(UserManager<IIdentityUser, Guid>)).Any())
-            {
-                Bind<UserManager<IIdentityUser, Guid>>()
-                    .To<UserManager<IIdentityUser, Guid>>()
-                    .InRequestOrJobScope();
-            }
-
-            if (!Kernel.GetBindings(typeof(IUserStore<IIdentityUser, Guid>)).Any())
-            {
-                Bind<IUserStore<IIdentityUser, Guid>>()
-                    .To<NullUserStore>()
-                    .InRequestOrJobScope();
-            }
+            Bind<UserManager<IIdentityUser, Guid>>()
+                .To<UserManager<IIdentityUser, Guid>>()
+                .InRequestOrJobScope();
 
             Bind<IAuthenticationManager>()
                 .ToMethod(ctx =>

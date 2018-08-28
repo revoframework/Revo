@@ -10,22 +10,16 @@ namespace Revo.Platforms.AspNet.Core
     {
         public static void OnPostApplicationStart()
         {
-            RevoHttpApplication.Current.PostStart();
-
             foreach (IWebActivatorExHooks appInitializer in RevoHttpApplication.Current.ResolveAll<IWebActivatorExHooks>())
             {
                 appInitializer.OnPostApplicationStart();
             }
-
-            var initializer = RevoHttpApplication.Current.Resolve<IApplicationStartListenerInitializer>();
-            initializer.InitializeStarted();
+            
+            RevoHttpApplication.Current.PostStart();
         }
 
         public static void OnApplicationShutdown()
         {
-            var initializer = RevoHttpApplication.Current.Resolve<IApplicationStartListenerInitializer>();
-            initializer.DeinitializeStopping();
-
             foreach (IWebActivatorExHooks appInitializer in RevoHttpApplication.Current.ResolveAll<IWebActivatorExHooks>())
             {
                 appInitializer.OnApplicationShutdown();

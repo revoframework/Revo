@@ -4,13 +4,6 @@ namespace Revo.Infrastructure.Events.Async
 {
     public class AsyncEventPipelineConfiguration : IAsyncEventPipelineConfiguration
     {
-        public static IAsyncEventPipelineConfiguration Current { get; set; }
-
-        static AsyncEventPipelineConfiguration()
-        {
-            Current = new AsyncEventPipelineConfiguration();
-        }
-
         public AsyncEventPipelineConfiguration()
         {
         }

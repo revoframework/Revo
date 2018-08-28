@@ -1,5 +1,8 @@
-﻿using System.Data.Entity;
+﻿using System;
+using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
+using Ninject.Extensions.ContextPreservation;
 using Ninject.Modules;
 using Revo.Core.Core;
 using Revo.Core.IO.OData;
@@ -12,33 +15,50 @@ using Revo.Platforms.AspNet.IO.OData;
 
 namespace Revo.DataAccess.EF6
 {
+    [AutoLoadModule(false)]
     public class EF6DataAccessModule : NinjectModule
     {
+        private readonly EF6ConnectionConfiguration connectionConfiguration;
+        private readonly bool useAsPrimaryRepository;
+
+        public EF6DataAccessModule(EF6ConnectionConfiguration connectionConfiguration, bool useAsPrimaryRepository)
+        {
+            this.connectionConfiguration = connectionConfiguration;
+            this.useAsPrimaryRepository = useAsPrimaryRepository;
+        }
+
         public override void Load()
         {
+            Bind<EF6ConnectionConfiguration>()
+                .ToConstant(connectionConfiguration);
+
             Bind<DbContext>().To<EntityContext>()
                  .InTransientScope()
-                 .WithConstructorArgument("connectionName", "EntityContext");
+                 .WithConstructorArgument("connectionName", ctx => ctx.ContextPreservingGet<EF6ConnectionConfiguration>());
 
-            if (!Bindings.Any(x => x.Service == typeof(IEF6CrudRepository)))
+            List<Type> repositoryTypes = new List<Type>()
             {
-                Bind(typeof(ICrudRepository), typeof(IReadRepository), typeof(IEF6CrudRepository),
-                        typeof(IEF6ReadRepository))
-                    .To<EF6CrudRepository>()
+                typeof(IEF6CrudRepository),
+                typeof(IEF6ReadRepository)
+            };
+
+            if (useAsPrimaryRepository)
+            {
+                repositoryTypes.AddRange(new[]
+                {
+                    typeof(ICrudRepository), typeof(IReadRepository)
+                });
+
+                Bind<IDatabaseAccess>().To<DatabaseAccess>()
                     .InRequestOrJobScope();
             }
 
-            if (!Bindings.Any(x => x.Service == typeof(ICrudRepositoryFactory<IEF6ReadRepository>)))
-            {
-                Bind(typeof(ICrudRepositoryFactory<ICrudRepository>),
-                        typeof(ICrudRepositoryFactory<IReadRepository>),
-                        typeof(ICrudRepositoryFactory<IEF6CrudRepository>),
-                        typeof(ICrudRepositoryFactory<IEF6ReadRepository>))
-                    .To<EF6CrudRepositoryFactory>()
-                    .InRequestOrJobScope();
-            }
+            Bind(repositoryTypes.ToArray())
+                .To<EF6CrudRepository>()
+                .InRequestOrJobScope();
 
-            Bind<IDatabaseAccess>().To<DatabaseAccess>()
+            Bind(repositoryTypes.Select(x => typeof(ICrudRepositoryFactory<>).MakeGenericType(x)).ToArray())
+                .To<EF6CrudRepositoryFactory>()
                 .InRequestOrJobScope();
 
             Bind<IModelMetadataExplorer, IApplicationStartListener>()

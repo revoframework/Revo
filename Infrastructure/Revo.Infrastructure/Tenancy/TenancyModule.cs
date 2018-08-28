@@ -11,11 +11,7 @@ namespace Revo.Infrastructure.Tenancy
             Bind<ITenantContext>()
                 .To<DefaultTenantContext>()
                 .InRequestOrJobScope();
-
-            Bind<ITenantContextResolver>()
-                .To<NullTenantContextResolver>()
-                .InSingletonScope();
-
+            
             Bind<IRepositoryFilter>()
                 .To<TenantRepositoryFilter>()
                 .WhenNoAncestorMatches(ctx => typeof(ITenantProvider).IsAssignableFrom(ctx.Request.Service))

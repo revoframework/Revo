@@ -5,6 +5,7 @@ using Revo.Domain.Events;
 
 namespace Revo.DataAccess.RavenDB.Projections
 {
+    [AutoLoadModule(false)]
     public class RavenProjectionsModule : NinjectModule
     {
         public override void Load()

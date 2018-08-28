@@ -14,13 +14,15 @@ namespace Revo.Infrastructure.Tests.Events.Async
         private ProcessAsyncEventsJobHandler sut;
         private IAsyncEventQueueBacklogWorker asyncEventQueueBacklogWorker;
         private IJobScheduler jobScheduler;
+        private AsyncEventPipelineConfiguration asyncEventPipelineConfiguration;
 
         public ProcessAsyncEventsJobHandlerTests()
         {
             asyncEventQueueBacklogWorker = Substitute.For<IAsyncEventQueueBacklogWorker>();
             jobScheduler = Substitute.For<IJobScheduler>();
+            asyncEventPipelineConfiguration = new AsyncEventPipelineConfiguration();
 
-            sut = new ProcessAsyncEventsJobHandler(asyncEventQueueBacklogWorker, jobScheduler);
+            sut = new ProcessAsyncEventsJobHandler(asyncEventQueueBacklogWorker, asyncEventPipelineConfiguration, jobScheduler);
         }
 
         [Fact]
@@ -41,7 +43,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
             await sut.HandleAsync(job, CancellationToken.None);
 
             jobScheduler.Received(1).EnqeueJobAsync(Arg.Is<ProcessAsyncEventsJob>(x => x.AttemptsLeft == 4
-                && x.RetryTimeout == TimeSpan.FromTicks(job.RetryTimeout.Ticks * AsyncEventPipelineConfiguration.Current.AsyncProcessRetryTimeoutMultiplier)
+                && x.RetryTimeout == TimeSpan.FromTicks(job.RetryTimeout.Ticks * asyncEventPipelineConfiguration.AsyncProcessRetryTimeoutMultiplier)
                 && x.QueueName == "queue"), job.RetryTimeout);
         }
 
@@ -65,7 +67,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
             await sut.HandleAsync(job, CancellationToken.None);
 
             jobScheduler.Received(1).EnqeueJobAsync(Arg.Is<ProcessAsyncEventsJob>(x => x.AttemptsLeft == 4
-                && x.RetryTimeout == TimeSpan.FromTicks(job.RetryTimeout.Ticks * AsyncEventPipelineConfiguration.Current.AsyncProcessRetryTimeoutMultiplier)
+                && x.RetryTimeout == TimeSpan.FromTicks(job.RetryTimeout.Ticks * asyncEventPipelineConfiguration.AsyncProcessRetryTimeoutMultiplier)
                 && x.QueueName == "queue"), job.RetryTimeout);
         }
 

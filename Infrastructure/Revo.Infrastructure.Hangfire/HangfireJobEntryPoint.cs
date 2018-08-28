@@ -1,7 +1,8 @@
 ﻿using System.Threading.Tasks;
 using Revo.Core.Core;
+using Revo.Infrastructure.Jobs;
 
-namespace Revo.Infrastructure.Jobs.Hangfire
+namespace Revo.Infrastructure.Hangfire
 {
     public class HangfireJobEntryPoint<TJob>
         where TJob : IJob

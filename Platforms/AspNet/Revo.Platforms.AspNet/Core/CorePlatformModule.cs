@@ -5,6 +5,7 @@ using Revo.Core.IO;
 using Revo.Core.IO.Resources;
 using Revo.Core.Lifecycle;
 using Revo.Core.Types;
+using Revo.Infrastructure.Hangfire;
 using Revo.Platforms.AspNet.Core.Lifecycle;
 using Revo.Platforms.AspNet.IO.Resources;
 using Revo.Platforms.AspNet.IO.Stache;
@@ -13,8 +14,16 @@ using Revo.Platforms.AspNet.Web.VirtualPath;
 
 namespace Revo.Platforms.AspNet.Core
 {
+    [AutoLoadModule(false)]
     public class CorePlatformModule : NinjectModule
     {
+        private readonly HangfireConfigurationSection hangfireConfigurationSection;
+
+        public CorePlatformModule(HangfireConfigurationSection hangfireConfigurationSection)
+        {
+            this.hangfireConfigurationSection = hangfireConfigurationSection;
+        }
+
         public override void Load()
         {
             Rebind<ITypeExplorer>()
@@ -57,13 +66,17 @@ namespace Revo.Platforms.AspNet.Core
                 .ToSelf()
                 .InSingletonScope();
 
-            Bind<IOwinConfigurator>()
-                .To<HangfireOwinConfigurator>()
-                .InSingletonScope();
-
             Bind<IServiceLocator>()
                 .To<NinjectServiceLocator>()
                 .InSingletonScope();
+
+            if (hangfireConfigurationSection.IsActive)
+            {
+                Bind<IOwinConfigurator>()
+                    .To<HangfireOwinConfigurator>()
+                    .InSingletonScope()
+                    .WithConstructorArgument("jobStorage", ctx => hangfireConfigurationSection.JobStorage);
+            }
         }
     }
 }

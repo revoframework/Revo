@@ -18,6 +18,7 @@ Configurable user notifications extension package.</Description>
   
   <ItemGroup>
     <PackageReference Include="EntityFramework" Version="6.2.0" />
+    <PackageReference Include="Hangfire.Core" Version="1.6.20" />
     <PackageReference Include="PushSharp.Core" Version="1.0.0" />
   </ItemGroup>
   

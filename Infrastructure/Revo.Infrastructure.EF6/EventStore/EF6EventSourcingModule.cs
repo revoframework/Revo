@@ -7,6 +7,7 @@ using Revo.Infrastructure.EventStore;
 
 namespace Revo.Infrastructure.EF6.EventStore
 {
+    [AutoLoadModule(false)]
     public class EF6EventSourcingModule : NinjectModule
     {
         public override void Load()
@@ -28,7 +29,6 @@ namespace Revo.Infrastructure.EF6.EventStore
                 .To<EF6CrudRepository>()
                 .WhenInjectedInto<EF6EventSourceCatchUp>()
                 .InTransientScope();
-
         }
     }
 }

@@ -1,0 +1,38 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Raven.Client.Documents.Session;
+using Revo.DataAccess.Entities;
+
+namespace Revo.DataAccess.RavenDB.Entities
+{
+    public class RavenCrudRepositoryFactory :
+        ICrudRepositoryFactory<IRavenCrudRepository>,
+        ICrudRepositoryFactory<ICrudRepository>,
+        ICrudRepositoryFactory<IReadRepository>
+    {
+        private readonly IAsyncDocumentSession asyncDocumentSession;
+
+        public RavenCrudRepositoryFactory(IAsyncDocumentSession asyncDocumentSession)
+        {
+            this.asyncDocumentSession = asyncDocumentSession;
+        }
+
+        public IRavenCrudRepository Create()
+        {
+            return new RavenCrudRepository(asyncDocumentSession);
+        }
+
+        ICrudRepository ICrudRepositoryFactory<ICrudRepository>.Create()
+        {
+            return Create();
+        }
+
+        IReadRepository ICrudRepositoryFactory<IReadRepository>.Create()
+        {
+            return Create();
+        }
+    }
+}

@@ -1,8 +1,10 @@
 ﻿using Ninject.Modules;
+using Revo.Core.Core;
 using Revo.Core.Lifecycle;
 
 namespace Revo.Platforms.AspNet.Globalization
 {
+    [AutoLoadModule(false)]
     public class GlobalizationModule : NinjectModule
     {
         public override void Load()

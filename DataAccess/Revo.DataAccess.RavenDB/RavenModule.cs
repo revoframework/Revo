@@ -2,31 +2,40 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Revo.Core.Core;
 using Revo.DataAccess.RavenDB.Entities;
 using Ninject;
 using Ninject.Modules;
-using Raven.Client;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
-using Revo.Core.IO.OData;
+using Revo.DataAccess.Entities;
 using Revo.DataAccess.RavenDB.IO.OData;
-using Revo.Platforms.AspNet.Core.Lifecycle;
 using Revo.Platforms.AspNet.IO.OData;
 
 namespace Revo.DataAccess.RavenDB
 {
+    [AutoLoadModule(false)]
     public class RavenModule : NinjectModule
     {
+        private readonly RavenConnectionConfiguration connectionConfiguration;
+        private readonly bool useAsPrimaryRepository;
+
+        public RavenModule(RavenConnectionConfiguration connectionConfiguration, bool useAsPrimaryRepository)
+        {
+            this.connectionConfiguration = connectionConfiguration;
+            this.useAsPrimaryRepository = useAsPrimaryRepository;
+        }
+
         public override void Load()
         {
             Bind<IDocumentStore>()
                 .ToMethod(ctx =>
                 {
-                    var connectionString = ConfigurationManager.ConnectionStrings["RavenDB"].ConnectionString;
-                    Dictionary<string, string> connectionParams = connectionString.Split(';')
+                    var connectionString = connectionConfiguration.ConnectionString
+                                           ?? (connectionConfiguration.ConnectionName != null
+                                               ? ConfigurationManager.ConnectionStrings[connectionConfiguration.ConnectionName]?.ConnectionString
+                                               : null);
+                    Dictionary<string, string> connectionParams = connectionString?.Split(';')
                         .Select(value => value.Split('='))
                         .ToDictionary(pair => pair[0].Trim(), pair => pair.Length > 0 ? pair[1].Trim() : null);
 
@@ -34,9 +43,9 @@ namespace Revo.DataAccess.RavenDB
                     {
                         Urls = new []
                         {
-                            connectionParams.TryGetValue("Url", out string url) ? url : "http://localhost:8998"
+                            connectionParams != null && connectionParams.TryGetValue("Url", out string url) ? url : "http://localhost:8998"
                         },
-                        Database = connectionParams.TryGetValue("Database", out string database) ? database : "Revo"
+                        Database = connectionParams != null && connectionParams.TryGetValue("Database", out string database) ? database : "Revo"
                     };
 
                     store.Conventions.FindIdentityProperty = memberInfo => memberInfo.Name == "DocumentId";
@@ -54,8 +63,25 @@ namespace Revo.DataAccess.RavenDB
                 })
                 .InRequestOrJobScope();
 
-            Bind<IRavenCrudRepository>()
+            List<Type> repositoryTypes = new List<Type>()
+            {
+                typeof(IRavenCrudRepository)
+            };
+
+            if (useAsPrimaryRepository)
+            {
+                repositoryTypes.AddRange(new[]
+                {
+                    typeof(ICrudRepository), typeof(IReadRepository)
+                });
+            }
+            
+            Bind(repositoryTypes.ToArray())
                 .To<RavenCrudRepository>()
+                .InRequestOrJobScope();
+
+            Bind(repositoryTypes.Select(x => typeof(ICrudRepositoryFactory<>).MakeGenericType(x)).ToArray())
+                .To<RavenCrudRepositoryFactory>()
                 .InRequestOrJobScope();
 
             Bind<IQueryableToODataResultConverter>()

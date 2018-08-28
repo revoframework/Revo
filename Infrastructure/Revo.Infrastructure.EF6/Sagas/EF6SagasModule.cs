@@ -5,6 +5,7 @@ using Revo.Infrastructure.Sagas;
 
 namespace Revo.Infrastructure.EF6.Sagas
 {
+    [AutoLoadModule(false)]
     public class EF6SagasModule : NinjectModule
     {
         public override void Load()

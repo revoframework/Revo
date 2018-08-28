@@ -7,6 +7,7 @@ using Revo.Infrastructure.Events.Async;
 
 namespace Revo.Infrastructure.EF6.Events
 {
+    [AutoLoadModule(false)]
     public class EF6AsyncEventsModule : NinjectModule
     {
         public override void Load()

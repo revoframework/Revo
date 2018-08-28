@@ -16,14 +16,17 @@ namespace Revo.Infrastructure.Events.Async
         private readonly Func<IAsyncEventQueueBacklogWorker> asyncEventQueueBacklogWorkerFunc;
         private readonly IAsyncEventQueueManager asyncEventQueueManager;
         private readonly IJobScheduler jobScheduler;
+        private readonly IAsyncEventPipelineConfiguration asyncEventPipelineConfiguration;
 
         public AsyncEventProcessor(Func<IAsyncEventQueueBacklogWorker> asyncEventQueueBacklogWorkerFunc,
             IAsyncEventQueueManager asyncEventQueueManager,
-            IJobScheduler jobScheduler)
+            IJobScheduler jobScheduler,
+            IAsyncEventPipelineConfiguration asyncEventPipelineConfiguration)
         {
             this.asyncEventQueueBacklogWorkerFunc = asyncEventQueueBacklogWorkerFunc;
             this.asyncEventQueueManager = asyncEventQueueManager;
             this.jobScheduler = jobScheduler;
+            this.asyncEventPipelineConfiguration = asyncEventPipelineConfiguration;
         }
 
         public async Task ProcessSynchronously(IReadOnlyCollection<IAsyncEventQueueRecord> eventsToProcess)
@@ -31,8 +34,8 @@ namespace Revo.Infrastructure.Events.Async
             string[] queues = eventsToProcess.Select(x => x.QueueName).Distinct().ToArray();
             List<IAsyncEventQueueRecord> remainingEvents = eventsToProcess.ToList();
 
-            int triesLeft = AsyncEventPipelineConfiguration.Current.SyncProcessAttemptCount;
-            TimeSpan sleepTime = AsyncEventPipelineConfiguration.Current.SyncProcessRetryTimeout;
+            int triesLeft = asyncEventPipelineConfiguration.SyncProcessAttemptCount;
+            TimeSpan sleepTime = asyncEventPipelineConfiguration.SyncProcessRetryTimeout;
             while (triesLeft > 0)
             {
                 triesLeft--;
@@ -51,22 +54,22 @@ namespace Revo.Infrastructure.Events.Async
                 if (triesLeft > 0)
                 {
                     await Sleep.Current.SleepAsync(sleepTime);
-                    sleepTime = TimeSpan.FromTicks(sleepTime.Ticks * AsyncEventPipelineConfiguration.Current.SyncProcessRetryTimeoutMultiplier);
+                    sleepTime = TimeSpan.FromTicks(sleepTime.Ticks * asyncEventPipelineConfiguration.SyncProcessRetryTimeoutMultiplier);
                 }
             }
 
             if (queues.Length > 0 && remainingEvents.Count > 0)
             {
                 Logger.Error(
-                    $"Not able to synchronously process all event queues, about to reschedule {remainingEvents.Count} events for later async processing in {AsyncEventPipelineConfiguration.Current.AsyncRescheduleDelayAfterSyncProcessFailure.TotalSeconds:0.##} seconds");
-                await EnqueueForAsyncProcessingAsync(remainingEvents, AsyncEventPipelineConfiguration.Current.AsyncRescheduleDelayAfterSyncProcessFailure);
+                    $"Not able to synchronously process all event queues, about to reschedule {remainingEvents.Count} events for later async processing in {asyncEventPipelineConfiguration.AsyncRescheduleDelayAfterSyncProcessFailure.TotalSeconds:0.##} seconds");
+                await EnqueueForAsyncProcessingAsync(remainingEvents, asyncEventPipelineConfiguration.AsyncRescheduleDelayAfterSyncProcessFailure);
             }
         }
 
         public async Task EnqueueForAsyncProcessingAsync(IReadOnlyCollection<IAsyncEventQueueRecord> eventsToProcess, TimeSpan? timeDelay)
         {
             string[] queues = eventsToProcess.Select(x => x.QueueName).Distinct().ToArray();
-            var jobs = queues.Select(x => new ProcessAsyncEventsJob(x, AsyncEventPipelineConfiguration.Current.AsyncProcessAttemptCount, AsyncEventPipelineConfiguration.Current.AsyncProcessRetryTimeout));
+            var jobs = queues.Select(x => new ProcessAsyncEventsJob(x, asyncEventPipelineConfiguration.AsyncProcessAttemptCount, asyncEventPipelineConfiguration.AsyncProcessRetryTimeout));
 
             foreach (ProcessAsyncEventsJob job in jobs)
             {
