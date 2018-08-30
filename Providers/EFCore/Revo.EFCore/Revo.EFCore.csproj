@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), Common.props))\Common.props" />
+  
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <Configurations>Debug;Release</Configurations>
+    <Description>Event Sourcing, CQRS and DDD framework for modern C#/.NET applications.
+Entity Framework Core (EF Core) implementation of infrastructure services.</Description>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <None Remove="DB\01_REV_CREATE.sql" />
+    <None Remove="DB\03_REV_INDICES.sql" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Include="DB\PostgreSQL\01_REV_CREATE.sql" />
+    <Content Include="DB\PostgreSQL\03_REV_INDICES.sql" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="6.2.2" />
+    <PackageReference Include="Castle.Core" Version="4.2.1" />
+    <PackageReference Include="LINQKit.Core" Version="1.1.15" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.1.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.1.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="2.1.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.1.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.1.2" />
+    <PackageReference Include="morelinq" Version="2.10.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="Ninject" Version="3.3.4" />
+    <PackageReference Include="Ninject.Extensions.ContextPreservation" Version="3.3.1" />
+    <PackageReference Include="Ninject.Extensions.Factory" Version="3.3.2" />
+    <PackageReference Include="NLog" Version="4.5.3" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Revo.Infrastructure\Revo.Infrastructure.csproj" />
+  </ItemGroup>
+    
+</Project>

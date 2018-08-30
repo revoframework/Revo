@@ -14,12 +14,12 @@ using Xunit;
 
 namespace Revo.Infrastructure.Tests.Sagas.Generic
 {
-    public class EF6SagaMetadataRepositoryTests
+    public class SagaMetadataRepositoryTests
     {
         private readonly SagaMetadataRepository sut;
         private readonly InMemoryCrudRepository inMemoryCrudRepository;
 
-        public EF6SagaMetadataRepositoryTests()
+        public SagaMetadataRepositoryTests()
         {
             inMemoryCrudRepository = new InMemoryCrudRepository();
             sut = new SagaMetadataRepository(inMemoryCrudRepository);

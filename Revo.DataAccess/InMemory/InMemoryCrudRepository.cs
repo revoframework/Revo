@@ -293,7 +293,7 @@ namespace Revo.DataAccess.InMemory
             }
         }
 
-        public void SaveChanges()
+        public virtual void SaveChanges()
         {
             foreach (EntityEntry entry in EntityEntries.ToList())
             {
@@ -308,7 +308,7 @@ namespace Revo.DataAccess.InMemory
             }
         }
 
-        public Task SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public virtual Task SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             SaveChanges();
             return Task.FromResult(0);

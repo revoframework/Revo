@@ -20,11 +20,5 @@ namespace Revo.Infrastructure.Tests.Events.Async.Generic
 
             sut = new AsyncEventQueueManager(crudRepository, eventSerializer);
         }
-
-        [Fact]
-        public async Task A()
-        {
-            
-        }
     }
 }

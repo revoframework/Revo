@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -82,6 +83,28 @@ namespace Revo.DataAccess.Entities
             Func<T, TKey> keySelector, Func<T, TElement> elementSelector, IEqualityComparer<TKey> comparer, CancellationToken cancellationToken = default(CancellationToken))
         {
             return repository.ToDictionaryAsync(queryable, keySelector, elementSelector, comparer, cancellationToken);
+        }
+
+        public static T GetById<T, TId>(this IQueryable<T> queryable, TId id)
+            where T : IHasId<TId>
+        {
+            var lambda = EntityExpressionUtils.CreateIdPropertyEqualsConstExpression<T, TId>(id);
+
+            T t = queryable.FirstOrDefault(lambda);
+            RepositoryHelpers.ThrowIfGetFailed(t, id);
+
+            return t;
+        }
+
+        public static async Task<T> GetByIdAsync<T, TId>(this IQueryable<T> queryable, IQueryableExtensionsResolver repository,  TId id)
+            where T : IHasId<TId>
+        {
+            var lambda = EntityExpressionUtils.CreateIdPropertyEqualsConstExpression<T, TId>(id);
+
+            T t = await queryable.Where(lambda).FirstOrDefaultAsync(repository);
+            RepositoryHelpers.ThrowIfGetFailed(t, id);
+
+            return t;
         }
     }
 }
