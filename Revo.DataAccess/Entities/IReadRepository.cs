@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Revo.DataAccess.Entities
 {
-    public interface IReadRepository : IDisposable
+    public interface IReadRepository : IQueryableExtensionsResolver, IDisposable
     {
         IEnumerable<IRepositoryFilter> DefaultFilters { get; }
 

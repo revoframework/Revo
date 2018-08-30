@@ -13,7 +13,6 @@ using Revo.Core.Events;
 using Revo.DataAccess.Entities;
 using Revo.Infrastructure.Events;
 using Revo.Infrastructure.EventSourcing;
-using Revo.Infrastructure.EventStore;
 using Revo.Infrastructure.Sagas;
 using NSubstitute;
 using Revo.Core.Transactions;

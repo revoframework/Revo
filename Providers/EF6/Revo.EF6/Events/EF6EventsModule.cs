@@ -2,8 +2,9 @@
 using Revo.Core.Core;
 using Revo.DataAccess.Entities;
 using Revo.EF6.DataAccess.Entities;
-using Revo.EF6.Events.Async;
+using Revo.Infrastructure.Events;
 using Revo.Infrastructure.Events.Async;
+using Revo.Infrastructure.Events.Async.Generic;
 
 namespace Revo.EF6.Events
 {

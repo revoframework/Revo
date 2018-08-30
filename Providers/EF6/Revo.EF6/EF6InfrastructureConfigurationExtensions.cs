@@ -2,7 +2,7 @@
 using Revo.Core.Configuration;
 using Revo.EF6.DataAccess;
 using Revo.EF6.Events;
-using Revo.EF6.EventStore;
+using Revo.EF6.EventStores;
 using Revo.EF6.Projections;
 using Revo.EF6.Sagas;
 using Revo.Infrastructure;
@@ -34,7 +34,7 @@ namespace Revo.EF6
             {
                 if (section.UseEventStore)
                 {
-                    c.LoadModule<EF6EventSourcingModule>();
+                    c.LoadModule<EF6EventStoreModule>();
                 }
             });
 

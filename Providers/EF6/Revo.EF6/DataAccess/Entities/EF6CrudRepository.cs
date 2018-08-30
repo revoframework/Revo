@@ -14,7 +14,7 @@ namespace Revo.EF6.DataAccess.Entities
 {
     public class EF6CrudRepository : IEF6CrudRepository, IFilteringRepository<IEF6CrudRepository>, ITransactionProvider
     {
-        private readonly Dictionary<string, DbContext> dbContexts;
+        private readonly Dictionary<string, DbContext> dbContexts = new Dictionary<string, DbContext>();
         private readonly IDbContextFactory dbContextFactory;
         private readonly IModelMetadataExplorer modelMetadataExplorer;
         private readonly IRepositoryFilter[] repositoryFilters;
@@ -25,8 +25,6 @@ namespace Revo.EF6.DataAccess.Entities
             this.modelMetadataExplorer = modelMetadataExplorer;
             this.dbContextFactory = dbContextFactory;
             this.repositoryFilters = repositoryFilters;
-
-            dbContexts = new Dictionary<string, DbContext>();
         }
 
         protected EF6CrudRepository(IModelMetadataExplorer modelMetadataExplorer,
@@ -68,7 +66,7 @@ namespace Revo.EF6.DataAccess.Entities
         {
             T t = GetDbContext(typeof(T)).Set<T>().Find(id);
             t = FilterResult(t);
-            RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
+            Revo.DataAccess.Entities.RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
             return t;
         }
 
@@ -76,7 +74,7 @@ namespace Revo.EF6.DataAccess.Entities
         {
             T t = GetDbContext(typeof(T)).Set<T>().Find(id);
             t = FilterResult(t);
-            RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
+            Revo.DataAccess.Entities.RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
             return t;
         }
 
@@ -84,7 +82,7 @@ namespace Revo.EF6.DataAccess.Entities
         {
             T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(id);
             t = FilterResult(t);
-            RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
+            Revo.DataAccess.Entities.RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
             return t;
         }
 
@@ -92,7 +90,7 @@ namespace Revo.EF6.DataAccess.Entities
         {
             T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(cancellationToken, id);
             t = FilterResult(t);
-            RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
+            Revo.DataAccess.Entities.RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
             return t;
         }
 
@@ -100,7 +98,7 @@ namespace Revo.EF6.DataAccess.Entities
         {
             T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(id);
             t = FilterResult(t);
-            RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
+            Revo.DataAccess.Entities.RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
             return t;
         }
 
@@ -108,7 +106,7 @@ namespace Revo.EF6.DataAccess.Entities
         {
             T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(cancellationToken, id);
             t = FilterResult(t);
-            RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
+            Revo.DataAccess.Entities.RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
             return t;
         }
 
@@ -196,6 +194,70 @@ namespace Revo.EF6.DataAccess.Entities
 
             return FilterResults(GetDbContext(typeof(T)).Set<T>())
                 .Union(addedEntities);
+        }
+
+        public Task<int> CountAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return queryable.CountAsync(cancellationToken);
+        }
+
+        public IQueryable<T> Include<T, TProperty>(IQueryable<T> queryable, Expression<Func<T, TProperty>> navigationPropertyPath) where T : class
+        {
+            return queryable.Include(navigationPropertyPath);
+        }
+
+        public IQueryable<T> Include<T>(IQueryable<T> queryable, string navigationPropertyPath) where T : class
+        {
+            return queryable.Include(navigationPropertyPath);
+        }
+
+        public Task<long> LongCountAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return queryable.LongCountAsync(cancellationToken);
+        }
+
+        public Task<T> FirstOrDefaultAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return queryable.FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public Task<T> FirstAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return queryable.FirstAsync(cancellationToken);
+        }
+
+        public Task<T[]> ToArrayAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return queryable.ToArrayAsync(cancellationToken);
+        }
+
+        public Task<List<T>> ToListAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return queryable.ToListAsync(cancellationToken);
+        }
+
+        public Task<Dictionary<TKey, T>> ToDictionaryAsync<T, TKey>(IQueryable<T> queryable, Func<T, TKey> keySelector,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return queryable.ToDictionaryAsync(keySelector, cancellationToken);
+        }
+
+        public Task<Dictionary<TKey, T>> ToDictionaryAsync<T, TKey>(IQueryable<T> queryable, Func<T, TKey> keySelector, IEqualityComparer<TKey> comparer,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return queryable.ToDictionaryAsync(keySelector, comparer, cancellationToken);
+        }
+
+        public Task<Dictionary<TKey, TElement>> ToDictionaryAsync<T, TKey, TElement>(IQueryable<T> queryable, Func<T, TKey> keySelector, Func<T, TElement> elementSelector,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return queryable.ToDictionaryAsync(keySelector, elementSelector, cancellationToken);
+        }
+
+        public Task<Dictionary<TKey, TElement>> ToDictionaryAsync<T, TKey, TElement>(IQueryable<T> queryable, Func<T, TKey> keySelector, Func<T, TElement> elementSelector,
+            IEqualityComparer<TKey> comparer, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return queryable.ToDictionaryAsync(keySelector, elementSelector, comparer, cancellationToken);
         }
 
         public void Remove<T>(T entity) where T : class

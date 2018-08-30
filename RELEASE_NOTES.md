@@ -13,7 +13,8 @@
 - **EF6/EntityEventProjector** for more arbitrary projections
 
 ### Changed
-- framework configuration - framework and its module parameters now need to be programmatically configured and set-up using the newly introduced **RevoConfiguration** 
+- flattened and **simplified project structure** (now provider-centric) - e.g. it is now enough to link Revo.EF6 instead of former Revo.DataAccess.EF6 packages and Revo.Infrastructure.EF6
+- framework configuration - framework and its module parameters now need to be programmatically configured and set-up using the newly introduced **RevoConfiguration**
 - **PermissionAuthorizer** renamed to PermissionAuthorizationMatcher
 - **Default ASP.NET Web API JSON ContractResolver** switched to DefaultContractResolver with CamelCaseNamingStrategy from CamelCasePropertyNamesContractResolver
 (matches default ASP.NET Core behavior and does not change dictionary key character cases)

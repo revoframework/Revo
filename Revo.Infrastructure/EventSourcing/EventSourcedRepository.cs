@@ -9,7 +9,7 @@ using Revo.Domain.Entities;
 using Revo.Domain.Entities.EventSourcing;
 using Revo.Domain.Events;
 using Revo.Infrastructure.Events;
-using Revo.Infrastructure.EventStore;
+using Revo.Infrastructure.EventStores;
 using Revo.Infrastructure.Repositories;
 
 namespace Revo.Infrastructure.EventSourcing

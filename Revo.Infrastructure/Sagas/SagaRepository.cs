@@ -12,7 +12,6 @@ using Revo.Domain.Entities;
 using Revo.Domain.Sagas;
 using Revo.Infrastructure.Events;
 using Revo.Infrastructure.EventSourcing;
-using Revo.Infrastructure.EventStore;
 using Revo.Infrastructure.Repositories;
 
 namespace Revo.Infrastructure.Sagas

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Revo.Core.Core;
 using Revo.Core.Events;
-using Revo.Infrastructure.EventStore;
+using Revo.Infrastructure.EventStores;
 
 namespace Revo.Testing.Infrastructure
 {

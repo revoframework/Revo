@@ -2,6 +2,7 @@
 using Revo.Core.Core;
 using Revo.EF6.DataAccess.Entities;
 using Revo.Infrastructure.Sagas;
+using Revo.Infrastructure.Sagas.Generic;
 
 namespace Revo.EF6.Sagas
 {
@@ -11,12 +12,12 @@ namespace Revo.EF6.Sagas
         public override void Load()
         {
             Bind<ISagaMetadataRepository>()
-                .To<EF6SagaMetadataRepository>()
+                .To<SagaMetadataRepository>()
                 .InRequestOrJobScope();
 
             Bind<IEF6CrudRepository>()
                 .To<EF6CrudRepository>()
-                .WhenInjectedInto<EF6SagaMetadataRepository>()
+                .WhenInjectedInto<SagaMetadataRepository>()
                 .InTransientScope();
         }
     }

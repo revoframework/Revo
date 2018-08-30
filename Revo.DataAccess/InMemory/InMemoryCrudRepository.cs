@@ -220,6 +220,70 @@ namespace Revo.DataAccess.InMemory
             }
         }
 
+        public Task<int> CountAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return Task.FromResult(queryable.Count());
+        }
+
+        public IQueryable<T> Include<T, TProperty>(IQueryable<T> queryable, Expression<Func<T, TProperty>> navigationPropertyPath) where T : class
+        {
+            return queryable;
+        }
+
+        public IQueryable<T> Include<T>(IQueryable<T> queryable, string navigationPropertyPath) where T : class
+        {
+            return queryable;
+        }
+
+        public Task<long> LongCountAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return Task.FromResult(queryable.LongCount());
+        }
+
+        public Task<T> FirstOrDefaultAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return Task.FromResult(queryable.FirstOrDefault());
+        }
+
+        public Task<T> FirstAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return Task.FromResult(queryable.First());
+        }
+
+        public Task<T[]> ToArrayAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return Task.FromResult(queryable.ToArray());
+        }
+
+        public Task<List<T>> ToListAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return Task.FromResult(queryable.ToList());
+        }
+
+        public Task<Dictionary<TKey, T>> ToDictionaryAsync<T, TKey>(IQueryable<T> queryable, Func<T, TKey> keySelector,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return Task.FromResult(queryable.ToDictionary(keySelector));
+        }
+
+        public Task<Dictionary<TKey, T>> ToDictionaryAsync<T, TKey>(IQueryable<T> queryable, Func<T, TKey> keySelector, IEqualityComparer<TKey> comparer,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return Task.FromResult(queryable.ToDictionary(keySelector, comparer));
+        }
+
+        public Task<Dictionary<TKey, TElement>> ToDictionaryAsync<T, TKey, TElement>(IQueryable<T> queryable, Func<T, TKey> keySelector, Func<T, TElement> elementSelector,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return Task.FromResult(queryable.ToDictionary(keySelector, elementSelector));
+        }
+
+        public Task<Dictionary<TKey, TElement>> ToDictionaryAsync<T, TKey, TElement>(IQueryable<T> queryable, Func<T, TKey> keySelector, Func<T, TElement> elementSelector,
+            IEqualityComparer<TKey> comparer, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return Task.FromResult(queryable.ToDictionary(keySelector, elementSelector, comparer));
+        }
+
         public void Remove<T>(T entity) where T : class
         {
             EntityEntry entry = EntityEntries.FirstOrDefault(x => x.Instance == entity);
