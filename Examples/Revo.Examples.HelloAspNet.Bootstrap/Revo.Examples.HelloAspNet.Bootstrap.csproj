@@ -279,45 +279,41 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\DataAccess\Revo.DataAccess.EF6\Revo.DataAccess.EF6.csproj">
-      <Project>{a8de2f53-e404-48dd-b11f-b6a3302ce163}</Project>
-      <Name>Revo.DataAccess.EF6</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\DataAccess\Revo.DataAccess\Revo.DataAccess.csproj">
-      <Project>{fa942fe7-71fd-4cf5-8959-309583fe7903}</Project>
-      <Name>Revo.DataAccess</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Infrastructure\Revo.Infrastructure.EF6\Revo.Infrastructure.EF6.csproj">
-      <Project>{49959901-1dd0-41fd-8352-7f9c6bb811a7}</Project>
-      <Name>Revo.Infrastructure.EF6</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Infrastructure\Revo.Infrastructure.Hangfire\Revo.Infrastructure.Hangfire.csproj">
-      <Project>{cba7e02b-d221-489d-91ff-4d5f73eae4dc}</Project>
-      <Name>Revo.Infrastructure.Hangfire</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Infrastructure\Revo.Infrastructure\Revo.Infrastructure.csproj">
-      <Project>{6f893b4e-8119-41f8-b1c9-28eea56946a9}</Project>
-      <Name>Revo.Infrastructure</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Platforms\AspNet\Revo.Platforms.AspNet\Revo.Platforms.AspNet.csproj">
-      <Project>{42cdfad0-cb40-433e-ac6e-874f3f58e77d}</Project>
-      <Name>Revo.Platforms.AspNet</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Revo.Core\Revo.Core.csproj">
-      <Project>{1015ba79-4241-4221-9d27-0db033ea624b}</Project>
-      <Name>Revo.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Revo.Domain\Revo.Domain.csproj">
-      <Project>{558603ae-becf-4f72-86b4-ad832d2453ab}</Project>
-      <Name>Revo.Domain</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
     <Content Include="Views\Home\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Providers\AspNet\Revo.AspNet\Revo.AspNet.csproj">
+      <Project>{3eadb9ab-2267-4d93-8762-9dff912cd595}</Project>
+      <Name>Revo.AspNet</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Providers\EF6\Revo.EF6\Revo.EF6.csproj">
+      <Project>{cc8e6384-aa97-4b18-8d14-58315483d48d}</Project>
+      <Name>Revo.EF6</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Providers\Hangfire\Revo.Hangfire\Revo.Hangfire.csproj">
+      <Project>{e306ec37-07a5-4158-8429-cadb3789ae2e}</Project>
+      <Name>Revo.Hangfire</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Revo.Core\Revo.Core.csproj">
+      <Project>{1015ba79-4241-4221-9d27-0db033ea624b}</Project>
+      <Name>Revo.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Revo.DataAccess\Revo.DataAccess.csproj">
+      <Project>{7e57e300-dced-4573-8899-a2884123969b}</Project>
+      <Name>Revo.DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Revo.Domain\Revo.Domain.csproj">
+      <Project>{558603ae-becf-4f72-86b4-ad832d2453ab}</Project>
+      <Name>Revo.Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Revo.Infrastructure\Revo.Infrastructure.csproj">
+      <Project>{30742fe3-df4d-4364-ac70-7046303a70ee}</Project>
+      <Name>Revo.Infrastructure</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

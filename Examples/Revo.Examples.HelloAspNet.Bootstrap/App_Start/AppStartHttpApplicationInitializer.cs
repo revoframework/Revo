@@ -2,7 +2,7 @@
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
-using Revo.Platforms.AspNet.Core.Lifecycle;
+using Revo.AspNet.Core.Lifecycle;
 
 namespace Revo.Examples.HelloAspNet.Bootstrap
 {

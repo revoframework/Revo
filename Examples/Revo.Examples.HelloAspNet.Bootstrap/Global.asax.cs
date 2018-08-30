@@ -1,9 +1,11 @@
-﻿using Revo.Core.Configuration;
-using Revo.DataAccess.EF6;
+﻿using Revo.AspNet;
+using Revo.AspNet.Core;
+using Revo.Core.Configuration;
+using Revo.EF6;
+using Revo.EF6.DataAccess;
+using Revo.Hangfire;
 using Revo.Infrastructure.EF6;
-using Revo.Infrastructure.Hangfire;
-using Revo.Platforms.AspNet;
-using Revo.Platforms.AspNet.Core;
+using Revo.Infrastructure.EF6.DataAcccess;
 
 namespace Revo.Examples.HelloAspNet.Bootstrap
 {

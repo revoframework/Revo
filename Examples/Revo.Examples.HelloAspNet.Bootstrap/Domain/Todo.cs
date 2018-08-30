@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using Revo.Domain.Entities.Attributes;
 using Revo.Domain.Entities.EventSourcing;
 using Revo.Examples.HelloAspNet.Bootstrap.Domain.Events;

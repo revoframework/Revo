@@ -114,7 +114,7 @@ Task("Test")
   .IsDependentOn("Build")
   .Does(() =>
   {
-    var projectFiles = GetFiles("./Tests/**/*.csproj");
+    var projectFiles = GetFiles("./**/Revo.*.Tests.csproj");
     foreach (var projectFile in projectFiles)
     {
       var arguments = new ProcessArgumentBuilder()
@@ -144,9 +144,9 @@ Task("Pack")
   {
     foreach (var projectFile in GetFiles("./**/Revo.*.csproj")) // without the "Revo.*" prefix, it also matches stuff from ./tools
     {
-      if (projectFile.FullPath.Contains("Revo.Tests.")
-      || projectFile.FullPath.Contains("Revo.Tests.")
-        || projectFile.FullPath.Contains("Revo.Examples."))
+      if (!projectFile.GetFilename().FullPath.StartsWith("Revo.")
+	    || projectFile.GetFilename().FullPath.EndsWith(".Tests.csproj")
+        || projectFile.GetFilename().FullPath.StartsWith("Revo.Examples."))
       {
         continue;
       }

@@ -10,16 +10,13 @@ Configurable user notifications extension package.</Description>
   </PropertyGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\..\DataAccess\Revo.DataAccess\Revo.DataAccess.csproj" />
-    <ProjectReference Include="..\..\Infrastructure\Revo.Infrastructure\Revo.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\Revo.Core\Revo.Core.csproj" />
-    <ProjectReference Include="..\..\Revo.Domain\Revo.Domain.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup>
     <PackageReference Include="EntityFramework" Version="6.2.0" />
     <PackageReference Include="Hangfire.Core" Version="1.6.20" />
     <PackageReference Include="PushSharp.Core" Version="1.0.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\Revo.Infrastructure\Revo.Infrastructure.csproj" />
   </ItemGroup>
   
 </Project>

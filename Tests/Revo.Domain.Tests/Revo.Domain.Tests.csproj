@@ -7,13 +7,6 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\..\DataAccess\Revo.DataAccess\Revo.DataAccess.csproj" />
-    <ProjectReference Include="..\..\Revo.Core\Revo.Core.csproj" />
-    <ProjectReference Include="..\..\Revo.Domain\Revo.Domain.csproj" />
-    <ProjectReference Include="..\..\Revo.Testing\Revo.Testing.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup>
     <PackageReference Include="Castle.Core" Version="4.2.1" />
     <PackageReference Include="FluentAssertions" Version="5.3.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.0" />
@@ -27,6 +20,11 @@
     <PackageReference Include="xunit.extensibility.execution" Version="2.3.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\Revo.Domain\Revo.Domain.csproj" />
+    <ProjectReference Include="..\..\Revo.Testing\Revo.Testing.csproj" />
   </ItemGroup>
   
 </Project>

@@ -1,7 +1,7 @@
 ﻿using System.Net.Http;
 using System.Text;
 using System.Web.Http;
-using Revo.Platforms.AspNet.IO.Stache;
+using Revo.AspNet.IO.Stache;
 
 namespace Revo.Extensions.AspNet.Interop.Globalization
 {

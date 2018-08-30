@@ -10,18 +10,15 @@ Infrastructure for testing framework apps.</Description>
   </PropertyGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\Revo.Core\Revo.Core.csproj" />
-    <ProjectReference Include="..\DataAccess\Revo.DataAccess\Revo.DataAccess.csproj" />
-    <ProjectReference Include="..\Revo.Domain\Revo.Domain.csproj" />
-    <ProjectReference Include="..\Infrastructure\Revo.Infrastructure\Revo.Infrastructure.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="5.3.0" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="NLog" Version="4.5.3" />
     <PackageReference Include="NSubstitute" Version="3.1.0" />
     <PackageReference Include="xunit.assert" Version="2.3.1" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Revo.Infrastructure\Revo.Infrastructure.csproj" />
   </ItemGroup>
   
 </Project>

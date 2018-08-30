@@ -1,5 +1,4 @@
-﻿using System.Web.Http.Description;
-using Ninject.Modules;
+﻿using Ninject.Modules;
 using Revo.Core.Core;
 using Revo.Core.Events;
 using Revo.Infrastructure.Globalization;

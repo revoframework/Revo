@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Revo.Domain.Entities.Basic.Dto
+namespace Revo.Domain.Dto
 {
     public abstract class ClassEntityDto : EntityDto
     {

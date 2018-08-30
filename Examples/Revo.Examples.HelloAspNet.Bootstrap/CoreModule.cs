@@ -1,15 +1,11 @@
 ﻿using Hangfire;
 using Hangfire.MemoryStorage;
 using Ninject.Modules;
+using Revo.AspNet.Core.Lifecycle;
 using Revo.Core.Core;
-using Revo.Core.Lifecycle;
-using Revo.Core.Security;
-using Revo.Domain.Entities;
+using Revo.EF6.Projections;
 using Revo.Examples.HelloAspNet.Bootstrap.Domain;
 using Revo.Examples.HelloAspNet.Bootstrap.ReadSide.Projections;
-using Revo.Infrastructure.EF6.Projections;
-using Revo.Platforms.AspNet.Core.Lifecycle;
-using Revo.Platforms.AspNet.Security.Identity;
 
 namespace Revo.Examples.HelloAspNet.Bootstrap
 {
