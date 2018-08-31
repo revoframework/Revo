@@ -1,6 +1,6 @@
 # RELEASE NOTES
 
-## [1.3.0] - unreleased (_develop_)
+## [1.3.0] - 2018-08-31
 ### Fixed
 - **EF6SagaMetadataRepository** bug not including the keys in a query
 - **EF6 saga keys** not being reloaded correctly due to JSON serialization changing dictionary key character cases
