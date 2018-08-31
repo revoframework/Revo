@@ -1,5 +1,7 @@
 # RELEASE NOTES
 
+## [1.4.0] - unreleased (_develop_)
+
 ## [1.3.0] - 2018-08-31
 ### Fixed
 - **EF6SagaMetadataRepository** bug not including the keys in a query
