@@ -73,10 +73,6 @@ namespace Revo.DataAccess.EF6
                 .ToSelf()
                 .InSingletonScope();
 
-            /*Bind<IConvention>()
-                .To<CustomStoreConvention>()
-                .InTransientScope();*/
-
             Bind<IDbContextFactory, IApplicationStartListener>()
                 .To<DbContextFactory>()
                 .InSingletonScope();

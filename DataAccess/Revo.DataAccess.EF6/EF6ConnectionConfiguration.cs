@@ -8,11 +8,11 @@ namespace Revo.DataAccess.EF6
 {
     public class EF6ConnectionConfiguration
     {
-        public EF6ConnectionConfiguration(string connectionName)
+        public EF6ConnectionConfiguration(string nameOrConnectionString)
         {
-            ConnectionName = connectionName;
+            NameOrConnectionString = nameOrConnectionString;
         }
 
-        public string ConnectionName { get; }
+        public string NameOrConnectionString { get; }
     }
 }

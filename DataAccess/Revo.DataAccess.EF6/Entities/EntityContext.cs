@@ -5,9 +5,9 @@ namespace Revo.DataAccess.EF6.Entities
 {
     public class EntityContext : DbContext
     {
-        public EntityContext(/*string nameOrConnectionString,*/
+        public EntityContext(string nameOrConnectionString,
             DbCompiledModel compiledModel)
-            : base("EFConnectionString", compiledModel /*nameOrConnectionString*/)
+            : base(nameOrConnectionString, compiledModel)
         {
         }
 
