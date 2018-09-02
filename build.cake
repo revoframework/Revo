@@ -128,6 +128,11 @@ Task("Test")
         arguments = arguments.Append("-framework netcoreapp2.0");
         arguments = arguments.Append("-fxversion 2.0.7");
       }
+	  else if (parsedProject.TargetFrameworkVersions.Contains("netcoreapp2.1"))
+      {
+        arguments = arguments.Append("-framework netcoreapp2.1");
+        arguments = arguments.Append("-fxversion 2.1.3");
+      }
 
       var dotnetTestSettings = new DotNetCoreToolSettings
       {
