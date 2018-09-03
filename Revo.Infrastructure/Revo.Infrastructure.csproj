@@ -10,7 +10,7 @@ Framework infrastruture package - event stores, projections, jobs, etc.</Descrip
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="6.2.2" />
+    <PackageReference Include="AutoMapper" Version="7.0.1" />
     <PackageReference Include="Castle.Core" Version="4.2.1" />
     <PackageReference Include="LINQKit.Core" Version="1.1.15" />
     <PackageReference Include="morelinq" Version="2.10.0" />

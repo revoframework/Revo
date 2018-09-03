@@ -2,7 +2,7 @@
 using Ninject.Planning.Bindings.Resolvers;
 using Revo.Core.Commands;
 
-namespace Revo.AspNet.Core
+namespace Revo.Core.Core
 {
     public class CommandBusModule : NinjectModule
     {

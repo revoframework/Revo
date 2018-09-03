@@ -10,7 +10,7 @@ using Revo.Core.Collections;
 using Revo.Core.Lifecycle;
 using Revo.EF6.DataAccess.Entities;
 
-namespace Revo.Infrastructure.EF6.DataAcccess.Model
+namespace Revo.EF6.DataAccess.Model
 {
     public class ModelMetadataExplorer : IModelMetadataExplorer, IApplicationStartListener
     {

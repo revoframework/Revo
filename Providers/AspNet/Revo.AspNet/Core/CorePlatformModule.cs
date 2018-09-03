@@ -48,10 +48,6 @@ namespace Revo.AspNet.Core
                 .To<AspNetResourceManager>()
                 .InSingletonScope();
             
-            Bind<IApplicationConfigurer>()
-                .To<AutoMapperInitializer>()
-                .InSingletonScope();
-
             Bind<IConfiguration>()
                 .ToMethod(ctx => LocalConfiguration.Current)
                 .InTransientScope();
@@ -60,10 +56,6 @@ namespace Revo.AspNet.Core
                 .To<UserActorContext>()
                 .InRequestOrJobScope();
             
-            Bind<AutoMapperDefinitionDiscovery>()
-                .ToSelf()
-                .InSingletonScope();
-
             Bind<IServiceLocator>()
                 .To<NinjectServiceLocator>()
                 .InSingletonScope();

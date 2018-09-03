@@ -4,7 +4,7 @@ using Revo.EFCore.DataAccess.Entities;
 using Revo.Infrastructure.Sagas;
 using Revo.Infrastructure.Sagas.Generic;
 
-namespace Revo.Infrastructure.EFCore.Sagas
+namespace Revo.EFCore.Sagas
 {
     [AutoLoadModule(false)]
     public class EFCoreSagasModule : NinjectModule

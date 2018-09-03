@@ -10,8 +10,7 @@ ASP.NET platform integration package (user context, authentication using Identit
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="6.2.2" />
-    <PackageReference Include="AutoMapper.EF6" Version="1.0.0" />
+    <PackageReference Include="AutoMapper" Version="7.0.1" />
     <PackageReference Include="Castle.Core" Version="4.2.1" />
     <PackageReference Include="CryptSharpOfficial" Version="2.1.0.0" />
     <PackageReference Include="EntityFramework" Version="6.2.0" />

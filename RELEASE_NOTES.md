@@ -2,6 +2,21 @@
 
 ## [1.4.0] - unreleased (_develop_)
 
+### Added
+- [#1](https://github.com/revoframework/Revo/issues/1) **ASP.NET Core support** - platform implementation, i.e. user context, security, DI, OData, etc.
+- [#2](https://github.com/revoframework/Revo/issues/2), [#3](https://github.com/revoframework/Revo/issues/3) **EF Core support** - data access & infrastructure (async events, sagas, projections...)
+
+### Changed
+- **flattened and simplified package structure** (now provider-centric) - vendor-specific modules were moved
+to Providers directory and some of them merged/renamed:  
+  - _Revo.Platforms.AspNet → Revo.AspNet_
+  - _Revo.DataAccess.EF6 and Revo.Infrastructure.EF6 → Revo.EF6_  
+  - _Revo.DataAccess.RavenDB → Revo.RavenDB_  
+  - _Revo.Integrations.Rebus → Revo.Rebus_
+
+### Removed
+- **IAutoMapperDefinition** - removed as obsolete and replaced with AutoMapper's own profiles (auto-discovered again)
+
 ## [1.3.0] - 2018-08-31
 ### Fixed
 - **EF6SagaMetadataRepository** bug not including the keys in a query
@@ -13,7 +28,6 @@
 - **EF6/EntityEventProjector** for more arbitrary projections
 
 ### Changed
-- flattened and **simplified project structure** (now provider-centric) - e.g. it is now enough to link Revo.EF6 instead of former Revo.DataAccess.EF6 packages and Revo.Infrastructure.EF6
 - framework configuration - framework and its module parameters now need to be programmatically configured and set-up using the newly introduced **RevoConfiguration**
 - **PermissionAuthorizer** renamed to PermissionAuthorizationMatcher
 - **Default ASP.NET Web API JSON ContractResolver** switched to DefaultContractResolver with CamelCaseNamingStrategy from CamelCasePropertyNamesContractResolver

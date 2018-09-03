@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Data.Entity.ModelConfiguration.Configuration;
 
-namespace Revo.Infrastructure.EF6.DataAcccess.Model
+namespace Revo.EF6.DataAccess.Model
 {
     public static class PrimitivePropertyConfigurationExtensions
     {

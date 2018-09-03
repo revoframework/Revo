@@ -7,7 +7,7 @@ using Ninject.Infrastructure;
 using Ninject.Planning.Bindings;
 using Ninject.Planning.Bindings.Resolvers;
 
-namespace Revo.AspNet.Core
+namespace Revo.Core.Core
 {
     public class ContravariantBindingResolver : NinjectComponent, IBindingResolver
     {

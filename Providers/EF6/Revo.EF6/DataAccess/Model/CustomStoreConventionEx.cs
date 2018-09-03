@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Revo.Domain.ReadModel;
-using Revo.Infrastructure.EF6.DataAcccess.Model;
 
 namespace Revo.EF6.DataAccess.Model
 {

@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Revo.Core.Transactions;
 using Revo.DataAccess.Entities;
-using Revo.Infrastructure.EF6.DataAcccess.Model;
+using Revo.EF6.DataAccess.Model;
 using EntityState = System.Data.Entity.EntityState;
 
 namespace Revo.EF6.DataAccess.Entities

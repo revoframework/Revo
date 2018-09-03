@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Revo.Infrastructure.EF6.DataAcccess.Model
+namespace Revo.EF6.DataAccess.Model
 {
     public interface IModelMetadataExplorer
     {

@@ -7,7 +7,7 @@ using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Linq;
 using Revo.Core.Collections;
 using Revo.Core.Lifecycle;
-using Revo.Infrastructure.EF6.DataAcccess.Model;
+using Revo.EF6.DataAccess.Model;
 
 namespace Revo.EF6.DataAccess.Entities
 {

@@ -37,7 +37,7 @@ namespace Revo.Extensions.History.Tests.ChangeTracking
             trackedChangeRecordConverter = Substitute.For<ITrackedChangeRecordConverter>();
 
             Mapper.Reset(); // TODO will break if other parallel tests call this too
-            Mapper.Initialize(x => new HistoryAutoMapperDefinition(trackedChangeRecordConverter).Configure(x));
+            Mapper.Initialize(cfg => cfg.AddProfile(new HistoryAutoMapperProfile(trackedChangeRecordConverter)));
 
             sut = new ChangeTracker(crudRepository, actorContext, trackedChangeRecordConverter, eventBus);
         }

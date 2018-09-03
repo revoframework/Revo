@@ -5,6 +5,7 @@ using Ninject.Extensions.ContextPreservation;
 using Ninject.Modules;
 using Revo.Core.Commands;
 using Revo.Core.Events;
+using Revo.Core.IO;
 using Revo.Core.Lifecycle;
 using Revo.Core.Security;
 using Revo.Core.Transactions;
@@ -79,6 +80,14 @@ namespace Revo.Core.Core
             Bind<IUserPermissionAuthorizer>()
                 .To<UserPermissionAuthorizer>()
                 .InRequestOrJobScope();
+
+            Bind<IAutoMapperProfileDiscovery>()
+                .To<AutoMapperProfileDiscovery>()
+                .InSingletonScope();
+
+            Bind<IApplicationConfigurer>()
+                .To<AutoMapperInitializer>()
+                .InSingletonScope();
         }
     }
 }

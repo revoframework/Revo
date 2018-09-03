@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Revo.Infrastructure.EF6.DataAcccess.Model
+namespace Revo.EF6.DataAccess.Model
 {
     public class InheritedColumnNameAnnotation
     {
