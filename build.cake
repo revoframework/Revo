@@ -11,6 +11,12 @@ using System.Xml;
 
 string Target = Argument<string>("Target", "Default");
 
+bool IsCleanEnabled = Argument<bool>("DoClean", true);
+bool IsRestoreEnabled = Argument<bool>("DoRestore", true);
+bool IsBuildEnabled = Argument<bool>("DoBuild", true);
+bool IsTestEnabled = Argument<bool>("DoTest", true);
+bool IsPackEnabled = Argument<bool>("DoPack", true);
+
 string Configuration = HasArgument("Configuration") 
     ? Argument<string>("Configuration") 
     : EnvironmentVariable("Configuration") ?? "Release";
@@ -23,28 +29,31 @@ var ReportsDir = System.IO.Path.Combine(SolutionDir, "build", "reports");
 
 bool IsCiBuild = AppVeyor.IsRunningOnAppVeyor;
 
-int BuildNumber =
-    HasArgument("BuildNumber") ? Argument<int>("BuildNumber") :
-    AppVeyor.IsRunningOnAppVeyor ? AppVeyor.Environment.Build.Number :
-    EnvironmentVariable("BuildNumber") != null ? int.Parse(EnvironmentVariable("BuildNumber")) : 0;
+int? BuildNumber =
+    HasArgument("BuildNumber") ? (int?)Argument<int>("BuildNumber") :
+    AppVeyor.IsRunningOnAppVeyor ? (int?)AppVeyor.Environment.Build.Number :
+    EnvironmentVariable("BuildNumber") != null ? (int?)int.Parse(EnvironmentVariable("BuildNumber")) : null;
 
-string VersionSuffix = null;
+string VersionSuffix = HasArgument("VersionSuffix") ? Argument<string>("VersionSuffix") : null;
 
 // load VersionSuffix (if explicitly specified in Common.props)
-var xmlDocument = new XmlDocument();
-xmlDocument.Load(System.IO.Path.Combine(SolutionDir, "Common.props"));
-
-var node = xmlDocument.SelectSingleNode("Project/PropertyGroup/VersionSuffix") as XmlElement;
-if (node != null)
+if (VersionSuffix == null)
 {
+  var xmlDocument = new XmlDocument();
+  xmlDocument.Load(System.IO.Path.Combine(SolutionDir, "Common.props"));
+
+  var node = xmlDocument.SelectSingleNode("Project/PropertyGroup/VersionSuffix") as XmlElement;
+  if (node != null)
+  {
     VersionSuffix = node.InnerText;
+  }
 }
 
 // append the VersionSuffix for non-release CI builds
 string ciTag = AppVeyor.Environment.Repository.Tag.IsTag ? AppVeyor.Environment.Repository.Tag.Name : null;
 string ciBranch = AppVeyor.IsRunningOnAppVeyor ? AppVeyor.Environment.Repository.Branch : null;
 
-if (ciTag == null && !string.IsNullOrWhiteSpace(ciBranch) && ciBranch != "master")
+if (BuildNumber.HasValue && ciTag == null && (string.IsNullOrWhiteSpace(ciBranch) || ciBranch != "master"))
 {
   VersionSuffix = VersionSuffix != null
     ? $"{VersionSuffix}-build{BuildNumber:00000}"
@@ -62,39 +71,47 @@ Task("Default")
 Task("Clean")
   .Does(() =>
   {
-    CleanDirectories(new []{ PackagesDir, ReportsDir });
+    if (IsCleanEnabled)
+    {
+      CleanDirectories(new []{ PackagesDir, ReportsDir });
 
-    var msbuildSettings = new MSBuildSettings
-      {
-        Verbosity = Verbosity.Minimal,
-        ToolVersion = MSBuildToolVersion.VS2017,
-        Configuration = Configuration,
-        PlatformTarget = PlatformTarget.MSIL,
-        ArgumentCustomization = args => args
-      };
+      var msbuildSettings = new MSBuildSettings
+        {
+          Verbosity = Verbosity.Minimal,
+          ToolVersion = MSBuildToolVersion.VS2017,
+          Configuration = Configuration,
+          PlatformTarget = PlatformTarget.MSIL,
+          ArgumentCustomization = args => args
+        };
 
-    msbuildSettings.Targets.Add("Clean");
+      msbuildSettings.Targets.Add("Clean");
 
-    MSBuild(SolutionFile, msbuildSettings);
+      MSBuild(SolutionFile, msbuildSettings);
+    }
   });
 
 Task("Restore")
   .IsDependentOn("Clean")
   .Does(() =>
   {
-    NuGetRestore(
+    if (IsRestoreEnabled)
+    {
+      NuGetRestore(
       SolutionFile,
       new NuGetRestoreSettings ()
       {
         Verbosity = NuGetVerbosity.Normal
       });
+    }
   });
 
 Task("Build")
   .IsDependentOn("Restore")
   .Does(() =>
   {
-    MSBuild(SolutionFile,
+    if (IsBuildEnabled)
+    {
+      MSBuild(SolutionFile,
       new MSBuildSettings
       {
         Verbosity = Verbosity.Minimal,
@@ -104,42 +121,46 @@ Task("Build")
         ArgumentCustomization = args => args
           .Append($"/p:VersionSuffix={VersionSuffix}")
           .Append("/p:ci=true")
-          .AppendSwitch("/p:DebugType", "=", "portable")
+          .AppendSwitch("/p:DebugType", "=", Configuration == "Release" ? "portable" : "full")
           .AppendSwitch("/p:ContinuousIntegrationBuild", "=", IsCiBuild ? "true" : "false")
           .AppendSwitch("/p:DeterministicSourcePaths", "=", "false") // Temporary workaround for https://github.com/dotnet/sourcelink/issues/91
       });
+    }
   });
 
 Task("Test")
   .IsDependentOn("Build")
   .Does(() =>
   {
-    var projectFiles = GetFiles("./**/Revo.*.Tests.csproj");
-    foreach (var projectFile in projectFiles)
+    if (IsTestEnabled)
     {
-      var arguments = new ProcessArgumentBuilder()
-        .Append("-configuration " + Configuration)
-        .Append("-nobuild")
-        .Append($"-xml {GetXunitXmlReportFilePath(projectFile)}");
-
-      var parsedProject = ParseProject(projectFile.FullPath, configuration: "Debug");
-      if (parsedProject.TargetFrameworkVersions.Contains("netcoreapp2.0"))
+      var projectFiles = GetFiles("./**/Revo.*.Tests.csproj");
+      foreach (var projectFile in projectFiles)
       {
-        arguments = arguments.Append("-framework netcoreapp2.0");
-        arguments = arguments.Append("-fxversion 2.0.7");
+        var arguments = new ProcessArgumentBuilder()
+          .Append("-configuration " + Configuration)
+          .Append("-nobuild")
+          .Append($"-xml {GetXunitXmlReportFilePath(projectFile)}");
+
+        var parsedProject = ParseProject(projectFile.FullPath, configuration: "Debug");
+        if (parsedProject.TargetFrameworkVersions.Contains("netcoreapp2.0"))
+        {
+          arguments = arguments.Append("-framework netcoreapp2.0");
+          arguments = arguments.Append("-fxversion 2.0.7");
+        }
+      else if (parsedProject.TargetFrameworkVersions.Contains("netcoreapp2.1"))
+        {
+          arguments = arguments.Append("-framework netcoreapp2.1");
+          arguments = arguments.Append("-fxversion 2.1.3");
+        }
+
+        var dotnetTestSettings = new DotNetCoreToolSettings
+        {
+          WorkingDirectory = projectFile.GetDirectory().FullPath
+        };
+
+        DotNetCoreTool(projectFile.FullPath, "xunit", arguments, dotnetTestSettings);
       }
-	  else if (parsedProject.TargetFrameworkVersions.Contains("netcoreapp2.1"))
-      {
-        arguments = arguments.Append("-framework netcoreapp2.1");
-        arguments = arguments.Append("-fxversion 2.1.3");
-      }
-
-      var dotnetTestSettings = new DotNetCoreToolSettings
-      {
-        WorkingDirectory = projectFile.GetDirectory().FullPath
-      };
-
-      DotNetCoreTool(projectFile.FullPath, "xunit", arguments, dotnetTestSettings);
     }
   });
 
@@ -147,27 +168,30 @@ Task("Pack")
   .IsDependentOn("Test")
   .Does(() =>
   {
-    foreach (var projectFile in GetFiles("./**/Revo.*.csproj")) // without the "Revo.*" prefix, it also matches stuff from ./tools
+    if (IsPackEnabled)
     {
-      if (!projectFile.GetFilename().FullPath.StartsWith("Revo.")
-	    || projectFile.GetFilename().FullPath.EndsWith(".Tests.csproj")
-        || projectFile.GetFilename().FullPath.StartsWith("Revo.Examples."))
+      foreach (var projectFile in GetFiles("./**/Revo.*.csproj")) // without the "Revo.*" prefix, it also matches stuff from ./tools
       {
-        continue;
-      }
-
-      DotNetCorePack(
-        projectFile.FullPath,
-        new DotNetCorePackSettings
+        if (!projectFile.GetFilename().FullPath.StartsWith("Revo.")
+        || projectFile.GetFilename().FullPath.EndsWith(".Tests.csproj")
+        || projectFile.GetFilename().FullPath.StartsWith("Revo.Examples."))
         {
-          Configuration = Configuration,
-          OutputDirectory = PackagesDir,
-          NoBuild = true,
-          NoRestore = true,
-          IncludeSymbols = true,
-          Verbosity = DotNetCoreVerbosity.Minimal,
-          VersionSuffix = VersionSuffix
-        });
+        continue;
+        }
+
+        DotNetCorePack(
+          projectFile.FullPath,
+          new DotNetCorePackSettings
+          {
+            Configuration = Configuration,
+            OutputDirectory = PackagesDir,
+            NoBuild = true,
+            NoRestore = true,
+            IncludeSymbols = true,
+            Verbosity = DotNetCoreVerbosity.Minimal,
+            VersionSuffix = VersionSuffix
+          });
+      }
     }
   });
 

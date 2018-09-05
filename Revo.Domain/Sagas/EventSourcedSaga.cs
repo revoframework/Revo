@@ -15,7 +15,7 @@ namespace Revo.Domain.Sagas
     /// <para>Saga that uses event sourcing to define its state.</para>
     /// <seealso cref="EventSourcedAggregateRoot"/>
     /// </summary>
-    public class EventSourcedSaga : EventSourcedAggregateRoot, IConventionBasedSaga
+    public abstract class EventSourcedSaga : EventSourcedAggregateRoot, IConventionBasedSaga
     {
         private readonly List<ICommandBase> uncommitedCommands = new List<ICommandBase>();
         private readonly MultiValueDictionary<string, string> keys = new MultiValueDictionary<string, string>();

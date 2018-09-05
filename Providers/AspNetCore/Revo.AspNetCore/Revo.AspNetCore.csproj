@@ -12,6 +12,7 @@ Entity Framework (EF) Core data-access layer implementation.</Description>
   <ItemGroup>
     <PackageReference Include="Hangfire" Version="1.6.20" />
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.OData" Version="7.0.1" />
     <PackageReference Include="Ninject.Extensions.ContextPreservation" Version="3.3.1" />
     <PackageReference Include="NLog" Version="4.5.3" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.5.3" />

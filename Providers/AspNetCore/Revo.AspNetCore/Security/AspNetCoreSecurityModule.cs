@@ -5,7 +5,7 @@ using Revo.Core.Security;
 namespace Revo.AspNetCore.Security
 {
     [AutoLoadModule(false)]
-    public class SecurityModule : NinjectModule
+    public class AspNetCoreSecurityModule : NinjectModule
     {
         public override void Load()
         {

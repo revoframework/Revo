@@ -65,7 +65,7 @@ namespace Revo.AspNet.Core
         {
             System.Web.Http.GlobalConfiguration.Configure(httpConfiguration =>
             {
-                WebApiConfig.Register(httpConfiguration);
+                WebApiConfig.Register(httpConfiguration, revoConfiguration);
 
                 foreach (IHttpApplicationInitializer appInitializer in ResolveAll<IHttpApplicationInitializer>())
                 {

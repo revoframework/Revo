@@ -15,7 +15,7 @@ namespace Revo.Domain.Sagas
     /// <para>Saga whose state is typically persisted using just its visible state data.</para>
     /// <seealso cref="BasicAggregateRoot"/>
     /// </summary>
-    public class BasicSaga : BasicAggregateRoot, IConventionBasedSaga
+    public abstract class BasicSaga : BasicAggregateRoot, IConventionBasedSaga
     {
         private readonly List<ICommandBase> uncommitedCommands = new List<ICommandBase>();
         private readonly MultiValueDictionary<string, string> keys = new MultiValueDictionary<string, string>();

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Revo.Domain.Entities.Basic;
 using Revo.Domain.Events;
 
 namespace Revo.Domain.Entities
@@ -10,14 +11,11 @@ namespace Revo.Domain.Entities
     /// Implements a basic aggregate-event-routing and convention-based discovery of Apply methods
     /// that can act upon the events published inside the aggregate.
     /// </summary>
-    public abstract class AggregateRoot : IAggregateRoot
+    public abstract class AggregateRoot : Entity, IAggregateRoot
     {
-        private bool isDeleted;
-
-        public AggregateRoot(Guid id) : this()
+        public AggregateRoot(Guid id) : base(id)
         {
-            Id = id;
-            Version = 0;
+            EventRouter = new AggregateEventRouter(this);
         }
 
         /// <summary>
@@ -28,9 +26,8 @@ namespace Revo.Domain.Entities
             EventRouter = new AggregateEventRouter(this);
         }
 
-        public bool IsDeleted => isDeleted;
-        public virtual Guid Id { get; private set; }
-        public virtual int Version { get; protected set; }
+        public bool IsDeleted { get; private set; }
+        public virtual int Version { get; protected set; } = 0;
 
         public virtual bool IsChanged => UncommittedEvents.Any();
         public virtual IReadOnlyCollection<DomainAggregateEvent> UncommittedEvents => EventRouter.UncommitedEvents;
@@ -70,7 +67,7 @@ namespace Revo.Domain.Entities
 
         protected void MarkDeleted()
         {
-            isDeleted = true;
+            IsDeleted = true;
         }
     }
 }

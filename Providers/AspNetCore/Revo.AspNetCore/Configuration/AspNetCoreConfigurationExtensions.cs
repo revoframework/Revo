@@ -21,8 +21,8 @@ namespace Revo.AspNetCore.Configuration
                 if (section.IsActive)
                 {
                     var hangfireConfigurationSection = configuration.GetSection<HangfireConfigurationSection>();
-                    c.LoadModule(new AspNetCoreModule());
-                    c.LoadModule(new SecurityModule());
+                    c.LoadModule(new AspNetCoreModule(hangfireConfigurationSection));
+                    c.LoadModule(new AspNetCoreSecurityModule());
                     c.LoadModule(new NullAspNetCoreIdentityModule());
                 }
             });

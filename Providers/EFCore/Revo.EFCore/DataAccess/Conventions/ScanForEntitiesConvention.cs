@@ -4,7 +4,7 @@ using Revo.EFCore.DataAccess.Model;
 
 namespace Revo.EFCore.DataAccess.Conventions
 {
-    public class ScanForEntitiesConvention : IEFCoreConvention
+    public class ScanForEntitiesConvention : EFCoreConventionBase
     {
         private readonly EntityTypeDiscovery entityTypeDiscovery;
 
@@ -12,8 +12,8 @@ namespace Revo.EFCore.DataAccess.Conventions
         {
             this.entityTypeDiscovery = entityTypeDiscovery;
         }
-
-        public void Initialize(ModelBuilder modelBuilder)
+        
+        public override void Initialize(ModelBuilder modelBuilder)
         {
             var all = entityTypeDiscovery.DiscoverEntities();
             foreach (var schemaSpaceAndEntities in all)
@@ -25,7 +25,7 @@ namespace Revo.EFCore.DataAccess.Conventions
             }
         }
 
-        public void Finalize(ModelBuilder modelBuilder)
+        public override void Finalize(ModelBuilder modelBuilder)
         {
         }
     }

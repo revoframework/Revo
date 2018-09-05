@@ -20,7 +20,6 @@ namespace Revo.Infrastructure.EventStores.Generic.Model
             StreamSequenceNumber = streamSequenceNumber;
             StoreDate = storeDate;
             AdditionalMetadataJson = additionalMetadataJson;
-            GlobalSequenceNumber = -1;
         }
 
         protected EventStreamRow()

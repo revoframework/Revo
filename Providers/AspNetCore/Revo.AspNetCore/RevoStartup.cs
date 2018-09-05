@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using Microsoft.AspNetCore.Builder;
@@ -14,7 +15,10 @@ using Ninject.Activation;
 using Ninject.Extensions.ContextPreservation;
 using Ninject.Extensions.Factory;
 using Ninject.Infrastructure.Disposal;
+using Revo.AspNetCore.Configuration;
+using Revo.AspNetCore.Core;
 using Revo.AspNetCore.Ninject;
+using Revo.AspNetCore.Web;
 using Revo.Core.Configuration;
 using Revo.Core.Core;
 using Revo.Core.Types;
@@ -27,7 +31,7 @@ namespace Revo.AspNetCore
         private static readonly AsyncLocal<Scope> scopeProvider = new AsyncLocal<Scope>();
         public static object RequestScope(IContext context) => scopeProvider.Value;
         
-        private readonly List<Assembly> loadedAssemblies = new List<Assembly>();
+        private KernelBootstrapper kernelBootstrapper;
 
         public RevoStartup(IConfiguration configuration)
         {
@@ -40,26 +44,50 @@ namespace Revo.AspNetCore
 
         public virtual void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            CreateKernel();
+            var revoConfiguration = CreateRevoConfiguration();
+            var aspNetCoreConfig = revoConfiguration.GetSection<AspNetCoreConfigurationSection>();
+
+            services
+                .AddMvc(options =>
+                {
+                    if (aspNetCoreConfig.UseODataExtensions)
+                    {
+                        options.Filters.Add(new ODataAsyncResultFilter());
+                    }
+                })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton(sp => Kernel);
 
             services.AddRequestScopingMiddleware(() => scopeProvider.Value = new Scope());
             services.AddCustomControllerActivation(Resolve);
             services.AddCustomViewComponentActivation(Resolve);
-        }
-        
-        public virtual void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
-        {
-            Kernel = CreateKernel(app, loggerFactory);
 
-            var revoConfiguration = CreateRevoConfiguration();
-            var kernelBootstrapper = new KernelBootstrapper(Kernel, revoConfiguration);
-
+            kernelBootstrapper = new KernelBootstrapper(Kernel, revoConfiguration);
+            
             var typeExplorer = new TypeExplorer();
 
             kernelBootstrapper.Configure();
             kernelBootstrapper.LoadAssemblies(typeExplorer.GetAllReferencedAssemblies());
+
+            var aspNetCoreConfigurers = Kernel.GetAll<IAspNetCoreStartupConfigurer>();
+            foreach (var aspNetCoreConfigurer in aspNetCoreConfigurers)
+            {
+                aspNetCoreConfigurer.ConfigureServices(services);
+            }
+        }
+        
+        public virtual void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        {
+            RegisterAspNetCoreService(app, loggerFactory);
+            
+            var aspNetCoreConfigurers = Kernel.GetAll<IAspNetCoreStartupConfigurer>();
+            foreach (var aspNetCoreConfigurer in aspNetCoreConfigurers)
+            {
+                aspNetCoreConfigurer.Configure(app, env, loggerFactory);
+            }
             
             kernelBootstrapper.RunAppConfigurers();
             kernelBootstrapper.RunAppStartListeners();
@@ -67,7 +95,7 @@ namespace Revo.AspNetCore
 
         protected abstract IRevoConfiguration CreateRevoConfiguration();
 
-        private IKernel CreateKernel(IApplicationBuilder app, ILoggerFactory loggerFactory)
+        private void CreateKernel()
         {
             Kernel = new StandardKernel();
 
@@ -81,10 +109,6 @@ namespace Revo.AspNetCore
             //Hangfire.GlobalConfiguration.Configuration.UseNinjectActivator();
 
             NinjectBindingExtensions.Current = new AspNetCoreNinjectBindingExtension();
-
-            RegisterAspNetCoreService(app, loggerFactory);
-
-            return Kernel;
         }
 
         private void RegisterAspNetCoreService(IApplicationBuilder app, ILoggerFactory loggerFactory)
@@ -96,6 +120,7 @@ namespace Revo.AspNetCore
 
             Kernel.Bind<IViewBufferScope>().ToMethod(ctx => app.GetRequestService<IViewBufferScope>());
             Kernel.Bind<ILoggerFactory>().ToConstant(loggerFactory);
+            //Kernel.Bind<IServiceProvider>().ToMethod(ctx => app.ApplicationServices);
             Kernel.Bind<IHttpContextAccessor>()
                 .ToMethod(ctx => app.ApplicationServices.GetRequiredService<IHttpContextAccessor>())
                 .InTransientScope();

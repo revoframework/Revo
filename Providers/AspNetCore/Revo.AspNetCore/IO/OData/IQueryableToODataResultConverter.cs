@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.OData.Query;
 using Revo.Core.IO.OData;
 
-namespace Revo.AspNet.IO.OData
+namespace Revo.AspNetCore.IO.OData
 {
     public interface IQueryableToODataResultConverter
     {

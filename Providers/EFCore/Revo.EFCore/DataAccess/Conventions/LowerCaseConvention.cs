@@ -2,13 +2,13 @@
 
 namespace Revo.EFCore.DataAccess.Conventions
 {
-    public class LowerCaseConvention : IEFCoreConvention
+    public class LowerCaseConvention : EFCoreConventionBase
     {
-        public void Initialize(ModelBuilder modelBuilder)
+        public override void Initialize(ModelBuilder modelBuilder)
         {
         }
 
-        public void Finalize(ModelBuilder modelBuilder)
+        public override void Finalize(ModelBuilder modelBuilder)
         {
             foreach (var entity in modelBuilder.Model.GetEntityTypes())
             {

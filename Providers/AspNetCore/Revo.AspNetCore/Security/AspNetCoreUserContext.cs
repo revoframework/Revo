@@ -11,7 +11,6 @@ namespace Revo.AspNetCore.Security
     public class AspNetCoreUserContext : IUserContext
     {
         private readonly IUserPermissionResolver userPermissionResolver;
-        private readonly ISignInManager signInManager;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly IUserManager userManager;
         private readonly Lazy<Guid?> userIdLazy;
@@ -19,40 +18,28 @@ namespace Revo.AspNetCore.Security
         private IUser user;
 
         public AspNetCoreUserContext(IUserPermissionResolver userPermissionResolver,
-            ISignInManager signInManager,
             IUserManager userManager,
             IHttpContextAccessor httpContextAccessor)
         {
             this.userPermissionResolver = userPermissionResolver;
-            this.signInManager = signInManager;
             this.userManager = userManager;
             this.httpContextAccessor = httpContextAccessor;
 
             userIdLazy = new Lazy<Guid?>(() =>
             {
-                if (IsAuthenticated)
+                var httpContext = httpContextAccessor.HttpContext;
+                if (httpContext?.User?.Identity?.IsAuthenticated ?? false)
                 {
-                    var httpContext = httpContextAccessor.HttpContext;
                     var claimsPrincipal = httpContext.User;
                     string userIdString = userManager.GetUserId(claimsPrincipal);
-                    return Guid.Parse(userIdString);
+                    return userIdString != null ? (Guid?) Guid.Parse(userIdString) : null;
                 }
 
                 return null;
             });
         }
 
-        public bool IsAuthenticated
-        {
-            get
-            {
-                var httpContext = httpContextAccessor.HttpContext;
-                var claimsPrincipal = httpContext.User;
-                return (httpContext.User?.Identity?.IsAuthenticated ?? false)
-                       && signInManager.IsSignedIn(claimsPrincipal);
-            }
-        }
-
+        public bool IsAuthenticated => UserId != null;
         public Guid? UserId => userIdLazy.Value;
 
         public async Task<IReadOnlyCollection<Permission>> GetPermissionsAsync()
@@ -77,14 +64,14 @@ namespace Revo.AspNetCore.Security
         {
             if (user == null)
             {
-                if (IsAuthenticated)
+                if (UserId != null)
                 {
                     var httpContext = httpContextAccessor.HttpContext;
                     var claimsPrincipal = httpContext.User;
                     user = await userManager.GetUserAsync(claimsPrincipal);
                     if (user == null)
                     {
-                        throw new InvalidOperationException($"GetUserAsync failed because the authenticated user with ID '{UserId.Value}' could not be found");
+                        throw new InvalidOperationException($"GetUserAsync failed because the authenticated user with ID '{UserId}' could not be found");
                     }
                 }
             }

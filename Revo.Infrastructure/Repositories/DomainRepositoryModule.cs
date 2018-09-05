@@ -18,23 +18,10 @@ namespace Revo.Infrastructure.Repositories
                 .To<RepositoryFactory>()
                 .InTransientScope();
 
-            Bind<IAggregateStore>()
-                .To<CrudAggregateStore>()
-                .InTransientScope();
-
-            Bind<ICrudRepository>()
-                .ToMethod(ctx => ctx.ContextPreservingGet<ICrudRepositoryFactory<ICrudRepository>>().Create())
-                .WhenInjectedInto<CrudAggregateStore>()
-                .InTransientScope();
-
             Bind<IAggregateStoreFactory>()
                 .To<CrudAggregateStoreFactory>()
                 .InTransientScope();
-
-            Bind<IAggregateStore>()
-                .To<EventSourcedAggregateStore>()
-                .InTransientScope();
-
+            
             Bind<IAggregateStoreFactory>()
                 .To<EventSourcedAggregateStoreFactory>()
                 .InTransientScope();

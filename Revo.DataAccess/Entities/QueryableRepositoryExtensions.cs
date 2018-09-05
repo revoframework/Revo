@@ -24,7 +24,7 @@ namespace Revo.DataAccess.Entities
             return repository.Include(queryable, navigationPropertyPath);
         }
 
-        public static IQueryable<T> Include<T, TProperty>(this IQueryable<T> queryable, IQueryableExtensionsResolver repository,
+        public static IQueryable<T> Include<T>(this IQueryable<T> queryable, IQueryableExtensionsResolver repository,
             string navigationPropertyPath) where T : class
         {
             return repository.Include(queryable, navigationPropertyPath);

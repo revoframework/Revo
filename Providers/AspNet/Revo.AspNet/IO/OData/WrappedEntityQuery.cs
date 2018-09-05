@@ -1,4 +1,4 @@
-﻿using System.Web.OData.Query;
+﻿using Microsoft.AspNet.OData.Query;
 
 namespace Revo.AspNet.IO.OData
 {

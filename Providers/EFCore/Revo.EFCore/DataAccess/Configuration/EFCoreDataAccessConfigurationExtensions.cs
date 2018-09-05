@@ -23,14 +23,13 @@ namespace Revo.EFCore.DataAccess.Configuration
             {
                 if (section.IsActive)
                 {
+                    c.Kernel.Bind<EFCoreDataAccessConfigurationSection>().ToConstant(section);
+
                     c.LoadModule(new EFCoreDataAccessModule(section.UseAsPrimaryRepository));
 
-                    if (section.ConventionTypes != null)
+                    foreach (var conventionFunc in section.Conventions)
                     {
-                        foreach (var conventionType in section.ConventionTypes)
-                        {
-                            c.Kernel.Bind<IEFCoreConvention>().To(conventionType);
-                        }
+                        c.Kernel.Bind<IEFCoreConvention>().ToMethod(conventionFunc);
                     }
 
                     if (section.Configurer != null)

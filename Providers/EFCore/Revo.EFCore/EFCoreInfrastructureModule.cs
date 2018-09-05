@@ -8,9 +8,6 @@ namespace Revo.EFCore
     {
         public override void Load()
         {
-            Bind<IEFCoreConvention>()
-                .To<BasicDomainModelConvention>()
-                .InSingletonScope();
         }
     }
 }

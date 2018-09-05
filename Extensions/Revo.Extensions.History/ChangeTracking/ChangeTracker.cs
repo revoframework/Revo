@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using AutoMapper.Extensions.ExpressionMapping;
 using AutoMapper.QueryableExtensions;
 using Revo.Core.Core;
 using Revo.Core.Events;
@@ -48,8 +49,10 @@ namespace Revo.Extensions.History.ChangeTracking
 
         public IQueryable<TrackedChange> FindChanges()
         {
-            return crudRepository.FindAll<TrackedChangeRecord>()
-                .ProjectTo<TrackedChange>();
+            return crudRepository
+                .FindAll<TrackedChangeRecord>()
+                .UseAsDataSource()
+                .For<TrackedChange>();
         }
 
         public async Task<TrackedChange> GetChangeAsync(Guid trackedChangeId)

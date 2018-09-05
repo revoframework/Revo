@@ -7,11 +7,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
-using System.Web.OData;
-using System.Web.OData.Builder;
-using System.Web.OData.Extensions;
-using System.Web.OData.Query;
 using Microsoft.OData.Edm;
+using Microsoft.AspNet.OData;
+using Microsoft.AspNet.OData.Builder;
+using Microsoft.AspNet.OData.Extensions;
+using Microsoft.AspNet.OData.Query;
 using Ninject;
 using Revo.AspNet.IO.OData;
 using Revo.Core.IO.OData;
@@ -20,7 +20,7 @@ namespace Revo.AspNet.Web
 {
     public class ODataActionFilterAttribute : ActionFilterAttribute
     {
-        private const string ModelKeyPrefix = "System.Web.OData.Model+";
+        private const string ModelKeyPrefix = "Microsoft.AspNet.OData.Model+";
 
         [Inject]
         public IQueryableToODataResultConverter[] ODataResultConverters { get; set; } = {};
@@ -92,7 +92,7 @@ namespace Revo.AspNet.Web
             return new ODataQueryOptions<T>(entitySetContext, httpRequestMessage);
         }
 
-        // borrowed from WebApi/src/System.Web.OData/Extensions/HttpActionDescriptorExtensions.cs
+        // borrowed from WebApi/src/Microsoft.AspNet.OData/Extensions/HttpActionDescriptorExtensions.cs
         internal static IEdmModel GetEdmModel(HttpActionDescriptor actionDescriptor, Type entityClrType)
         {
             // save the EdmModel to the action descriptor

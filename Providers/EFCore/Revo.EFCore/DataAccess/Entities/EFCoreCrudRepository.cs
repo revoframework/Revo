@@ -73,7 +73,7 @@ namespace Revo.EFCore.DataAccess.Entities
 
         public async Task<T> GetAsync<T>(CancellationToken cancellationToken, object[] id) where T : class
         {
-            T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(cancellationToken, id);
+            T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(id, cancellationToken);
             t = FilterResult(t);
             RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
             return t;
@@ -89,7 +89,7 @@ namespace Revo.EFCore.DataAccess.Entities
 
         public async Task<T> GetAsync<T>(CancellationToken cancellationToken, object id) where T : class
         {
-            T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(cancellationToken, id);
+            T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(new[] { id }, cancellationToken);
             t = FilterResult(t);
             RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
             return t;
@@ -142,7 +142,7 @@ namespace Revo.EFCore.DataAccess.Entities
 
         public async Task<T> FindAsync<T>(CancellationToken cancellationToken, object[] id) where T : class
         {
-            T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(cancellationToken, id);
+            T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(id, cancellationToken);
             t = FilterResult(t);
             return t;
         }
@@ -156,7 +156,7 @@ namespace Revo.EFCore.DataAccess.Entities
 
         public async Task<T> FindAsync<T>(CancellationToken cancellationToken, object id) where T : class
         {
-            T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(cancellationToken, id);
+            T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(new[] { id }, cancellationToken);
             t = FilterResult(t);
             return t;
         }

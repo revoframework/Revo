@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using Microsoft.AspNet.OData.Query;
 
-namespace Revo.AspNet.IO.OData
+namespace Revo.AspNetCore.IO.OData
 {
     public static class ODataQueryableExtensions
     {

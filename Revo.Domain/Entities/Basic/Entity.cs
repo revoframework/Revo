@@ -13,7 +13,7 @@ namespace Revo.Domain.Entities.Basic
         {
         }
 
-        public Guid Id { get; private set; }
+        public virtual Guid Id { get; private set; }
 
         public override int GetHashCode()
         {

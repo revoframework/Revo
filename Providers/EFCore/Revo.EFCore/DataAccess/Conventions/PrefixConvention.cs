@@ -1,20 +1,29 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Linq;
+using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Revo.DataAccess.Entities;
+using Revo.Domain.ReadModel;
 
 namespace Revo.EFCore.DataAccess.Conventions
 {
-    public class PrefixConvention : IEFCoreConvention
+    public class PrefixConvention : EFCoreConventionBase
     {
-        public void Initialize(ModelBuilder modelBuilder)
+        public override void Initialize(ModelBuilder modelBuilder)
         {
         }
 
-        public void Finalize(ModelBuilder modelBuilder)
+        public override void Finalize(ModelBuilder modelBuilder)
         {
             foreach (var entity in modelBuilder.Model.GetEntityTypes())
             {
                 var tablePrefixAttribute = entity.ClrType.GetCustomAttribute<TablePrefixAttribute>();
+                var readModelForEntityAttribute = entity.ClrType.GetCustomAttribute<ReadModelForEntityAttribute>();
+
+                if (tablePrefixAttribute == null && readModelForEntityAttribute != null)
+                {
+                    tablePrefixAttribute = readModelForEntityAttribute.EntityType.GetCustomAttribute<TablePrefixAttribute>();
+                }
 
                 if (tablePrefixAttribute?.NamespacePrefix?.Length > 0)
                 {

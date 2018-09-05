@@ -2,13 +2,14 @@
 
 namespace Revo.EFCore.DataAccess.Conventions
 {
-    public class IdColumnsPrefixedWithTableNameConvention : IEFCoreConvention
+    public class IdColumnsPrefixedWithTableNameConvention : EFCoreConventionBase
     {
-        public void Initialize(ModelBuilder modelBuilder)
+
+        public override void Initialize(ModelBuilder modelBuilder)
         {
         }
 
-        public void Finalize(ModelBuilder modelBuilder)
+        public override void Finalize(ModelBuilder modelBuilder)
         {
             foreach (var entity in modelBuilder.Model.GetEntityTypes())
             {

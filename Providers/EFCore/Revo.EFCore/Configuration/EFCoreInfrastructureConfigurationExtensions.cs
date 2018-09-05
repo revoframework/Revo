@@ -3,6 +3,7 @@ using Revo.Core.Configuration;
 using Revo.EFCore.Events;
 using Revo.EFCore.EventStores;
 using Revo.EFCore.Projections;
+using Revo.EFCore.Sagas;
 using Revo.Infrastructure;
 
 namespace Revo.EFCore.Configuration
@@ -50,7 +51,7 @@ namespace Revo.EFCore.Configuration
             {
                 if (section.UseSagas)
                 {
-                    //c.LoadModule<EFCoreSagasModule>();
+                    c.LoadModule<EFCoreSagasModule>();
                 }
             });
 
