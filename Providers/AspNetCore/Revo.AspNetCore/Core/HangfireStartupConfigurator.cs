@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Ninject;
 using Revo.Hangfire;
 
 namespace Revo.AspNetCore.Core
@@ -10,10 +11,13 @@ namespace Revo.AspNetCore.Core
     public class HangfireStartupConfigurator : IAspNetCoreStartupConfigurer
     {
         private readonly HangfireConfigurationSection hangfireConfigurationSection;
+        private readonly IKernel kernel;
 
-        public HangfireStartupConfigurator(HangfireConfigurationSection hangfireConfigurationSection)
+        public HangfireStartupConfigurator(HangfireConfigurationSection hangfireConfigurationSection,
+            IKernel kernel)
         {
             this.hangfireConfigurationSection = hangfireConfigurationSection;
+            this.kernel = kernel;
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -27,6 +31,9 @@ namespace Revo.AspNetCore.Core
                     {
                         action(globalCfg);
                     }
+
+                    globalCfg.UseNLogLogProvider();
+                    globalCfg.UseActivator(new HangfireJobActivator(kernel));
                 });
         }
 
