@@ -46,6 +46,20 @@ namespace Revo.AspNetCore
         {
             CreateKernel();
             var revoConfiguration = CreateRevoConfiguration();
+
+            /** NOTE: these assemblies containing these modules are usually not directly referenced
+             * and thus would other not get loaded into the app domain */
+            Type[] ninjectExtModules = new[] {typeof(FuncModule), typeof(ContextPreservationModule)};
+            foreach (Type ninjectExtModule in ninjectExtModules)
+            {
+                if (!revoConfiguration
+                    .GetSection<KernelConfigurationSection>()
+                    .LoadedModuleOverrides.ContainsKey(ninjectExtModule))
+                {
+                    revoConfiguration.OverrideModuleLoading(ninjectExtModule, true);
+                }
+            }
+            
             var aspNetCoreConfig = revoConfiguration.GetSection<AspNetCoreConfigurationSection>();
 
             services
@@ -70,7 +84,13 @@ namespace Revo.AspNetCore
             var typeExplorer = new TypeExplorer();
 
             kernelBootstrapper.Configure();
-            kernelBootstrapper.LoadAssemblies(typeExplorer.GetAllReferencedAssemblies());
+
+            var assemblies = typeExplorer
+                .GetAllReferencedAssemblies()
+                .Where(a => !a.GetName().Name.StartsWith("System."))
+                .Where(a => !a.IsDynamic).ToList();
+
+            kernelBootstrapper.LoadAssemblies(assemblies);
 
             var aspNetCoreConfigurers = Kernel.GetAll<IAspNetCoreStartupConfigurer>();
             foreach (var aspNetCoreConfigurer in aspNetCoreConfigurers)
@@ -98,9 +118,6 @@ namespace Revo.AspNetCore
         private void CreateKernel()
         {
             Kernel = new StandardKernel();
-
-            Kernel.Load(new FuncModule());
-            Kernel.Load(new ContextPreservationModule());
 
             Kernel.Bind<Func<IKernel>>().ToMethod(ctx => () => Kernel);
             Kernel.Bind<StandardKernel>().ToMethod(ctx => Kernel as StandardKernel);

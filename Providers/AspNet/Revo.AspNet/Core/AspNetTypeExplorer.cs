@@ -10,8 +10,7 @@ namespace Revo.AspNet.Core
         public override IEnumerable<Assembly> GetAllReferencedAssemblies()
         {
             return System.Web.Compilation.BuildManager.GetReferencedAssemblies()
-               .Cast<Assembly>()
-               /*.Where(a => a.GetName().Name.StartsWith("System") == false)*/;
+               .Cast<Assembly>();
         }
     }
 }

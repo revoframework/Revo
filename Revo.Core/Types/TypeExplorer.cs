@@ -9,8 +9,7 @@ namespace Revo.Core.Types
     {
         public virtual IEnumerable<Assembly> GetAllReferencedAssemblies()
         {
-            return AppDomain.CurrentDomain.GetAssemblies()
-               /*.Where(a => a.GetName().Name.StartsWith("System") == false)*/;
+            return AppDomain.CurrentDomain.GetAssemblies();
         }
 
         public IEnumerable<Type> GetAllTypes()
