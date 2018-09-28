@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using Revo.Core.ValueObjects;
 
 namespace Revo.Core.Security
 {
-    public class PermissionType
+    public class PermissionType : ValueObject<PermissionType>
     {
         public PermissionType(Guid id, string name)
         {
@@ -13,20 +15,10 @@ namespace Revo.Core.Security
         public Guid Id { get; }
         public string Name { get; }
 
-        public override bool Equals(object obj)
+        protected override IEnumerable<(string Name, object Value)> GetValueComponents()
         {
-            PermissionType other = obj as PermissionType;
-            return other != null && other.Id == Id;
-        }
-
-        public override int GetHashCode()
-        {
-            return Id.GetHashCode();
-        }
-
-        public override string ToString()
-        {
-            return $"PermissionType {{ Id = {Id}, Name = {Name} }}";
+            yield return (nameof(Id), Id);
+            yield return (nameof(Name), Name);
         }
     }
 }
