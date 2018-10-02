@@ -12,6 +12,11 @@ namespace Revo.EFCore.AspNetCoreOData.IO.OData
 {
     public class EFCoreQueryableToODataResultConverter : IQueryableToODataResultConverter
     {
+        public static readonly ODataQuerySettings ODataQuerySettings = new ODataQuerySettings()
+        {
+            HandleNullPropagation = HandleNullPropagationOption.True
+        };
+
         private readonly bool disableAsyncQueryableResolution;
 
         public EFCoreQueryableToODataResultConverter(bool disableAsyncQueryableResolution)
@@ -32,14 +37,14 @@ namespace Revo.EFCore.AspNetCoreOData.IO.OData
             if (disableAsyncQueryableResolution) 
             {
                 return new ODataResult<T>(queryable
-                    .ApplyOptions(queryOptions)
+                    .ApplyOptions(queryOptions, ODataQuerySettings)
                     .ToList());
             }
             else
             {
                 return new ODataResult<T>(
                     await queryable
-                        .ApplyOptions(queryOptions)
+                        .ApplyOptions(queryOptions, ODataQuerySettings)
                         .ToListAsync(cancellationToken));
             }
         }
@@ -53,19 +58,19 @@ namespace Revo.EFCore.AspNetCoreOData.IO.OData
             if (disableAsyncQueryableResolution)
             {
                 list = queryable
-                    .ApplyOptions(queryOptions)
+                    .ApplyOptions(queryOptions, ODataQuerySettings)
                     .ToList();
                 count = ((IQueryable<T>)queryOptions
-                        .ApplyTo(queryable, AllowedQueryOptions.Skip | AllowedQueryOptions.Top))
+                        .ApplyTo(queryable, ODataQuerySettings, AllowedQueryOptions.Skip | AllowedQueryOptions.Top))
                     .LongCount();
             }
             else
             {
                 list = await queryable
-                    .ApplyOptions(queryOptions)
+                    .ApplyOptions(queryOptions, ODataQuerySettings)
                     .ToListAsync(cancellationToken);
                 count = await ((IQueryable<T>)queryOptions
-                        .ApplyTo(queryable, AllowedQueryOptions.Skip | AllowedQueryOptions.Top))
+                        .ApplyTo(queryable, ODataQuerySettings, AllowedQueryOptions.Skip | AllowedQueryOptions.Top))
                     .LongCountAsync(cancellationToken);
             }
 
