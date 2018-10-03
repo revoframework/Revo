@@ -195,12 +195,12 @@ namespace Revo.Infrastructure.EventStores.Generic
 
             if (minEventNumber != streamVersion + 1)
             {
-                throw new OptimisticConcurrencyException($"Concurrency exception committing EF6EventStore events: next expected event number for stream ID {streamPair.Key} is {streamVersion + 1}, {minEventNumber} passed");
+                throw new OptimisticConcurrencyException($"Concurrency exception committing {GetType().Name} events: next expected event number for stream ID {streamPair.Key} is {streamVersion + 1}, {minEventNumber} passed");
             }
 
             if (maxEventNumber - minEventNumber != streamPair.Value.UncommitedRows.Count - 1)
             {
-                throw new OptimisticConcurrencyException($"Concurrency exception committing EF6EventStore events: non-sequential event numbers in stream ID {streamPair.Key}");
+                throw new OptimisticConcurrencyException($"Concurrency exception committing {GetType().Name} events: non-sequential event numbers in stream ID {streamPair.Key}");
             }
         }
 

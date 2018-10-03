@@ -11,20 +11,20 @@ using Xunit;
 
 namespace Revo.Infrastructure.Tests.Events.Async
 {
-    public class AsyncEventQueueBacklogWorkerTests
+    public class AsyncEventWorkerTests
     {
-        private AsyncEventQueueBacklogWorker sut;
+        private AsyncEventWorker sut;
         private IAsyncEventQueueManager asyncEventQueueManager;
         private IServiceLocator serviceLocator;
         private List<IAsyncEventQueueRecord> events = new List<IAsyncEventQueueRecord>();
         private FakeAsyncEventQueueState queueState = new FakeAsyncEventQueueState();
         private List<IAsyncEventListener> listeners = new List<IAsyncEventListener>();
 
-        public AsyncEventQueueBacklogWorkerTests()
+        public AsyncEventWorkerTests()
         {
             asyncEventQueueManager = Substitute.For<IAsyncEventQueueManager>();
             serviceLocator = Substitute.For<IServiceLocator>();
-            sut = new AsyncEventQueueBacklogWorker(asyncEventQueueManager, serviceLocator);
+            sut = new AsyncEventWorker(asyncEventQueueManager, serviceLocator);
 
             asyncEventQueueManager.GetQueueStateAsync("queue").Returns(ci => queueState);
             asyncEventQueueManager.GetQueueEventsAsync("queue").Returns(ci => events);

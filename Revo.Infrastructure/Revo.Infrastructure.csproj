@@ -18,6 +18,7 @@ Framework infrastruture package - event stores, projections, jobs, etc.</Descrip
     <PackageReference Include="Ninject" Version="3.3.4" />
     <PackageReference Include="Ninject.Extensions.ContextPreservation" Version="3.3.1" />
     <PackageReference Include="Ninject.Extensions.Factory" Version="3.3.2" />
+    <PackageReference Include="Nito.AsyncEx" Version="5.0.0-pre-05" />
     <PackageReference Include="NLog" Version="4.5.3" />
   </ItemGroup>
   

@@ -13,12 +13,12 @@ namespace Revo.Infrastructure.Events.Async
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly Func<IAsyncEventQueueBacklogWorker> asyncEventQueueBacklogWorkerFunc;
+        private readonly Func<IAsyncEventWorker> asyncEventQueueBacklogWorkerFunc;
         private readonly IAsyncEventQueueManager asyncEventQueueManager;
         private readonly IJobScheduler jobScheduler;
         private readonly IAsyncEventPipelineConfiguration asyncEventPipelineConfiguration;
 
-        public AsyncEventProcessor(Func<IAsyncEventQueueBacklogWorker> asyncEventQueueBacklogWorkerFunc,
+        public AsyncEventProcessor(Func<IAsyncEventWorker> asyncEventQueueBacklogWorkerFunc,
             IAsyncEventQueueManager asyncEventQueueManager,
             IJobScheduler jobScheduler,
             IAsyncEventPipelineConfiguration asyncEventPipelineConfiguration)

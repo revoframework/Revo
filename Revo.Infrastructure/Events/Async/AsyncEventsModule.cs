@@ -15,9 +15,18 @@ namespace Revo.Infrastructure.Events.Async
                 .To<AsyncEventExecutionCatchUp>()
                 .InSingletonScope();
 
-            Bind<IAsyncEventQueueBacklogWorker>()
-                .To<AsyncEventQueueBacklogWorker>()
+            Bind<IAsyncEventWorkerLockCache>()
+                .To<AsyncEventWorkerLockCache>()
+                .InSingletonScope();
+
+            Bind<IAsyncEventWorker>()
+                .To<LockingAsyncEventWorker>()
                 .InRequestOrJobScope();
+
+            Bind<IAsyncEventWorker>()
+                .To<AsyncEventWorker>()
+                .WhenInjectedExactlyInto<LockingAsyncEventWorker>()
+                .InTransientScope();
 
             Bind<IAsyncEventQueueDispatcher>()
                 .To<AsyncEventQueueDispatcher>()

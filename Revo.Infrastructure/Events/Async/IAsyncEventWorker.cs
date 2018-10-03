@@ -2,7 +2,7 @@
 
 namespace Revo.Infrastructure.Events.Async
 {
-    public interface IAsyncEventQueueBacklogWorker
+    public interface IAsyncEventWorker
     {
         Task RunQueueBacklogAsync(string queueName);
     }

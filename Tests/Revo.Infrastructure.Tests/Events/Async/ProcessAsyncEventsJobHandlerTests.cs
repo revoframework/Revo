@@ -12,17 +12,17 @@ namespace Revo.Infrastructure.Tests.Events.Async
     public class ProcessAsyncEventsJobHandlerTests
     {
         private ProcessAsyncEventsJobHandler sut;
-        private IAsyncEventQueueBacklogWorker asyncEventQueueBacklogWorker;
+        private IAsyncEventWorker asyncEventWorker;
         private IJobScheduler jobScheduler;
         private AsyncEventPipelineConfiguration asyncEventPipelineConfiguration;
 
         public ProcessAsyncEventsJobHandlerTests()
         {
-            asyncEventQueueBacklogWorker = Substitute.For<IAsyncEventQueueBacklogWorker>();
+            asyncEventWorker = Substitute.For<IAsyncEventWorker>();
             jobScheduler = Substitute.For<IJobScheduler>();
             asyncEventPipelineConfiguration = new AsyncEventPipelineConfiguration();
 
-            sut = new ProcessAsyncEventsJobHandler(asyncEventQueueBacklogWorker, asyncEventPipelineConfiguration, jobScheduler);
+            sut = new ProcessAsyncEventsJobHandler(asyncEventWorker, asyncEventPipelineConfiguration, jobScheduler);
         }
 
         [Fact]
@@ -31,14 +31,14 @@ namespace Revo.Infrastructure.Tests.Events.Async
             ProcessAsyncEventsJob job = new ProcessAsyncEventsJob("queue", 5, TimeSpan.FromMinutes(1));
             await sut.HandleAsync(job, CancellationToken.None);
 
-            asyncEventQueueBacklogWorker.Received(1).RunQueueBacklogAsync(job.QueueName);
+            asyncEventWorker.Received(1).RunQueueBacklogAsync(job.QueueName);
         }
 
         [Fact]
         public async Task HandleAsync_RetryAsyncEventProcessingSequenceException()
         {
             ProcessAsyncEventsJob job = new ProcessAsyncEventsJob("queue", 5, TimeSpan.FromMinutes(1));
-            asyncEventQueueBacklogWorker.When(x => x.RunQueueBacklogAsync(job.QueueName)).Throw(new AsyncEventProcessingSequenceException(0));
+            asyncEventWorker.When(x => x.RunQueueBacklogAsync(job.QueueName)).Throw(new AsyncEventProcessingSequenceException(0));
             
             await sut.HandleAsync(job, CancellationToken.None);
 
@@ -51,7 +51,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
         public async Task HandleAsync_NoRetriesLeftForAsyncEventProcessingSequenceException()
         {
             ProcessAsyncEventsJob job = new ProcessAsyncEventsJob("queue", 1, TimeSpan.FromMinutes(1));
-            asyncEventQueueBacklogWorker.When(x => x.RunQueueBacklogAsync(job.QueueName)).Throw(new AsyncEventProcessingSequenceException(0));
+            asyncEventWorker.When(x => x.RunQueueBacklogAsync(job.QueueName)).Throw(new AsyncEventProcessingSequenceException(0));
             
             await sut.HandleAsync(job, CancellationToken.None);
 
@@ -62,7 +62,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
         public async Task HandleAsync_RetryOptimisticConcurrencyException()
         {
             ProcessAsyncEventsJob job = new ProcessAsyncEventsJob("queue", 5, TimeSpan.FromMinutes(1));
-            asyncEventQueueBacklogWorker.When(x => x.RunQueueBacklogAsync(job.QueueName)).Throw(new OptimisticConcurrencyException());
+            asyncEventWorker.When(x => x.RunQueueBacklogAsync(job.QueueName)).Throw(new OptimisticConcurrencyException());
             
             await sut.HandleAsync(job, CancellationToken.None);
 
@@ -76,7 +76,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
         public async Task HandleAsync_NoRetriesLeftForOptimisticConcurrencyException()
         {
             ProcessAsyncEventsJob job = new ProcessAsyncEventsJob("queue", 1, TimeSpan.FromMinutes(1));
-            asyncEventQueueBacklogWorker.When(x => x.RunQueueBacklogAsync(job.QueueName)).Throw(new OptimisticConcurrencyException());
+            asyncEventWorker.When(x => x.RunQueueBacklogAsync(job.QueueName)).Throw(new OptimisticConcurrencyException());
 
             await sut.HandleAsync(job, CancellationToken.None);
 

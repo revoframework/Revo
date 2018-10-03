@@ -13,10 +13,15 @@ to Providers directory and some of them merged/renamed:
   - _Revo.DataAccess.EF6 and Revo.Infrastructure.EF6 → Revo.EF6_  
   - _Revo.DataAccess.RavenDB → Revo.RavenDB_  
   - _Revo.Integrations.Rebus → Revo.Rebus_
-
+- **improved AsyncEventWorker concurrency** - framework did not prevent multiple workers from parallel processing of one async event queue, causing occasional (e.g. when under heavy load) concurrency exceptions 
+(which are eventually handled by an automatic retry); now allowing only one active worker per a queue in an application instance
+  
 ### Removed
 - **IAutoMapperDefinition** - removed as obsolete and replaced with AutoMapper's own profiles (auto-discovered again)
 - **removed implicit ASP.NET Web API configuration** - i.e. default OData and serializer settings
+
+### Fixed
+- **CRUD repositories** now correctly wrap their **concurrency exceptions as OptimisticConcurrencyException**
 
 ## [1.3.0] - 2018-08-31
 ### Fixed

@@ -15,8 +15,8 @@ namespace Revo.Infrastructure.Tests.Events.Async
         private AsyncEventExecutionCatchUp sut;
         private IEventSourceCatchUp[] eventSourceCatchUps;
         private IAsyncEventQueueManager asyncEventQueueManager;
-        private List<IAsyncEventQueueBacklogWorker> asyncEventQueueBacklogWorkers = new List<IAsyncEventQueueBacklogWorker>();
-        private List<(IAsyncEventQueueBacklogWorker, string)> processedQueues = new List<(IAsyncEventQueueBacklogWorker, string)>();
+        private List<IAsyncEventWorker> asyncEventQueueBacklogWorkers = new List<IAsyncEventWorker>();
+        private List<(IAsyncEventWorker, string)> processedQueues = new List<(IAsyncEventWorker, string)>();
 
         public AsyncEventExecutionCatchUpTests()
         {
@@ -33,7 +33,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
                 asyncEventQueueManager,
                 () =>
                 {
-                    var worker = Substitute.For<IAsyncEventQueueBacklogWorker>();
+                    var worker = Substitute.For<IAsyncEventWorker>();
                     worker.WhenForAnyArgs(x => x.RunQueueBacklogAsync(null)).Do(ci =>
                     {
                         lock (processedQueues)
@@ -73,7 +73,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
             sut.OnApplicationStarted();
             
             processedQueues.Should().HaveCount(2);
-            processedQueues.Select(x => x.Item1).Should().BeEquivalentTo(asyncEventQueueBacklogWorkers, cfg => cfg.ComparingByValue<IAsyncEventQueueBacklogWorker>());
+            processedQueues.Select(x => x.Item1).Should().BeEquivalentTo(asyncEventQueueBacklogWorkers, cfg => cfg.ComparingByValue<IAsyncEventWorker>());
             processedQueues.Select(x => x.Item2).Should().BeEquivalentTo("first", "second");
         }
 
@@ -88,7 +88,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
                 asyncEventQueueManager,
                 () =>
                 {
-                    var worker = Substitute.For<IAsyncEventQueueBacklogWorker>();
+                    var worker = Substitute.For<IAsyncEventWorker>();
 
                     worker.When(x => x.RunQueueBacklogAsync("okay")).Do(ci =>
                     {

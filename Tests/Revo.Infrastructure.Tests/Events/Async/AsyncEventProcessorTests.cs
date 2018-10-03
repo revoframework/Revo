@@ -18,8 +18,8 @@ namespace Revo.Infrastructure.Tests.Events.Async
     public class AsyncEventProcessorTests
     {
         private AsyncEventProcessor sut;
-        private List<IAsyncEventQueueBacklogWorker> asyncEventQueueBacklogWorkers = new List<IAsyncEventQueueBacklogWorker>();
-        private List<(IAsyncEventQueueBacklogWorker, string)> processedQueues = new List<(IAsyncEventQueueBacklogWorker, string)>();
+        private List<IAsyncEventWorker> asyncEventQueueBacklogWorkers = new List<IAsyncEventWorker>();
+        private List<(IAsyncEventWorker, string)> processedQueues = new List<(IAsyncEventWorker, string)>();
         private IAsyncEventQueueManager asyncEventQueueManager;
         private IJobScheduler jobScheduler;
         private List<IAsyncEventQueueRecord> events;
@@ -42,9 +42,9 @@ namespace Revo.Infrastructure.Tests.Events.Async
                 SyncProcessRetryTimeoutMultiplier = 4
             };
 
-            IAsyncEventQueueBacklogWorker AsyncEventQueueBacklogWorkerFunc()
+            IAsyncEventWorker AsyncEventQueueBacklogWorkerFunc()
             {
-                var worker = Substitute.For<IAsyncEventQueueBacklogWorker>();
+                var worker = Substitute.For<IAsyncEventWorker>();
 
                 worker.WhenForAnyArgs(x => x.RunQueueBacklogAsync(null)).Do(
                     ci =>
@@ -125,7 +125,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
             await sut.ProcessSynchronously(events);
 
             asyncEventQueueBacklogWorkers.Should().HaveCount(2);
-            processedQueues.Select(x => x.Item1).Should().BeEquivalentTo(asyncEventQueueBacklogWorkers, cfg => cfg.ComparingByValue<IAsyncEventQueueBacklogWorker>());
+            processedQueues.Select(x => x.Item1).Should().BeEquivalentTo(asyncEventQueueBacklogWorkers, cfg => cfg.ComparingByValue<IAsyncEventWorker>());
             processedQueues.Select(x => x.Item2).Should().BeEquivalentTo("Queue1", "Queue2");
             Sleep.Current.DidNotReceiveWithAnyArgs().SleepAsync(TimeSpan.Zero);
         }
@@ -138,7 +138,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
             await sut.ProcessSynchronously(events);
 
             asyncEventQueueBacklogWorkers.Should().HaveCount(3);
-            processedQueues.Select(x => x.Item1).Should().BeEquivalentTo(asyncEventQueueBacklogWorkers, cfg => cfg.ComparingByValue<IAsyncEventQueueBacklogWorker>());
+            processedQueues.Select(x => x.Item1).Should().BeEquivalentTo(asyncEventQueueBacklogWorkers, cfg => cfg.ComparingByValue<IAsyncEventWorker>());
             processedQueues.Select(x => x.Item2).Should().BeEquivalentTo("Queue1", "Queue1", "Queue2");
             var queue1Processors = processedQueues.Where(x => x.Item2 == "Queue1").Select(x => x.Item1).ToArray();
             var queue2Processors = processedQueues.Where(x => x.Item2 == "Queue2").Select(x => x.Item1).ToArray();
@@ -161,7 +161,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
             await sut.ProcessSynchronously(events);
 
             asyncEventQueueBacklogWorkers.Should().HaveCount(3);
-            processedQueues.Select(x => x.Item1).Should().BeEquivalentTo(asyncEventQueueBacklogWorkers, cfg => cfg.ComparingByValue<IAsyncEventQueueBacklogWorker>());
+            processedQueues.Select(x => x.Item1).Should().BeEquivalentTo(asyncEventQueueBacklogWorkers, cfg => cfg.ComparingByValue<IAsyncEventWorker>());
             processedQueues.Select(x => x.Item2).Should().BeEquivalentTo("Queue1", "Queue1", "Queue2");
             var queue1Processors = processedQueues.Where(x => x.Item2 == "Queue1").Select(x => x.Item1).ToArray();
             var queue2Processors = processedQueues.Where(x => x.Item2 == "Queue2").Select(x => x.Item1).ToArray();
@@ -185,7 +185,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
             await sut.ProcessSynchronously(events);
 
             asyncEventQueueBacklogWorkers.Should().HaveCount(4);
-            processedQueues.Select(x => x.Item1).Should().BeEquivalentTo(asyncEventQueueBacklogWorkers, cfg => cfg.ComparingByValue<IAsyncEventQueueBacklogWorker>());
+            processedQueues.Select(x => x.Item1).Should().BeEquivalentTo(asyncEventQueueBacklogWorkers, cfg => cfg.ComparingByValue<IAsyncEventWorker>());
             processedQueues.Select(x => x.Item2).Should().BeEquivalentTo("Queue1", "Queue1", "Queue1", "Queue2");
             var queue1Processors = processedQueues.Where(x => x.Item2 == "Queue1").Select(x => x.Item1).ToArray();
             var queue2Processors = processedQueues.Where(x => x.Item2 == "Queue2").Select(x => x.Item1).ToArray();
@@ -213,7 +213,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
             await sut.ProcessSynchronously(events);
 
             asyncEventQueueBacklogWorkers.Should().HaveCount(4);
-            processedQueues.Select(x => x.Item1).Should().BeEquivalentTo(asyncEventQueueBacklogWorkers, cfg => cfg.ComparingByValue<IAsyncEventQueueBacklogWorker>());
+            processedQueues.Select(x => x.Item1).Should().BeEquivalentTo(asyncEventQueueBacklogWorkers, cfg => cfg.ComparingByValue<IAsyncEventWorker>());
             processedQueues.Select(x => x.Item2).Should().BeEquivalentTo("Queue1", "Queue1", "Queue1", "Queue2");
             var queue1Processors = processedQueues.Where(x => x.Item2 == "Queue1").Select(x => x.Item1).ToArray();
             var queue2Processors = processedQueues.Where(x => x.Item2 == "Queue2").Select(x => x.Item1).ToArray();
@@ -249,7 +249,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
             Sleep.Current.DidNotReceiveWithAnyArgs().SleepAsync(TimeSpan.Zero);
 
             asyncEventQueueBacklogWorkers.Should().HaveCount(2);
-            processedQueues.Select(x => x.Item1).Should().BeEquivalentTo(asyncEventQueueBacklogWorkers, cfg => cfg.ComparingByValue<IAsyncEventQueueBacklogWorker>());
+            processedQueues.Select(x => x.Item1).Should().BeEquivalentTo(asyncEventQueueBacklogWorkers, cfg => cfg.ComparingByValue<IAsyncEventWorker>());
             processedQueues.Select(x => x.Item2).Should().BeEquivalentTo("Queue1", "Queue2");
             var queue1Processors = processedQueues.Where(x => x.Item2 == "Queue1").Select(x => x.Item1).ToArray();
             var queue2Processors = processedQueues.Where(x => x.Item2 == "Queue2").Select(x => x.Item1).ToArray();

@@ -14,11 +14,11 @@ namespace Revo.Infrastructure.Events.Async
 
         private readonly IEventSourceCatchUp[] eventSourceCatchUps;
         private readonly IAsyncEventQueueManager asyncEventQueueManager;
-        private readonly Func<IAsyncEventQueueBacklogWorker> asyncEventQueueBacklogWorkerFunc;
+        private readonly Func<IAsyncEventWorker> asyncEventQueueBacklogWorkerFunc;
 
         public AsyncEventExecutionCatchUp(IEventSourceCatchUp[] eventSourceCatchUps,
             IAsyncEventQueueManager asyncEventQueueManager,
-            Func<IAsyncEventQueueBacklogWorker> asyncEventQueueBacklogWorkerFunc)
+            Func<IAsyncEventWorker> asyncEventQueueBacklogWorkerFunc)
         {
             this.eventSourceCatchUps = eventSourceCatchUps;
             this.asyncEventQueueManager = asyncEventQueueManager;
