@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
+using Raven.Client.Exceptions;
 using Revo.DataAccess.Entities;
 
 namespace Revo.RavenDB.Entities
@@ -260,8 +262,15 @@ namespace Revo.RavenDB.Entities
                     GetRavenId(entity), cancellationToken);
             }
 
-            await asyncDocumentSession.SaveChangesAsync(cancellationToken);
-            addedEntities.Clear();
+            try
+            {
+                await asyncDocumentSession.SaveChangesAsync(cancellationToken);
+                addedEntities.Clear();
+            }
+            catch (ConcurrencyException e)
+            {
+                throw new OptimisticConcurrencyException($"Optimistic concurrency exception occurred while saving Raven repository", e);
+            }
         }
 
         protected string GetRavenId<T>(T entity)

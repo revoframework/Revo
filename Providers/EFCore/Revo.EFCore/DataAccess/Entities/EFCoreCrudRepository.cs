@@ -336,9 +336,17 @@ namespace Revo.EFCore.DataAccess.Entities
             {
                 dbContext.SaveChanges();
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 IncrementEntityVersions(dbContext, -1);
+
+                if (e is DbUpdateConcurrencyException ce)
+                {
+                    throw new OptimisticConcurrencyException(
+                        $"Optimistic concurrency exception occurred while saving EF Core repository entities: {string.Join(", ", ce.Entries.Select(x => $"{x.Entity} ({x.State})"))}",
+                        e);
+                }
+
                 throw;
             }
         }
@@ -363,9 +371,17 @@ namespace Revo.EFCore.DataAccess.Entities
             {
                 await dbContext.SaveChangesAsync(cancellationToken);
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 IncrementEntityVersions(dbContext, -1);
+
+                if (e is DbUpdateConcurrencyException ce)
+                {
+                    throw new OptimisticConcurrencyException(
+                        $"Optimistic concurrency exception occurred while saving EF Core repository entities: {string.Join(", ", ce.Entries.Select(x => $"{x.Entity} ({x.State})"))}",
+                        e);
+                }
+
                 throw;
             }
         }

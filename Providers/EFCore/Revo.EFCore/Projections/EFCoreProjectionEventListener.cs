@@ -33,7 +33,7 @@ namespace Revo.EFCore.Projections
 
         public class EF6ProjectionEventSequencer : AsyncEventSequencer<DomainAggregateEvent>
         {
-            public readonly string QueueNamePrefix = "EF6ProjectionEventListener:";
+            public readonly string QueueNamePrefix = "EFCoreProjectionEventListener:";
 
             protected override IEnumerable<EventSequencing> GetEventSequencing(IEventMessage<DomainAggregateEvent> message)
             {

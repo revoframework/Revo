@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -351,9 +352,17 @@ namespace Revo.EF6.DataAccess.Entities
             {
                 dbContext.SaveChanges();
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 IncrementEntityVersions(dbContext, -1);
+
+                if (e is DbUpdateConcurrencyException ce)
+                {
+                    throw new OptimisticConcurrencyException(
+                        $"Optimistic concurrency exception occurred while saving EF Core repository entities: {string.Join(", ", ce.Entries.Select(x => $"{x.Entity} ({x.State})"))}",
+                        e);
+                }
+
                 throw;
             }
         }
@@ -378,9 +387,17 @@ namespace Revo.EF6.DataAccess.Entities
             {
                 await dbContext.SaveChangesAsync(cancellationToken);
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 IncrementEntityVersions(dbContext, -1);
+
+                if (e is DbUpdateConcurrencyException ce)
+                {
+                    throw new OptimisticConcurrencyException(
+                        $"Optimistic concurrency exception occurred while saving EF Core repository entities: {string.Join(", ", ce.Entries.Select(x => $"{x.Entity} ({x.State})"))}",
+                        e);
+                }
+
                 throw;
             }
         }
