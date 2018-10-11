@@ -43,6 +43,10 @@ namespace Revo.EFCore.DataAccess
                 .To<EFCoreCrudRepositoryFactory>()
                 .InRequestOrJobScope();
 
+            Bind<IEFCoreDatabaseAccess>()
+                .To<EFCoreDatabaseAccess>()
+                .InRequestOrJobScope();
+
             Bind<ModelDefinitionDiscovery>()
                 .ToSelf()
                 .InSingletonScope();

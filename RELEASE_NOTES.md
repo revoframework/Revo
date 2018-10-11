@@ -19,6 +19,8 @@ to Providers directory and some of them merged/renamed:
 ### Removed
 - **IAutoMapperDefinition** - removed as obsolete and replaced with AutoMapper's own profiles (auto-discovered again)
 - **removed implicit ASP.NET Web API configuration** - i.e. default OData and serializer settings
+- **TokenValidator** - removed as obsolete
+- **(Tenant)ContextSequence** - removed (possibly to be reimplemented later)
 
 ### Fixed
 - **CRUD repositories** now correctly wrap their **concurrency exceptions as OptimisticConcurrencyException**

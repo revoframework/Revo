@@ -21,7 +21,8 @@ namespace Revo.EFCore.DataAccess.Entities
 
         public IEFCoreCrudRepository Create()
         {
-            return new EFCoreCrudRepository(dbContextFactoryFunc(), repositoryFiltersFunc());
+            var databaseAccess = new EFCoreDatabaseAccess(dbContextFactoryFunc());
+            return new EFCoreCrudRepository(repositoryFiltersFunc(), databaseAccess);
         }
 
         IReadRepository ICrudRepositoryFactory<IReadRepository>.Create()

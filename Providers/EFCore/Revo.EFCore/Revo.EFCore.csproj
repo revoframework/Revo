@@ -10,15 +10,6 @@ Entity Framework Core (EF Core) implementation of infrastructure services.</Desc
   </PropertyGroup>
   
   <ItemGroup>
-    <None Remove="DB\01_REV_CREATE.sql" />
-    <None Remove="DB\03_REV_INDICES.sql" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Content Include="DB\PostgreSQL\01_REV_CREATE.sql" />
-  </ItemGroup>
-  
-  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="7.0.1" />
     <PackageReference Include="Castle.Core" Version="4.2.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.2" />

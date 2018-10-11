@@ -13,7 +13,6 @@ namespace Revo.Infrastructure.Repositories
 {
     internal class CrudAggregateStoreFactory : IAggregateStoreFactory
     {
-        private readonly Func<IPublishEventBuffer, CrudAggregateStore> func;
         private readonly ICrudRepositoryFactory<ICrudRepository> crudRepositoryFactory;
         private readonly IEntityTypeManager entityTypeManager;
         private readonly IEventMessageFactory eventMessageFactory;
@@ -23,7 +22,6 @@ namespace Revo.Infrastructure.Repositories
             IEntityTypeManager entityTypeManager,
             IEventMessageFactory eventMessageFactory)
         {
-            this.func = func;
             this.crudRepositoryFactory = crudRepositoryFactory;
             this.entityTypeManager = entityTypeManager;
             this.eventMessageFactory = eventMessageFactory;

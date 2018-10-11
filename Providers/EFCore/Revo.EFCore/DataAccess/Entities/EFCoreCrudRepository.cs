@@ -5,51 +5,59 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using Revo.DataAccess.Entities;
 using EntityState = Revo.DataAccess.Entities.EntityState;
 
 namespace Revo.EFCore.DataAccess.Entities
 {
-    public class EFCoreCrudRepository : IEFCoreCrudRepository, IFilteringRepository<IEFCoreCrudRepository>
+    public class EFCoreCrudRepository :
+        IEFCoreCrudRepository,
+        IFilteringRepository<IEFCoreCrudRepository>
     {
-        private readonly Dictionary<string, DbContext> dbContexts = new Dictionary<string, DbContext>();
-        private readonly IDbContextFactory dbContextFactory;
         private readonly IRepositoryFilter[] repositoryFilters;
 
-        public EFCoreCrudRepository(IDbContextFactory dbContextFactory, IRepositoryFilter[] repositoryFilters)
+        public EFCoreCrudRepository(IRepositoryFilter[] repositoryFilters,
+            IEFCoreDatabaseAccess databaseAccess)
         {
-            this.dbContextFactory = dbContextFactory;
             this.repositoryFilters = repositoryFilters;
+            this.DatabaseAccess = databaseAccess;
         }
 
+        public IEFCoreDatabaseAccess DatabaseAccess { get; }
         public IEnumerable<IRepositoryFilter> DefaultFilters => repositoryFilters;
 
         public void Attach<T>(T entity) where T : class
         {
-            GetDbContext(typeof(T)).Set<T>().Attach(entity);
+            DatabaseAccess.GetDbContext(typeof(T)).Set<T>().Attach(entity);
         }
 
         public void AttachRange<T>(IEnumerable<T> entities) where T : class
         {
             foreach (T entity in entities)
             {
-                GetDbContext(typeof(T)).Set<T>().Attach(entity);
+                DatabaseAccess.GetDbContext(typeof(T)).Set<T>().Attach(entity);
             }
         }
 
         public void Add<T>(T entity) where T : class
         {
-            GetDbContext(typeof(T)).Set<T>().Add(entity);
+            DatabaseAccess.GetDbContext(typeof(T)).Set<T>().Add(entity);
         }
 
         public void AddRange<T>(IEnumerable<T> entities) where T : class
         {
-            GetDbContext(typeof(T)).Set<T>().AddRange(entities);
+            DatabaseAccess.GetDbContext(typeof(T)).Set<T>().AddRange(entities);
+        }
+
+        public void Dispose()
+        {
+            DatabaseAccess.Dispose();
         }
 
         public T Get<T>(object id) where T : class
         {
-            T t = GetDbContext(typeof(T)).Set<T>().Find(id);
+            T t = DatabaseAccess.GetDbContext(typeof(T)).Set<T>().Find(id);
             t = FilterResult(t);
             RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
             return t;
@@ -57,7 +65,7 @@ namespace Revo.EFCore.DataAccess.Entities
 
         public T Get<T>(params object[] id) where T : class
         {
-            T t = GetDbContext(typeof(T)).Set<T>().Find(id);
+            T t = DatabaseAccess.GetDbContext(typeof(T)).Set<T>().Find(id);
             t = FilterResult(t);
             RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
             return t;
@@ -65,7 +73,7 @@ namespace Revo.EFCore.DataAccess.Entities
 
         public async Task<T> GetAsync<T>(object[] id) where T : class
         {
-            T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(id);
+            T t = await DatabaseAccess.GetDbContext(typeof(T)).Set<T>().FindAsync(id);
             t = FilterResult(t);
             RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
             return t;
@@ -73,7 +81,7 @@ namespace Revo.EFCore.DataAccess.Entities
 
         public async Task<T> GetAsync<T>(CancellationToken cancellationToken, object[] id) where T : class
         {
-            T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(id, cancellationToken);
+            T t = await DatabaseAccess.GetDbContext(typeof(T)).Set<T>().FindAsync(id, cancellationToken);
             t = FilterResult(t);
             RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
             return t;
@@ -81,7 +89,7 @@ namespace Revo.EFCore.DataAccess.Entities
 
         public async Task<T> GetAsync<T>(object id) where T : class
         {
-            T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(id);
+            T t = await DatabaseAccess.GetDbContext(typeof(T)).Set<T>().FindAsync(id);
             t = FilterResult(t);
             RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
             return t;
@@ -89,7 +97,7 @@ namespace Revo.EFCore.DataAccess.Entities
 
         public async Task<T> GetAsync<T>(CancellationToken cancellationToken, object id) where T : class
         {
-            T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(new[] { id }, cancellationToken);
+            T t = await DatabaseAccess.GetDbContext(typeof(T)).Set<T>().FindAsync(new[] { id }, cancellationToken);
             t = FilterResult(t);
             RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
             return t;
@@ -97,87 +105,87 @@ namespace Revo.EFCore.DataAccess.Entities
 
         public T FirstOrDefault<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            return FilterResult(GetDbContext(typeof(T)).Set<T>())
+            return FilterResult(DatabaseAccess.GetDbContext(typeof(T)).Set<T>())
                 .FirstOrDefault(predicate);
         }
 
         public T First<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            return FilterResults(GetDbContext(typeof(T)).Set<T>())
+            return FilterResults(DatabaseAccess.GetDbContext(typeof(T)).Set<T>())
                 .First(predicate);
         }
 
         public async Task<T> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken) where T : class
         {
-            return await FilterResults(GetDbContext(typeof(T)).Set<T>())
+            return await FilterResults(DatabaseAccess.GetDbContext(typeof(T)).Set<T>())
                 .FirstOrDefaultAsync(predicate, cancellationToken);
         }
 
         public async Task<T> FirstAsync<T>(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken) where T : class
         {
-            return await FilterResults(GetDbContext(typeof(T)).Set<T>())
+            return await FilterResults(DatabaseAccess.GetDbContext(typeof(T)).Set<T>())
                 .FirstAsync(predicate, cancellationToken);
         }
 
         public T Find<T>(object id) where T : class
         {
-            T t = GetDbContext(typeof(T)).Set<T>().Find(id);
+            T t = DatabaseAccess.GetDbContext(typeof(T)).Set<T>().Find(id);
             t = FilterResult(t);
             return t;
         }
 
         public T Find<T>(params object[] id) where T : class
         {
-            T t = GetDbContext(typeof(T)).Set<T>().Find(id);
+            T t = DatabaseAccess.GetDbContext(typeof(T)).Set<T>().Find(id);
             t = FilterResult(t);
             return t;
         }
 
         public async Task<T> FindAsync<T>(object[] id) where T : class
         {
-            T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(id);
+            T t = await DatabaseAccess.GetDbContext(typeof(T)).Set<T>().FindAsync(id);
             t = FilterResult(t);
             return t;
         }
 
         public async Task<T> FindAsync<T>(CancellationToken cancellationToken, object[] id) where T : class
         {
-            T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(id, cancellationToken);
+            T t = await DatabaseAccess.GetDbContext(typeof(T)).Set<T>().FindAsync(id, cancellationToken);
             t = FilterResult(t);
             return t;
         }
 
         public async Task<T> FindAsync<T>(object id) where T : class
         {
-            T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(id);
+            T t = await DatabaseAccess.GetDbContext(typeof(T)).Set<T>().FindAsync(id);
             t = FilterResult(t);
             return t;
         }
 
         public async Task<T> FindAsync<T>(CancellationToken cancellationToken, object id) where T : class
         {
-            T t = await GetDbContext(typeof(T)).Set<T>().FindAsync(new[] { id }, cancellationToken);
+            T t = await DatabaseAccess.GetDbContext(typeof(T)).Set<T>().FindAsync(new[] { id }, cancellationToken);
             t = FilterResult(t);
             return t;
         }
 
         public IQueryable<T> FindAll<T>() where T : class
         {
-            return FilterResults(GetDbContext(typeof(T)).Set<T>());
+            return FilterResults(DatabaseAccess.GetDbContext(typeof(T)).Set<T>());
         }
 
         public async Task<IList<T>> FindAllAsync<T>(CancellationToken cancellationToken) where T : class
         {
-            return await FilterResults(GetDbContext(typeof(T)).Set<T>()).ToListAsync(cancellationToken);
+            return await FilterResults(DatabaseAccess.GetDbContext(typeof(T)).Set<T>()).ToListAsync(cancellationToken);
         }
 
         public IEnumerable<T> FindAllWithAdded<T>() where T : class
         {
-            var addedEntities = GetDbContext(typeof(T)).ChangeTracker.Entries<T>()
+            var addedEntities = DatabaseAccess.GetDbContext(typeof(T)).ChangeTracker.Entries<T>()
                 .Where(x => x.State == Microsoft.EntityFrameworkCore.EntityState.Added)
                 .Select(x => x.Entity);
 
-            return FilterResults(GetDbContext(typeof(T)).Set<T>())
+            return FilterResults(DatabaseAccess.GetDbContext(typeof(T)).Set<T>())
                 .Union(addedEntities);
         }
 
@@ -249,24 +257,24 @@ namespace Revo.EFCore.DataAccess.Entities
         {
             if (IsAttached(entity))
             {
-                GetDbContext(typeof(T)).Set<T>().Remove(entity);
+                DatabaseAccess.GetDbContext(typeof(T)).Set<T>().Remove(entity);
             }
         }
 
         public IQueryable<T> Where<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            return FilterResults(GetDbContext(typeof(T)).Set<T>())
+            return FilterResults(DatabaseAccess.GetDbContext(typeof(T)).Set<T>())
                 .Where(predicate);
         }
 
         public IEnumerable<T> WhereWithAdded<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            IEnumerable<T> addedEntities = GetDbContext(typeof(T)).ChangeTracker.Entries<T>()
+            IEnumerable<T> addedEntities = DatabaseAccess.GetDbContext(typeof(T)).ChangeTracker.Entries<T>()
                 .Where(x => x.State == Microsoft.EntityFrameworkCore.EntityState.Added)
                 .Select(x => x.Entity)
                 .Where(predicate.Compile());
 
-            return FilterResults(GetDbContext(typeof(T)).Set<T>().Where(predicate)).ToList()
+            return FilterResults(DatabaseAccess.GetDbContext(typeof(T)).Set<T>().Where(predicate)).ToList()
                 .Union(addedEntities);
         }
 
@@ -274,7 +282,7 @@ namespace Revo.EFCore.DataAccess.Entities
         {
             var efStates = entityStates.Select(x => EntityStateToEF(x)).ToArray();
 
-            var entries = dbContexts.Values.SelectMany(x => x.ChangeTracker.Entries());
+            var entries = DatabaseAccess.DbContexts.Values.SelectMany(x => x.ChangeTracker.Entries());
             if (entityStates?.Length > 0)
             {
                 entries = entries.Where(x => efStates.Any(s => (s & x.State) == s));
@@ -286,40 +294,46 @@ namespace Revo.EFCore.DataAccess.Entities
 
         public Revo.DataAccess.Entities.EntityState GetEntityState<T>(T entity) where T : class
         {
-            return EntityStateFromEF(GetDbContext(typeof(T)).Entry(entity).State);
+            return EntityStateFromEF(DatabaseAccess.GetDbContext(typeof(T)).Entry(entity).State);
         }
 
         public void SetEntityState<T>(T entity, Revo.DataAccess.Entities.EntityState state) where T : class
         {
-            GetDbContext(typeof(T)).Entry(entity).State = EntityStateToEF(state);
+            DatabaseAccess.GetDbContext(typeof(T)).Entry(entity).State = EntityStateToEF(state);
         }
 
         public bool IsAttached<T>(T entity) where T : class
         {
-            return GetDbContext(typeof(T)).Set<T>().Local.Any(x => x == entity);
+            return DatabaseAccess.GetDbContext(typeof(T)).Set<T>().Local.Any(x => x == entity);
         }
 
         public IEFCoreCrudRepository IncludeFilters(params IRepositoryFilter[] repositoryFilters)
         {
-            return new EFCoreCrudRepository(dbContextFactory,
-                this.repositoryFilters.Union(repositoryFilters).ToArray());
+            return new EFCoreCrudRepository(
+                this.repositoryFilters.Union(repositoryFilters).ToArray(),
+                DatabaseAccess);
         }
 
         public IEFCoreCrudRepository ExcludeFilter(params IRepositoryFilter[] repositoryFilters)
         {
-            return new EFCoreCrudRepository(dbContextFactory,
-                this.repositoryFilters.Except(repositoryFilters).ToArray());
+            return new EFCoreCrudRepository(
+                this.repositoryFilters.Except(repositoryFilters).ToArray(),
+                DatabaseAccess);
         }
 
         public IEFCoreCrudRepository ExcludeFilters<TRepositoryFilter>() where TRepositoryFilter : IRepositoryFilter
         {
-            return new EFCoreCrudRepository(dbContextFactory,
-                this.repositoryFilters.Where(x => !typeof(TRepositoryFilter).IsAssignableFrom(x.GetType())).ToArray());
+            return new EFCoreCrudRepository(
+                this.repositoryFilters.Where(x => !typeof(TRepositoryFilter).IsAssignableFrom(x.GetType())).ToArray(),
+                DatabaseAccess);
         }
 
         public void SaveChanges()
         {
-            List<DbContext> modifiedDbContexts = dbContexts.Values.Where(x => x.ChangeTracker.HasChanges()).ToList();
+            List<DbContext> modifiedDbContexts = DatabaseAccess.DbContexts.Values
+                .Where(x => x.ChangeTracker.HasChanges())
+                .ToList();
+
             if (modifiedDbContexts.Count == 0)
             {
                 return;
@@ -353,7 +367,10 @@ namespace Revo.EFCore.DataAccess.Entities
 
         public async Task SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            List<DbContext> modifiedDbContexts = dbContexts.Values.Where(x => x.ChangeTracker.HasChanges()).ToList();
+            List<DbContext> modifiedDbContexts = DatabaseAccess.DbContexts.Values
+                .Where(x => x.ChangeTracker.HasChanges())
+                .ToList();
+
             if (modifiedDbContexts.Count == 0)
             {
                 return;
@@ -461,14 +478,6 @@ namespace Revo.EFCore.DataAccess.Entities
                 entity.Version += increment;
             }
         }
-        
-        public void Dispose()
-        {
-            foreach (var dbContext in dbContexts)
-            {
-                dbContext.Value.Dispose();
-            }
-        }
 
         private IQueryable<T> FilterResults<T>(IQueryable<T> results) where T : class
         {
@@ -524,28 +533,6 @@ namespace Revo.EFCore.DataAccess.Entities
             {
                 repositoryFilter.FilterModified(updated);
             }
-        }
-
-        private DbContext GetDbContext(string schemaSpace)
-        {
-            lock (this)
-            {
-                DbContext dbContext;
-                if (dbContexts.TryGetValue(schemaSpace, out dbContext))
-                {
-                    return dbContext;
-                }
-
-                dbContext = dbContextFactory.CreateContext(schemaSpace);
-                dbContexts.Add(schemaSpace, dbContext);
-                return dbContext;
-            }
-        }
-
-        private DbContext GetDbContext(Type entityType)
-        {
-            string schemaSpace = "Default"; //modelMetadataExplorer.GetEntityTypeSchemaSpace(entityType);
-            return GetDbContext(schemaSpace);
         }
     }
 }
