@@ -26,10 +26,6 @@ namespace Revo.Infrastructure.Security
             Bind<IPreCommandFilter<ICommandBase>>()
                 .To<CommandPermissionAuthorizer>()
                 .InTransientScope();
-
-            Bind<ITokenValidator>()
-                .To<TokenValidator>()
-                .InTransientScope();
         }
     }
 }
