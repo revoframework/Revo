@@ -96,12 +96,13 @@ namespace Revo.DataAccess.Entities
             return t;
         }
 
-        public static async Task<T> GetByIdAsync<T, TId>(this IQueryable<T> queryable, IQueryableExtensionsResolver repository,  TId id)
+        public static async Task<T> GetByIdAsync<T, TId>(this IQueryable<T> queryable, IQueryableExtensionsResolver repository,  TId id,
+            CancellationToken cancellationToken = default(CancellationToken))
             where T : IHasId<TId>
         {
             var lambda = EntityExpressionUtils.CreateIdPropertyEqualsConstExpression<T, TId>(id);
 
-            T t = await queryable.Where(lambda).FirstOrDefaultAsync(repository);
+            T t = await queryable.Where(lambda).FirstOrDefaultAsync(repository, cancellationToken);
             RepositoryHelpers.ThrowIfGetFailed(t, id);
 
             return t;
