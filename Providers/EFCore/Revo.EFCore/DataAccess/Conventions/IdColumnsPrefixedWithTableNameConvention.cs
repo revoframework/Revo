@@ -13,6 +13,11 @@ namespace Revo.EFCore.DataAccess.Conventions
         {
             foreach (var entity in modelBuilder.Model.GetEntityTypes())
             {
+                if (entity.BaseType != null)
+                {
+                    continue;
+                }
+
                 foreach (var property in entity.GetProperties())
                 {
                     if (property.IsPrimaryKey() && property.Name == "Id")
