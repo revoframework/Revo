@@ -6,7 +6,7 @@ using Revo.Domain.ReadModel;
 
 namespace Revo.Extensions.History.ChangeTracking.Model
 {
-    [TablePrefix(NamespacePrefix = "REV", ColumnPrefix = "EAD")]
+    [TablePrefix(NamespacePrefix = "RHI", ColumnPrefix = "EAD")]
     public class EntityAttributeData : EntityReadModel
     {
         private string attributeValueMapJson;

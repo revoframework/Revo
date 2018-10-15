@@ -6,7 +6,7 @@ using Revo.Domain.Entities.Basic;
 
 namespace Revo.Extensions.Notifications.Channels.Fcm.Model
 {
-    [TablePrefix(NamespacePrefix = "REV", ColumnPrefix = "FUT")]
+    [TablePrefix(NamespacePrefix = "RNO", ColumnPrefix = "FUT")]
     public class FcmUserDeviceToken : BasicAggregateRoot
     {
         public FcmUserDeviceToken(Guid id, IUser user, string registrationId, string appId) : base(id)

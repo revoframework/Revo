@@ -5,7 +5,7 @@ using Revo.Extensions.Notifications.Channels.Apns.Commands;
 
 namespace Revo.Extensions.AspNet.Interop.Notifications.Apns
 {
-    [RoutePrefix("api/apns-device-registration-service")]
+    [RoutePrefix("apns-device-registration-service")]
     public class ApnsDeviceRegistrationService : CommandApiController
     {
         [AcceptVerbs("POST")]

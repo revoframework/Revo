@@ -4,7 +4,7 @@ using Revo.Domain.ReadModel;
 
 namespace Revo.Extensions.Notifications.Model
 {
-    [TablePrefix(NamespacePrefix = "REV", ColumnPrefix = "NBF")]
+    [TablePrefix(NamespacePrefix = "RNO", ColumnPrefix = "NBF")]
     public class NotificationBuffer : ReadModelBase
     {
         public NotificationBuffer(Guid id, Guid governorId, Guid pipelineId)

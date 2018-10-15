@@ -4,7 +4,7 @@ using Revo.Domain.ReadModel;
 
 namespace Revo.Extensions.History.ChangeTracking.Model
 {
-    [TablePrefix(NamespacePrefix = "REV", ColumnPrefix = "TCH")]
+    [TablePrefix(NamespacePrefix = "RHI", ColumnPrefix = "TCH")]
     public class TrackedChangeRecord : ReadModelBase
     {
         public Guid Id { get; set; }

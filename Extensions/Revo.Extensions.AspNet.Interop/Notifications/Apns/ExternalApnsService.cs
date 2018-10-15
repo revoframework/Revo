@@ -5,7 +5,7 @@ using Revo.Extensions.Notifications.Channels.Apns.Commands;
 
 namespace Revo.Extensions.AspNet.Interop.Notifications.Apns
 {
-    [RoutePrefix("api/external-apns-service")]
+    [RoutePrefix("external-apns-service")]
     public class ExternalApnsService : CommandApiController
     {
         [AcceptVerbs("POST")]

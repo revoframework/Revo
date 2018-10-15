@@ -6,7 +6,7 @@ using Revo.Extensions.Notifications.Channels.Fcm.Commands;
 namespace Revo.Extensions.AspNet.Interop.Notifications.Fcm
 {
 
-    [RoutePrefix("api/external-fcm-service")]
+    [RoutePrefix("external-fcm-service")]
     public class ExternalFcmService : CommandApiController
     {
         [AcceptVerbs("POST")]

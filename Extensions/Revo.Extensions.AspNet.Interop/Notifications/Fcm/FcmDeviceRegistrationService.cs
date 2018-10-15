@@ -5,7 +5,7 @@ using Revo.Extensions.Notifications.Channels.Fcm.Commands;
 
 namespace Revo.Extensions.AspNet.Interop.Notifications.Fcm
 {
-    [RoutePrefix("api/fcm-device-registration-service")]
+    [RoutePrefix("fcm-device-registration-service")]
     public class FcmDeviceRegistrationService : CommandApiController
     {
         [AcceptVerbs("POST")]

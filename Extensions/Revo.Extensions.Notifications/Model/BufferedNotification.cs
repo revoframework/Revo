@@ -4,7 +4,7 @@ using Revo.Domain.ReadModel;
 
 namespace Revo.Extensions.Notifications.Model
 {
-    [TablePrefix(NamespacePrefix = "REV", ColumnPrefix = "BNT")]
+    [TablePrefix(NamespacePrefix = "RNO", ColumnPrefix = "BNT")]
     public class BufferedNotification : ReadModelBase
     {
         public BufferedNotification(Guid id, string notificationClassName,

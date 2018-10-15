@@ -7,7 +7,7 @@ using Revo.Domain.Entities.Basic;
 
 namespace Revo.Extensions.Notifications.Channels.Apns.Model
 {
-    [TablePrefix(NamespacePrefix = "REV", ColumnPrefix = "AUT")]
+    [TablePrefix(NamespacePrefix = "RNO", ColumnPrefix = "AUT")]
     public class ApnsUserDeviceToken : BasicAggregateRoot
     {
         private static readonly Regex DeviceTokenRegex = new Regex(@"^[0-9A-F]{64,}$", RegexOptions.IgnoreCase);
