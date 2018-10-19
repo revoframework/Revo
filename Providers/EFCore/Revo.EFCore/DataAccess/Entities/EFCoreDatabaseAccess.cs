@@ -29,7 +29,16 @@ namespace Revo.EFCore.DataAccess.Entities
         public IQueryable<T> FromSql<T>([NotParameterized] FormattableString sql)
             where T : class
         {
-            return GetDbContext(typeof(T)).Set<T>().FromSql(sql);
+            var dbContext = GetDbContext(typeof(T));
+            var entityType = dbContext.Model.FindEntityType(typeof(T));
+            if (entityType == null || entityType.IsQueryType)
+            {
+                return GetDbContext(typeof(T)).Query<T>().FromSql(sql);
+            }
+            else
+            {
+                return GetDbContext(typeof(T)).Set<T>().FromSql(sql);
+            }
         }
 
         public IQueryable<T> FromSql<T>([NotParameterized] RawSqlString sql,
