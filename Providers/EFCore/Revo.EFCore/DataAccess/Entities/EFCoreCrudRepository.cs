@@ -105,25 +105,25 @@ namespace Revo.EFCore.DataAccess.Entities
 
         public T FirstOrDefault<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            return FilterResult(DatabaseAccess.GetDbContext(typeof(T)).Set<T>())
+            return FindAll<T>()
                 .FirstOrDefault(predicate);
         }
 
         public T First<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            return FilterResults(DatabaseAccess.GetDbContext(typeof(T)).Set<T>())
+            return FindAll<T>()
                 .First(predicate);
         }
 
         public async Task<T> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken) where T : class
         {
-            return await FilterResults(DatabaseAccess.GetDbContext(typeof(T)).Set<T>())
+            return await FindAll<T>()
                 .FirstOrDefaultAsync(predicate, cancellationToken);
         }
 
         public async Task<T> FirstAsync<T>(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken) where T : class
         {
-            return await FilterResults(DatabaseAccess.GetDbContext(typeof(T)).Set<T>())
+            return await FindAll<T>()
                 .FirstAsync(predicate, cancellationToken);
         }
 
@@ -171,12 +171,20 @@ namespace Revo.EFCore.DataAccess.Entities
 
         public IQueryable<T> FindAll<T>() where T : class
         {
-            return FilterResults(DatabaseAccess.GetDbContext(typeof(T)).Set<T>());
+            var dbContext = DatabaseAccess.GetDbContext(typeof(T)); var entityType = dbContext.Model.FindEntityType(typeof(T));
+            if (entityType == null || entityType.IsQueryType)
+            {
+                return FilterResults(dbContext.Query<T>());
+            }
+            else
+            {
+                return FilterResults(dbContext.Set<T>());
+            }
         }
 
         public async Task<IList<T>> FindAllAsync<T>(CancellationToken cancellationToken) where T : class
         {
-            return await FilterResults(DatabaseAccess.GetDbContext(typeof(T)).Set<T>()).ToListAsync(cancellationToken);
+            return await FindAll<T>().ToListAsync(cancellationToken);
         }
 
         public IEnumerable<T> FindAllWithAdded<T>() where T : class
@@ -263,8 +271,7 @@ namespace Revo.EFCore.DataAccess.Entities
 
         public IQueryable<T> Where<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            return FilterResults(DatabaseAccess.GetDbContext(typeof(T)).Set<T>())
-                .Where(predicate);
+            return FindAll<T>().Where(predicate);
         }
 
         public IEnumerable<T> WhereWithAdded<T>(Expression<Func<T, bool>> predicate) where T : class
