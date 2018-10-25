@@ -24,7 +24,7 @@ namespace Revo.Domain.Core
             {
                 Bind<IEntityTypeManager, IApplicationStartListener>()
                     .To<EntityTypeManager>()
-                    .InRequestOrJobScope();
+                    .InTaskScope();
             }
         }
     }

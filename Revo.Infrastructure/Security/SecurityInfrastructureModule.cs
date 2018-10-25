@@ -13,11 +13,11 @@ namespace Revo.Infrastructure.Security
         {
             Bind<IEntityQueryAuthorizer>()
                 .To<EntityQueryAuthorizer>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<IEntityQueryFilterFactory>()
                 .To<EntityQueryFilterFactory>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<ICommandPermissionCache, IApplicationStartListener>()
                 .To<CommandPermissionCache>()

@@ -41,7 +41,5 @@ namespace Revo.AspNet.Globalization
 
         public override bool CanRead => false;
         public override bool CanWrite => true;
-
-        
     }
 }

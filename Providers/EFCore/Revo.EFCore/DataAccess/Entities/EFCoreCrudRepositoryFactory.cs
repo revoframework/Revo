@@ -11,17 +11,20 @@ namespace Revo.EFCore.DataAccess.Entities
     {
         private readonly Func<IDbContextFactory> dbContextFactoryFunc;
         private readonly Func<IRepositoryFilter[]> repositoryFiltersFunc;
+        private readonly Func<IRequestDbContextCache> requestDbContextCacheFunc;
 
         public EFCoreCrudRepositoryFactory(Func<IDbContextFactory> dbContextFactoryFunc,
-            Func<IRepositoryFilter[]> repositoryFiltersFunc)
+            Func<IRepositoryFilter[]> repositoryFiltersFunc,
+            Func<IRequestDbContextCache> requestDbContextCacheFunc)
         {
             this.dbContextFactoryFunc = dbContextFactoryFunc;
             this.repositoryFiltersFunc = repositoryFiltersFunc;
+            this.requestDbContextCacheFunc = requestDbContextCacheFunc;
         }
 
         public IEFCoreCrudRepository Create()
         {
-            var databaseAccess = new EFCoreDatabaseAccess(dbContextFactoryFunc());
+            var databaseAccess = new EFCoreDatabaseAccess(dbContextFactoryFunc(), requestDbContextCacheFunc());
             return new EFCoreCrudRepository(repositoryFiltersFunc(), databaseAccess);
         }
 

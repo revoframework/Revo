@@ -9,11 +9,11 @@ namespace Revo.Infrastructure.Jobs
         {
             Bind<IJobHandler<IExecuteCommandJob>>()
                 .To<ExecuteCommandJobHandler>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<IJobRunner>()
                 .To<JobRunner>()
-                .InRequestOrJobScope();
+                .InTaskScope();
         }
     }
 }

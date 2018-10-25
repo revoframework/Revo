@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Revo.DataAccess.Entities;
 using Revo.DataAccess.InMemory;
@@ -11,6 +12,8 @@ namespace Revo.EF6.DataAccess.InMemory
         public EF6InMemoryCrudRepository()
         {
         }
+
+        public IEF6DatabaseAccess DatabaseAccess => throw new NotImplementedException();
 
         public IEnumerable<IDbEntityEntry> Entries()
         {

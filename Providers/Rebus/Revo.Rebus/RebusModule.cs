@@ -37,11 +37,11 @@ namespace Revo.Rebus
 
             Bind<IAsyncEventListener<IEvent>>()
                 .To<RebusEventListener>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<IAsyncEventSequencer<IEvent>, RebusEventListener.RebusEventSequencer>()
                 .To<RebusEventListener.RebusEventSequencer>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<IHandleMessages<IEvent>>()
                 .To<RebusEventMessageHandler>()

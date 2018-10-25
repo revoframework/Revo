@@ -15,7 +15,7 @@ namespace Revo.Examples.HelloAspNet.Bootstrap
         {
             Bind<IEF6EntityEventProjector<Todo>>()
                 .To<TodoReadModelProjector>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<IHttpApplicationInitializer>()
                 .To<AppStartHttpApplicationInitializer>()

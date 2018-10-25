@@ -15,7 +15,7 @@ namespace Revo.EFCore.EventStores
         {
             Bind<IEventStore>()
                 .To<EFCoreEventStore>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<ICrudRepository>()
                 .To<EFCoreCrudRepository>()

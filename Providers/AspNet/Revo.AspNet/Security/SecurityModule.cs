@@ -17,11 +17,11 @@ namespace Revo.AspNet.Security
         {
             Bind<SignInManager<IIdentityUser, Guid>>()
                 .To<SignInManager<IIdentityUser, Guid>>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<UserManager<IIdentityUser, Guid>>()
                 .To<UserManager<IIdentityUser, Guid>>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<IAuthenticationManager>()
                 .ToMethod(ctx =>
@@ -29,7 +29,7 @@ namespace Revo.AspNet.Security
 
             Bind<IUserContext>()
                 .To<AspNetUserContext>()
-                .InRequestOrJobScope();
+                .InTaskScope();
         }
     }
 }

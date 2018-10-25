@@ -11,21 +11,20 @@ namespace Revo.EFCore.DataAccess.Entities
     {
         private readonly Dictionary<string, DbContext> dbContexts = new Dictionary<string, DbContext>();
         private readonly IDbContextFactory dbContextFactory;
+        private readonly IRequestDbContextCache requestDbContextCache;        
 
-        public EFCoreDatabaseAccess(IDbContextFactory dbContextFactory)
+        public EFCoreDatabaseAccess(IDbContextFactory dbContextFactory, IRequestDbContextCache requestDbContextCache)
         {
             this.dbContextFactory = dbContextFactory;
+            this.requestDbContextCache = requestDbContextCache;
         }
 
         public IReadOnlyDictionary<string, DbContext> DbContexts => dbContexts;
 
         public void Dispose()
         {
-            foreach (var dbContext in dbContexts)
-            {
-                dbContext.Value.Dispose();
-            }
         }
+
         public IQueryable<T> FromSql<T>([NotParameterized] FormattableString sql)
             where T : class
         {
@@ -60,6 +59,7 @@ namespace Revo.EFCore.DataAccess.Entities
 
                 dbContext = dbContextFactory.CreateContext(schemaSpace);
                 dbContexts.Add(schemaSpace, dbContext);
+                requestDbContextCache.AddDbContext(dbContext);
                 return dbContext;
             }
         }

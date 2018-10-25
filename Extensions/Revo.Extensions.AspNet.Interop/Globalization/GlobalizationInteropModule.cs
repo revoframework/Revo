@@ -16,7 +16,7 @@ namespace Revo.Extensions.AspNet.Interop.Globalization
             
             Bind<IEventListener<MessageRepositoryReloadedEvent>>()
                 .To<DbMessageCacheReloader>()
-                .InRequestOrJobScope();
+                .InTaskScope();
         }
     }
 }

@@ -48,7 +48,7 @@ namespace Revo.Core.Commands
                 {
                     CommandBindExtensions
                         .BindCommandHandler(kernel, commandHandlerType)
-                        .InRequestOrJobScope();
+                        .InTaskScope();
                 }
             }
         }

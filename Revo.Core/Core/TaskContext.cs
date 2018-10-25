@@ -3,13 +3,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Ninject.Infrastructure.Disposal;
 
 namespace Revo.Core.Core
 {
-    public sealed class TaskContext : IDisposable
+    public sealed class TaskContext : DisposableObject
     {
         private static readonly AsyncLocal<TaskContext[]> CurrentLocal = new AsyncLocal<TaskContext[]>();
-        private bool disposed = false;
 
         private TaskContext()
         {
@@ -26,9 +26,9 @@ namespace Revo.Core.Core
             return Current;
         }
 
-        public void Dispose()
+        public override void Dispose(bool disposing)
         {
-            if (!disposed)
+            if (!IsDisposed)
             {
                 Debug.Assert(Current == this);
 
@@ -36,6 +36,8 @@ namespace Revo.Core.Core
                     ? null
                     : CurrentLocal.Value.Take(CurrentLocal.Value.Length - 1).ToArray();
             }
+
+            base.Dispose(disposing);
         }
     }
 }

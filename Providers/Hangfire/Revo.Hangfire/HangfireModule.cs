@@ -11,7 +11,7 @@ namespace Revo.Hangfire
         {
             Bind<IJobScheduler>()
                 .To<HangfireJobScheduler>()
-                .InRequestOrJobScope();
+                .InTaskScope();
         }
     }
 }

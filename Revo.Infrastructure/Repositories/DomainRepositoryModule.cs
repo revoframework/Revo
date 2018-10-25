@@ -12,7 +12,7 @@ namespace Revo.Infrastructure.Repositories
         {
             Bind<IRepository>()
                 .To<Repository>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<IRepositoryFactory>()
                 .To<RepositoryFactory>()

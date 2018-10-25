@@ -18,11 +18,11 @@ namespace Revo.Extensions.History.ChangeTracking
 
             Bind<IChangeTracker>()
                 .To<ChangeTracker>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<IEntityAttributeChangeLogger>()
                 .To<EntityAttributeChangeLogger>()
-                .InRequestOrJobScope();
+                .InTaskScope();
         }
     }
 }

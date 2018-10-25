@@ -17,11 +17,11 @@ namespace Revo.Infrastructure.Globalization.Messages.Database
                     IEventListener<LocalizationMessageModifiedEvent>,
                     IEventListener<LocalizationMessageDeletedEvent>>()
                 .To<DbMessageLoader>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<IEventListener<DbMessageCacheReloadedEvent>>()
                 .To<MessageRepositoryReloader>()
-                .InRequestOrJobScope();
+                .InTaskScope();
         }
     }
 }

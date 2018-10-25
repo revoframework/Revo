@@ -41,18 +41,22 @@ namespace Revo.EF6.DataAccess
                 {
                     typeof(ICrudRepository), typeof(IReadRepository)
                 });
-
-                Bind<IDatabaseAccess>().To<DatabaseAccess>()
-                    .InRequestOrJobScope();
             }
 
             Bind(repositoryTypes.ToArray())
                 .To<EF6CrudRepository>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind(repositoryTypes.Select(x => typeof(ICrudRepositoryFactory<>).MakeGenericType(x)).ToArray())
                 .To<EF6CrudRepositoryFactory>()
-                .InRequestOrJobScope();
+                .InTaskScope();
+
+            Bind<IEF6DatabaseAccess>().To<EF6DatabaseAccess>()
+                .InTaskScope();
+
+            Bind<IRequestDbContextCache>()
+                .To<RequestDbContextCache>()
+                .InRequestScope();
 
             Bind<IModelMetadataExplorer, IApplicationStartListener>()
                 .To<ModelMetadataExplorer>()

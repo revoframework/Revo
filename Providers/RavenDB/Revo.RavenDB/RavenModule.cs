@@ -59,7 +59,7 @@ namespace Revo.RavenDB
                     var documentStore = ctx.Kernel.Get<IDocumentStore>();
                     return documentStore.OpenAsyncSession();
                 })
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             List<Type> repositoryTypes = new List<Type>()
             {
@@ -76,11 +76,11 @@ namespace Revo.RavenDB
             
             Bind(repositoryTypes.ToArray())
                 .To<RavenCrudRepository>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind(repositoryTypes.Select(x => typeof(ICrudRepositoryFactory<>).MakeGenericType(x)).ToArray())
                 .To<RavenCrudRepositoryFactory>()
-                .InRequestOrJobScope();
+                .InTaskScope();
         }
     }
 }

@@ -21,7 +21,7 @@ namespace Revo.Infrastructure.Events.Async
 
             Bind<IAsyncEventWorker>()
                 .To<LockingAsyncEventWorker>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<IAsyncEventWorker>()
                 .To<AsyncEventWorker>()
@@ -30,15 +30,15 @@ namespace Revo.Infrastructure.Events.Async
 
             Bind<IAsyncEventQueueDispatcher>()
                 .To<AsyncEventQueueDispatcher>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<IEventListener<IEvent>, IUnitOfWorkListener>()
                 .To<AsyncEventQueueDispatchListener>()
-                .InRequestOrJobScope();
+                .InTaskScope();
             
             Bind<IAsyncEventProcessor>()
                 .To<AsyncEventProcessor>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<IJobHandler<ProcessAsyncEventsJob>>()
                 .To<ProcessAsyncEventsJobHandler>()

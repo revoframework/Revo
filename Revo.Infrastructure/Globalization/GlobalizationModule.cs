@@ -18,7 +18,7 @@ namespace Revo.Infrastructure.Globalization
 
             Bind<IMessageRepository>()
                 .To<MessageRepository>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<IApplicationStartListener>()
                 .To<LocaleLoader>()

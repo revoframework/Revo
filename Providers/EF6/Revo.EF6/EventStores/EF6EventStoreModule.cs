@@ -15,7 +15,7 @@ namespace Revo.EF6.EventStores
         {
             Bind<IEventStore>()
                 .To<EF6EventStore>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<ICrudRepository>()
                 .To<EF6CrudRepository>()

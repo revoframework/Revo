@@ -10,11 +10,11 @@ namespace Revo.Infrastructure.Events
         {
             Bind<IEventMessageFactory>()
                 .To<EventMessageFactory>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<IEventMetadataProvider>()
                 .To<ActorNameEventMetadataProvider>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<IEventMetadataProvider>()
                 .To<MachineNameEventMetadataProvider>()
@@ -22,11 +22,11 @@ namespace Revo.Infrastructure.Events
             
             Bind<IEventMetadataProvider>()
                 .To<UserIdEventMetadataProvider>()
-                .InRequestOrJobScope();
+                .InTaskScope();
             
             Bind<IEventMetadataProvider>()
                 .To<CommandContextEventMetadataProvider>()
-                .InRequestOrJobScope();
+                .InTaskScope();
         }
     }
 }

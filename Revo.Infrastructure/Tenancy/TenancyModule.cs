@@ -10,7 +10,7 @@ namespace Revo.Infrastructure.Tenancy
         {
             Bind<ITenantContext>()
                 .To<DefaultTenantContext>()
-                .InRequestOrJobScope();
+                .InTaskScope();
             
             Bind<IRepositoryFilter>()
                 .To<TenantRepositoryFilter>()

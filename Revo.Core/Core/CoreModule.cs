@@ -27,15 +27,15 @@ namespace Revo.Core.Core
 
             Bind<IEventBus>()
                 .To<EventBus>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<ICommandContext, CommandContextStack>()
                 .To<CommandContextStack>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<IUnitOfWorkFactory>()
                 .To<UnitOfWorkFactory>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<IUnitOfWork>()
                 .ToMethod(ctx => ctx.ContextPreservingGet<ICommandContext>().UnitOfWork ?? throw new InvalidOperationException("Trying to resolve IUnitOfWork when there is no instance active in current command context"))
@@ -43,7 +43,7 @@ namespace Revo.Core.Core
 
             Bind<IPublishEventBufferFactory>()
                 .To<PublishEventBufferFactory>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<IPublishEventBuffer>()
                 .ToMethod(ctx => ctx.ContextPreservingGet<IUnitOfWork>().EventBuffer)
@@ -71,7 +71,7 @@ namespace Revo.Core.Core
 
             Bind<IPermissionAuthorizationMatcher>()
                 .To<PermissionAuthorizationMatcher>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<IPermissionCache>()
                 .To<PermissionCache>()
@@ -79,7 +79,7 @@ namespace Revo.Core.Core
 
             Bind<IUserPermissionAuthorizer>()
                 .To<UserPermissionAuthorizer>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<IAutoMapperProfileDiscovery>()
                 .To<AutoMapperProfileDiscovery>()

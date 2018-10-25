@@ -16,7 +16,7 @@ namespace Revo.Infrastructure.Sagas
         {
             Bind<ISagaLocator>()
                 .To<KeySagaLocator>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<ISagaRegistry>()
                 .To<SagaRegistry>()
@@ -45,11 +45,11 @@ namespace Revo.Infrastructure.Sagas
 
             Bind<IAsyncEventSequencer<DomainEvent>, SagaEventListener.SagaEventSequencer>()
                 .To<SagaEventListener.SagaEventSequencer>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<IAsyncEventListener<DomainEvent>>()
                 .To<SagaEventListener>()
-                .InRequestOrJobScope();
+                .InTaskScope();
         }
     }
 }

@@ -21,7 +21,7 @@ namespace Revo.EFCore.DataAccess.Entities
             IEFCoreDatabaseAccess databaseAccess)
         {
             this.repositoryFilters = repositoryFilters;
-            this.DatabaseAccess = databaseAccess;
+            DatabaseAccess = databaseAccess;
         }
 
         public IEFCoreDatabaseAccess DatabaseAccess { get; }
@@ -52,7 +52,6 @@ namespace Revo.EFCore.DataAccess.Entities
 
         public void Dispose()
         {
-            DatabaseAccess.Dispose();
         }
 
         public T Get<T>(object id) where T : class
@@ -171,7 +170,8 @@ namespace Revo.EFCore.DataAccess.Entities
 
         public IQueryable<T> FindAll<T>() where T : class
         {
-            var dbContext = DatabaseAccess.GetDbContext(typeof(T)); var entityType = dbContext.Model.FindEntityType(typeof(T));
+            var dbContext = DatabaseAccess.GetDbContext(typeof(T));
+            var entityType = dbContext.Model.FindEntityType(typeof(T));
             if (entityType == null || entityType.IsQueryType)
             {
                 return FilterResults(dbContext.Query<T>());

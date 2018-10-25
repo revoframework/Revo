@@ -15,7 +15,7 @@ namespace Revo.EF6.Events
         {
             Bind<IAsyncEventQueueManager>()
                 .To<AsyncEventQueueManager>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<ICrudRepository>()
                 .To<EF6CrudRepository>()

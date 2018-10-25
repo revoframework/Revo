@@ -13,18 +13,23 @@ namespace Revo.EF6.DataAccess.Entities
         private readonly Func<IModelMetadataExplorer> modelMetadataExplorerFunc;
         private readonly Func<IDbContextFactory> dbContextFactoryFunc;
         private readonly Func<IRepositoryFilter[]> repositoryFiltersFunc;
+        private readonly Func<IRequestDbContextCache> requestDbContextCacheFunc;
 
         public EF6CrudRepositoryFactory(Func<IModelMetadataExplorer> modelMetadataExplorerFunc,
-            Func<IDbContextFactory> dbContextFactoryFunc, Func<IRepositoryFilter[]> repositoryFiltersFunc)
+            Func<IDbContextFactory> dbContextFactoryFunc, Func<IRepositoryFilter[]> repositoryFiltersFunc,
+            Func<IRequestDbContextCache> requestDbContextCacheFunc)
         {
             this.modelMetadataExplorerFunc = modelMetadataExplorerFunc;
             this.dbContextFactoryFunc = dbContextFactoryFunc;
             this.repositoryFiltersFunc = repositoryFiltersFunc;
+            this.requestDbContextCacheFunc = requestDbContextCacheFunc;
         }
 
         public IEF6CrudRepository Create()
         {
-            return new EF6CrudRepository(modelMetadataExplorerFunc(), dbContextFactoryFunc(), repositoryFiltersFunc());
+            var databaseAccess = new EF6DatabaseAccess(dbContextFactoryFunc(),
+                requestDbContextCacheFunc(), modelMetadataExplorerFunc());
+            return new EF6CrudRepository(databaseAccess, repositoryFiltersFunc());
         }
 
         IReadRepository ICrudRepositoryFactory<IReadRepository>.Create()

@@ -11,7 +11,7 @@ namespace Revo.AspNetCore.Security
         {
             Bind<IUserContext>()
                 .To<AspNetCoreUserContext>()
-                .InRequestOrJobScope();
+                .InTaskScope();
         }
     }
 }

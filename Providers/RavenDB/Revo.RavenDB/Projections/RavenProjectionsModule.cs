@@ -12,11 +12,11 @@ namespace Revo.RavenDB.Projections
         {
             Bind<IAsyncEventSequencer<DomainAggregateEvent>, RavenProjectionEventListener.RavenProjectionEventSequencer>()
                 .To<RavenProjectionEventListener.RavenProjectionEventSequencer>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<IAsyncEventListener<DomainAggregateEvent>>()
                 .To<RavenProjectionEventListener>()
-                .InRequestOrJobScope();
+                .InTaskScope();
         }
     }
 }

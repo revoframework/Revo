@@ -21,12 +21,12 @@ namespace Revo.Infrastructure.Repositories
 
         public CrudAggregateStore(ICrudRepository crudRepository,
             IEntityTypeManager entityTypeManager,
-            IPublishEventBuffer eventQueue,
+            IPublishEventBuffer publishEventBuffer,
             IEventMessageFactory eventMessageFactory)
         {
             this.crudRepository = crudRepository;
             this.entityTypeManager = entityTypeManager;
-            this.publishEventBuffer = eventQueue;
+            this.publishEventBuffer = publishEventBuffer;
             this.eventMessageFactory = eventMessageFactory;
         }
 
@@ -145,7 +145,7 @@ namespace Revo.Infrastructure.Repositories
         private async Task<List<IEventMessageDraft>> CreateEventMessagesAsync(IAggregateRoot aggregate, IReadOnlyCollection<DomainAggregateEvent> events)
         {
             var messages = new List<IEventMessageDraft>();
-            Guid? aggregateClassId = entityTypeManager.TryGetClassInfoByClrType(aggregate.GetType()).Id;
+            Guid? aggregateClassId = entityTypeManager.TryGetClassInfoByClrType(aggregate.GetType())?.Id;
 
             foreach (DomainAggregateEvent ev in events)
             {

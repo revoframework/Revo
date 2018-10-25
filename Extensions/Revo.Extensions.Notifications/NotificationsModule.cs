@@ -33,7 +33,7 @@ namespace Revo.Extensions.Notifications
             
             Bind<IBufferedNotificationStore>()
                 .To<BufferedNotificationStore>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<ICrudRepository>()
                 //.To<CrudRepository>()

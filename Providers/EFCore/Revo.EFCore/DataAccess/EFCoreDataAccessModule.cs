@@ -37,15 +37,19 @@ namespace Revo.EFCore.DataAccess
 
             Bind(repositoryTypes.ToArray())
                 .To<EFCoreCrudRepository>()
-                .InRequestOrJobScope();
+                .InTaskScope();
+
+            Bind<IRequestDbContextCache>()
+                .To<RequestDbContextCache>()
+                .InRequestScope();
 
             Bind(repositoryTypes.Select(x => typeof(ICrudRepositoryFactory<>).MakeGenericType(x)).ToArray())
                 .To<EFCoreCrudRepositoryFactory>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<IEFCoreDatabaseAccess>()
                 .To<EFCoreDatabaseAccess>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<ModelDefinitionDiscovery>()
                 .ToSelf()

@@ -24,7 +24,7 @@ namespace Revo.AspNetCore
 
             Bind<IActorContext>()
                 .To<UserActorContext>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<IServiceLocator>()
                 .To<NinjectServiceLocator>()

@@ -19,7 +19,7 @@ namespace Revo.Core.Commands
                 bindingRoot
                     .Bind(decoratorTypePair.Key)
                     .To(decoratorTypePair.Value)
-                    .InRequestOrJobScope();
+                    .InTaskScope();
             }
 
             return bindingRoot
@@ -40,7 +40,7 @@ namespace Revo.Core.Commands
                 bindingRoot
                     .Bind(decoratorTypePair.Key)
                     .To(decoratorTypePair.Value)
-                    .InRequestOrJobScope();
+                    .InTaskScope();
             }
 
             return bindingRoot

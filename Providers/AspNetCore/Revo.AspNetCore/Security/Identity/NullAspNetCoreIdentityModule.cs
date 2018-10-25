@@ -10,11 +10,11 @@ namespace Revo.AspNetCore.Security.Identity
         {
             Bind<IUserManager>()
                 .To<NullUserManager>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<ISignInManager>()
                 .To<NullSignInManager>()
-                .InRequestOrJobScope();
+                .InTaskScope();
         }
     }
 }

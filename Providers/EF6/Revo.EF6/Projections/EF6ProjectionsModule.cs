@@ -12,11 +12,11 @@ namespace Revo.EF6.Projections
         {
             Bind<IAsyncEventSequencer<DomainAggregateEvent>, EF6ProjectionEventListener.EF6ProjectionEventSequencer>()
                 .To<EF6ProjectionEventListener.EF6ProjectionEventSequencer>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<IAsyncEventListener<DomainAggregateEvent>>()
                 .To<EF6ProjectionEventListener>()
-                .InRequestOrJobScope();
+                .InTaskScope();
         }
     }
 }

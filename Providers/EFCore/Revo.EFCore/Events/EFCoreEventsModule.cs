@@ -15,7 +15,7 @@ namespace Revo.EFCore.Events
         {
             Bind<IAsyncEventQueueManager>()
                 .To<AsyncEventQueueManager>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<ICrudRepository>()
                 .To<EFCoreCrudRepository>()

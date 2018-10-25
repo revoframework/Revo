@@ -6,7 +6,16 @@ namespace Revo.AspNetCore.Ninject
 {
     public class AspNetCoreNinjectBindingExtension : INinjectBindingExtension
     {
-        public IBindingNamedWithOrOnSyntax<T> InRequestOrJobScope<T>(IBindingInSyntax<T> syntax)
+        public IBindingNamedWithOrOnSyntax<T> InRequestScope<T>(IBindingInSyntax<T> syntax)
+        {
+            return syntax
+                .InScope(context =>
+                   RevoStartup.RequestScope(context)
+                    ?? (object)TaskContext.Current
+                    ?? StandardScopeCallbacks.Thread(context));
+        }
+
+        public IBindingNamedWithOrOnSyntax<T> InTaskScope<T>(IBindingInSyntax<T> syntax)
         {
             return syntax
                 .InScope(context =>

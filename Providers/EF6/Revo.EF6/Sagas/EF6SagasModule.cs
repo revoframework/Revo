@@ -13,7 +13,7 @@ namespace Revo.EF6.Sagas
         {
             Bind<ISagaMetadataRepository>()
                 .To<SagaMetadataRepository>()
-                .InRequestOrJobScope();
+                .InTaskScope();
 
             Bind<IEF6CrudRepository>()
                 .To<EF6CrudRepository>()

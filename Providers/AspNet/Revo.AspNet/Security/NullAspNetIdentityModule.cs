@@ -13,7 +13,7 @@ namespace Revo.AspNet.Security
         {
             Bind<IUserStore<IIdentityUser, Guid>>()
                 .To<NullUserStore>()
-                .InRequestOrJobScope();
+                .InTaskScope();
         }
     }
 }
