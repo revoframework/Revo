@@ -14,11 +14,11 @@ namespace Revo.Hangfire
             this.jobRunner = jobRunner;
         }
 
-        public Task ExecuteAsync(TJob job)
+        public async Task ExecuteAsync(TJob job)
         {
             using (TaskContext.Enter())
             {
-                return jobRunner.RunJobAsync(job);
+                await jobRunner.RunJobAsync(job); // has to await, otherwise task context gets disposed too early
             }
         }
     }

@@ -15,6 +15,7 @@ to Providers directory and some of them merged/renamed:
   - _Revo.Integrations.Rebus → Revo.Rebus_
 - **improved AsyncEventWorker concurrency** - framework did not prevent multiple workers from parallel processing of one async event queue, causing occasional (e.g. when under heavy load) concurrency exceptions 
 (which are eventually handled by an automatic retry); now allowing only one active worker per a queue in an application instance
+- **Ninject binding extensions InRequestOrJobScope** is now two separate methods with corresponding fallbacks in order - InTaskScope (mostly preferred) and InRequestScope
   
 ### Removed
 - **IAutoMapperDefinition** - removed as obsolete and replaced with AutoMapper's own profiles (auto-discovered again)
@@ -24,6 +25,8 @@ to Providers directory and some of them merged/renamed:
 
 ### Fixed
 - **CRUD repositories** now correctly wrap their **concurrency exceptions as OptimisticConcurrencyException**
+- **objects from DI container** are now deterministically disposed at the end of tasks run within a context
+- **Hangfire job task context disposal** now correctly awaits the command to finish
 
 ## [1.3.0] - 2018-08-31
 ### Fixed
