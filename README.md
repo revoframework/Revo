@@ -33,7 +33,7 @@ Furthermore, its extensions implement other useful features like entity history 
 Building blocks for rich DDD-style domain models \([aggregates](https://revoframework.gitbook.io/revo/reference-guide/domain-building-blocks#aggregates), [entities](https://revoframework.gitbook.io/revo/reference-guide/domain-building-blocks#entities), [value objects](https://revoframework.gitbook.io/revo/reference-guide/domain-building-blocks#value-objects), [domain events](https://revoframework.gitbook.io/revo/reference-guide/domain-building-blocks#domain-events), [repositories](https://revoframework.gitbook.io/revo/reference-guide/data-persistence#aggregate-repository)...\).
 
 [**Event Sourcing**](https://revoframework.gitbook.io/revo/reference-guide/events)  
-Implementing event-sourced entity persistence with multiple backends \(just _MSSQL_ for now\).
+Implementing event-sourced entity persistence with support for multiple event store backends \(PostgreSQL, MSSQL...\).
 
 [**CQRS**](https://revoframework.gitbook.io/revo/reference-guide/commands-and-queries)  
 Segregating command and query responsibilities with:
@@ -49,7 +49,7 @@ Support for both [synchronous](https://revoframework.gitbook.io/revo/reference-g
 Abstraction layer for _Entity Framework 6_, _RavenDB,_ testable _in-memory database_ or other data providers.
 
 [**Projections**](https://revoframework.gitbook.io/revo/reference-guide/projections)  
-Support for read-model projections with various backends \(e.g. _MSSQL_/_Entity Framework 6_, _RavenDB_...\), automatic idempotency- and concurrency-handling, etc.
+Support for read-model projections with various backends \(e.g. _Entity Framework Core_ (_PostgreSQL_, _MSSQL_...), _Entity Framework 6_, _RavenDB_...\), automatic idempotency- and concurrency-handling, etc.
 
 [**SOA and integration**](https://revoframework.gitbook.io/revo/reference-guide/integrations)  
 Scale and integrate by publishing and receiving events, commands and queries using common messaging patterns,<br>e.g. with _RabbitMQ_ message queue and/or uses _Rebus_ service bus.
@@ -68,7 +68,7 @@ Basic permission/role-based ACL for commands and queries, fine-grained row filte
 * [**Event versioning**](https://revoframework.gitbook.io/revo/reference-guide/events#event-versioning)
 * **History and change-tracking**
 * **User notifications:** event-based, with mail/APNS/FCM output channels, supporting aggregation, etc.
-* **ASP.NET support** \(ASP.NET Core coming soon...\)
+* **ASP.NET Core (.NET Standard) & ASP.NET support**
 
 ## Getting started
 
@@ -128,32 +128,73 @@ Binaries are up for grabs in form of NuGet packages:
 <table border="0" cellpadding="0" cellspacing="0" style="float:left;">
   <tr>
     <th colspan="2">
-      Entity Framework 6 (.NET Framework 4.7.1)
+      Data access
     </th>
   </tr>
   <tr>
     <td>
-      Revo.DataAccess.EF6
+      Revo.EFCore
     </td>
     <td>
-      <a href="https://www.nuget.org/packages/Revo.DataAccess.EF6/"><img src="https://img.shields.io/nuget/v/Revo.DataAccess.EF6.svg" alt="NuGet package version"></a>
+      <a href="https://www.nuget.org/packages/Revo.EFCore/"><img src="https://img.shields.io/nuget/v/Revo.EFCore.svg" alt="NuGet package version"></a>
     </td>
   </tr>
   <tr>
     <td>
-      Revo.Infrastructure.EF6
+      Revo.EFCore.AspNetCoreOData
     </td>
     <td>
-      <a href="https://www.nuget.org/packages/Revo.Infrastructure.EF6/"><img src="https://img.shields.io/nuget/v/Revo.Infrastructure.EF6.svg" alt="NuGet package version"></a>
+      <a href="https://www.nuget.org/packages/Revo.EFCore.AspNetCoreOData/"><img src="https://img.shields.io/nuget/v/Revo.EFCore.AspNetCoreOData.svg" alt="NuGet package version"></a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Revo.EF6
+    </td>
+    <td>
+      <a href="https://www.nuget.org/packages/Revo.EF6/"><img src="https://img.shields.io/nuget/v/Revo.EF6.svg" alt="NuGet package version"></a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Revo.EF6.AspNetOData
+    </td>
+    <td>
+      <a href="https://www.nuget.org/packages/Revo.EF6.AspNetOData/"><img src="https://img.shields.io/nuget/v/Revo.EF6.AspNetOData.svg" alt="NuGet package version"></a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Revo.RavenDB
+    </td>
+    <td>
+      <a href="https://www.nuget.org/packages/Revo.RavenDB/"><img src="https://img.shields.io/nuget/v/Revo.RavenDB.svg" alt="NuGet package version"></a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Revo.RavenDB.AspNetOData
+    </td>
+    <td>
+      <a href="https://www.nuget.org/packages/Revo.RavenDB.AspNetOData/"><img src="https://img.shields.io/nuget/v/Revo.RavenDB.AspNetOData.svg" alt="NuGet package version"></a>
     </td>
   </tr>
 </table>
 
+
 <table border="0" cellpadding="0" cellspacing="0" style="float:left;">
   <tr>
     <th colspan="2">
-      ASP.NET (.NET Framework 4.7.1)
+      Platforms
     </th>
+  </tr>
+  <tr>
+    <td>
+      Revo.AspNetCore
+    </td>
+    <td>
+      <a href="https://www.nuget.org/packages/Revo.AspNetCore/"><img src="https://img.shields.io/nuget/v/Revo.AspNetCore.svg" alt="NuGet package version"></a>
+    </td>
   </tr>
   <tr>
     <td>
@@ -165,10 +206,10 @@ Binaries are up for grabs in form of NuGet packages:
   </tr>
   <tr>
     <td>
-      Revo.Extensions.AspNet.Interop
+      Revo.Hangfire
     </td>
     <td>
-      <a href="https://www.nuget.org/packages/Revo.Extensions.AspNet.Interop/"><img src="https://img.shields.io/nuget/v/Revo.Extensions.AspNet.Interop.svg" alt="NuGet package version"></a>
+      <a href="https://www.nuget.org/packages/Revo.Hangfire/"><img src="https://img.shields.io/nuget/v/Revo.Hangfire.svg" alt="NuGet package version"></a>
     </td>
   </tr>
 </table>
@@ -181,10 +222,10 @@ Binaries are up for grabs in form of NuGet packages:
   </tr>
   <tr>
     <td>
-      Revo.Integrations.Rebus
+      Revo.Extensions.AspNet.Interop
     </td>
     <td>
-      <a href="https://www.nuget.org/packages/Revo.Integrations.Rebus/"><img src="https://img.shields.io/nuget/v/Revo.Integrations.Rebus.svg" alt="NuGet package version"></a>
+      <a href="https://www.nuget.org/packages/Revo.Extensions.AspNet.Interop/"><img src="https://img.shields.io/nuget/v/Revo.Extensions.AspNet.Interop.svg" alt="NuGet package version"></a>
     </td>
   </tr>
   <tr>
@@ -203,10 +244,18 @@ Binaries are up for grabs in form of NuGet packages:
       <a href="https://www.nuget.org/packages/Revo.Extensions.Notifications/"><img src="https://img.shields.io/nuget/v/Revo.Extensions.Notifications.svg" alt="NuGet package version"></a>
     </td>
   </tr>
+  <tr>
+    <td>
+      Revo.Rebus
+    </td>
+    <td>
+      <a href="https://www.nuget.org/packages/Revo.Rebus/"><img src="https://img.shields.io/nuget/v/Revo.Rebus.svg" alt="NuGet package version"></a>
+    </td>
+  </tr>
 </table>
 </div>
 
-Most applications will require at least **Revo.Core**, **Revo.DataAccess**, **Revo.Domain**, **Revo.Infrastructure** packages to get started with and then typically **Revo.Platforms.AspNet** package (ASP.NET platform implementation) and **Revo.DataAccess.EF6** with **Revo.Infrastructure.EF6** package (for Entity Framework 6 support).
+Most applications will require at least **Revo.Core**, **Revo.DataAccess**, **Revo.Domain**, **Revo.Infrastructure** packages to get started with and then typically a platform package like **Revo.Platforms.AspNetCore** (ASP.NET Core platform implementation) and a data-access package like **Revo.EFCore** (for Entity Framework Core support).
 
 ## Examples
 
@@ -216,7 +265,7 @@ For now, see the sample Hello World application in the examples folder ([Example
 
 ## Requirements
 
-The framework is written in C\# 7.1 and targets the .NET Standard 2.0 specification; some of its modules currently also require the .NET Framework 4.7.1 where needed \(e.g. Entity Framework 6 support\). Revo also makes a heavy use of the C\# async/await pattern and uses the TAP \(Task Asynchronous Pattern\) throughout its entire codebase \(i.e. _async all the way_\).
+The framework is written in C\# 7.1 and targets the .NET Standard 2.0 specification; some of its modules currently also use .NET Core 2.1 (ASP.NET Core) or .NET Framework 4.7.1 where needed \(e.g. Entity Framework 6 support\). Revo also makes a heavy use of the C\# async/await pattern and uses the TAP \(Task Asynchronous Pattern\) throughout its entire codebase \(i.e. _async all the way_\).
 
 ## License
 

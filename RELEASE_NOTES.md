@@ -1,6 +1,6 @@
 # RELEASE NOTES
 
-## [1.4.0] - unreleased (_develop_)
+## [1.4.0] - 2018-11-05
 
 ### Added
 - [#1](https://github.com/revoframework/Revo/issues/1) **ASP.NET Core support** - platform implementation, i.e. user context, security, DI, OData, etc.
@@ -9,7 +9,7 @@
 
 ### Changed
 - **flattened and simplified package structure** (now provider-centric) - vendor-specific modules were moved
-to Providers directory and some of them merged/renamed:  
+to Providers directory and some of them were merged/renamed:  
   - _Revo.Platforms.AspNet → Revo.AspNet_
   - _Revo.DataAccess.EF6 and Revo.Infrastructure.EF6 → Revo.EF6_  
   - _Revo.DataAccess.RavenDB → Revo.RavenDB_  
