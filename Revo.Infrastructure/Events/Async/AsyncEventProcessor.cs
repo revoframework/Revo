@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using NLog;
 using Revo.Core.Core;
@@ -13,17 +14,17 @@ namespace Revo.Infrastructure.Events.Async
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly Func<IAsyncEventWorker> asyncEventQueueBacklogWorkerFunc;
+        private readonly Func<IAsyncEventWorker> asyncEventWorkerFunc;
         private readonly IAsyncEventQueueManager asyncEventQueueManager;
         private readonly IJobScheduler jobScheduler;
         private readonly IAsyncEventPipelineConfiguration asyncEventPipelineConfiguration;
 
-        public AsyncEventProcessor(Func<IAsyncEventWorker> asyncEventQueueBacklogWorkerFunc,
+        public AsyncEventProcessor(Func<IAsyncEventWorker> asyncEventWorkerFunc,
             IAsyncEventQueueManager asyncEventQueueManager,
             IJobScheduler jobScheduler,
             IAsyncEventPipelineConfiguration asyncEventPipelineConfiguration)
         {
-            this.asyncEventQueueBacklogWorkerFunc = asyncEventQueueBacklogWorkerFunc;
+            this.asyncEventWorkerFunc = asyncEventWorkerFunc;
             this.asyncEventQueueManager = asyncEventQueueManager;
             this.jobScheduler = jobScheduler;
             this.asyncEventPipelineConfiguration = asyncEventPipelineConfiguration;
@@ -79,30 +80,44 @@ namespace Revo.Infrastructure.Events.Async
 
         private async Task<string[]> TryRunQueues(string[] queues)
         {
-            string[] finishedQueues = await Task.WhenAll(queues.Select(x =>
-                Task.Factory.StartNewWithContext(async () =>
-                {
-                    try
-                    {
-                        var asyncEventQueueBacklogWorker = asyncEventQueueBacklogWorkerFunc();
-                        await asyncEventQueueBacklogWorker.RunQueueBacklogAsync(x);
-                        return x;
-                    }
-                    catch (AsyncEventProcessingSequenceException e)
-                    {
-                        Logger.Debug(e,
-                            $"AsyncEventProcessingSequenceException occurred during synchronous queue processing");
-                        return null; //can retry
-                    }
-                    catch (OptimisticConcurrencyException e)
-                    {
-                        Logger.Debug(e, $"OptimisticConcurrencyException occurred during synchronous queue processing");
-                        return null; //can retry
-                    }
-                })
-            ));
+            var throttledTasks = new List<Task<string>>();
 
-            return queues.Except(finishedQueues).ToArray();
+            using (var throttle = new SemaphoreSlim(asyncEventPipelineConfiguration.SyncQueueProcessingParallelism))
+            {
+                foreach (string queueName in queues)
+                {
+                    await throttle.WaitAsync();
+
+                    throttledTasks.Add(Task.Factory.StartNewWithContext(async () =>
+                    {
+                        try
+                        {
+                            var asyncEventQueueBacklogWorker = asyncEventWorkerFunc();
+                            await asyncEventQueueBacklogWorker.RunQueueBacklogAsync(queueName);
+                            return queueName;
+                        }
+                        catch (AsyncEventProcessingSequenceException e)
+                        {
+                            Logger.Debug(e,
+                                $"AsyncEventProcessingSequenceException occurred during synchronous queue processing");
+                            return null; //can retry
+                        }
+                        catch (OptimisticConcurrencyException e)
+                        {
+                            Logger.Debug(e,
+                                $"OptimisticConcurrencyException occurred during synchronous queue processing");
+                            return null; //can retry
+                        }
+                        finally
+                        {
+                            throttle.Release();
+                        }
+                    }));
+                }
+
+                string[] finishedQueues = await Task.WhenAll(throttledTasks);
+                return queues.Except(finishedQueues).ToArray();
+            }
         }
     }
 }

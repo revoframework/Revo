@@ -17,14 +17,14 @@ namespace Revo.Infrastructure.Tests.Events.Async
 {
     public class AsyncEventProcessorTests
     {
-        private AsyncEventProcessor sut;
-        private List<IAsyncEventWorker> asyncEventQueueBacklogWorkers = new List<IAsyncEventWorker>();
-        private List<(IAsyncEventWorker, string)> processedQueues = new List<(IAsyncEventWorker, string)>();
-        private IAsyncEventQueueManager asyncEventQueueManager;
-        private IJobScheduler jobScheduler;
-        private List<IAsyncEventQueueRecord> events;
-        private List<(string queueName, Exception e)> queueExceptions;
-        private AsyncEventPipelineConfiguration asyncEventPipelineConfiguration;
+        private readonly AsyncEventProcessor sut;
+        private readonly List<IAsyncEventWorker> asyncEventQueueBacklogWorkers = new List<IAsyncEventWorker>();
+        private readonly List<(IAsyncEventWorker, string)> processedQueues = new List<(IAsyncEventWorker, string)>();
+        private readonly IAsyncEventQueueManager asyncEventQueueManager;
+        private readonly IJobScheduler jobScheduler;
+        private readonly List<IAsyncEventQueueRecord> events;
+        private readonly List<(string queueName, Exception e)> queueExceptions;
+        private readonly AsyncEventPipelineConfiguration asyncEventPipelineConfiguration;
 
         public AsyncEventProcessorTests()
         {
@@ -33,6 +33,8 @@ namespace Revo.Infrastructure.Tests.Events.Async
 
             asyncEventPipelineConfiguration = new AsyncEventPipelineConfiguration()
             {
+                CatchUpProcessingParallelism = 80,
+                SyncQueueProcessingParallelism = 5, // TODO test this
                 AsyncProcessAttemptCount = 3,
                 SyncProcessAttemptCount = 3,
                 AsyncRescheduleDelayAfterSyncProcessFailure = TimeSpan.FromMinutes(1),

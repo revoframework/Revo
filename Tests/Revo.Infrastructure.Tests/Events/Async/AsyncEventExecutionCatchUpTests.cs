@@ -13,10 +13,11 @@ namespace Revo.Infrastructure.Tests.Events.Async
     public class AsyncEventExecutionCatchUpTests
     {
         private AsyncEventExecutionCatchUp sut;
-        private IEventSourceCatchUp[] eventSourceCatchUps;
-        private IAsyncEventQueueManager asyncEventQueueManager;
-        private List<IAsyncEventWorker> asyncEventQueueBacklogWorkers = new List<IAsyncEventWorker>();
-        private List<(IAsyncEventWorker, string)> processedQueues = new List<(IAsyncEventWorker, string)>();
+        private readonly IEventSourceCatchUp[] eventSourceCatchUps;
+        private readonly IAsyncEventQueueManager asyncEventQueueManager;
+        private readonly List<IAsyncEventWorker> asyncEventQueueBacklogWorkers = new List<IAsyncEventWorker>();
+        private readonly List<(IAsyncEventWorker, string)> processedQueues = new List<(IAsyncEventWorker, string)>();
+        private readonly AsyncEventPipelineConfiguration asyncEventPipelineConfiguration;
 
         public AsyncEventExecutionCatchUpTests()
         {
@@ -27,10 +28,23 @@ namespace Revo.Infrastructure.Tests.Events.Async
             };
 
             asyncEventQueueManager = Substitute.For<IAsyncEventQueueManager>();
+            asyncEventPipelineConfiguration = new AsyncEventPipelineConfiguration()
+            {
+                CatchUpProcessingParallelism = 80, // TODO test this
+                SyncQueueProcessingParallelism = 5,
+                AsyncProcessAttemptCount = 3,
+                SyncProcessAttemptCount = 3,
+                AsyncRescheduleDelayAfterSyncProcessFailure = TimeSpan.FromMinutes(1),
+                AsyncProcessRetryTimeout = TimeSpan.FromMilliseconds(500),
+                AsyncProcessRetryTimeoutMultiplier = 6,
+                SyncProcessRetryTimeout = TimeSpan.FromMilliseconds(600),
+                SyncProcessRetryTimeoutMultiplier = 4
+            };
 
             sut = new AsyncEventExecutionCatchUp(
                 eventSourceCatchUps,
                 asyncEventQueueManager,
+                asyncEventPipelineConfiguration,
                 () =>
                 {
                     var worker = Substitute.For<IAsyncEventWorker>();
@@ -86,6 +100,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
             sut = new AsyncEventExecutionCatchUp(
                 eventSourceCatchUps,
                 asyncEventQueueManager,
+                asyncEventPipelineConfiguration,
                 () =>
                 {
                     var worker = Substitute.For<IAsyncEventWorker>();

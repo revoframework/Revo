@@ -5,6 +5,7 @@
 ### Added
 - [#1](https://github.com/revoframework/Revo/issues/1) **ASP.NET Core support** - platform implementation, i.e. user context, security, DI, OData, etc.
 - [#2](https://github.com/revoframework/Revo/issues/2), [#3](https://github.com/revoframework/Revo/issues/3) **EF Core support** - data access & infrastructure (async events, sagas, projections...)
+- Throttling async event processing to minimize the amount of running tasks and open DB connections (when running event queue catch-ups during app start-up and pseudo-synchronously processing events after a request; see IAsyncEventPipelineConfiguration)
 
 ### Changed
 - **flattened and simplified package structure** (now provider-centric) - vendor-specific modules were moved
@@ -25,7 +26,7 @@ to Providers directory and some of them merged/renamed:
 
 ### Fixed
 - **CRUD repositories** now correctly wrap their **concurrency exceptions as OptimisticConcurrencyException**
-- **objects from DI container** are now deterministically disposed at the end of tasks run within a context
+- **objects from DI container** are now deterministically disposed at the end of tasks run within a context (also reducing amount of unused open DB connection)
 - **Hangfire job task context disposal** now correctly awaits the command to finish
 
 ## [1.3.0] - 2018-08-31

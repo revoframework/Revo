@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using NLog;
 using Revo.Core.Core;
 using Revo.Core.Lifecycle;
-using Revo.DataAccess.Entities;
 
 namespace Revo.Infrastructure.Events.Async
 {
@@ -14,15 +15,18 @@ namespace Revo.Infrastructure.Events.Async
 
         private readonly IEventSourceCatchUp[] eventSourceCatchUps;
         private readonly IAsyncEventQueueManager asyncEventQueueManager;
-        private readonly Func<IAsyncEventWorker> asyncEventQueueBacklogWorkerFunc;
+        private readonly IAsyncEventPipelineConfiguration asyncEventPipelineConfiguration;
+        private readonly Func<IAsyncEventWorker> asyncEventWorkerFunc;
 
         public AsyncEventExecutionCatchUp(IEventSourceCatchUp[] eventSourceCatchUps,
             IAsyncEventQueueManager asyncEventQueueManager,
-            Func<IAsyncEventWorker> asyncEventQueueBacklogWorkerFunc)
+            IAsyncEventPipelineConfiguration asyncEventPipelineConfiguration,
+            Func<IAsyncEventWorker> asyncEventWorkerFunc)
         {
             this.eventSourceCatchUps = eventSourceCatchUps;
             this.asyncEventQueueManager = asyncEventQueueManager;
-            this.asyncEventQueueBacklogWorkerFunc = asyncEventQueueBacklogWorkerFunc;
+            this.asyncEventPipelineConfiguration = asyncEventPipelineConfiguration;
+            this.asyncEventWorkerFunc = asyncEventWorkerFunc;
         }
 
         public void OnApplicationStarted()
@@ -55,21 +59,36 @@ namespace Revo.Infrastructure.Events.Async
         private async Task RunBackloggedQueuesAsync()
         {
             var backloggedQueueNames = await asyncEventQueueManager.GetNonemptyQueueNamesAsync();
+            var throttledTasks = new List<Task>();
 
-            await Task.WhenAll(backloggedQueueNames.Select(queueName =>
-                Task.Factory.StartNewWithContext(async () =>
+            using (var throttle = new SemaphoreSlim(asyncEventPipelineConfiguration.CatchUpProcessingParallelism))
+            {
+                foreach (string queueName in backloggedQueueNames)
                 {
-                    var asyncEventQueueBacklogWorker = asyncEventQueueBacklogWorkerFunc();
-                    try
+                    await throttle.WaitAsync();
+
+                    throttledTasks.Add(Task.Factory.StartNewWithContext(async () =>
                     {
-                        await asyncEventQueueBacklogWorker.RunQueueBacklogAsync(queueName);
-                    }
-                    catch (AsyncEventProcessingException e)
-                    {
-                        // TODO reschedule?
-                        Logger.Error(e, $"AsyncEventProcessingException occurred while processing async event queue {queueName} during startup");
-                    }
-                }))); //using new Task because we want a new context (parallelization on ASP.NET 4 + fresh DI lifetime scope)
+                        try
+                        {
+                            var asyncEventQueueBacklogWorker = asyncEventWorkerFunc();
+                            await asyncEventQueueBacklogWorker.RunQueueBacklogAsync(queueName);
+                        }
+                        catch (AsyncEventProcessingException e)
+                        {
+                            // TODO reschedule?
+                            Logger.Error(e,
+                                $"AsyncEventProcessingException occurred while processing async event queue {queueName} during startup");
+                        }
+                        finally
+                        {
+                            throttle.Release();
+                        }
+                    }));
+                }
+
+                await Task.WhenAll(throttledTasks);
+            }
         }
     }
 }

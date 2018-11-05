@@ -40,12 +40,12 @@ namespace Revo.Infrastructure.Events.Async
             var dispatchResult = await asyncEventQueueDispatcher.DispatchToQueuesAsync(eventMessages, null, null);
             eventMessages.Clear();
 
-            if (dispatchResult.EnqueuedEventsAsyncProcessed.Any())
+            if (dispatchResult.EnqueuedEventsAsyncProcessed.Count > 0)
             {
                 await asyncEventProcessor.EnqueueForAsyncProcessingAsync(dispatchResult.EnqueuedEventsAsyncProcessed, null);
             }
 
-            if (dispatchResult.EnqueuedEventsSyncProcessed.Any())
+            if (dispatchResult.EnqueuedEventsSyncProcessed.Count > 0)
             {
                 await asyncEventProcessor.ProcessSynchronously(dispatchResult.EnqueuedEventsSyncProcessed);
             }
