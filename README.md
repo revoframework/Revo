@@ -198,10 +198,10 @@ Binaries are up for grabs in form of NuGet packages:
   </tr>
   <tr>
     <td>
-      Revo.Platforms.AspNet
+      Revo.AspNet
     </td>
     <td>
-      <a href="https://www.nuget.org/packages/Revo.Platforms.AspNet/"><img src="https://img.shields.io/nuget/v/Revo.Platforms.AspNet.svg" alt="NuGet package version"></a>
+      <a href="https://www.nuget.org/packages/Revo.AspNet/"><img src="https://img.shields.io/nuget/v/Revo.AspNet.svg" alt="NuGet package version"></a>
     </td>
   </tr>
   <tr>
