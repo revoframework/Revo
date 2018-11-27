@@ -7,6 +7,7 @@
 
 ### Fixed
 - ODataAsyncResultFilter.DefaultConverter now returns correct counts
+- event publishing for non-event sourced entities (not transactionally safe and not saving to event store yet, though, so beware)
 
 ## [1.4.0] - 2018-11-05
 

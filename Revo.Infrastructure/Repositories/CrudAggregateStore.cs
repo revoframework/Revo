@@ -155,6 +155,11 @@ namespace Revo.Infrastructure.Repositories
                     message.SetMetadata(BasicEventMetadataNames.AggregateClassId, aggregateClassId.Value.ToString());
                 }
 
+                if (message.Metadata.GetEventId() == null)
+                {
+                    message.SetMetadata(BasicEventMetadataNames.EventId, Guid.NewGuid().ToString());
+                }
+
                 messages.Add(message);
             }
 

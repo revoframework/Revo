@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Revo.Domain.Entities.EventSourcing;
+using Revo.Domain.Entities;
 using Revo.EFCore.DataAccess.Entities;
 using Revo.Infrastructure.Projections;
 
@@ -14,7 +14,7 @@ namespace Revo.EFCore.Projections
     public class EFCoreEntityEventProjector<TSource> :
         EntityEventProjector<TSource>,
         IEFCoreEntityEventProjector<TSource>
-        where TSource : class, IEventSourcedAggregateRoot
+        where TSource : class, IAggregateRoot
     {
         public EFCoreEntityEventProjector(IEFCoreCrudRepository repository)
         {

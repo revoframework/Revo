@@ -29,7 +29,7 @@ namespace Revo.Infrastructure.Projections
     /// <typeparam name="TTarget">Read model type. Should have a parameterless constructor.</typeparam>
     public abstract class CrudEntityEventToPocoProjector<TSource, TTarget> :
         EntityEventToPocoProjector<TSource, TTarget>
-        where TSource : class, IEventSourcedAggregateRoot
+        where TSource : class, IAggregateRoot
         where TTarget : class, new()
     {
         public CrudEntityEventToPocoProjector(ICrudRepository repository)

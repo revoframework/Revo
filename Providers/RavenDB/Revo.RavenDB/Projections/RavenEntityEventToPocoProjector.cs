@@ -1,4 +1,4 @@
-﻿using Revo.Domain.Entities.EventSourcing;
+﻿using Revo.Domain.Entities;
 using Revo.Infrastructure.Projections;
 using Revo.RavenDB.Entities;
 
@@ -7,7 +7,7 @@ namespace Revo.RavenDB.Projections
     public class RavenEntityEventToPocoProjector<TSource, TTarget> :
         CrudEntityEventToPocoProjector<TSource, TTarget>,
         IRavenEntityEventProjector<TSource>
-        where TSource : class, IEventSourcedAggregateRoot
+        where TSource : class, IAggregateRoot
         where TTarget : class, new()
     {
         public RavenEntityEventToPocoProjector(IRavenCrudRepository repository) : base(repository)

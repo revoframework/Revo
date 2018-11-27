@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Revo.Core.Collections;
 using Revo.Core.Events;
 using Revo.DataAccess.Entities;
-using Revo.Domain.Entities.EventSourcing;
+using Revo.Domain.Entities;
 using Revo.Domain.Events;
 
 namespace Revo.Infrastructure.Projections
@@ -24,7 +23,7 @@ namespace Revo.Infrastructure.Projections
     /// <typeparam name="TTarget">Read model type.</typeparam>
     public abstract class EntityEventToPocoProjector<TSource, TTarget> :
         EntityEventProjector<TSource>
-        where TSource : class, IEventSourcedAggregateRoot
+        where TSource : class, IAggregateRoot
     {
         /// <summary>
         /// Currently projected read-model instance.
