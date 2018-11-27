@@ -1,5 +1,13 @@
 # RELEASE NOTES
 
+## [1.4.1] - 2018-?-?
+
+### Added
+- EFCoreInMemoryCrudRepository and EFCoreInMemoryDatabaseAccess
+
+### Fixed
+- ODataAsyncResultFilter.DefaultConverter now returns correct counts
+
 ## [1.4.0] - 2018-11-05
 
 ### Added
