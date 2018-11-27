@@ -129,12 +129,14 @@ namespace Revo.AspNet.Web
             public Task<ODataResultWithCount<T>> ToListWithCountAsync<T>(IQueryable<T> queryable,
                 ODataQueryOptions<T> queryOptions, CancellationToken cancellationToken)
             {
-                return Task.FromResult(
-                    new ODataResultWithCount<T>(
-                        queryable
-                            .ApplyOptions(queryOptions)
-                            .ToList(),
-                        queryable.LongCount()));
+                var list = queryable
+                    .ApplyOptions(queryOptions)
+                    .ToList();
+                long count = ((IQueryable<T>)queryOptions
+                        .ApplyTo(queryable, AllowedQueryOptions.Skip | AllowedQueryOptions.Top))
+                    .LongCount();
+
+                return Task.FromResult(new ODataResultWithCount<T>(list, count));
             }
         }
     }

@@ -132,9 +132,12 @@ namespace Revo.AspNetCore.Web
                 var list = filtered is IAsyncEnumerable<T> asyncFiltered
                     ? await asyncFiltered.ToList(cancellationToken)
                     : filtered.ToList();
-                long count = filtered is IAsyncEnumerable<T> asyncCounted
+
+                var filteredUnranged = ((IQueryable<T>) queryOptions
+                    .ApplyTo(queryable, AllowedQueryOptions.Skip | AllowedQueryOptions.Top));
+                long count = filteredUnranged is IAsyncEnumerable<T> asyncCounted
                     ? await asyncCounted.LongCount(cancellationToken)
-                    : queryable.LongCount();
+                    : filteredUnranged.LongCount();
 
                 return new ODataResultWithCount<T>(list, count);
             }

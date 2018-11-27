@@ -80,7 +80,7 @@ Binaries are up for grabs in form of NuGet packages:
 <table border="0" cellpadding="0" cellspacing="0" style="float:left;">
   <tr>
     <th colspan="2">
-      Core (.NET Standard 2.0)
+      Core
     </th>
   </tr>
   <tr>
