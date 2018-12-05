@@ -5,9 +5,14 @@ namespace Revo.Domain.Tenancy
 {
     public abstract class TenantBasicClassAggregateRoot : BasicClassAggregateRoot, ITenantOwned
     {
-        protected TenantBasicClassAggregateRoot(Guid id, ITenant tenant) : base(id)
+        public TenantBasicClassAggregateRoot(Guid id, ITenant tenant) : base(id)
         {
             TenantId = tenant?.Id;
+        }
+
+        public TenantBasicClassAggregateRoot(Guid id, Guid? tenantId) : base(id)
+        {
+            TenantId = tenantId;
         }
 
         protected TenantBasicClassAggregateRoot()

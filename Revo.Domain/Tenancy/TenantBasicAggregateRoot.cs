@@ -10,6 +10,11 @@ namespace Revo.Domain.Tenancy
             TenantId = tenant?.Id;
         }
 
+        public TenantBasicAggregateRoot(Guid id, Guid? tenantId) : base(id)
+        {
+            TenantId = tenantId;
+        }
+
         protected TenantBasicAggregateRoot()
         {
         }
