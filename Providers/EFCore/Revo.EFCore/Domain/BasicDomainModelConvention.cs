@@ -35,11 +35,14 @@ namespace Revo.EFCore.Domain
             foreach (var entity in modelBuilder.Model.GetEntityTypes()
                 .Where(x => typeof(BasicAggregateRoot).IsAssignableFrom(x.ClrType)))
             {
-                var entityBuilder = modelBuilder.Entity(entity.ClrType);
+                if (entity.BaseType == null)
+                {
+                    var entityBuilder = modelBuilder.Entity(entity.ClrType);
 
-                entityBuilder.Ignore(nameof(BasicAggregateRoot.IsChanged));
-                entityBuilder.Ignore(nameof(BasicAggregateRoot.IsDeleted));
-                entityBuilder.Ignore(nameof(BasicAggregateRoot.UncommittedEvents));
+                    entityBuilder.Ignore(nameof(BasicAggregateRoot.IsChanged));
+                    entityBuilder.Ignore(nameof(BasicAggregateRoot.IsDeleted));
+                    entityBuilder.Ignore(nameof(BasicAggregateRoot.UncommittedEvents));
+                }
             }
         }
     }
