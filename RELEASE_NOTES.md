@@ -4,6 +4,7 @@
 
 ### Added
 - EFCoreInMemoryCrudRepository and EFCoreInMemoryDatabaseAccess
+- recurring job scheduling support
 
 ### Fixed
 - ODataAsyncResultFilter.DefaultConverter now returns correct counts

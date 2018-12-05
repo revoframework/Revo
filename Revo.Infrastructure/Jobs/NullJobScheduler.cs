@@ -17,7 +17,17 @@ namespace Revo.Infrastructure.Jobs
             throw new NotImplementedException("Cannot use NullJobScheduler to schedule jobs. Please configure a real job scheduler, e.g. Hangfire.");
         }
 
-        public Task DeleteJobScheduleAsync(string jobId)
+        public Task AddOrUpdateRecurringJobAsync(IJob job, string jobId, string cronExpression)
+        {
+            throw new NotImplementedException("Cannot use NullJobScheduler to schedule jobs. Please configure a real job scheduler, e.g. Hangfire.");
+        }
+
+        public Task RemoveRecurringJobIfExists(string jobId)
+        {
+            throw new NotImplementedException("Cannot use NullJobScheduler to schedule jobs. Please configure a real job scheduler, e.g. Hangfire.");
+        }
+
+        public Task DeleteScheduleJobAsync(string jobId)
         {
             throw new NotImplementedException("Cannot use NullJobScheduler to schedule jobs. Please configure a real job scheduler, e.g. Hangfire.");
         }

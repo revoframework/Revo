@@ -7,7 +7,9 @@ namespace Revo.Infrastructure.Jobs
     {
         Task<string> EnqeueJobAsync(IJob job, TimeSpan? timeDelay);
         Task<string> ScheduleJobAsync(IJob job, DateTimeOffset enqueueAt);
-        Task DeleteJobScheduleAsync(string jobId);
+        Task AddOrUpdateRecurringJobAsync(IJob job, string jobId, string cronExpression);
+        Task RemoveRecurringJobIfExists(string jobId);
+        Task DeleteScheduleJobAsync(string jobId);
         //void ScheduleRecurringJob(Job job, RecurringJobSchedule schedule);
     }
 }
