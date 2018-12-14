@@ -10,6 +10,7 @@ using Revo.DataAccess.Entities;
 using Revo.Domain.Entities;
 using Revo.Domain.Entities.EventSourcing;
 using Revo.Domain.Events;
+using Revo.Infrastructure.Events;
 
 namespace Revo.Infrastructure.Projections
 {
@@ -18,25 +19,27 @@ namespace Revo.Infrastructure.Projections
     /// A convention-based abstract base class that calls an Apply for every event type
     /// and also supports sub-projectors.
     /// </summary>
-    /// <typeparam name="TSource">Aggregate type.</typeparam>
-    public abstract class EntityEventProjector<TSource> :
-        IEntityEventProjector<TSource>
-        where TSource : class, IAggregateRoot
+    public abstract class EntityEventProjector : IEventPublishingEntityEventProjector
     {
         private readonly Lazy<MultiValueDictionary<Type, Func<IEventMessage<DomainAggregateEvent>, Task>>> applyHandlers;
         private readonly List<ISubEntityEventProjector> subProjectors = new List<ISubEntityEventProjector>();
+        private readonly List<IEvent> publishedEvents = new List<IEvent>();
 
         public EntityEventProjector()
         {
             applyHandlers = new Lazy<MultiValueDictionary<Type, Func<IEventMessage<DomainAggregateEvent>, Task>>>(CreateApplyDelegates);
         }
-
-        public Type ProjectedAggregateType => typeof(TSource);
+        
+        public IPublishEventBuffer EventBuffer { get; set; }
+        public IEventMessageFactory EventMessageFactory { get; set; }
 
         protected Guid AggregateId { get; private set; }
         protected IReadOnlyCollection<IEventMessage<DomainAggregateEvent>> Events { get; private set; }
 
-        public abstract Task CommitChangesAsync();
+        public virtual async Task CommitChangesAsync()
+        {
+            await PublishEventsAsync();
+        }
 
         public virtual async Task ProjectEventsAsync(Guid aggregateId, IReadOnlyCollection<IEventMessage<DomainAggregateEvent>> events)
         {
@@ -67,6 +70,11 @@ namespace Revo.Infrastructure.Projections
             {
                 CreateApplyDelegates(projector.GetType(), projector, applyHandlers.Value);
             }
+        }
+
+        protected void PublishEvent(IEvent ev)
+        {
+            publishedEvents.Add(ev);
         }
 
         protected async Task ExecuteHandler<T>(T evt) where T : IEventMessage<DomainAggregateEvent>
@@ -169,6 +177,33 @@ namespace Revo.Infrastructure.Projections
             foreach (var action in actions)
             {
                 result.Add(action.Item1, action.Item2);
+            }
+        }
+
+        private async Task PublishEventsAsync()
+        {
+            if (publishedEvents.Count > 0)
+            {
+                if (EventBuffer == null)
+                {
+                    throw new InvalidOperationException($"Cannot publish events from {this} because its {nameof(EventBuffer)} has not been set");
+                }
+
+                if (EventMessageFactory == null)
+                {
+                    throw new InvalidOperationException($"Cannot publish events from {this} because its {nameof(EventMessageFactory)} has not been set");
+                }
+            }
+
+            foreach (var ev in publishedEvents)
+            {
+                var eventMessage = await EventMessageFactory.CreateMessageAsync(ev);
+                if (eventMessage.Metadata.GetEventId() == null)
+                {
+                    eventMessage.SetMetadata(BasicEventMetadataNames.EventId, Guid.NewGuid().ToString());
+                }
+
+                EventBuffer.PushEvent(eventMessage);
             }
         }
     }

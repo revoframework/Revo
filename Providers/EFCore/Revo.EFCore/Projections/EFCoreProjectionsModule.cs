@@ -10,12 +10,16 @@ namespace Revo.EFCore.Projections
     {
         public override void Load()
         {
-            Bind<IAsyncEventSequencer<DomainAggregateEvent>, EFCoreProjectionEventListener.EF6ProjectionEventSequencer>()
-                .To<EFCoreProjectionEventListener.EF6ProjectionEventSequencer>()
+            Bind<IAsyncEventSequencer<DomainAggregateEvent>, EFCoreProjectionEventListener.EFCoreProjectionEventSequencer>()
+                .To<EFCoreProjectionEventListener.EFCoreProjectionEventSequencer>()
                 .InTaskScope();
 
             Bind<IAsyncEventListener<DomainAggregateEvent>>()
                 .To<EFCoreProjectionEventListener>()
+                .InTaskScope();
+
+            Bind<IEFCoreProjectionSubSystem>()
+                .To<EFCoreProjectionSubSystem>()
                 .InTaskScope();
         }
     }

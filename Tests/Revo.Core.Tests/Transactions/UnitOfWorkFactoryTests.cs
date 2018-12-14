@@ -10,7 +10,6 @@ namespace Revo.Core.Tests.Transactions
 {
     public class UnitOfWorkFactoryTests
     {
-        private readonly List<Tuple<ITransactionProvider, ITransaction>> transactions = new List<Tuple<ITransactionProvider, ITransaction>>();
         private readonly List<IUnitOfWorkListener> unitOfWorkListeners = new List<IUnitOfWorkListener>();
         private readonly UnitOfWorkFactory sut;
         private readonly IPublishEventBufferFactory publishEventBufferFactory;
@@ -22,7 +21,7 @@ namespace Revo.Core.Tests.Transactions
 
             publishEventBufferFactory = Substitute.For<IPublishEventBufferFactory>();
 
-            sut = new UnitOfWorkFactory(unitOfWorkListeners.ToArray(), publishEventBufferFactory);
+            sut = new UnitOfWorkFactory(() => new Lazy<IUnitOfWorkListener[]>(unitOfWorkListeners.ToArray()), publishEventBufferFactory);
         }
 
         // TODO merge these tests with UnitOfWorkTests?
@@ -32,6 +31,7 @@ namespace Revo.Core.Tests.Transactions
         {
             using (var uow = sut.CreateUnitOfWork())
             {
+                uow.Begin();
                 unitOfWorkListeners[0].Received(1).OnWorkBegin(uow);
                 unitOfWorkListeners[1].Received(1).OnWorkBegin(uow);
             }
@@ -42,6 +42,7 @@ namespace Revo.Core.Tests.Transactions
         {
             using (var uow = sut.CreateUnitOfWork())
             {
+                uow.Begin();
                 await uow.CommitAsync();
 
                 unitOfWorkListeners[0].Received(1).OnWorkSucceededAsync(uow);

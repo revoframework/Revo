@@ -23,6 +23,8 @@ namespace Revo.Core.Commands
             ICommandContext newContext = new CommandContext(command, unitOfWorkFactory.CreateUnitOfWork());
             commandContextStack.Push(newContext);
 
+            newContext.UnitOfWork.Begin();
+
             return Task.FromResult(0);
         }
         

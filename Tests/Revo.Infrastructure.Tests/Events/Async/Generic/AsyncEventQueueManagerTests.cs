@@ -18,7 +18,7 @@ namespace Revo.Infrastructure.Tests.Events.Async.Generic
             crudRepository = new InMemoryCrudRepository();
             eventSerializer = Substitute.For<IEventSerializer>();
 
-            sut = new AsyncEventQueueManager(crudRepository, eventSerializer);
+            sut = new AsyncEventQueueManager(crudRepository, eventSerializer, null); // TODO test
         }
     }
 }

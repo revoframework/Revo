@@ -2,7 +2,7 @@
 
 namespace Revo.Infrastructure.EventSourcing
 {
-    internal interface IEventSourcedAggregateRepository : IEventSourcedRepository<IEventSourcedAggregateRoot>
+    public interface IEventSourcedAggregateRepository : IEventSourcedRepository<IEventSourcedAggregateRoot>
     {
     }
 }

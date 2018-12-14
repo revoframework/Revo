@@ -1,16 +1,46 @@
-﻿using Revo.DataAccess.Entities;
+﻿using System;
+using System.Threading.Tasks;
+using Revo.DataAccess.Entities;
+using Revo.EFCore.DataAccess.Entities;
+using Revo.EFCore.UnitOfWork;
 using Revo.Infrastructure.Events;
 using Revo.Infrastructure.EventStores.Generic;
 
 namespace Revo.EFCore.EventStores
 {
-    public class EFCoreEventStore : EventStore
+    public class EFCoreEventStore : EventStore, ITransactionParticipant, IEFCoreEventStore
     {
-        public EFCoreEventStore(ICrudRepository crudRepository, IEventSerializer eventSerializer)
+        private readonly IEFCoreTransactionCoordinator transactionCoordinator;
+
+        public EFCoreEventStore(IEFCoreCrudRepository crudRepository, IEventSerializer eventSerializer,
+            IEFCoreTransactionCoordinator transactionCoordinator)
             : base(crudRepository, eventSerializer)
         {
+            this.transactionCoordinator = transactionCoordinator;
+
+            transactionCoordinator.AddTransactionParticipant(this);
         }
 
         public override string EventSourceName => "EFCore.EventStore";
+        
+        public override async Task CommitChangesAsync()
+        {
+            await transactionCoordinator.CommitAsync();
+        }
+
+        public Task OnBeforeCommitAsync()
+        {
+            return DoBeforeCommitAsync();
+        }
+
+        public Task OnCommitSucceededAsync()
+        {
+            return DoOnCommitSucceedAsync();
+        }
+
+        public Task OnCommitFailedAsync()
+        {
+            return DoOnCommitFailedAsync();
+        }
     }
 }

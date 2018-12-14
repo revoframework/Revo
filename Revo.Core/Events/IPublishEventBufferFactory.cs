@@ -2,6 +2,6 @@
 {
     public interface IPublishEventBufferFactory
     {
-        IPublishEventBuffer CreatEventBuffer();
+        IPublishEventBuffer CreateEventBuffer();
     }
 }

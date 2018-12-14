@@ -18,14 +18,6 @@ namespace Revo.Infrastructure.Repositories
                 .To<RepositoryFactory>()
                 .InTransientScope();
 
-            Bind<IAggregateStoreFactory>()
-                .To<CrudAggregateStoreFactory>()
-                .InTransientScope();
-            
-            Bind<IAggregateStoreFactory>()
-                .To<EventSourcedAggregateStoreFactory>()
-                .InTransientScope();
-
             Bind<IEntityFactory>()
                 .To<EntityFactory>()
                 .InSingletonScope();

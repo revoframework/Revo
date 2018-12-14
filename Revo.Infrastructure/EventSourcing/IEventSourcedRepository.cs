@@ -7,7 +7,7 @@ using Revo.Domain.Entities.EventSourcing;
 
 namespace Revo.Infrastructure.EventSourcing
 {
-    internal interface IEventSourcedRepository<TBase>
+    public interface IEventSourcedRepository<TBase>
         where TBase : class, IEventSourcedAggregateRoot
     {
         IEnumerable<IRepositoryFilter> DefaultFilters { get; }

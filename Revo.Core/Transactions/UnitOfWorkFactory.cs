@@ -6,20 +6,18 @@ namespace Revo.Core.Transactions
 {
     public class UnitOfWorkFactory : IUnitOfWorkFactory
     {
-        private readonly IUnitOfWorkListener[] unitOfWorkListeners;
+        private readonly Func<Lazy<IUnitOfWorkListener[]>> unitOfWorkListenersLazyFunc;
         private readonly IPublishEventBufferFactory publishEventBufferFactory;
 
-        public UnitOfWorkFactory(
-            IUnitOfWorkListener[] unitOfWorkListeners,
-            IPublishEventBufferFactory publishEventBufferFactory)
+        public UnitOfWorkFactory(Func<Lazy<IUnitOfWorkListener[]>> unitOfWorkListenersLazyFunc, IPublishEventBufferFactory publishEventBufferFactory)
         {
-            this.unitOfWorkListeners = unitOfWorkListeners;
+            this.unitOfWorkListenersLazyFunc = unitOfWorkListenersLazyFunc;
             this.publishEventBufferFactory = publishEventBufferFactory;
         }
 
         public IUnitOfWork CreateUnitOfWork()
         {
-            var tx = new UnitOfWork(unitOfWorkListeners, publishEventBufferFactory.CreatEventBuffer());
+            var tx = new UnitOfWork(unitOfWorkListenersLazyFunc(), publishEventBufferFactory.CreateEventBuffer());
             return tx;
         }
     }

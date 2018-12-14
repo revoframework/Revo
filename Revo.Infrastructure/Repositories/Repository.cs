@@ -11,17 +11,31 @@ namespace Revo.Infrastructure.Repositories
 {
     public class Repository : IRepository
     {
-        private readonly IAggregateStore[] aggregateStores;
+        private readonly IAggregateStoreFactory[] aggregateStoreFactories;
+        private readonly IUnitOfWork unitOfWork;
+        private readonly List<IAggregateStore> aggregateStores = new List<IAggregateStore>();
 
         public Repository(IAggregateStoreFactory[] aggregateStoreFactories, IUnitOfWork unitOfWork)
         {
-            aggregateStores = aggregateStoreFactories.Select(x => x.CreateAggregateStore(unitOfWork)).ToArray();
+            this.aggregateStoreFactories = aggregateStoreFactories;
+            this.unitOfWork = unitOfWork;
             unitOfWork.AddInnerTransaction(new RepositoryTransaction(this));
         }
 
         public IAggregateStore GetAggregateStore(Type entityType)
         {
-            return aggregateStores.First(x => x.CanHandleAggregateType(entityType));
+            var aggregateStore = aggregateStores.FirstOrDefault(x => x.CanHandleAggregateType(entityType));
+
+            if (aggregateStore == null)
+            {
+                aggregateStore = aggregateStoreFactories.FirstOrDefault(x => x.CanHandleAggregateType(entityType))
+                                     ?.CreateAggregateStore(unitOfWork)
+                                 ?? throw new InvalidOperationException(
+                                     $"No aggregate store for entity type {entityType} was found");
+                aggregateStores.Add(aggregateStore);
+            }
+
+            return aggregateStore;
         }
 
         public IAggregateStore GetAggregateStore<T>()
@@ -51,7 +65,6 @@ namespace Revo.Infrastructure.Repositories
         
         public void Dispose()
         {
-            // TODO ?
         }
 
         public T FirstOrDefault<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
@@ -136,7 +149,7 @@ namespace Revo.Infrastructure.Repositories
         
         public async Task SaveChangesAsync()
         {
-            var modifiedStores = aggregateStores.Where(x => x.IsChanged).ToArray();
+            var modifiedStores = aggregateStores.Where(x => x.NeedsSave).ToArray();
 
             if (modifiedStores.Length > 1)
             {

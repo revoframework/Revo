@@ -82,18 +82,7 @@ namespace Revo.Infrastructure.Tests.Projections
             subProjector.Received(1).Apply((IEventMessage<TestEvent3>)eventMessages[2], aggregateId);
         }
 
-        public class TestAggregate : EventSourcedAggregateRoot
-        {
-            public TestAggregate(Guid id) : base(id)
-            {
-            }
-        }
-
-        public class TestReadModel : ReadModelBase
-        {
-        }
-
-        public class TestEntityEventProjector : EntityEventProjector<TestAggregate>
+        public class TestEntityEventProjector : EntityEventProjector
         {
             public new void AddSubProjector(ISubEntityEventProjector projector)
             {

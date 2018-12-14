@@ -11,6 +11,8 @@ namespace Revo.EFCore.DataAccess.Entities
     {
         IReadOnlyDictionary<string, DbContext> DbContexts { get; }
 
+        void ClearDbContexts();
+
         IQueryable<T> FromSql<T>([NotParameterized] FormattableString sql)
             where T : class;
 

@@ -9,24 +9,35 @@ namespace Revo.Core.Transactions
     public class UnitOfWork : IUnitOfWork
     {
         private readonly List<ITransaction> innerTransactions = new List<ITransaction>();
-        private readonly IUnitOfWorkListener[] unitOfWorkListeners;
-
+        private readonly Lazy<IUnitOfWorkListener[]> unitOfWorkListeners;
+        
         private bool disposedValue = false; // To detect redundant calls
 
-        public UnitOfWork(IUnitOfWorkListener[] unitOfWorkListeners,
+        public UnitOfWork(Lazy<IUnitOfWorkListener[]> unitOfWorkListeners,
             IPublishEventBuffer publishEventBuffer)
         {
             this.unitOfWorkListeners = unitOfWorkListeners;
 
             EventBuffer = publishEventBuffer;
-
-            foreach (var listener in unitOfWorkListeners)
-            {
-                listener.OnWorkBegin(this);
-            }
         }
         
         public IPublishEventBuffer EventBuffer { get; }
+        public bool IsWorkBegun { get; private set; }
+
+        public void Begin()
+        {
+            if (IsWorkBegun)
+            {
+                throw new InvalidOperationException($"This {this} has already been started");
+            }
+
+            foreach (var listener in unitOfWorkListeners.Value)
+            {
+                listener.OnWorkBegin(this);
+            }
+
+            IsWorkBegun = true;
+        }
 
         public void AddInnerTransaction(ITransaction innerTransaction)
         {
@@ -35,7 +46,12 @@ namespace Revo.Core.Transactions
 
         public async Task CommitAsync()
         {
-            foreach (var listener in unitOfWorkListeners)
+            if (!IsWorkBegun)
+            {
+                throw new InvalidOperationException($"This {this} has not been started yet");
+            }
+            
+            foreach (var listener in unitOfWorkListeners.Value)
             {
                 await listener.OnBeforeWorkCommitAsync(this);
             }
@@ -47,7 +63,7 @@ namespace Revo.Core.Transactions
             
             await EventBuffer.FlushAsync(new CancellationToken());
 
-            foreach (var listener in unitOfWorkListeners)
+            foreach (var listener in unitOfWorkListeners.Value)
             {
                 await listener.OnWorkSucceededAsync(this);
             }

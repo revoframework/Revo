@@ -165,13 +165,6 @@ namespace Revo.Infrastructure.Tests.Projections
             sut2.CreatedTarget.Version.Should().Be(2);
         }
 
-        public class TestAggregate : EventSourcedAggregateRoot
-        {
-            public TestAggregate(Guid id) : base(id)
-            {
-            }
-        }
-
         public class TestReadModel : ReadModelBase
         {
         }
@@ -181,7 +174,7 @@ namespace Revo.Infrastructure.Tests.Projections
             public int Version { get; set; }
         }
 
-        public class TestEntityEventToPocoProjector : EntityEventToPocoProjector<TestAggregate, TestReadModel>
+        public class TestEntityEventToPocoProjector : EntityEventToPocoProjector<TestReadModel>
         {
             public new TestReadModel Target => base.Target;
             public TestReadModel LastCreatedTarget { get; private set; }
@@ -219,7 +212,7 @@ namespace Revo.Infrastructure.Tests.Projections
             }
         }
 
-        public class TestEntityEventToPocoProjectorVersioning : EntityEventToPocoProjector<TestAggregate, TestReadModelVersioned>
+        public class TestEntityEventToPocoProjectorVersioning : EntityEventToPocoProjector<TestReadModelVersioned>
         {
             public TestReadModelVersioned CreatedTarget { get; set; }
             public TestReadModelVersioned FoundTarget { get; set; }

@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Revo.Core.Events;
 using Revo.Core.Transactions;
 using Revo.DataAccess.Entities;
 using Revo.Domain.Entities;
@@ -11,26 +7,29 @@ using Revo.Infrastructure.Events;
 
 namespace Revo.Infrastructure.Repositories
 {
-    internal class CrudAggregateStoreFactory : IAggregateStoreFactory
+    public class CrudAggregateStoreFactory : IAggregateStoreFactory
     {
-        private readonly ICrudRepositoryFactory<ICrudRepository> crudRepositoryFactory;
+        private readonly Func<ICrudRepository> crudRepositoryFunc;
         private readonly IEntityTypeManager entityTypeManager;
         private readonly IEventMessageFactory eventMessageFactory;
 
-        public CrudAggregateStoreFactory(
-            ICrudRepositoryFactory<ICrudRepository> crudRepositoryFactory,
-            IEntityTypeManager entityTypeManager,
-            IEventMessageFactory eventMessageFactory)
+        public CrudAggregateStoreFactory(Func<ICrudRepository> crudRepositoryFunc,
+            IEntityTypeManager entityTypeManager, IEventMessageFactory eventMessageFactory)
         {
-            this.crudRepositoryFactory = crudRepositoryFactory;
+            this.crudRepositoryFunc = crudRepositoryFunc;
             this.entityTypeManager = entityTypeManager;
             this.eventMessageFactory = eventMessageFactory;
         }
 
-        public IAggregateStore CreateAggregateStore(IUnitOfWork unitOfWork)
+        public bool CanHandleAggregateType(Type aggregateType)
         {
-            var crudRepository = crudRepositoryFactory.Create();
-            return new CrudAggregateStore(crudRepository, entityTypeManager, unitOfWork.EventBuffer, eventMessageFactory);
+            return aggregateType.GetCustomAttributes(typeof(DatabaseEntityAttribute), true).Any();
+        }
+
+        public virtual IAggregateStore CreateAggregateStore(IUnitOfWork unitOfWork)
+        {
+            return new CrudAggregateStore(crudRepositoryFunc(), entityTypeManager,
+                unitOfWork.EventBuffer, eventMessageFactory);
         }
     }
 }

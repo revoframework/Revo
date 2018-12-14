@@ -21,9 +21,7 @@ namespace Revo.Infrastructure.Projections
     /// </remarks>
     /// <typeparam name="TSource">Aggregate type.</typeparam>
     /// <typeparam name="TTarget">Read model type.</typeparam>
-    public abstract class EntityEventToPocoProjector<TSource, TTarget> :
-        EntityEventProjector<TSource>
-        where TSource : class, IAggregateRoot
+    public abstract class EntityEventToPocoProjector<TTarget> : EntityEventProjector
     {
         /// <summary>
         /// Currently projected read-model instance.

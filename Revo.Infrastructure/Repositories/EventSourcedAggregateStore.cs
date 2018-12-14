@@ -7,7 +7,7 @@ using Revo.Infrastructure.EventSourcing;
 
 namespace Revo.Infrastructure.Repositories
 {
-    internal class EventSourcedAggregateStore : IAggregateStore
+    public class EventSourcedAggregateStore : IAggregateStore
     {
         private readonly IEventSourcedAggregateRepository eventSourcedRepository;
 
@@ -16,7 +16,7 @@ namespace Revo.Infrastructure.Repositories
             this.eventSourcedRepository = eventSourcedRepository;
         }
 
-        public bool IsChanged => eventSourcedRepository.IsChanged;
+        public virtual bool NeedsSave => eventSourcedRepository.IsChanged;
 
         public void Add<T>(T aggregate) where T : class, IAggregateRoot
         {
@@ -53,7 +53,7 @@ namespace Revo.Infrastructure.Repositories
             return typeof(IEventSourcedAggregateRoot).IsAssignableFrom(aggregateType);
         }
 
-        public Task SaveChangesAsync()
+        public virtual Task SaveChangesAsync()
         {
             return eventSourcedRepository.SaveChangesAsync();
         }

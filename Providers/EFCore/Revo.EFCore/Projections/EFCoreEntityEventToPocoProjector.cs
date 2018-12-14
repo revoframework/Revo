@@ -5,7 +5,7 @@ using Revo.Infrastructure.Projections;
 namespace Revo.EFCore.Projections
 {
     /// <summary>
-    /// An EF6 CRUD repository-backed event projector for an aggregate type with a single POCO read model for every aggregate.
+    /// An EF Core CRUD repository-backed event projector for an aggregate type with a single POCO read model for every aggregate.
     /// A convention-based abstract base class that calls an Apply for every event type
     /// and also supports sub-projectors.
     /// </summary>

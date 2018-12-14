@@ -5,11 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Revo.Core.Events;
 using Revo.Core.Transactions;
+using Revo.Domain.Entities.EventSourcing;
 using Revo.Infrastructure.EventSourcing;
 
 namespace Revo.Infrastructure.Repositories
 {
-    internal class EventSourcedAggregateStoreFactory : IAggregateStoreFactory
+    public class EventSourcedAggregateStoreFactory : IAggregateStoreFactory
     {
         private readonly Func<IPublishEventBuffer, IEventSourcedAggregateRepository> func;
 
@@ -18,7 +19,12 @@ namespace Revo.Infrastructure.Repositories
             this.func = func;
         }
 
-        public IAggregateStore CreateAggregateStore(IUnitOfWork unitOfWork)
+        public bool CanHandleAggregateType(Type aggregateType)
+        {
+            return typeof(IEventSourcedAggregateRoot).IsAssignableFrom(aggregateType);
+        }
+
+        public virtual IAggregateStore CreateAggregateStore(IUnitOfWork unitOfWork)
         {
             return new EventSourcedAggregateStore(func(unitOfWork.EventBuffer));
         }

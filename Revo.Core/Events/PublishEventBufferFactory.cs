@@ -9,7 +9,7 @@
             this.eventBus = eventBus;
         }
 
-        public IPublishEventBuffer CreatEventBuffer()
+        public IPublishEventBuffer CreateEventBuffer()
         {
             return new PublishEventBuffer(eventBus);
         }

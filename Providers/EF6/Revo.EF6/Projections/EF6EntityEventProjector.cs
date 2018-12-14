@@ -12,7 +12,7 @@ namespace Revo.EF6.Projections
     /// </summary>
     /// <typeparam name="TSource">Aggregate type.</typeparam>
     public class EF6EntityEventProjector<TSource> :
-        EntityEventProjector<TSource>,
+        EntityEventProjector,
         IEF6EntityEventProjector<TSource>
         where TSource : class, IAggregateRoot
     {
@@ -22,10 +22,5 @@ namespace Revo.EF6.Projections
         }
 
         protected IEF6CrudRepository Repository { get; }
-
-        public override async Task CommitChangesAsync()
-        {
-            await Repository.SaveChangesAsync();
-        }
     }
 }

@@ -34,10 +34,12 @@ CREATE TABLE IF NOT EXISTS rae_async_event_queue (
 
 CREATE TABLE IF NOT EXISTS rae_external_event_record (
 	rae_eer_external_event_record_id uuid NOT NULL PRIMARY KEY,
+	rae_eer_version int NOT NULL,
 	rae_eer_event_name text NOT NULL,
 	rae_eer_event_version int NOT NULL,
 	rae_eer_event_json text NOT NULL,
-	rae_eer_metadata_json text
+	rae_eer_metadata_json text,
+	rae_eer_is_dispatched_to_async_queues boolean NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS rae_queued_async_event (
@@ -69,7 +71,7 @@ CREATE TABLE IF NOT EXISTS rev_saga_metadata_key (
 GLOBALIZATION
 ******/
 
-CREATE TABLE IF NOT EXISTS REV_LOCALIZATION_MESSAGE (
+CREATE TABLE IF NOT EXISTS rev_localization_message (
 	rev_lom_localization_message_id uuid primary key,
 	rev_lom_version int not null,
 	rev_lom_tenant_id uuid,

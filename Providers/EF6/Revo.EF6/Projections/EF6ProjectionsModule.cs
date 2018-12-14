@@ -17,6 +17,10 @@ namespace Revo.EF6.Projections
             Bind<IAsyncEventListener<DomainAggregateEvent>>()
                 .To<EF6ProjectionEventListener>()
                 .InTaskScope();
+            
+            Bind<IEF6ProjectionSubSystem>()
+                .To<EF6ProjectionSubSystem>()
+                .InTaskScope();
         }
     }
 }

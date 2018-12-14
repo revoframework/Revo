@@ -1,4 +1,6 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+using Revo.Core.Events;
 using Revo.DataAccess.Entities;
 
 namespace Revo.Infrastructure.Events.Async.Generic
@@ -22,9 +24,18 @@ namespace Revo.Infrastructure.Events.Async.Generic
         }
 
         public Guid Id { get; private set; }
+
+        [ConcurrencyCheck]
+        public int Version { get; private set; }
+        public bool IsDispatchedToAsyncQueues { get; private set; }
         public string EventName { get; private set; }
         public int EventVersion { get; private set; }
         public string EventJson { get; private set; }
         public string MetadataJson { get; private set; }
+
+        public void MarkDispatchedToAsyncQueues()
+        {
+            IsDispatchedToAsyncQueues = true;
+        }
     }
 }

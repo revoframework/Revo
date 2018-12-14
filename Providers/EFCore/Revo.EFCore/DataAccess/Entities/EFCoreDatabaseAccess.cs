@@ -21,6 +21,11 @@ namespace Revo.EFCore.DataAccess.Entities
 
         public IReadOnlyDictionary<string, DbContext> DbContexts => dbContexts;
 
+        public void ClearDbContexts()
+        {
+            dbContexts.Clear();
+        }
+
         public void Dispose()
         {
         }

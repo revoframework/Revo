@@ -13,6 +13,10 @@ namespace Revo.EFCore.DataAccess.InMemory
         }
 
         public IReadOnlyDictionary<string, DbContext> DbContexts { get; }
+        public void ClearDbContexts()
+        {
+        }
+
         public IQueryable<T> FromSql<T>(FormattableString sql) where T : class
         {
             throw new NotImplementedException();

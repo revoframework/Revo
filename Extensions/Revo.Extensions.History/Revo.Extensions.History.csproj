@@ -15,7 +15,7 @@ History-tracking extension package.</Description>
   
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="7.0.1" />
-    <PackageReference Include="AutoMapper.Extensions.ExpressionMapping" Version="1.0.2" />
+    <PackageReference Include="AutoMapper.Extensions.ExpressionMapping" Version="1.0.4" />
   </ItemGroup>
   
   <ItemGroup>

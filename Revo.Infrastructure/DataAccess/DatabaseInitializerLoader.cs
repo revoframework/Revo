@@ -44,6 +44,7 @@ namespace Revo.Infrastructure.DataAccess
                         commandContextStack.Push(new CommandContext(null, uow));
                         try
                         {
+                            uow.Begin();
                             await initializer.InitializeAsync(repositoryFunc());
                             await uow.CommitAsync();
                         }

@@ -166,12 +166,38 @@ namespace Revo.Infrastructure.EventStores.Generic
             return SelectEventRecordFromRow(row);
         }
         
-        public async Task CommitChangesAsync()
+        public virtual async Task CommitChangesAsync()
+        {
+            await DoBeforeCommitAsync();
+
+            try
+            {
+                await crudRepository.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                await DoOnCommitFailedAsync();
+                throw;
+            }
+
+            await DoOnCommitSucceedAsync();
+        }
+
+        protected async Task DoBeforeCommitAsync()
         {
             await SetStreamMetadatasAsync();
             await CheckStreamVersionsAsync();
-            await crudRepository.SaveChangesAsync();
+        }
+
+        protected Task DoOnCommitSucceedAsync()
+        {
             ResetChanges();
+            return Task.CompletedTask;
+        }
+
+        protected Task DoOnCommitFailedAsync()
+        {
+            return Task.CompletedTask;
         }
 
         private async Task SetStreamMetadatasAsync()

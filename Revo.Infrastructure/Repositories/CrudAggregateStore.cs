@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Revo.Core.Events;
+using Revo.Core.Transactions;
 using Revo.DataAccess.Entities;
 using Revo.Domain.Entities;
 using Revo.Domain.Entities.Basic;
@@ -12,7 +13,7 @@ using Revo.Infrastructure.Events;
 
 namespace Revo.Infrastructure.Repositories
 {
-    internal class CrudAggregateStore : IQueryableAggregateStore
+    public class CrudAggregateStore : IQueryableAggregateStore
     {
         private readonly ICrudRepository crudRepository;
         private readonly IEntityTypeManager entityTypeManager;
@@ -30,7 +31,7 @@ namespace Revo.Infrastructure.Repositories
             this.eventMessageFactory = eventMessageFactory;
         }
 
-        public bool IsChanged => crudRepository
+        public virtual bool NeedsSave => crudRepository
             .GetEntities<object>(EntityState.Added, EntityState.Deleted, EntityState.Modified).Any();
 
         public void Add<T>(T aggregate) where T : class, IAggregateRoot
@@ -108,14 +109,14 @@ namespace Revo.Infrastructure.Repositories
             crudRepository.Remove(aggregate);
         }
 
-        public async Task SaveChangesAsync()
+        public virtual async Task SaveChangesAsync()
         {
             InjectClassIds();
-            await crudRepository.SaveChangesAsync();
             await CommitAggregatesAsync();
+            await crudRepository.SaveChangesAsync();
         }
 
-        private void InjectClassIds()
+        protected void InjectClassIds()
         {
             var addedClassEntitites =
                 crudRepository.GetEntities<IBasicClassIdEntity>(Revo.DataAccess.Entities.EntityState.Added, Revo.DataAccess.Entities.EntityState.Modified);
@@ -129,7 +130,7 @@ namespace Revo.Infrastructure.Repositories
             }
         }
 
-        private async Task CommitAggregatesAsync()
+        protected async Task CommitAggregatesAsync()
         {
             foreach (var aggregate in GetTrackedAggregates())
             {

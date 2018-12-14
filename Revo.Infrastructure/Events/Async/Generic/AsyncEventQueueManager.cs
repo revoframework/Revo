@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MoreLinq;
 using Revo.Core.Events;
 using Revo.Core.Types;
 using Revo.DataAccess.Entities;
@@ -17,14 +18,16 @@ namespace Revo.Infrastructure.Events.Async.Generic
     {
         private readonly ICrudRepository crudRepository;
         private readonly IEventSerializer eventSerializer;
+        private readonly IExternalEventStore externalEventStore;
 
-        private readonly List<(ExternalEventRecord externalEventRecord, List<QueuedAsyncEvent> queuedEvents)>
-            externalEvents = new List<(ExternalEventRecord externalEventRecord, List<QueuedAsyncEvent> queuedEvents)>();
+        private readonly Dictionary<IEventMessage, List<EventSequencing>> eventsToQueues = new Dictionary<IEventMessage, List<EventSequencing>>();
 
-        public AsyncEventQueueManager(ICrudRepository crudRepository, IEventSerializer eventSerializer)
+        public AsyncEventQueueManager(ICrudRepository crudRepository, IEventSerializer eventSerializer,
+            IExternalEventStore externalEventStore)
         {
             this.crudRepository = crudRepository;
             this.eventSerializer = eventSerializer;
+            this.externalEventStore = externalEventStore;
         }
 
         public async Task<IReadOnlyCollection<IAsyncEventQueueRecord>> FindQueuedEventsAsync(Guid[] asyncEventQueueRecordIds)
@@ -84,53 +87,12 @@ namespace Revo.Infrastructure.Events.Async.Generic
         
         public async Task EnqueueEventAsync(IEventMessage eventMessage, IEnumerable<EventSequencing> queues)
         {
-            EventStreamRow eventStreamRow = null;
-            ExternalEventRecord externalEventRecord = null;
-            if (eventMessage is IEventStoreEventMessage eventStoreEventMessage)
+            if (!eventsToQueues.TryGetValue(eventMessage, out var queueList))
             {
-                eventStreamRow = ((EventStoreRecordAdapter)eventStoreEventMessage.Record).EventStreamRow;
-                if (eventStreamRow.IsDispatchedToAsyncQueues)
-                {
-                    return; // TODO might want to return existing queue records instead?
-                }
-
-                eventStreamRow.MarkDispatchedToAsyncQueues();
-
-                if (!crudRepository.IsAttached(eventStreamRow))
-                {
-                    crudRepository.Attach(eventStreamRow);
-                    crudRepository.SetEntityState(eventStreamRow, EntityState.Modified);
-                }
-            }
-            else
-            {
-                externalEventRecord = CreateExternalEventRecord(eventMessage);
+                queueList = eventsToQueues[eventMessage] = new List<EventSequencing>();
             }
 
-            List<QueuedAsyncEvent> externalQueuedEvents = new List<QueuedAsyncEvent>();
-            foreach (var sequence in queues)
-            {
-                AsyncEventQueue queue = await GetOrCreateQueueAsync(sequence.SequenceName, null);
-                if (eventStreamRow != null)
-                {
-                    QueuedAsyncEvent queuedEvent = new QueuedAsyncEvent(queue.Id, eventStreamRow, sequence.EventSequenceNumber);
-                    crudRepository.Add(queuedEvent);
-                }
-                else
-                {
-                    externalQueuedEvents.Add(new QueuedAsyncEvent(queue.Id, externalEventRecord, sequence.EventSequenceNumber));
-                }
-            }
-
-            if (externalQueuedEvents.Count > 0)
-            {
-                if (externalEvents.Any(x => x.externalEventRecord.Id == externalEventRecord.Id))
-                {
-                    throw new InvalidOperationException($"Tried to enqueue external event to async queue twice, event ID: {externalEventRecord.Id}");
-                }
-
-                externalEvents.Add((externalEventRecord, externalQueuedEvents));
-            }
+            queueList.AddRange(queues);
         }
         
         public async Task<string> GetEventSourceCheckpointAsync(string eventSourceName)
@@ -151,42 +113,79 @@ namespace Revo.Infrastructure.Events.Async.Generic
             eventSourceState.EventEnqueueCheckpoint = opaqueCheckpoint;
         }
 
-        public async Task<IReadOnlyCollection<IAsyncEventQueueRecord>> CommitAsync()
+        public virtual async Task<IReadOnlyCollection<IAsyncEventQueueRecord>> CommitAsync()
         {
-            await ResolveExternalEvents();
-            List<QueuedAsyncEvent> queueRecords = crudRepository.GetEntities<QueuedAsyncEvent>(EntityState.Added).ToList();
+            List<QueuedAsyncEvent> queuedEvents = await EnqueueEventsToRepositoryAsync();
             await crudRepository.SaveChangesAsync();
-            return queueRecords.Select(SelectRecordFromQueuedEvent).ToList();
+            return queuedEvents.Select(SelectRecordFromQueuedEvent).ToList();
         }
 
-        private ExternalEventRecord CreateExternalEventRecord(IEventMessage eventMessage)
+        protected async Task<List<QueuedAsyncEvent>> EnqueueEventsToRepositoryAsync()
         {
-            Guid eventId = eventMessage.Metadata.GetEventId() ?? throw new InvalidOperationException($"Cannot queue an external async event ({eventMessage}) without ID");
-            (string eventJson, VersionedTypeId typeId) = eventSerializer.SerializeEvent(eventMessage.Event);
-            string metadataJson = eventSerializer.SerializeEventMetadata(eventMessage.Metadata);
+            var eventStoreEvents = eventsToQueues.Where(x =>
+                (x.Key as IEventStoreEventMessage)?.Record is EventStoreRecordAdapter).ToArray();
+            var externalEvents = eventsToQueues.Except(eventStoreEvents).ToArray();
 
-            return new ExternalEventRecord(eventId, eventJson, typeId.Name, typeId.Version, metadataJson);
-        }
+            var queuedEvents = new List<QueuedAsyncEvent>();
 
-        private async Task ResolveExternalEvents()
-        {
-            var externalEventIds = externalEvents.Select(x => x.externalEventRecord.Id).ToArray();
-            var existingRecordIds = await crudRepository
-                .Where<ExternalEventRecord>(x => externalEventIds.Contains(x.Id))
-                .Select(x => x.Id)
-                .ToListAsync(crudRepository);
-
-            foreach (var externalEventPair in externalEvents)
+            //external
+            if (externalEvents.Length > 0)
             {
-                if (existingRecordIds.Contains(externalEventPair.externalEventRecord.Id))
+                foreach (var externalEvent in externalEvents)
+                {
+                    externalEventStore.PushEvent(externalEvent.Key);
+                }
+
+                var externalEventRecords = await externalEventStore.CommitAsync();
+                foreach (var externalEventRecord in externalEventRecords)
+                {
+                    if (externalEventRecord.IsDispatchedToAsyncQueues)
+                    {
+                        continue;
+                    }
+
+                    externalEventRecord.MarkDispatchedToAsyncQueues();
+                    var sequences = externalEvents.First(x => x.Key.Metadata.GetEventId() == externalEventRecord.Id).Value;
+
+                    foreach (var sequence in sequences)
+                    {
+                        AsyncEventQueue queue = await GetOrCreateQueueAsync(sequence.SequenceName, null);
+                        QueuedAsyncEvent queuedEvent = new QueuedAsyncEvent(queue.Id, externalEventRecord, sequence.EventSequenceNumber);
+                        crudRepository.Add(queuedEvent);
+                        queuedEvents.Add(queuedEvent);
+                    }
+                }
+            }
+
+            //event store
+            foreach (var eventToQueues in eventStoreEvents)
+            {
+                var storeMessage = (IEventStoreEventMessage) eventToQueues.Key;
+                var eventStreamRow = ((EventStoreRecordAdapter)storeMessage.Record).EventStreamRow;
+                if (eventStreamRow.IsDispatchedToAsyncQueues)
                 {
                     continue;
                 }
 
-                crudRepository.AddRange(externalEventPair.queuedEvents);
+                eventStreamRow.MarkDispatchedToAsyncQueues();
+
+                if (!crudRepository.IsAttached(eventStreamRow))
+                {
+                    crudRepository.Attach(eventStreamRow);
+                    crudRepository.SetEntityState(eventStreamRow, EntityState.Modified);
+                }
+
+                foreach (var sequence in eventToQueues.Value)
+                {
+                    AsyncEventQueue queue = await GetOrCreateQueueAsync(sequence.SequenceName, null);
+                    QueuedAsyncEvent queuedEvent = new QueuedAsyncEvent(queue.Id, eventStreamRow, sequence.EventSequenceNumber);
+                    crudRepository.Add(queuedEvent);
+                    queuedEvents.Add(queuedEvent);
+                }
             }
 
-            externalEvents.Clear();
+            eventsToQueues.Clear();
+            return queuedEvents;
         }
 
         private Task<AsyncEventQueue> GetQueueAsync(string queueName)
@@ -215,7 +214,7 @@ namespace Revo.Infrastructure.Events.Async.Generic
                 .Include(crudRepository, x => x.ExternalEventRecord);
         }
 
-        private AsyncEventQueueRecordAdapter SelectRecordFromQueuedEvent(QueuedAsyncEvent queuedEvent)
+        protected AsyncEventQueueRecordAdapter SelectRecordFromQueuedEvent(QueuedAsyncEvent queuedEvent)
         {
             return new AsyncEventQueueRecordAdapter(queuedEvent, eventSerializer);
         }

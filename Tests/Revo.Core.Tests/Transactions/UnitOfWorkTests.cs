@@ -24,12 +24,14 @@ namespace Revo.Core.Tests.Transactions
             unitOfWorkListeners = new[] { Substitute.For<IUnitOfWorkListener>(), Substitute.For<IUnitOfWorkListener>() };
             publishEventBuffer = Substitute.For<IPublishEventBuffer>();
 
-            sut = new UnitOfWork(unitOfWorkListeners, publishEventBuffer);
+            sut = new UnitOfWork(new Lazy<IUnitOfWorkListener[]>(unitOfWorkListeners), publishEventBuffer);
         }
 
         [Fact]
-        public void Constructor_BeginsWork()
+        public void Begin_Notifies()
         {
+            sut.Begin();
+
             unitOfWorkListeners[0].Received(1).OnWorkBegin(sut);
             unitOfWorkListeners[1].Received(1).OnWorkBegin(sut);
         }
@@ -37,6 +39,7 @@ namespace Revo.Core.Tests.Transactions
         [Fact]
         public async Task CommitAsync_CommitsInnerTransactions()
         {
+            sut.Begin();
             sut.AddInnerTransaction(innerTransactions[0]);
             sut.AddInnerTransaction(innerTransactions[1]);
 
@@ -49,6 +52,7 @@ namespace Revo.Core.Tests.Transactions
         [Fact]
         public async Task CommitAsync_NotifiesListenersBefore()
         {
+            sut.Begin();
             sut.AddInnerTransaction(innerTransactions[0]);
             await sut.CommitAsync();
 
@@ -68,6 +72,7 @@ namespace Revo.Core.Tests.Transactions
         [Fact]
         public async Task CommitAsync_FlushesEvents()
         {
+            sut.Begin();
             sut.AddInnerTransaction(innerTransactions[0]);
             sut.AddInnerTransaction(innerTransactions[1]);
             await sut.CommitAsync();
@@ -90,6 +95,7 @@ namespace Revo.Core.Tests.Transactions
         [Fact]
         public async Task CommitAsync_NotifiesListenersWhenSucceeded()
         {
+            sut.Begin();
             sut.AddInnerTransaction(innerTransactions[0]);
             await sut.CommitAsync();
 

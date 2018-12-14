@@ -44,13 +44,6 @@ namespace Revo.Infrastructure.Tests.Projections
             }
 
             [Fact]
-            public async Task CommitChangesAsync_SavesRepository()
-            {
-                await sut.CommitChangesAsync();
-                crudRepository.ReceivedWithAnyArgs(1).SaveChangesAsync();
-            }
-
-            [Fact]
             public async Task ProjectEventsAsync_AddsToRepository()
             {
                 await sut.ProjectEventsAsync(Guid.NewGuid(), events);

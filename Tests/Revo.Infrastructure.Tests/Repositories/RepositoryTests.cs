@@ -37,6 +37,7 @@ namespace Revo.Infrastructure.Tests.Repositories
             aggregateStore1.CanHandleAggregateType(typeof(MyEntity1)).Returns(true);
             aggregateStoreFactory1 = Substitute.For<IAggregateStoreFactory>();
             aggregateStoreFactory1.CreateAggregateStore(unitOfWork).Returns(aggregateStore1);
+            aggregateStoreFactory1.CanHandleAggregateType(typeof(MyEntity1)).Returns(true);
 
             aggregateStore2 = Substitute.For<IAggregateStore>();
             aggregateStoreFactory2 = Substitute.For<IAggregateStoreFactory>();

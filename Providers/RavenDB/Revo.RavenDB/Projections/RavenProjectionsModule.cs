@@ -17,6 +17,10 @@ namespace Revo.RavenDB.Projections
             Bind<IAsyncEventListener<DomainAggregateEvent>>()
                 .To<RavenProjectionEventListener>()
                 .InTaskScope();
+
+            Bind<IRavenProjectionSubSystem>()
+                .To<RavenProjectionSubSystem>()
+                .InTaskScope();
         }
     }
 }

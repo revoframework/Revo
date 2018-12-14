@@ -3,7 +3,7 @@ using Revo.Infrastructure.Projections;
 
 namespace Revo.RavenDB.Projections
 {
-    public interface IRavenEntityEventProjector<T> : IEntityEventProjector<T>
+    public interface IRavenEntityEventProjector<T> : IEntityEventProjector
         where T : IAggregateRoot
     {
     }

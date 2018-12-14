@@ -28,7 +28,7 @@ namespace Revo.Infrastructure.Projections
     /// <typeparam name="TSource">Aggregate type.</typeparam>
     /// <typeparam name="TTarget">Read model type. Should have a parameterless constructor.</typeparam>
     public abstract class CrudEntityEventToPocoProjector<TSource, TTarget> :
-        EntityEventToPocoProjector<TSource, TTarget>
+        EntityEventToPocoProjector<TTarget>
         where TSource : class, IAggregateRoot
         where TTarget : class, new()
     {
@@ -38,11 +38,6 @@ namespace Revo.Infrastructure.Projections
         }
 
         protected ICrudRepository Repository { get; }
-
-        public override async Task CommitChangesAsync()
-        {
-            await Repository.SaveChangesAsync();
-        }
 
         protected override async Task<TTarget> CreateProjectionTargetAsync(Guid aggregateId, IReadOnlyCollection<IEventMessage<DomainAggregateEvent>> events)
         {

@@ -48,6 +48,8 @@ namespace Revo.Infrastructure.Sagas
 
                 try
                 {
+                    uow.Begin();
+
                     var sagaEventDispatcher = sagaEventDispatcherFunc();
                     await sagaEventDispatcher.DispatchEventsToSagas(bufferedEvents);
 

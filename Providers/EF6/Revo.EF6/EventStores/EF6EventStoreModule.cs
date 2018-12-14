@@ -26,6 +26,10 @@ namespace Revo.EF6.EventStores
                 .To<EventSourceCatchUp>()
                 .InTransientScope();
 
+            Bind<IEventSourceCatchUp>()
+                .To<ExternalEventSourceCatchUp>()
+                .InTransientScope();
+
             Bind<ICrudRepository>()
                 .To<EF6CrudRepository>()
                 .WhenInjectedInto<EventSourceCatchUp>()

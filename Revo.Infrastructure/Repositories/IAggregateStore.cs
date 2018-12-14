@@ -7,7 +7,7 @@ namespace Revo.Infrastructure.Repositories
 {
     public interface IAggregateStore
     {
-        bool IsChanged { get; }
+        bool NeedsSave { get; }
 
         void Add<T>(T aggregate) where T : class, IAggregateRoot;
 

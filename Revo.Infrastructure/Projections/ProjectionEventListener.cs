@@ -1,40 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using Revo.Core.Commands;
 using Revo.Core.Events;
-using Revo.Domain.Entities;
-using Revo.Domain.Entities.EventSourcing;
+using Revo.Core.Transactions;
 using Revo.Domain.Events;
 using Revo.Infrastructure.Events.Async;
-using Revo.Infrastructure.EventSourcing;
 
 namespace Revo.Infrastructure.Projections
 {
     public abstract class ProjectionEventListener :
         IAsyncEventListener<DomainAggregateEvent>
     {
-        private readonly IEntityTypeManager entityTypeManager;
-        private readonly Dictionary<Guid, PublishedEntityEvents> allEvents = new Dictionary<Guid, PublishedEntityEvents>();
+        private readonly IProjectionSubSystem projectionSubSystem;
+        private readonly IUnitOfWorkFactory unitOfWorkFactory;
+        private readonly CommandContextStack commandContextStack;
+        private readonly List<IEventMessage<DomainAggregateEvent>> events = new List<IEventMessage<DomainAggregateEvent>>();
 
-        public ProjectionEventListener(IEntityTypeManager entityTypeManager)
+        public ProjectionEventListener(IProjectionSubSystem projectionSubSystem,
+            IUnitOfWorkFactory unitOfWorkFactory, CommandContextStack commandContextStack)
         {
-            this.entityTypeManager = entityTypeManager;
+            this.projectionSubSystem = projectionSubSystem;
+            this.unitOfWorkFactory = unitOfWorkFactory;
+            this.commandContextStack = commandContextStack;
         }
 
         public abstract IAsyncEventSequencer EventSequencer { get; }
 
-        public abstract IEnumerable<IEntityEventProjector> GetProjectors(Type entityType);
-
         public Task HandleAsync(IEventMessage<DomainAggregateEvent> message, string sequenceName)
         {
-            PublishedEntityEvents events;
-            if (!allEvents.TryGetValue(message.Event.AggregateId, out events))
-            {
-                events = new PublishedEntityEvents();
-                allEvents[message.Event.AggregateId] = events;
-            }
-
             events.Add(message);
             return Task.FromResult(0);
         }
@@ -46,34 +40,29 @@ namespace Revo.Infrastructure.Projections
 
         public async Task ExecuteProjectionsAsync()
         {
-            var usedProjectors = new HashSet<IEntityEventProjector>();
-
-            foreach (var entityEvents in allEvents)
+            using (IUnitOfWork uow = unitOfWorkFactory.CreateUnitOfWork())
             {
-                var events = entityEvents.Value;
-                Guid classId = events.First().Metadata.GetAggregateClassId() ?? throw new InvalidOperationException($"Cannot create projection for aggregate ID {entityEvents.Key} because event metadata don't contain aggregate class ID");
-                Type entityType = entityTypeManager.GetClassInfoByClassId(classId).ClrType;
+                commandContextStack.Push(new CommandContext(null, uow));
 
-                Guid aggregateId = entityEvents.Key;
-                IEnumerable<IEntityEventProjector> projectors = GetProjectors(entityType);
-
-                foreach (var projector in projectors)
+                try
                 {
-                    await projector.ProjectEventsAsync(aggregateId, events);
-                    usedProjectors.Add(projector);
+                    uow.Begin();
+
+                    await projectionSubSystem.ExecuteProjectionsAsync(events, uow, GetEventProjectionOptions());
+                    events.Clear();
+
+                    await uow.CommitAsync();
+                }
+                finally
+                {
+                    commandContextStack.Pop();
                 }
             }
-
-            foreach (var projector in usedProjectors)
-            {
-                await projector.CommitChangesAsync();
-            }
-
-            allEvents.Clear();
         }
-        
-        private class PublishedEntityEvents : List<IEventMessage<DomainAggregateEvent>>
+
+        protected virtual EventProjectionOptions GetEventProjectionOptions()
         {
+            return new EventProjectionOptions();
         }
     }
 }

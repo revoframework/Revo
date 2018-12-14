@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.Extensions.ExpressionMapping;
 using Revo.Core.Lifecycle;
 using Revo.Core.Types;
 
@@ -17,6 +18,7 @@ namespace Revo.Core.IO
         {
             Mapper.Initialize(config =>
             {
+                config.AddExpressionMapping();
                 var profiles = profileDiscovery.DiscoverProfiles();
                 foreach (Profile profile in profiles)
                 {
