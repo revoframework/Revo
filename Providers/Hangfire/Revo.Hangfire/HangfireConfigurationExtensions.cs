@@ -23,7 +23,7 @@ namespace Revo.Hangfire
             {
                 if (section.IsActive)
                 {
-                    c.LoadModule(new HangfireModule());
+                    c.LoadModule(new HangfireModule(section));
                 }
             });
 
