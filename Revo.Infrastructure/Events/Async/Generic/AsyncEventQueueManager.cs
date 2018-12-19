@@ -127,7 +127,7 @@ namespace Revo.Infrastructure.Events.Async.Generic
             var externalEvents = eventsToQueues.Except(eventStoreEvents).ToArray();
 
             var queuedEvents = new List<QueuedAsyncEvent>();
-
+            
             //external
             if (externalEvents.Length > 0)
             {
@@ -158,6 +158,20 @@ namespace Revo.Infrastructure.Events.Async.Generic
             }
 
             //event store
+            var allQueueNames = new HashSet<string>();
+            foreach (var eventToQueues in eventStoreEvents)
+            {
+                foreach (var sequence in eventToQueues.Value)
+                {
+                    allQueueNames.Add(sequence.SequenceName);
+                }
+            }
+
+            if (allQueueNames.Count > 10)
+            {
+                await LoadQueuesAsync(allQueueNames.ToArray());
+            }
+            
             foreach (var eventToQueues in eventStoreEvents)
             {
                 var storeMessage = (IEventStoreEventMessage) eventToQueues.Key;
@@ -191,6 +205,11 @@ namespace Revo.Infrastructure.Events.Async.Generic
         private Task<AsyncEventQueue> GetQueueAsync(string queueName)
         {
             return crudRepository.FindAsync<AsyncEventQueue>(queueName);
+        }
+
+        private async Task LoadQueuesAsync(string[] queueNames)
+        {
+            await crudRepository.Where<AsyncEventQueue>(x => queueNames.Contains(x.Id)).ToArrayAsync(crudRepository);
         }
 
         private async Task<AsyncEventQueue> GetOrCreateQueueAsync(string queueName, long? lastSequenceNumberProcessed)
