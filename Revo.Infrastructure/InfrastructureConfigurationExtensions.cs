@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Revo.Core.Configuration;
 using Revo.Infrastructure.Events.Async;
 
@@ -17,7 +18,10 @@ namespace Revo.Infrastructure
 
             configuration.ConfigureKernel(c =>
             {
-                c.Kernel.Bind<IAsyncEventPipelineConfiguration>().ToConstant(section.AsyncEventPipeline);
+                if (!c.Kernel.GetBindings(typeof(IAsyncEventPipelineConfiguration)).Any())
+                {
+                    c.Kernel.Bind<IAsyncEventPipelineConfiguration>().ToConstant(section.AsyncEventPipeline);
+                }
             });
 
             return configuration;
