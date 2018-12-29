@@ -20,12 +20,7 @@ namespace Revo.EF6.Tests.Projections
             sut = new TestProjector(ef6CrudRepository);
         }
 
-        [Fact]
-        public async Task CommitChangesAsync_SavesRepository()
-        {
-            await sut.CommitChangesAsync();
-            ef6CrudRepository.ReceivedWithAnyArgs(1).SaveChangesAsync();
-        }
+        // TODO?
 
         public class TestAggregate : EventSourcedAggregateRoot
         {
