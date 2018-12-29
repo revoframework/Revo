@@ -2,6 +2,7 @@
 using System.Linq;
 using Revo.Core.Configuration;
 using Revo.Infrastructure.Events.Async;
+using Revo.Infrastructure.Sagas;
 
 namespace Revo.Infrastructure
 {
@@ -21,6 +22,11 @@ namespace Revo.Infrastructure
                 if (!c.Kernel.GetBindings(typeof(IAsyncEventPipelineConfiguration)).Any())
                 {
                     c.Kernel.Bind<IAsyncEventPipelineConfiguration>().ToConstant(section.AsyncEventPipeline);
+                }
+
+                if(section.EnableSagas)
+                {
+                    c.LoadModule<SagasModule>();
                 }
             });
 

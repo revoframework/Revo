@@ -6,5 +6,6 @@ namespace Revo.Infrastructure
     public class InfrastructureConfigurationSection : IRevoConfigurationSection
     {
         public IAsyncEventPipelineConfiguration AsyncEventPipeline { get; set; } = new AsyncEventPipelineConfiguration();
+        public bool EnableSagas { get; set; } = true;
     }
 }

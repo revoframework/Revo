@@ -10,6 +10,7 @@ using Revo.Infrastructure.Repositories;
 
 namespace Revo.Infrastructure.Sagas
 {
+    [AutoLoadModule(false)]
     public class SagasModule : NinjectModule
     {
         public override void Load()
