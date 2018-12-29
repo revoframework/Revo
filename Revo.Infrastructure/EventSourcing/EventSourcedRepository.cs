@@ -8,6 +8,7 @@ using Revo.DataAccess.Entities;
 using Revo.Domain.Entities;
 using Revo.Domain.Entities.EventSourcing;
 using Revo.Domain.Events;
+using Revo.Domain.Tenancy;
 using Revo.Infrastructure.Events;
 using Revo.Infrastructure.EventStores;
 using Revo.Infrastructure.Repositories;
@@ -241,6 +242,12 @@ namespace Revo.Infrastructure.EventSourcing
             {
                 IEventMessageDraft message = await eventMessageFactory.CreateMessageAsync(ev);
                 message.SetMetadata(BasicEventMetadataNames.AggregateClassId, aggregateClassId.Value.ToString());
+
+                if (aggregate is ITenantOwned tenantOwned)
+                {
+                    message.SetMetadata(BasicEventMetadataNames.AggregateTenantId, tenantOwned.TenantId?.ToString());
+                }
+
                 messages.Add(message);
             }
 

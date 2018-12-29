@@ -19,6 +19,12 @@ namespace Revo.Domain.Events
             return stringValue != null ? (Guid?) Guid.Parse(stringValue) : null;
         }
 
+        public static Guid? GetAggregateTenantId(this IReadOnlyDictionary<string, string> metadata)
+        {
+            string stringValue = GetStringValue(metadata, BasicEventMetadataNames.AggregateTenantId);
+            return stringValue?.Length > 0 ? (Guid?) Guid.Parse(stringValue) : null;
+        }
+
         public static long? GetStreamSequenceNumber(this IReadOnlyDictionary<string, string> metadata)
         {
             string stringValue = GetStringValue(metadata, BasicEventMetadataNames.StreamSequenceNumber);

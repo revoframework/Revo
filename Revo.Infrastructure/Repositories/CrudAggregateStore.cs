@@ -9,6 +9,7 @@ using Revo.DataAccess.Entities;
 using Revo.Domain.Entities;
 using Revo.Domain.Entities.Basic;
 using Revo.Domain.Events;
+using Revo.Domain.Tenancy;
 using Revo.Infrastructure.Events;
 
 namespace Revo.Infrastructure.Repositories
@@ -154,6 +155,11 @@ namespace Revo.Infrastructure.Repositories
                 if (aggregateClassId != null)
                 {
                     message.SetMetadata(BasicEventMetadataNames.AggregateClassId, aggregateClassId.Value.ToString());
+                }
+                
+                if (aggregate is ITenantOwned tenantOwned)
+                {
+                    message.SetMetadata(BasicEventMetadataNames.AggregateTenantId, tenantOwned.TenantId?.ToString());
                 }
 
                 if (message.Metadata.GetEventId() == null)

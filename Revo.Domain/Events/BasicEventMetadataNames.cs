@@ -12,6 +12,7 @@
         public static readonly string StreamSequenceNumber = "StreamSequenceNumber";
         public static readonly string RequestUri = "RequestUri";
         public static readonly string AggregateClassId = "AggregateClassId";
+        public static readonly string AggregateTenantId = "AggregateTenantId";
         public static readonly string MachineName = "MachineName";
         public static readonly string EventSourceName = "EventSourceName";
         public static readonly string CommandTypeId = "CommandTypeId";
