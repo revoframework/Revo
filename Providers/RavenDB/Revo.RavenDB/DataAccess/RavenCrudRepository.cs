@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -10,7 +9,7 @@ using Raven.Client.Documents.Session;
 using Raven.Client.Exceptions;
 using Revo.DataAccess.Entities;
 
-namespace Revo.RavenDB.Entities
+namespace Revo.RavenDB.DataAccess
 {
     public class RavenCrudRepository : IRavenCrudRepository
     {
@@ -51,14 +50,14 @@ namespace Revo.RavenDB.Entities
         public async Task<T> GetAsync<T>(object id) where T : class
         {
             T t = await asyncDocumentSession.LoadAsync<T>(GetRavenId<T>(id.ToString()));
-            DataAccess.Entities.RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
+            Revo.DataAccess.Entities.RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
             return t;
         }
 
         public async Task<T> GetAsync<T>(CancellationToken cancellationToken, object id) where T : class
         {
             T t = await asyncDocumentSession.LoadAsync<T>(GetRavenId<T>(id.ToString()), cancellationToken);
-            DataAccess.Entities.RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
+            Revo.DataAccess.Entities.RepositoryHelpers.ThrowIfGetFailed<T>(t, id);
             return t;
         }
 

@@ -2,7 +2,7 @@
 using Revo.Core.Configuration;
 using Revo.RavenDB.Projections;
 
-namespace Revo.RavenDB
+namespace Revo.RavenDB.Configuration
 {
     public static class RavenConfigurationExtensions
     {
@@ -30,18 +30,22 @@ namespace Revo.RavenDB
         }
 
         public static IRevoConfiguration UseRavenProjections(this IRevoConfiguration configuration,
+            bool autoDiscoverProjectors = true,
             Action<RavenConfigurationSection> advancedAction = null)
         {
             configuration.UseRavenDataAccess(null);
 
             var section = configuration.GetSection<RavenConfigurationSection>();
+            section.UseProjections = true;
+            section.AutoDiscoverProjectors = autoDiscoverProjectors;
+
             advancedAction?.Invoke(section);
 
             configuration.ConfigureKernel(c =>
             {
                 if (section.UseProjections)
                 {
-                    c.LoadModule(new RavenProjectionsModule());
+                    c.LoadModule(new RavenProjectionsModule(section));
                 }
             });
 

@@ -1,8 +1,9 @@
 # RELEASE NOTES
 
-## [1.4.1] - 2018-?-?
+## [1.5.0] - 2019-?-?
 
 ### Added
+- automatic event projector discovery and registration (now enabled by default)
 - EFCoreInMemoryCrudRepository and EFCoreInMemoryDatabaseAccess
 - recurring job scheduling support
 

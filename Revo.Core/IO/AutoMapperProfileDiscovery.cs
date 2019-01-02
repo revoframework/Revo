@@ -18,7 +18,7 @@ namespace Revo.Core.IO
             this.kernel = kernel;
         }
 
-        public IReadOnlyCollection<Profile> DiscoverProfiles()
+        public void DiscoverProfiles()
         {
             var modelDefinitionTypes = typeExplorer.GetAllTypes()
                 .Where(x => typeof(Profile).IsAssignableFrom(x)
@@ -26,7 +26,13 @@ namespace Revo.Core.IO
                             && (x.AssemblyQualifiedName == null || !x.AssemblyQualifiedName.StartsWith("AutoMapper.")));
 
             RegisterProfiles(modelDefinitionTypes);
-            return GetProfiles();
+        }
+
+        public IReadOnlyCollection<Profile> GetProfiles()
+        {
+            return kernel.GetBindings(typeof(Profile)).Any()
+                ? kernel.GetAll<Profile>().ToList()
+                : new List<Profile>();
         }
 
         private void RegisterProfiles(IEnumerable<Type> profileTypes)
@@ -42,13 +48,6 @@ namespace Revo.Core.IO
                         .InSingletonScope();
                 }
             }
-        }
-
-        private List<Profile> GetProfiles()
-        {
-            return kernel.GetBindings(typeof(Profile)).Any()
-                ? kernel.GetAll<Profile>().ToList()
-                : new List<Profile>();
         }
     }
 }

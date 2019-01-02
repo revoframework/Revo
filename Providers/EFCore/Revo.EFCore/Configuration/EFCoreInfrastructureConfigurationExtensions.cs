@@ -1,5 +1,6 @@
 ﻿using System;
 using Revo.Core.Configuration;
+using Revo.EFCore.DataAccess.Configuration;
 using Revo.EFCore.Events;
 using Revo.EFCore.EventStores;
 using Revo.EFCore.Projections;
@@ -14,6 +15,8 @@ namespace Revo.EFCore.Configuration
             Action<EFCoreInfrastructureConfigurationSection> advancedAction = null)
         {
             return configuration
+                .UseEFCoreDataAccess(null)
+                .UseEFCoreRepositories()
                 .UseEFCoreAsyncEvents()
                 .UseEFCoreEventStore()
                 .UseEFCoreProjections()
@@ -39,6 +42,24 @@ namespace Revo.EFCore.Configuration
             return configuration;
         }
 
+        public static IRevoConfiguration UseEFCoreRepositories(this IRevoConfiguration configuration,
+            bool useCrudAggregateStore = true, bool useEventSourcedAggregateStore = true,
+            Action<EFCoreInfrastructureConfigurationSection> advancedAction = null)
+        {
+            var section = configuration.GetSection<EFCoreInfrastructureConfigurationSection>();
+            section.UseCrudAggregateStore = useCrudAggregateStore;
+            section.UseEventSourcedAggregateStore = useEventSourcedAggregateStore;
+
+            advancedAction?.Invoke(section);
+
+            configuration.ConfigureKernel(c =>
+            {
+                c.LoadModule(new EFCoreRepositoriesModule(section));
+            });
+
+            return configuration;
+        }
+
         public static IRevoConfiguration UseEFCoreSagas(this IRevoConfiguration configuration,
             Action<EFCoreInfrastructureConfigurationSection> advancedAction = null)
         {
@@ -59,10 +80,12 @@ namespace Revo.EFCore.Configuration
         }
 
         public static IRevoConfiguration UseEFCoreProjections(this IRevoConfiguration configuration,
+            bool autoDiscoverProjectors = true,
             Action<EFCoreInfrastructureConfigurationSection> advancedAction = null)
         {
             var section = configuration.GetSection<EFCoreInfrastructureConfigurationSection>();
             section.UseProjections = true;
+            section.AutoDiscoverProjectors = autoDiscoverProjectors;
 
             advancedAction?.Invoke(section);
 
@@ -70,7 +93,7 @@ namespace Revo.EFCore.Configuration
             {
                 if (section.UseProjections)
                 {
-                    c.LoadModule<EFCoreProjectionsModule>();
+                    c.LoadModule(new EFCoreProjectionsModule(section));
                 }
             });
 

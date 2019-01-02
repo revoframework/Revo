@@ -2,6 +2,7 @@
 using Revo.AspNet.Core;
 using Revo.Core.Configuration;
 using Revo.EF6;
+using Revo.EF6.Configuration;
 using Revo.EF6.DataAccess;
 using Revo.Hangfire;
 

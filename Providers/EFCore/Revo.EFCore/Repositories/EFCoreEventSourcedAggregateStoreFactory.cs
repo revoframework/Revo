@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Revo.Core.Events;
 using Revo.Core.Transactions;
 using Revo.Infrastructure.EventSourcing;
 using Revo.Infrastructure.Repositories;
 
-namespace Revo.EFCore.UnitOfWork
+namespace Revo.EFCore.Repositories
 {
     public class EFCoreEventSourcedAggregateStoreFactory : EventSourcedAggregateStoreFactory
     {

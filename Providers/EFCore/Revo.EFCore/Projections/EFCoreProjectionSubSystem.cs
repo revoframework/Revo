@@ -5,9 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Revo.Core.Core;
 using Revo.Core.Events;
+using Revo.Core.Transactions;
 using Revo.Domain.Entities;
 using Revo.Domain.Events;
-using Revo.EFCore.UnitOfWork;
+using Revo.EFCore.Repositories;
 using Revo.Infrastructure.Events;
 using Revo.Infrastructure.Projections;
 
@@ -16,17 +17,30 @@ namespace Revo.EFCore.Projections
     public class EFCoreProjectionSubSystem : ProjectionSubSystem, IEFCoreProjectionSubSystem, ITransactionParticipant
     {
         private readonly IServiceLocator serviceLocator;
-        private readonly IEFCoreTransactionCoordinator transactionCoordinator;
+        private readonly Lazy<IEFCoreTransactionCoordinator> transactionCoordinator;
+
         private readonly HashSet<IEntityEventProjector> allUsedProjectors = new HashSet<IEntityEventProjector>();
+        private bool transactionParticipantRegistered = false;
         private EventProjectionOptions eventProjectionOptions;
 
         public EFCoreProjectionSubSystem(IEntityTypeManager entityTypeManager, IEventMessageFactory eventMessageFactory,
-            IServiceLocator serviceLocator, IEFCoreTransactionCoordinator transactionCoordinator) : base(entityTypeManager, eventMessageFactory)
+            IServiceLocator serviceLocator, Lazy<IEFCoreTransactionCoordinator> transactionCoordinator) : base(entityTypeManager, eventMessageFactory)
         {
             this.serviceLocator = serviceLocator;
             this.transactionCoordinator = transactionCoordinator;
+        }
 
-            transactionCoordinator.AddTransactionParticipant(this);
+        public override async Task ExecuteProjectionsAsync(
+            IReadOnlyCollection<IEventMessage<DomainAggregateEvent>> events,
+            IUnitOfWork unitOfWork, EventProjectionOptions options)
+        {
+            if (!transactionParticipantRegistered)
+            {
+                transactionParticipantRegistered = true;
+                transactionCoordinator.Value.AddTransactionParticipant(this);
+            }
+
+            await base.ExecuteProjectionsAsync(events, unitOfWork, options);
         }
 
         protected override IEnumerable<IEntityEventProjector> GetProjectors(Type entityType, EventProjectionOptions options)
@@ -56,7 +70,7 @@ namespace Revo.EFCore.Projections
                 allUsedProjectors.Add(projector);
             }
 
-            await transactionCoordinator.CommitAsync();
+            await transactionCoordinator.Value.CommitAsync();
         }
 
         public async Task OnBeforeCommitAsync()

@@ -22,7 +22,7 @@ namespace Revo.Infrastructure.Projections
             this.eventMessageFactory = eventMessageFactory;
         }
 
-        public async Task ExecuteProjectionsAsync(IReadOnlyCollection<IEventMessage<DomainAggregateEvent>> events,
+        public virtual async Task ExecuteProjectionsAsync(IReadOnlyCollection<IEventMessage<DomainAggregateEvent>> events,
             IUnitOfWork unitOfWork, EventProjectionOptions options)
         {
             var usedProjectors = new HashSet<IEntityEventProjector>();

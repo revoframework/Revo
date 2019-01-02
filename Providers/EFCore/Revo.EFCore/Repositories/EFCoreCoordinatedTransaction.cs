@@ -1,18 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using MoreLinq;
 using Revo.Core.Commands;
 using Revo.Core.Transactions;
 using Revo.EFCore.DataAccess.Entities;
 using Revo.EFCore.Events;
 using Revo.EFCore.EventStores;
 using Revo.EFCore.Projections;
-using Revo.Infrastructure.Events;
 
-namespace Revo.EFCore.UnitOfWork
+namespace Revo.EFCore.Repositories
 {
     public class EFCoreCoordinatedTransaction : CoordinatedTransaction, IEFCoreTransactionCoordinator, IUnitOfWorkListener
     {

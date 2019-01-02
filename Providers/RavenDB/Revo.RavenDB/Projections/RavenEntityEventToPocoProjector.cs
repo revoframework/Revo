@@ -1,6 +1,6 @@
 ﻿using Revo.Domain.Entities;
 using Revo.Infrastructure.Projections;
-using Revo.RavenDB.Entities;
+using Revo.RavenDB.DataAccess;
 
 namespace Revo.RavenDB.Projections
 {

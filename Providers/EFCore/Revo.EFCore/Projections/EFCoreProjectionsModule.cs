@@ -1,6 +1,8 @@
 ﻿using Ninject.Modules;
 using Revo.Core.Core;
+using Revo.Core.Lifecycle;
 using Revo.Domain.Events;
+using Revo.EFCore.Configuration;
 using Revo.Infrastructure.Events.Async;
 
 namespace Revo.EFCore.Projections
@@ -8,6 +10,13 @@ namespace Revo.EFCore.Projections
     [AutoLoadModule(false)]
     public class EFCoreProjectionsModule : NinjectModule
     {
+        private readonly EFCoreInfrastructureConfigurationSection configurationSection;
+
+        public EFCoreProjectionsModule(EFCoreInfrastructureConfigurationSection configurationSection)
+        {
+            this.configurationSection = configurationSection;
+        }
+
         public override void Load()
         {
             Bind<IAsyncEventSequencer<DomainAggregateEvent>, EFCoreProjectionEventListener.EFCoreProjectionEventSequencer>()
@@ -21,6 +30,13 @@ namespace Revo.EFCore.Projections
             Bind<IEFCoreProjectionSubSystem>()
                 .To<EFCoreProjectionSubSystem>()
                 .InTaskScope();
+
+            if (configurationSection.AutoDiscoverProjectors)
+            {
+                Bind<IApplicationConfigurer>()
+                    .To<EFCoreProjectorDiscovery>()
+                    .InSingletonScope();
+            }
         }
     }
 }

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Revo.Core.Transactions;
 using Revo.DataAccess.Entities;
 using Revo.EFCore.DataAccess.Entities;
-using Revo.EFCore.UnitOfWork;
+using Revo.EFCore.Repositories;
 using Revo.Infrastructure.Events;
 using Revo.Infrastructure.EventStores.Generic;
 

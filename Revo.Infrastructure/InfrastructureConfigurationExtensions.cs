@@ -12,6 +12,8 @@ namespace Revo.Infrastructure
             AsyncEventPipelineConfiguration asyncEventPipelineConfiguration = null,
             Action<InfrastructureConfigurationSection> advancedAction = null)
         {
+            configuration.ConfigureCore();
+
             var section = configuration.GetSection<InfrastructureConfigurationSection>();
             section.AsyncEventPipeline = asyncEventPipelineConfiguration ?? section.AsyncEventPipeline;
 
@@ -24,7 +26,7 @@ namespace Revo.Infrastructure
                     c.Kernel.Bind<IAsyncEventPipelineConfiguration>().ToConstant(section.AsyncEventPipeline);
                 }
 
-                if(section.EnableSagas)
+                if (section.EnableSagas)
                 {
                     c.LoadModule<SagasModule>();
                 }

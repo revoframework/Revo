@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MoreLinq;
+using Revo.Core.Transactions;
 using Revo.DataAccess.Entities;
-using Revo.EFCore.UnitOfWork;
+using Revo.EFCore.Repositories;
 using Revo.Infrastructure.Events;
 using Revo.Infrastructure.Events.Async.Generic;
 

@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Revo.Core.Commands;
-using Revo.Core.Events;
+using Revo.Core.Transactions;
 using Revo.Infrastructure.Events;
 using Revo.Infrastructure.EventStores;
 using Revo.Infrastructure.EventStores.Generic;
 
-namespace Revo.EFCore.UnitOfWork
+namespace Revo.EFCore.Repositories
 {
     public class EFCoreExternalEventStoreHook : ITransactionParticipant
     {

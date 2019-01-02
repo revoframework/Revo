@@ -5,6 +5,7 @@ namespace Revo.Core.IO
 {
     public interface IAutoMapperProfileDiscovery
     {
-        IReadOnlyCollection<Profile> DiscoverProfiles();
+        void DiscoverProfiles();
+        IReadOnlyCollection<Profile> GetProfiles();
     }
 }

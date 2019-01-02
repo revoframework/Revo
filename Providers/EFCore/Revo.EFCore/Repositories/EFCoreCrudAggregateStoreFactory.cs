@@ -1,22 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Revo.Core.Transactions;
-using Revo.DataAccess.Entities;
 using Revo.Domain.Entities;
+using Revo.EFCore.DataAccess.Entities;
 using Revo.Infrastructure.Events;
 using Revo.Infrastructure.Repositories;
 
-namespace Revo.EFCore.UnitOfWork
+namespace Revo.EFCore.Repositories
 {
     public class EFCoreCrudAggregateStoreFactory : CrudAggregateStoreFactory
     {
-        private readonly Func<ICrudRepository> crudRepositoryFunc;
+        private readonly Func<IEFCoreCrudRepository> crudRepositoryFunc;
         private readonly IEntityTypeManager entityTypeManager;
         private readonly IEventMessageFactory eventMessageFactory;
         private readonly IEFCoreTransactionCoordinator transactionCoordinator;
 
-        public EFCoreCrudAggregateStoreFactory(Func<ICrudRepository> crudRepositoryFunc,
+        public EFCoreCrudAggregateStoreFactory(Func<IEFCoreCrudRepository> crudRepositoryFunc,
             IEntityTypeManager entityTypeManager, IEventMessageFactory eventMessageFactory,
             IEFCoreTransactionCoordinator transactionCoordinator)
             : base(crudRepositoryFunc, entityTypeManager, eventMessageFactory)

@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Revo.Core.Events;
+using Revo.Core.Transactions;
 using Revo.DataAccess.Entities;
 using Revo.Domain.Entities;
 using Revo.Infrastructure.Events;
 using Revo.Infrastructure.Repositories;
 
-namespace Revo.EFCore.UnitOfWork
+namespace Revo.EFCore.Repositories
 {
     public class EFCoreCrudAggregateStore : CrudAggregateStore, ITransactionParticipant
     {

@@ -10,7 +10,7 @@ using Revo.Infrastructure.Repositories;
 
 namespace Revo.Infrastructure.EventSourcing
 {
-    internal class EventSourcedAggregateRepository : EventSourcedRepository<IEventSourcedAggregateRoot>, IEventSourcedAggregateRepository
+    public class EventSourcedAggregateRepository : EventSourcedRepository<IEventSourcedAggregateRoot>, IEventSourcedAggregateRepository
     {
         public EventSourcedAggregateRepository(IEventStore eventStore,
             IEntityTypeManager entityTypeManager,

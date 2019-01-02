@@ -1,6 +1,4 @@
-﻿using Revo.Core.Transactions;
-
-namespace Revo.EFCore.UnitOfWork
+﻿namespace Revo.Core.Transactions
 {
     public interface ITransactionCoordinator
     {

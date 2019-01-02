@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using Revo.Core.Transactions;
 
-namespace Revo.EFCore.UnitOfWork
+namespace Revo.Core.Transactions
 {
     public class CoordinatedTransaction : ITransactionCoordinator, ITransaction
     {
@@ -42,9 +40,15 @@ namespace Revo.EFCore.UnitOfWork
 
         protected virtual async Task DoCommitAsync()
         {
-            foreach (var participant in Participants)
+            var usedParticipants = new HashSet<ITransactionParticipant>();
+
+            while (usedParticipants.Count < Participants.Count)
             {
-                await participant.OnBeforeCommitAsync();
+                foreach (var participant in Participants.ToArray())
+                {
+                    await participant.OnBeforeCommitAsync();
+                    usedParticipants.Add(participant);
+                }
             }
 
             try
@@ -53,7 +57,7 @@ namespace Revo.EFCore.UnitOfWork
             }
             catch (Exception)
             {
-                foreach (var participant in Participants)
+                foreach (var participant in usedParticipants)
                 {
                     await participant.OnCommitFailedAsync();
                 }
@@ -61,7 +65,7 @@ namespace Revo.EFCore.UnitOfWork
                 throw;
             }
 
-            foreach (var participant in Participants)
+            foreach (var participant in usedParticipants)
             {
                 await participant.OnCommitSucceededAsync();
             }

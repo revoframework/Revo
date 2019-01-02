@@ -1,16 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using Ninject.Extensions.ContextPreservation;
 using Ninject.Modules;
 using Revo.Core.Commands;
 using Revo.Core.Core;
 using Revo.Core.Transactions;
-using Revo.DataAccess.Entities;
-using Revo.EFCore.DataAccess.Conventions;
 using Revo.EFCore.DataAccess.Entities;
-using Revo.EFCore.Domain;
 using Revo.EFCore.Projections;
-using Revo.EFCore.UnitOfWork;
-using Revo.Infrastructure.Repositories;
+using Revo.EFCore.Repositories;
 
 namespace Revo.EFCore
 {
@@ -18,14 +16,6 @@ namespace Revo.EFCore
     {
         public override void Load()
         {
-            Bind<IAggregateStoreFactory>()
-                .To<EFCoreCrudAggregateStoreFactory>()
-                .InTransientScope();
-
-            Bind<IAggregateStoreFactory>()
-                .To<EFCoreEventSourcedAggregateStoreFactory>()
-                .InTransientScope();
-
             Bind<IEFCoreTransactionCoordinator, IUnitOfWorkListener>()
                 .ToMethod(ctx => new EFCoreCoordinatedTransaction(ctx.ContextPreservingGet<IEFCoreCrudRepository>(),
                     ctx.ContextPreservingGet<ICommandContext>(),

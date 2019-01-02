@@ -1,7 +1,7 @@
 ﻿using Raven.Client.Documents.Session;
 using Revo.DataAccess.Entities;
 
-namespace Revo.RavenDB.Entities
+namespace Revo.RavenDB.DataAccess
 {
     public class RavenCrudRepositoryFactory :
         ICrudRepositoryFactory<IRavenCrudRepository>,

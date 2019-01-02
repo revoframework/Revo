@@ -4,6 +4,7 @@ using Ninject;
 using Ninject.Extensions.ContextPreservation;
 using Ninject.Modules;
 using Revo.Core.Commands;
+using Revo.Core.Configuration;
 using Revo.Core.Events;
 using Revo.Core.IO;
 using Revo.Core.Lifecycle;
@@ -13,17 +14,28 @@ using Revo.Core.Types;
 
 namespace Revo.Core.Core
 {
+    [AutoLoadModule(false)]
     public class CoreModule : NinjectModule
     {
+        private readonly CoreConfigurationSection coreConfigurationSection;
+
+        public CoreModule(CoreConfigurationSection coreConfigurationSection)
+        {
+            this.coreConfigurationSection = coreConfigurationSection;
+        }
+
         public override void Load()
         {
             Bind<IClock>()
                 .ToMethod(ctx => Clock.Current)
                 .InTransientScope();
 
-            Bind<IApplicationConfigurer>()
-                .To<CommandHandlerDiscovery>()
-                .InSingletonScope();
+            if (coreConfigurationSection.AutoDiscoverCommandHandlers)
+            {
+                Bind<IApplicationConfigurer>()
+                    .To<CommandHandlerDiscovery>()
+                    .InSingletonScope();
+            }
 
             Bind<IEventBus>()
                 .To<EventBus>()
@@ -87,7 +99,8 @@ namespace Revo.Core.Core
 
             Bind<IApplicationConfigurer>()
                 .To<AutoMapperInitializer>()
-                .InSingletonScope();
+                .InSingletonScope()
+                .WithPropertyValue(nameof(AutoMapperInitializer.AutoDiscoverAutoMapperProfiles), coreConfigurationSection.AutoDiscoverAutoMapperProfiles);
         }
     }
 }

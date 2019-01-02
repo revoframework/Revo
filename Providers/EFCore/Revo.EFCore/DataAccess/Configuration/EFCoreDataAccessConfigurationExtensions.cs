@@ -15,7 +15,7 @@ namespace Revo.EFCore.DataAccess.Configuration
             var section = configuration.GetSection<EFCoreDataAccessConfigurationSection>();
             section.IsActive = true;
             section.UseAsPrimaryRepository = useAsPrimaryRepository ?? section.UseAsPrimaryRepository;
-            section.Configurer = configurer;
+            section.Configurer = configurer ?? section.Configurer;
 
             advancedAction?.Invoke(section);
 

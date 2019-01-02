@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Revo.Core.Transactions;
 using Revo.Infrastructure.EventSourcing;
 using Revo.Infrastructure.Repositories;
 
-namespace Revo.EFCore.UnitOfWork
+namespace Revo.EFCore.Repositories
 {
     public class EFCoreEventSourcedAggregateStore : EventSourcedAggregateStore, ITransactionParticipant
     {

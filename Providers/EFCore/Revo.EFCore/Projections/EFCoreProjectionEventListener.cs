@@ -8,7 +8,6 @@ using Revo.Core.Events;
 using Revo.Core.Transactions;
 using Revo.Domain.Entities;
 using Revo.Domain.Events;
-using Revo.EFCore.UnitOfWork;
 using Revo.Infrastructure.Events.Async;
 using Revo.Infrastructure.Projections;
 

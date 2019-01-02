@@ -25,7 +25,6 @@ namespace Revo.Core.Commands
             return bindingRoot
                 .Bind(handlerInterfaces.Concat(services).Concat(new[] {typeof(T)}).ToArray())
                 .To<T>()
-                //.When(x => x.Target?.ClrType.Name.StartsWith("CommandHandlerPipeline") ?? false);
                 .WhenInjectedInto(decoratorTypes.Values.ToArray());
         }
 
@@ -46,7 +45,6 @@ namespace Revo.Core.Commands
             return bindingRoot
                 .Bind(handlerInterfaces.Concat(services).Concat(new[] {commandHandlerType}).ToArray())
                 .To(commandHandlerType)
-                //.When(x => x.Target?.ClrType.Name.StartsWith("CommandHandlerPipeline") ?? false);
                 .WhenInjectedInto(decoratorTypes.Values.ToArray());
         }
 
@@ -83,10 +81,10 @@ namespace Revo.Core.Commands
         private static IEnumerable<Type> GetInterfaces(Type handlerType)
         {
             var intfs = (IEnumerable<Type>)handlerType.GetInterfaces();
-            var nestedIntfs = intfs.SelectMany(x => x.GetInterfaces().Length > 0 ? GetInterfaces(x) : new Type[] { });
-            if (nestedIntfs.Count() > 0)
+            var nestedIntfs = intfs.SelectMany(x => x.GetInterfaces().Length > 0 ? GetInterfaces(x) : new Type[] { }).ToArray();
+            if (nestedIntfs.Length > 0)
             {
-                intfs = intfs.Concat(nestedIntfs.ToList());
+                intfs = intfs.Concat(nestedIntfs);
             }
 
             return intfs;

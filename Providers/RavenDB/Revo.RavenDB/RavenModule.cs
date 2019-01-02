@@ -8,7 +8,8 @@ using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
 using Revo.Core.Core;
 using Revo.DataAccess.Entities;
-using Revo.RavenDB.Entities;
+using Revo.RavenDB.Configuration;
+using Revo.RavenDB.DataAccess;
 
 namespace Revo.RavenDB
 {

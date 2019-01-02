@@ -15,7 +15,7 @@ using Revo.Infrastructure.Repositories;
 
 namespace Revo.Infrastructure.EventSourcing
 {
-    internal class EventSourcedRepository<TBase> : IEventSourcedRepository<TBase>,
+    public class EventSourcedRepository<TBase> : IEventSourcedRepository<TBase>,
         IFilteringRepository<IEventSourcedRepository<TBase>>
         where TBase : class, IEventSourcedAggregateRoot
     {

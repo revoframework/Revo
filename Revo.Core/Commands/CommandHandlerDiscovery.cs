@@ -32,24 +32,19 @@ namespace Revo.Core.Commands
             var commandHandlerTypes = typeExplorer.GetAllTypes()
                 .Where(x => x.IsClass && !x.IsAbstract && !x.IsGenericTypeDefinition
                     && CommandBindExtensions.GetCommandHandlerInterfaces(x).Length > 0)
-                .ToList();
+                .ToArray();
 
             RegisterCommandHandlers(commandHandlerTypes);
-            Logger.Debug($"Found {commandHandlerTypes.Count()} command handlers: {string.Join(", ", commandHandlerTypes.Select(x => x.FullName))}"); // TODO does not include explicitly registered handlers now
+            Logger.Debug($"Discovered {commandHandlerTypes.Length} command handlers: {string.Join(", ", commandHandlerTypes.Select(x => x.FullName))}");
         }
 
         private void RegisterCommandHandlers(IEnumerable<Type> commandHandlerTypes)
         {
             foreach (Type commandHandlerType in commandHandlerTypes)
             {
-                var bindings = kernel.GetBindings(commandHandlerType);
-
-                if (!bindings.Any())
-                {
-                    CommandBindExtensions
-                        .BindCommandHandler(kernel, commandHandlerType)
-                        .InTaskScope();
-                }
+                CommandBindExtensions
+                    .BindCommandHandler(kernel, commandHandlerType)
+                    .InTaskScope();
             }
         }
     }

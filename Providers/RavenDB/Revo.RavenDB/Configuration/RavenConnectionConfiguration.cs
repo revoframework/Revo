@@ -1,4 +1,4 @@
-﻿namespace Revo.RavenDB
+﻿namespace Revo.RavenDB.Configuration
 {
     public class RavenConnectionConfiguration
     {

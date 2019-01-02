@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Revo.Domain.Entities;
+﻿using Revo.Domain.Entities;
 using Revo.Infrastructure.Projections;
 
 namespace Revo.EFCore.Projections
