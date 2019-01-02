@@ -5,6 +5,8 @@ using Ninject.Modules;
 using Revo.Core.Core;
 using Revo.Core.Lifecycle;
 using Revo.DataAccess.Entities;
+using Revo.EFCore.DataAccess.Configuration;
+using Revo.EFCore.DataAccess.Conventions;
 using Revo.EFCore.DataAccess.Entities;
 using Revo.EFCore.DataAccess.Model;
 
@@ -12,13 +14,13 @@ namespace Revo.EFCore.DataAccess
 {
     public class EFCoreDataAccessModule : NinjectModule
     {
-        private readonly bool useAsPrimaryRepository;
+        private readonly EFCoreDataAccessConfigurationSection configurationSection;
 
-        public EFCoreDataAccessModule(bool useAsPrimaryRepository)
+        public EFCoreDataAccessModule(EFCoreDataAccessConfigurationSection configurationSection)
         {
-            this.useAsPrimaryRepository = useAsPrimaryRepository;
+            this.configurationSection = configurationSection;
         }
-
+        
         public override void Load()
         {
             List<Type> repositoryTypes = new List<Type>()
@@ -27,7 +29,7 @@ namespace Revo.EFCore.DataAccess
                 typeof(IEFCoreReadRepository)
             };
 
-            if (useAsPrimaryRepository)
+            if (configurationSection.UseAsPrimaryRepository)
             {
                 repositoryTypes.AddRange(new[]
                 {
@@ -62,6 +64,18 @@ namespace Revo.EFCore.DataAccess
             Bind<IDbContextFactory, IApplicationStartListener>()
                 .To<DbContextFactory>()
                 .InSingletonScope();
+            
+            Bind<EFCoreDataAccessConfigurationSection>().ToConstant(configurationSection);
+
+            foreach (var conventionFunc in configurationSection.Conventions)
+            {
+                Bind<IEFCoreConvention>().ToMethod(conventionFunc);
+            }
+
+            if (configurationSection.Configurer != null)
+            {
+                Bind<IEFCoreConfigurer>().ToConstant(new ActionConfigurer(configurationSection.Configurer));
+            }
         }
     }
 }

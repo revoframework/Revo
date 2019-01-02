@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Revo.Core.Commands;
-using Revo.Core.Core;
 using Revo.Core.Events;
 using Revo.Core.Transactions;
 using Revo.Domain.Entities;
@@ -29,13 +26,31 @@ namespace Revo.EFCore.Projections
         {
             public readonly string QueueNamePrefix = "EFCoreProjectionEventListener:";
 
+            private readonly IEntityTypeManager entityTypeManager;
+            private readonly IEFCoreProjectorResolver projectorResolver;
+
+            public EFCoreProjectionEventSequencer(IEntityTypeManager entityTypeManager, IEFCoreProjectorResolver projectorResolver)
+            {
+                this.entityTypeManager = entityTypeManager;
+                this.projectorResolver = projectorResolver;
+            }
+
             protected override IEnumerable<EventSequencing> GetEventSequencing(IEventMessage<DomainAggregateEvent> message)
             {
-                yield return new EventSequencing()
+                Guid? aggregateClassId = message.Metadata.GetAggregateClassId();
+                DomainClassInfo classInfo = aggregateClassId != null
+                    ? entityTypeManager.TryGetClassInfoByClassId(aggregateClassId.Value)
+                    : null;
+                
+                if (classInfo == null
+                    || projectorResolver.HasAnyProjectors(classInfo.ClrType))
                 {
-                    SequenceName = QueueNamePrefix + message.Event.AggregateId.ToString(),
-                    EventSequenceNumber = message.Metadata.GetStreamSequenceNumber()
-                };
+                    yield return new EventSequencing()
+                    {
+                        SequenceName = QueueNamePrefix + message.Event.AggregateId.ToString(),
+                        EventSequenceNumber = message.Metadata.GetStreamSequenceNumber()
+                    };
+                }
             }
             
             protected override bool ShouldAttemptSynchronousDispatch(IEventMessage<DomainAggregateEvent> message)

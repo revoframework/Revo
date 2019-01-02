@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Linq;
 using Ninject.Extensions.ContextPreservation;
 using Ninject.Modules;
@@ -15,19 +16,17 @@ namespace Revo.EF6.DataAccess
     [AutoLoadModule(false)]
     public class EF6DataAccessModule : NinjectModule
     {
-        private readonly EF6ConnectionConfiguration connectionConfiguration;
-        private readonly bool useAsPrimaryRepository;
+        private readonly EF6DataAccessConfigurationSection configurationSection;
 
-        public EF6DataAccessModule(EF6ConnectionConfiguration connectionConfiguration, bool useAsPrimaryRepository)
+        public EF6DataAccessModule(EF6DataAccessConfigurationSection configurationSection)
         {
-            this.connectionConfiguration = connectionConfiguration;
-            this.useAsPrimaryRepository = useAsPrimaryRepository;
+            this.configurationSection = configurationSection;
         }
 
         public override void Load()
         {
             Bind<EF6ConnectionConfiguration>()
-                .ToConstant(connectionConfiguration);
+                .ToConstant(configurationSection.Connection);
             
             List<Type> repositoryTypes = new List<Type>()
             {
@@ -35,7 +34,7 @@ namespace Revo.EF6.DataAccess
                 typeof(IEF6ReadRepository)
             };
 
-            if (useAsPrimaryRepository)
+            if (configurationSection.UseAsPrimaryRepository)
             {
                 repositoryTypes.AddRange(new[]
                 {
@@ -73,6 +72,14 @@ namespace Revo.EF6.DataAccess
             Bind<IDbContextFactory, IApplicationStartListener>()
                 .To<DbContextFactory>()
                 .InSingletonScope();
+
+            if (configurationSection.ConventionTypes != null)
+            {
+                foreach (var conventionType in configurationSection.ConventionTypes)
+                {
+                    Bind<IConvention>().To(conventionType);
+                }
+            }
         }
     }
 }

@@ -16,7 +16,7 @@ namespace Revo.EFCore.Projections
 {
     public class EFCoreProjectionSubSystem : ProjectionSubSystem, IEFCoreProjectionSubSystem, ITransactionParticipant
     {
-        private readonly IServiceLocator serviceLocator;
+        private readonly IEFCoreProjectorResolver projectorResolver;
         private readonly Lazy<IEFCoreTransactionCoordinator> transactionCoordinator;
 
         private readonly HashSet<IEntityEventProjector> allUsedProjectors = new HashSet<IEntityEventProjector>();
@@ -24,9 +24,9 @@ namespace Revo.EFCore.Projections
         private EventProjectionOptions eventProjectionOptions;
 
         public EFCoreProjectionSubSystem(IEntityTypeManager entityTypeManager, IEventMessageFactory eventMessageFactory,
-            IServiceLocator serviceLocator, Lazy<IEFCoreTransactionCoordinator> transactionCoordinator) : base(entityTypeManager, eventMessageFactory)
+            IEFCoreProjectorResolver projectorResolver, Lazy<IEFCoreTransactionCoordinator> transactionCoordinator) : base(entityTypeManager, eventMessageFactory)
         {
-            this.serviceLocator = serviceLocator;
+            this.projectorResolver = projectorResolver;
             this.transactionCoordinator = transactionCoordinator;
         }
 
@@ -49,15 +49,11 @@ namespace Revo.EFCore.Projections
 
             if (efCoreOptions == null || efCoreOptions.IsSynchronousProjection == false)
             {
-                return serviceLocator.GetAll(
-                        typeof(IEFCoreEntityEventProjector<>).MakeGenericType(entityType))
-                    .Cast<IEntityEventProjector>();
+                return projectorResolver.GetProjectors(entityType);
             }
             else
             {
-                return serviceLocator.GetAll(
-                        typeof(IEFCoreSyncEntityEventProjector<>).MakeGenericType(entityType))
-                    .Cast<IEntityEventProjector>();
+                return projectorResolver.GetSyncProjectors(entityType);
             }
         }
 

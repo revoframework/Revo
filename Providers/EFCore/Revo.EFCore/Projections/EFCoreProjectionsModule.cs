@@ -31,6 +31,10 @@ namespace Revo.EFCore.Projections
                 .To<EFCoreProjectionSubSystem>()
                 .InTaskScope();
 
+            Bind<IEFCoreProjectorResolver>()
+                .To<EFCoreProjectorResolver>()
+                .InTransientScope();
+
             if (configurationSection.AutoDiscoverProjectors)
             {
                 Bind<IApplicationConfigurer>()

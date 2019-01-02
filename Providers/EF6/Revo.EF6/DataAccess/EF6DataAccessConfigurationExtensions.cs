@@ -22,15 +22,7 @@ namespace Revo.EF6.DataAccess
             {
                 if (section.IsActive)
                 {
-                    c.LoadModule(new EF6DataAccessModule(section.Connection, section.UseAsPrimaryRepository));
-
-                    if (section.ConventionTypes != null)
-                    {
-                        foreach (var conventionType in section.ConventionTypes)
-                        {
-                            c.Kernel.Bind<IConvention>().To(conventionType);
-                        }
-                    }
+                    c.LoadModule(new EF6DataAccessModule(section));
                 }
             });
 
