@@ -1,17 +1,19 @@
 # RELEASE NOTES
 
-## [1.5.0] - 2019-?-?
+## [1.5.0] - 2019-01-10
 
 ### Added
 - automatic event projector discovery and registration (now enabled by default)
+- event publishing for non-event sourced entities (not transactionally safe and not saving to event store yet, though, so beware)
+- coordinated UoW transaction for EF Core including synchronous projections, publishing events from projections and fast event queue dispatching
 - EFCoreInMemoryCrudRepository and EFCoreInMemoryDatabaseAccess
 - recurring job scheduling support
 
 ### Fixed
+- optimized event queue dispatching for big amounts of queues
 - ODataAsyncResultFilter.DefaultConverter now returns correct counts
-- event publishing for non-event sourced entities (not transactionally safe and not saving to event store yet, though, so beware)
 - fixed BasicDomainModelConvention when using inheritance including abstract types
-- fixed binding of Hangfire and infrastructure configuration sections
+- fixed binding of Hangfire and infrastructure configuration sections, added more options
 
 ## [1.4.0] - 2018-11-05
 

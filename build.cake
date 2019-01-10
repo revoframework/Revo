@@ -97,11 +97,11 @@ Task("Restore")
     if (IsRestoreEnabled)
     {
       NuGetRestore(
-      SolutionFile,
-      new NuGetRestoreSettings ()
-      {
-        Verbosity = NuGetVerbosity.Normal
-      });
+        SolutionFile,
+        new NuGetRestoreSettings ()
+        {
+          Verbosity = NuGetVerbosity.Normal
+        });
     }
   });
 
@@ -176,7 +176,7 @@ Task("Pack")
         || projectFile.GetFilename().FullPath.EndsWith(".Tests.csproj")
         || projectFile.GetFilename().FullPath.StartsWith("Revo.Examples."))
         {
-        continue;
+          continue;
         }
 
         DotNetCorePack(
