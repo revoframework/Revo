@@ -103,7 +103,7 @@ public class Todo : EventSourcedAggregateRoot
         Rename(name);
     }
     
-    protectedTodo(Guid id) : base(id)
+    protected Todo(Guid id) : base(id)
     {
     }
     
