@@ -1,0 +1,33 @@
+.todoList {
+    width: 300px;
+    display: inline-block;
+    vertical-align: top;
+    margin: 0 1rem 1rem 0;
+    background-color: #FFFCCC;
+    border: 1px solid #444444;
+    padding: 1rem;
+}
+
+.todoList h3 {
+    text-decoration: underline;
+}
+
+.todoList ul, .todoList ul li {
+    list-style-type: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+.todoList ul {
+    padding-top: 1rem;
+}
+
+.todoList ul li:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.todoList ul li span {
+    font-size: 1.3em;
+    padding: 0 0 0 1rem;
+}

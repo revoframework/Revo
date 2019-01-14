@@ -1,0 +1,23 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "TODOs - Revo example app";
+}
+
+<div class="row">
+    <div class="col">
+        <h2>Todo lists</h2>
+        
+        <form id="addTodoListForm" onsubmit="addTodoList(); return false;">
+            <input type="text" placeholder="Groceries..." id="addTodoListName" required="required"/>
+            <button type="submit">+ Add todo list</button>
+        </form>
+        
+        <div id="todoLists" class="py-4">
+        </div>
+        
+        <div id="todoListsLoader" style="display: none;" class="text-center py-4">
+            <i class="fa fa-sync fa-spin" style="font-size: 4rem;"></i>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Hangfire" Version="1.6.21" />
+    <PackageReference Include="Hangfire.PostgreSql" Version="1.5.0" />
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.2" />
+	<PackageReference Include="Microsoft.AspNetCore.OData" Version="7.0.1" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.0-preview3-35497" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.2.0-preview3-35497" />
+	<PackageReference Include="NLog" Version="4.5.11" />
+    <PackageReference Include="Npgsql" Version="4.0.3" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.2.0-preview1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Providers\AspNetCore\Revo.AspNetCore\Revo.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\..\Providers\EFCore\Revo.EFCore.AspNetCoreOData\Revo.EFCore.AspNetCoreOData.csproj" />
+    <ProjectReference Include="..\..\..\Providers\EFCore\Revo.EFCore\Revo.EFCore.csproj" />
+    <ProjectReference Include="..\..\..\Providers\Hangfire\Revo.Hangfire\Revo.Hangfire.csproj" />
+    <ProjectReference Include="..\..\..\Revo.Domain\Revo.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Revo.Infrastructure\Revo.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="nlog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\lib\" />
+  </ItemGroup>
+
+</Project>
