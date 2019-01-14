@@ -19,8 +19,9 @@ Revo is an application framework for modern server C\#/.NET applications built w
 
 * [Home](#revo-framework)
 * [Features](#features)
+* [Super-short example](#show-me-how-it-looks)
 * [Getting started](#getting-started)
-* [Examples](#examples)
+* [Binaries](#binaries)
 * [Requirements](#requirements)
 * [License](#license)
 
@@ -70,9 +71,158 @@ Basic permission/role-based ACL for commands and queries, fine-grained row filte
 * **User notifications:** event-based, with mail/APNS/FCM output channels, supporting aggregation, etc.
 * **ASP.NET Core (.NET Standard) & ASP.NET support**
 
+## Show me how it looks!
+
+Super-short example of a simple application that can save tasks using event-sourced aggregates and then query them back from a RDBMS.
+
+### Event
+
+The event that happens when changing a task's name.
+
+```C#
+public class TodoRenamedEvent : DomainAggregateEvent
+{
+    public TodoRenamedEvent(string name)
+    {
+        Name = name;
+    }
+
+    public string Name { get; }
+}
+```
+
+### Aggregate
+
+The task aggregate root.
+
+```C#
+public class Todo : EventSourcedAggregateRoot
+{
+    public Todo(Guid id, string name) : base(id)
+    {
+        Rename(name);
+    }
+    
+    protectedTodo(Guid id) : base(id)
+    {
+    }
+    
+    public string Name { get; private set; }
+    
+    public void Rename(string name)
+    {
+        if (!Name != name)
+        {
+            Publish(new TodoRenamedEvent(name));
+        }
+    }
+    
+    private void Apply(TodoRenamedEvent ev)
+    {
+        Name = ev.Name;
+    }
+}
+```
+
+### Command and command handler
+
+Command to save a new task.
+
+```C#
+public class CreateTodoCommand : ICommand
+{
+    public CreateTodoCommand(string name)
+    {
+        Name = name;
+    }
+
+    [Required]
+    public string Name { get; }
+}
+```
+
+```C#
+public class TodoCommandHandler : ICommandHandler<CreateTodoCommand>
+{
+    private readonly IRepository repository;
+    
+    public TodoCommandHandler(IRepository repository)
+    {
+        this.repository = repository;
+    }
+    
+    public Task HandleAsync(CreateTodoCommand command, CancellationToken cancellationToken)
+    {
+        var todo = new Todo(command.Id);
+        todo.Rename(command.Name);
+        repository.Add(todoList);
+        return Task.CompletedTask;
+    }   
+}
+```
+
+### Read model and projection
+
+Read model and a projection for the event-sourced aggregate.
+
+```C#
+public class TodoReadModel : EntityReadModel
+{
+    public string Name { get; set; }
+}
+```
+
+```C#
+public class TodoListReadModelProjector : EFCoreEntityEventToPocoProjector<Todo, TodoReadModel>
+{
+    public TodoListReadModelProjector(IEFCoreCrudRepository repository) : base(repository)
+    {
+    }
+    
+    private void Apply(IEventMessage<TodoRenamedEvent> ev)
+    {
+        Target.Name = ev.Event.Name;
+    }
+}
+```
+
+### Query and query handler
+
+Query to read the tasks back from a RDBMS.
+
+```C#
+public class GetTodosQuery : IQuery<IQueryable<TodoReadModel>>
+{
+}
+```
+
+```C#
+public class TaskQueryHandler : IQueryHandler<GetTodoQuery, IQueryable<TodoReadModel>>
+{
+    private readonly IReadRepository readRepository;
+    
+    public TaskListQueryHandler(IReadRepository readRepository)
+    {
+        this.readRepository = readRepository;
+    }
+    
+    public Task<IQueryable<TodoReadModel>> HandleAsync(GetTodoListsQuery query, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(readRepository
+            .FindAll<TodoListReadModel>());
+    }
+}
+```
+
 ## Getting started
 
-(TODO)
+If you are new to the framework, you can
+ * begin with reading the quick walkthrough for the [**Simple TO-DOs example**](https://github.com/revoframework/Revo/tree/develop/Examples/Todos/Revo.Examples.Todos) (a task list app)
+ * or try exploring [**the other examples**](https://github.com/revoframework/Revo/tree/develop/Examples) and framework sources on Github.
+ 
+You can also start by reading the [**reference guide**](https://revoframework.gitbook.io/revo/~/edit/primary/reference-guide/domain-building-blocks).
+
+## Binaries
 
 Binaries are up for grabs in form of NuGet packages:
 
@@ -256,12 +406,6 @@ Binaries are up for grabs in form of NuGet packages:
 </div>
 
 Most applications will require at least **Revo.Core**, **Revo.DataAccess**, **Revo.Domain**, **Revo.Infrastructure** packages to get started with and then typically a platform package like **Revo.Platforms.AspNetCore** (ASP.NET Core platform implementation) and a data-access package like **Revo.EFCore** (for Entity Framework Core support).
-
-## Examples
-
-(TODO)
-
-For now, see the sample Hello World application in the examples folder ([Examples/Revo.Examples.HelloAspNet.Bootstrap](https://github.com/revoframework/Revo/tree/develop/Examples/Revo.Examples.HelloAspNet.Bootstrap)) and the [reference guide](https://revoframework.gitbook.io/revo/).
 
 ## Requirements
 
