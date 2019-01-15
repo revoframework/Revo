@@ -218,9 +218,9 @@ public class TaskQueryHandler : IQueryHandler<GetTodoQuery, IQueryable<TodoReadM
 
 If you are new to the framework, you can
  * begin with reading the quick walkthrough for the [**Simple TO-DOs example**](https://github.com/revoframework/Revo/tree/develop/Examples/Todos/Revo.Examples.Todos) (a task list app)
- * or try exploring [**the other examples**](https://github.com/revoframework/Revo/tree/develop/Examples) and framework sources on Github.
+ * or try exploring [~~**the other examples**~~](https://github.com/revoframework/Revo/tree/develop/Examples) (TODO!) and framework sources on Github.
  
-You can also start by reading the [**reference guide**](https://revoframework.gitbook.io/revo/~/edit/primary/reference-guide/domain-building-blocks).
+You can also start by reading the [**reference guide**](https://docs.revoframework.net/general/getting-started).
 
 ## Binaries
 
