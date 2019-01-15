@@ -18,7 +18,7 @@ namespace Revo.EFCore.Repositories
             this.externalEventStore = externalEventStore;
         }
 
-        public async Task OnBeforeCommitAsync()
+        public Task OnBeforeCommitAsync()
         {
             if (commandContext.UnitOfWork != null)
             {
@@ -30,6 +30,8 @@ namespace Revo.EFCore.Repositories
                     }
                 }
             }
+
+            return Task.CompletedTask;
         }
 
         public Task OnCommitSucceededAsync()

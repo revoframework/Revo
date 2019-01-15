@@ -10,15 +10,6 @@ Entity Framework 6 (EF6) IQueryable converters for async ASP.NET Web API OData.<
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="EntityFramework" Version="6.2.0" />
-    <PackageReference Include="morelinq" Version="2.10.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="Ninject" Version="3.3.4" />
-    <PackageReference Include="NLog" Version="4.5.3" />
-    <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
-  </ItemGroup>
-  
-  <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
   

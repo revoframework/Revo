@@ -10,9 +10,6 @@ Rebus (service bus) messaging integration package.</Description>
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="Ninject" Version="3.3.4" />
-    <PackageReference Include="NLog" Version="4.5.3" />
     <PackageReference Include="RabbitMQ.Client" Version="5.0.1" />
     <PackageReference Include="Rebus" Version="4.2.1" />
     <PackageReference Include="Rebus.Ninject" Version="3.0.0" />
@@ -20,7 +17,6 @@ Rebus (service bus) messaging integration package.</Description>
     <PackageReference Include="Rebus.RabbitMq" Version="4.4.2" />
     <PackageReference Include="Rebus.UnitOfWork" Version="4.0.0" />
     <PackageReference Include="Rebus.XmlConfig" Version="4.0.0" />
-    <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
   </ItemGroup>
   
   <ItemGroup>

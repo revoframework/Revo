@@ -10,8 +10,6 @@ ASP.NET platform integration package (user context, authentication using Identit
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="7.0.1" />
-    <PackageReference Include="Castle.Core" Version="4.2.1" />
     <PackageReference Include="CryptSharpOfficial" Version="2.1.0.0" />
     <PackageReference Include="EntityFramework" Version="6.2.0" />
     <PackageReference Include="Hangfire" Version="1.6.20" />
@@ -43,18 +41,11 @@ ASP.NET platform integration package (user context, authentication using Identit
     <PackageReference Include="Microsoft.Web.Infrastructure" Version="1.0.0.0" />
     <PackageReference Include="Microsoft.Win32.Primitives" Version="4.3.0" />
     <PackageReference Include="Mono.Reflection" Version="1.1.0.0" />
-    <PackageReference Include="morelinq" Version="2.10.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="Ninject" Version="3.3.4" />
-    <PackageReference Include="Ninject.Extensions.ContextPreservation" Version="3.3.1" />
-    <PackageReference Include="Ninject.Extensions.Factory" Version="3.3.2" />
-    <PackageReference Include="Ninject.Extensions.NamedScope" Version="3.3.0" />
     <PackageReference Include="Ninject.MVC5" Version="3.3.0" />
     <PackageReference Include="Ninject.Web.Common" Version="3.3.0" />
     <PackageReference Include="Ninject.Web.Common.WebHost" Version="3.3.0" />
     <PackageReference Include="Ninject.Web.WebApi" Version="3.3.0" />
     <PackageReference Include="Ninject.Web.WebApi.WebHost" Version="3.3.0" />
-    <PackageReference Include="NLog" Version="4.5.3" />
     <PackageReference Include="Owin" Version="1.0" />
     <PackageReference Include="RazorEngine" Version="3.10.0" />
     <PackageReference Include="WebActivatorEx" Version="2.2.0" />

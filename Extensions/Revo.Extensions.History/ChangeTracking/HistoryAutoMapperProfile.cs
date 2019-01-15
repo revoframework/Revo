@@ -9,7 +9,7 @@ namespace Revo.Extensions.History.ChangeTracking
         public HistoryAutoMapperProfile(ITrackedChangeRecordConverter trackedChangeRecordConverter)
         {
             CreateMap<TrackedChangeRecord, TrackedChange>()
-                .ProjectUsing(x => trackedChangeRecordConverter.FromRecord(x));
+                .ConvertUsing(x => trackedChangeRecordConverter.FromRecord(x));
         }
     }
 }

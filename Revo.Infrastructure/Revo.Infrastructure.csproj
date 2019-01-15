@@ -10,16 +10,9 @@ Framework infrastruture package - event stores, projections, jobs, etc.</Descrip
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="7.0.1" />
-    <PackageReference Include="Castle.Core" Version="4.2.1" />
     <PackageReference Include="LINQKit.Core" Version="1.1.15" />
-    <PackageReference Include="morelinq" Version="2.10.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="Ninject" Version="3.3.4" />
-    <PackageReference Include="Ninject.Extensions.ContextPreservation" Version="3.3.1" />
-    <PackageReference Include="Ninject.Extensions.Factory" Version="3.3.2" />
+    <PackageReference Include="morelinq" Version="3.1.0" />
     <PackageReference Include="Nito.AsyncEx" Version="5.0.0-pre-05" />
-    <PackageReference Include="NLog" Version="4.5.3" />
   </ItemGroup>
   
   <ItemGroup>

@@ -85,7 +85,7 @@ namespace Revo.Infrastructure.Events.Async.Generic
             }
         }
         
-        public async Task EnqueueEventAsync(IEventMessage eventMessage, IEnumerable<EventSequencing> queues)
+        public Task EnqueueEventAsync(IEventMessage eventMessage, IEnumerable<EventSequencing> queues)
         {
             if (!eventsToQueues.TryGetValue(eventMessage, out var queueList))
             {
@@ -93,6 +93,7 @@ namespace Revo.Infrastructure.Events.Async.Generic
             }
 
             queueList.AddRange(queues);
+            return Task.CompletedTask;
         }
         
         public async Task<string> GetEventSourceCheckpointAsync(string eventSourceName)

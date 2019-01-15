@@ -10,13 +10,6 @@ RavenDB IQueryable to ASP.NET OData converters..</Description>
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="Ninject" Version="3.3.4" />
-    <PackageReference Include="NLog" Version="4.5.3" />
-    <PackageReference Include="RavenDB.Client" Version="4.0.0" />
-  </ItemGroup>
-  
-  <ItemGroup>
     <ProjectReference Include="..\..\AspNet\Revo.AspNet\Revo.AspNet.csproj" />
     <ProjectReference Include="..\Revo.RavenDB\Revo.RavenDB.csproj" />
   </ItemGroup>

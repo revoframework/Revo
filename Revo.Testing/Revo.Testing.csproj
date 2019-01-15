@@ -7,14 +7,13 @@
     <Configurations>Debug;Release</Configurations>
     <Description>Event Sourcing, CQRS and DDD framework for modern C#/.NET applications.
 Infrastructure for testing framework apps.</Description>
+    <IsTestProject>False</IsTestProject>
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="FluentAssertions" Version="5.3.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="NLog" Version="4.5.3" />
+    <PackageReference Include="FluentAssertions" Version="5.6.0" />
     <PackageReference Include="NSubstitute" Version="3.1.0" />
-    <PackageReference Include="xunit.assert" Version="2.3.1" />
+    <PackageReference Include="xunit" Version="2.4.1" />
   </ItemGroup>
   
   <ItemGroup>

@@ -112,19 +112,19 @@ Task("Build")
     if (IsBuildEnabled)
     {
       MSBuild(SolutionFile,
-      new MSBuildSettings
-      {
-        Verbosity = Verbosity.Minimal,
-        ToolVersion = MSBuildToolVersion.VS2017,
-        Configuration = Configuration,
-        PlatformTarget = PlatformTarget.MSIL,
-        ArgumentCustomization = args => args
-          .Append($"/p:VersionSuffix={VersionSuffix}")
-          .Append("/p:ci=true")
-          .AppendSwitch("/p:DebugType", "=", Configuration == "Release" ? "portable" : "full")
-          .AppendSwitch("/p:ContinuousIntegrationBuild", "=", IsCiBuild ? "true" : "false")
-          .AppendSwitch("/p:DeterministicSourcePaths", "=", "false") // Temporary workaround for https://github.com/dotnet/sourcelink/issues/91
-      });
+        new MSBuildSettings
+        {
+          Verbosity = Verbosity.Minimal,
+          ToolVersion = MSBuildToolVersion.VS2017,
+          Configuration = Configuration,
+          PlatformTarget = PlatformTarget.MSIL,
+          ArgumentCustomization = args => args
+            .Append($"/p:VersionSuffix={VersionSuffix}")
+            .Append("/p:ci=true")
+            .AppendSwitch("/p:DebugType", "=", Configuration == "Release" ? "portable" : "full")
+            .AppendSwitch("/p:ContinuousIntegrationBuild", "=", IsCiBuild ? "true" : "false")
+            .AppendSwitch("/p:DeterministicSourcePaths", "=", "false") // Temporary workaround for https://github.com/dotnet/sourcelink/issues/91
+        });
     }
   });
 
@@ -134,34 +134,15 @@ Task("Test")
   {
     if (IsTestEnabled)
     {
-      var projectFiles = GetFiles("./**/Revo.*.Tests.csproj");
-      foreach (var projectFile in projectFiles)
-      {
-        var arguments = new ProcessArgumentBuilder()
-          .Append("-configuration " + Configuration)
-          .Append("-nobuild")
-          .Append($"-xml {GetXunitXmlReportFilePath(projectFile)}");
-
-        var parsedProject = ParseProject(projectFile.FullPath, configuration: "Debug");
-        if (parsedProject.TargetFrameworkVersions.Contains("netcoreapp2.0"))
+      DotNetCoreTest(SolutionFile,
+        new DotNetCoreTestSettings
         {
-          arguments = arguments.Append("-framework netcoreapp2.0");
-          arguments = arguments.Append("-fxversion 2.0.7");
-        }
-      else if (parsedProject.TargetFrameworkVersions.Contains("netcoreapp2.1"))
-        {
-          arguments = arguments.Append("-framework netcoreapp2.1");
-          arguments = arguments.Append("-fxversion 2.1.3");
-        }
-
-        var dotnetTestSettings = new DotNetCoreToolSettings
-        {
-          WorkingDirectory = projectFile.GetDirectory().FullPath
-        };
-
-        DotNetCoreTool(projectFile.FullPath, "xunit", arguments, dotnetTestSettings);
-      }
-    }
+          Configuration = Configuration,
+          NoBuild = true,
+          NoRestore = true,
+          Verbosity = DotNetCoreVerbosity.Minimal
+        });
+     }
   });
 
 Task("Pack")

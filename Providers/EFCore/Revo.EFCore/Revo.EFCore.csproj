@@ -10,20 +10,12 @@ Entity Framework Core (EF Core) implementation of infrastructure services.</Desc
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="7.0.1" />
-    <PackageReference Include="Castle.Core" Version="4.2.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.1.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.1.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="2.1.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.1.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.1.2" />
-    <PackageReference Include="morelinq" Version="2.10.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="Ninject" Version="3.3.4" />
-    <PackageReference Include="Ninject.Extensions.ContextPreservation" Version="3.3.1" />
-    <PackageReference Include="Ninject.Extensions.Factory" Version="3.3.2" />
-    <PackageReference Include="NLog" Version="4.5.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.2.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="2.2.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.2.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.2.1" />
   </ItemGroup>
   
   <ItemGroup>
