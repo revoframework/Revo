@@ -1,5 +1,13 @@
 # RELEASE NOTES
 
+## [1.7.0] - 2019-?-?
+
+### Added
+
+### Changed
+
+### Fixed
+
 ## [1.6.0] - 2019-01-17
 
 ### Changed
