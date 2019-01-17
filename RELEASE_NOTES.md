@@ -1,12 +1,10 @@
 # RELEASE NOTES
 
-## [1.6.0] - 2019-?-?
-
-### Added
+## [1.6.0] - 2019-01-17
 
 ### Changed
 
-### Fixed
+- projects upgraded to .NET Core 2.2, ASP.NET Core 2.2 and Entity Framework Core 2.2
 
 ## [1.5.0] - 2019-01-10
 
