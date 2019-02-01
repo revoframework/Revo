@@ -4,7 +4,11 @@
 
 ### Added
 
+- new default in-memory job scheduler
+
 ### Changed
+
+- FakeClock now uses AsyncLocal instead of ThreadLocal
 
 ### Fixed
 

@@ -11,6 +11,7 @@ using Revo.Infrastructure.Events.Async;
 using Revo.Infrastructure.Jobs;
 using MoreLinq;
 using NSubstitute;
+using Revo.Infrastructure.Jobs.InMemory;
 using Xunit;
 
 namespace Revo.Infrastructure.Tests.Events.Async
@@ -21,7 +22,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
         private readonly List<IAsyncEventWorker> asyncEventQueueBacklogWorkers = new List<IAsyncEventWorker>();
         private readonly List<(IAsyncEventWorker, string)> processedQueues = new List<(IAsyncEventWorker, string)>();
         private readonly IAsyncEventQueueManager asyncEventQueueManager;
-        private readonly IJobScheduler jobScheduler;
+        private readonly IInMemoryJobScheduler jobScheduler;
         private readonly List<IAsyncEventQueueRecord> events;
         private readonly List<(string queueName, Exception e)> queueExceptions;
         private readonly AsyncEventPipelineConfiguration asyncEventPipelineConfiguration;
@@ -29,7 +30,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
         public AsyncEventProcessorTests()
         {
             asyncEventQueueManager = Substitute.For<IAsyncEventQueueManager>();
-            jobScheduler = Substitute.For<IJobScheduler>();
+            jobScheduler = Substitute.For<IInMemoryJobScheduler>();
 
             asyncEventPipelineConfiguration = new AsyncEventPipelineConfiguration()
             {

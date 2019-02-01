@@ -5,6 +5,7 @@ using Revo.DataAccess.Entities;
 using Revo.Infrastructure.Events.Async;
 using Revo.Infrastructure.Jobs;
 using NSubstitute;
+using Revo.Infrastructure.Jobs.InMemory;
 using Xunit;
 
 namespace Revo.Infrastructure.Tests.Events.Async
@@ -13,13 +14,13 @@ namespace Revo.Infrastructure.Tests.Events.Async
     {
         private ProcessAsyncEventsJobHandler sut;
         private IAsyncEventWorker asyncEventWorker;
-        private IJobScheduler jobScheduler;
+        private IInMemoryJobScheduler jobScheduler;
         private AsyncEventPipelineConfiguration asyncEventPipelineConfiguration;
 
         public ProcessAsyncEventsJobHandlerTests()
         {
             asyncEventWorker = Substitute.For<IAsyncEventWorker>();
-            jobScheduler = Substitute.For<IJobScheduler>();
+            jobScheduler = Substitute.For<IInMemoryJobScheduler>();
             asyncEventPipelineConfiguration = new AsyncEventPipelineConfiguration();
 
             sut = new ProcessAsyncEventsJobHandler(asyncEventWorker, asyncEventPipelineConfiguration, jobScheduler);

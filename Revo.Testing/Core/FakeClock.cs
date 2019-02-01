@@ -6,22 +6,35 @@ namespace Revo.Testing.Core
 {
     public static class FakeClock
     {
-        private static readonly ThreadLocal<FakeClockImpl> Clock = new ThreadLocal<FakeClockImpl>(() => new FakeClockImpl());
-        private static readonly object setupLock = new object();
+        private static readonly AsyncLocal<FakeClockImpl> ClockLocal = new AsyncLocal<FakeClockImpl>();
+        private static readonly object SetupLock = new object();
 
         public static DateTimeOffset Now
         {
-            get { return Clock.Value.Now; }
-            set { Clock.Value.Now = value; }
+            get { return Clock.Now; }
+            set { Clock.Now = value; }
         }
 
+        private static FakeClockImpl Clock
+        {
+            get
+            {
+                if (ClockLocal.Value == null)
+                {
+                    ClockLocal.Value = new FakeClockImpl();
+                }
+
+                return ClockLocal.Value;
+            }
+        }
+        
         public static void Setup()
         {
-            lock (setupLock)
+            lock (SetupLock)
             {
                 if (!(Revo.Core.Core.Clock.Current is FakeClockImpl))
                 {
-                    Revo.Core.Core.Clock.SetClock(() => Clock.Value);
+                    Revo.Core.Core.Clock.SetClock(() => Clock);
                 }
             }
 

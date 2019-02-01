@@ -7,22 +7,85 @@ namespace Revo.Core.Core
     public static class TaskFactoryExtensions
     {
         /// <summary>
-        /// Creates and starts a new Task whose execution is wrapped in a new task context.
+        /// Creates a new Task whose execution is wrapped in a new task context.
         /// Task contexts are flown across the async calls using an AsyncLocal and can be
         /// used for fine-grained object lifetime scoping.
         /// </summary>
-        public static Task StartNewWithContext(this TaskFactory factory, Action action)
+        public static Task CreateNewWithContext(this TaskFactory factory, Action action)
         {
-            Task task = null;
-
-            task = new Task(() =>
+            var task = new Task(() =>
             {
                 using (TaskContext.Enter())
                 {
                     action();
                 }
             });
+            
+            return task;
+        }
 
+        /// <summary>
+        /// Creates a new Task whose execution is wrapped in a new task context.
+        /// Task contexts are flown across the async calls using an AsyncLocal and can be
+        /// used for fine-grained object lifetime scoping.
+        /// </summary>
+        public static Task<TResult> CreateNewWithContext<TResult>(this TaskFactory factory, Func<TResult> function)
+        {
+            var task = new Task<TResult>(() =>
+            {
+                using (TaskContext.Enter())
+                {
+                    return function();
+                }
+            });
+            
+            return task;
+        }
+
+        /// <summary>
+        /// Creates a new Task whose execution is wrapped in a new task context.
+        /// Task contexts are flown across the async calls using an AsyncLocal and can be
+        /// used for fine-grained object lifetime scoping.
+        /// </summary>
+        public static Task<Task> CreateNewWithContextWrapped(this TaskFactory factory, Func<Task> action)
+        {
+            var task = new Task<Task>(async () =>
+            {
+                using (TaskContext.Enter())
+                {
+                    await action();
+                }
+            });
+
+            return task;
+        }
+
+        /// <summary>
+        /// Creates a new Task whose execution is wrapped in a new task context.
+        /// Task contexts are flown across the async calls using an AsyncLocal and can be
+        /// used for fine-grained object lifetime scoping.
+        /// </summary>
+        public static Task<Task<TResult>> CreateNewWithContextWrapped<TResult>(this TaskFactory factory, Func<Task<TResult>> function)
+        {
+            var task = new Task<Task<TResult>>(async () =>
+            {
+                using (TaskContext.Enter())
+                {
+                    return await function();
+                }
+            });
+
+            return task;
+        }
+
+        /// <summary>
+        /// Creates and starts a new Task whose execution is wrapped in a new task context.
+        /// Task contexts are flown across the async calls using an AsyncLocal and can be
+        /// used for fine-grained object lifetime scoping.
+        /// </summary>
+        public static Task StartNewWithContext(this TaskFactory factory, Action action)
+        {
+            var task = CreateNewWithContext(factory, action);
             task.Start();
 
             return task;
@@ -35,16 +98,7 @@ namespace Revo.Core.Core
         /// </summary>
         public static Task<TResult> StartNewWithContext<TResult>(this TaskFactory factory, Func<TResult> function)
         {
-            Task<TResult> task = null;
-
-            task = new Task<TResult>(() =>
-            {
-                using (TaskContext.Enter())
-                {
-                    return function();
-                }
-            });
-
+            var task = CreateNewWithContext(factory, function);
             task.Start();
 
             return task;
@@ -57,16 +111,7 @@ namespace Revo.Core.Core
         /// </summary>
         public static Task StartNewWithContext(this TaskFactory factory, Func<Task> action)
         {
-            Task<Task> task = null;
-
-            task = new Task<Task>(async () =>
-            {
-                using (TaskContext.Enter())
-                {
-                    await action();
-                }
-            });
-
+            var task = CreateNewWithContextWrapped(factory, action);
             task.Start();
 
             return task.Unwrap();
@@ -79,17 +124,9 @@ namespace Revo.Core.Core
         /// </summary>
         public static Task<TResult> StartNewWithContext<TResult>(this TaskFactory factory, Func<Task<TResult>> function)
         {
-            Task<Task<TResult>> task = null;
-
-            task = new Task<Task<TResult>>(async () =>
-            {
-                using (TaskContext.Enter())
-                {
-                    return await function();
-                }
-            });
-
+            var task = CreateNewWithContextWrapped(factory, function);
             task.Start();
+
             return task.Unwrap();
         }
     }

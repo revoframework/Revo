@@ -18,7 +18,7 @@ namespace Revo.Hangfire
         {
             using (TaskContext.Enter())
             {
-                await jobRunner.RunJobAsync(job); // has to await, otherwise task context gets disposed too early
+                await jobRunner.RunJobAsync(job); // must await instead of returning, otherwise task context gets disposed too early
             }
         }
     }

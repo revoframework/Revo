@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using NLog;
 using Revo.DataAccess.Entities;
 using Revo.Infrastructure.Jobs;
+using Revo.Infrastructure.Jobs.InMemory;
 
 namespace Revo.Infrastructure.Events.Async
 {
@@ -13,11 +14,11 @@ namespace Revo.Infrastructure.Events.Async
 
         private readonly IAsyncEventWorker asyncEventWorker;
         private readonly IAsyncEventPipelineConfiguration asyncEventPipelineConfiguration;
-        private readonly IJobScheduler jobScheduler;
+        private readonly IInMemoryJobScheduler jobScheduler;
 
         public ProcessAsyncEventsJobHandler(IAsyncEventWorker asyncEventWorker,
             IAsyncEventPipelineConfiguration asyncEventPipelineConfiguration,
-            IJobScheduler jobScheduler)
+            IInMemoryJobScheduler jobScheduler)
         {
             this.asyncEventWorker = asyncEventWorker;
             this.asyncEventPipelineConfiguration = asyncEventPipelineConfiguration;

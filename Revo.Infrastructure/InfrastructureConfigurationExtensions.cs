@@ -2,6 +2,7 @@
 using System.Linq;
 using Revo.Core.Configuration;
 using Revo.Infrastructure.Events.Async;
+using Revo.Infrastructure.Jobs.InMemory;
 using Revo.Infrastructure.Sagas;
 
 namespace Revo.Infrastructure
@@ -13,6 +14,7 @@ namespace Revo.Infrastructure
             Action<InfrastructureConfigurationSection> advancedAction = null)
         {
             configuration.ConfigureCore();
+            configuration.UseInMemoryJobs(isActive: null); // activate only if not previously disabled
 
             var section = configuration.GetSection<InfrastructureConfigurationSection>();
             section.AsyncEventPipeline = asyncEventPipelineConfiguration ?? section.AsyncEventPipeline;

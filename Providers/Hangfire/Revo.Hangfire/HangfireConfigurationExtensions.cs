@@ -2,6 +2,7 @@
 using Hangfire;
 using Revo.Core.Configuration;
 using Revo.Infrastructure.Jobs;
+using Revo.Infrastructure.Jobs.InMemory;
 
 namespace Revo.Hangfire
 {
@@ -11,7 +12,7 @@ namespace Revo.Hangfire
             JobStorage jobStorage = null,
             Action<HangfireConfigurationSection> advancedAction = null)
         {
-            configuration.OverrideModuleLoading<NullJobsModule>(false);
+            configuration.UseInMemoryJobs(false);
 
             var section = configuration.GetSection<HangfireConfigurationSection>();
             section.IsActive = true;
