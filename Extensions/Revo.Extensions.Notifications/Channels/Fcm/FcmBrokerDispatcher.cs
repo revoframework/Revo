@@ -13,7 +13,7 @@ namespace Revo.Extensions.Notifications.Channels.Fcm
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly Dictionary<string, GcmServiceBroker> fcmServiceBrokers; // TODO might pool multiple instances?
 
-        public FcmBrokerDispatcher(IEnumerable<FcmAppConfiguration> fcmAppConfigurations)
+        public FcmBrokerDispatcher(IReadOnlyCollection<IFcmAppConfiguration> fcmAppConfigurations)
         {
             if (fcmAppConfigurations.DistinctBy(x => x.AppId).Count() != fcmAppConfigurations.Count())
             {

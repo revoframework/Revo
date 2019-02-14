@@ -13,7 +13,7 @@ namespace Revo.Extensions.Notifications
             this.notificationChannels = notificationChannels;
         }
 
-        public async Task PushNotification(INotification notification)
+        public async Task PushNotificationAsync(INotification notification)
         {
             IEnumerable<INotificationChannel> channels = notificationChannels
                 .Where(x => x.NotificationTypes.Any(y => y.IsInstanceOfType(notification)));
@@ -23,7 +23,7 @@ namespace Revo.Extensions.Notifications
             }
         }
 
-        public async Task PushNotifications(IEnumerable<INotification> notifications)
+        public async Task PushNotificationsAsync(IEnumerable<INotification> notifications)
         {
             var notificationsByType = notifications.GroupBy(x => x.GetType());
             

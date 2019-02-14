@@ -9,6 +9,7 @@
 ### Changed
 
 - FakeClock now uses AsyncLocal instead of ThreadLocal
+- refactored Revo.Extensions.Notifications for .NET Core compatibility and better configuration
 
 ### Fixed
 

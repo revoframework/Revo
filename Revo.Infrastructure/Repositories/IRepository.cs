@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Revo.Core.Transactions;
+using Revo.DataAccess.Entities;
 using Revo.Domain.Entities;
 
 namespace Revo.Infrastructure.Repositories
@@ -21,9 +22,11 @@ namespace Revo.Infrastructure.Repositories
         Task<T> FindAsync<T>(Guid id) where T : class, IAggregateRoot;
         IQueryable<T> FindAll<T>() where T : class, IAggregateRoot, IQueryableEntity;
         Task<IList<T>> FindAllAsync<T>() where T : class, IAggregateRoot, IQueryableEntity;
+        Task<IList<T>> FindAllAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity;
 
         T Get<T>(Guid id) where T : class, IAggregateRoot;
         Task<T> GetAsync<T>(Guid id) where T : class, IAggregateRoot;
+        IAsyncQueryableResolver GetQueryableResolver<T>() where T : class, IAggregateRoot, IQueryableEntity;
 
         IQueryable<T> Where<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity;
         

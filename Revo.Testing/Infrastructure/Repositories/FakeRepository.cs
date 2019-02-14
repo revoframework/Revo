@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Revo.Core.Collections;
 using Revo.Core.Transactions;
+using Revo.DataAccess.Entities;
 using Revo.Domain.Entities;
 using Revo.Domain.Events;
 using Revo.Infrastructure.Repositories;
@@ -13,6 +15,8 @@ namespace Revo.Testing.Infrastructure.Repositories
 {
     public class FakeRepository : IRepository
     {
+        private static readonly FakeAsyncQueryableResolver AsyncQueryableResolver = new FakeAsyncQueryableResolver();
+
         private readonly List<SaveTransaction> saveTransactions = new List<SaveTransaction>();
 
         public FakeRepository()
@@ -70,6 +74,11 @@ namespace Revo.Testing.Infrastructure.Repositories
                 Aggregates.Select(x => x.Instance).OfType<T>().FirstOrDefault(x => x.Id.Equals(id)));
         }
 
+        public Task<IList<T>> FindAllAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
+        {
+            return Task.FromResult<IList<T>>(Where(predicate).ToList());
+        }
+
         public virtual T Get<T>(Guid id) where T : class, IAggregateRoot
         {
             return Aggregates.Select(x => x.Instance).OfType<T>().First(x => x.Id.Equals(id));
@@ -78,6 +87,11 @@ namespace Revo.Testing.Infrastructure.Repositories
         public virtual Task<T> GetAsync<T>(Guid id) where T : class, IAggregateRoot
         {
             return Task.FromResult(Get<T>(id));
+        }
+
+        public IAsyncQueryableResolver GetQueryableResolver<T>() where T : class, IAggregateRoot, IQueryableEntity
+        {
+            return AsyncQueryableResolver;
         }
 
         public virtual IQueryable<T> FindAll<T>() where T : class, IAggregateRoot, IQueryableEntity
@@ -218,6 +232,73 @@ namespace Revo.Testing.Infrastructure.Repositories
             public IEnumerable<EntityEntry> Modified { get; }
             public IEnumerable<EntityEntry> Removed { get; }
             public ILookup<EntityEntry, DomainAggregateEvent> PublishedEvents { get; }
+        }
+
+        public class FakeAsyncQueryableResolver : IAsyncQueryableResolver
+        {
+            public Task<int> CountAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                return Task.FromResult(queryable.Count());
+            }
+
+            public IQueryable<T> Include<T, TProperty>(IQueryable<T> queryable, Expression<Func<T, TProperty>> navigationPropertyPath) where T : class
+            {
+                return queryable;
+            }
+
+            public IQueryable<T> Include<T>(IQueryable<T> queryable, string navigationPropertyPath) where T : class
+            {
+                return queryable;
+            }
+
+            public Task<long> LongCountAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                return Task.FromResult(queryable.LongCount());
+            }
+
+            public Task<T> FirstOrDefaultAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                return Task.FromResult(queryable.FirstOrDefault());
+            }
+
+            public Task<T> FirstAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                return Task.FromResult(queryable.First());
+            }
+
+            public Task<T[]> ToArrayAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                return Task.FromResult(queryable.ToArray());
+            }
+
+            public Task<List<T>> ToListAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                return Task.FromResult(queryable.ToList());
+            }
+
+            public Task<Dictionary<TKey, T>> ToDictionaryAsync<T, TKey>(IQueryable<T> queryable, Func<T, TKey> keySelector,
+                CancellationToken cancellationToken = default(CancellationToken))
+            {
+                return Task.FromResult(queryable.ToDictionary(keySelector));
+            }
+
+            public Task<Dictionary<TKey, T>> ToDictionaryAsync<T, TKey>(IQueryable<T> queryable, Func<T, TKey> keySelector, IEqualityComparer<TKey> comparer,
+                CancellationToken cancellationToken = default(CancellationToken))
+            {
+                return Task.FromResult(queryable.ToDictionary(keySelector, comparer));
+            }
+
+            public Task<Dictionary<TKey, TElement>> ToDictionaryAsync<T, TKey, TElement>(IQueryable<T> queryable, Func<T, TKey> keySelector, Func<T, TElement> elementSelector,
+                CancellationToken cancellationToken = default(CancellationToken))
+            {
+                return Task.FromResult(queryable.ToDictionary(keySelector, elementSelector));
+            }
+
+            public Task<Dictionary<TKey, TElement>> ToDictionaryAsync<T, TKey, TElement>(IQueryable<T> queryable, Func<T, TKey> keySelector, Func<T, TElement> elementSelector,
+                IEqualityComparer<TKey> comparer, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                return Task.FromResult(queryable.ToDictionary(keySelector, elementSelector, comparer));
+            }
         }
     }
 }

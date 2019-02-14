@@ -5,6 +5,6 @@ namespace Revo.Extensions.Notifications.Channels.Mail
 {
     public interface IMailNotificationFormatter
     {
-        Task<IEnumerable<SerializableMailMessage>> FormatNotificationMessage(IEnumerable<INotification> notifications);
+        Task<IEnumerable<SerializableMailMessage>> FormatNotificationMessage(IReadOnlyCollection<INotification> notifications);
     }
 }

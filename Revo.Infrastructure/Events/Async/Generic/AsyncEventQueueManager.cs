@@ -2,14 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MoreLinq;
 using Revo.Core.Events;
-using Revo.Core.Types;
 using Revo.DataAccess.Entities;
 using Revo.Domain.Events;
 using Revo.Infrastructure.EventStores;
 using Revo.Infrastructure.EventStores.Generic;
-using Revo.Infrastructure.EventStores.Generic.Model;
 using EntityState = Revo.DataAccess.Entities.EntityState;
 
 namespace Revo.Infrastructure.Events.Async.Generic

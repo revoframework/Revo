@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using NLog;
 using Revo.Core.Core;
 using Revo.DataAccess.Entities;
-using Revo.Infrastructure.Jobs;
 using Revo.Infrastructure.Jobs.InMemory;
 
 namespace Revo.Infrastructure.Events.Async

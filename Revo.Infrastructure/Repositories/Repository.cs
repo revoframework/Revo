@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Revo.Core.Events;
 using Revo.Core.Transactions;
+using Revo.DataAccess.Entities;
 using Revo.Domain.Entities;
 
 namespace Revo.Infrastructure.Repositories
@@ -121,6 +122,12 @@ namespace Revo.Infrastructure.Repositories
             return aggregateStore.FindAllAsync<T>();
         }
 
+        public Task<IList<T>> FindAllAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
+        {
+            var aggregateStore = GetQueyrableAggregateStore<T>();
+            return aggregateStore.FindAllAsync<T>(predicate);
+        }
+
         public T Get<T>(Guid id) where T : class, IAggregateRoot
         {
             var aggregateStore = GetAggregateStore<T>();
@@ -133,6 +140,12 @@ namespace Revo.Infrastructure.Repositories
             var aggregateStore = GetAggregateStore<T>();
             T aggregate = await aggregateStore.GetAsync<T>(id);
             return aggregate;
+        }
+
+        public IAsyncQueryableResolver GetQueryableResolver<T>() where T : class, IAggregateRoot, IQueryableEntity
+        {
+            var aggregateStore = GetQueyrableAggregateStore<T>();
+            return aggregateStore.GetQueryableResolver<T>();
         }
 
         public IQueryable<T> Where<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity

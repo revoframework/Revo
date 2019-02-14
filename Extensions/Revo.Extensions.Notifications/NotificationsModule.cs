@@ -4,6 +4,9 @@ using Ninject.Modules;
 using Revo.Core.Core;
 using Revo.Core.Lifecycle;
 using Revo.DataAccess.Entities;
+using Revo.Extensions.Notifications.Channels.Buffering;
+using Revo.Extensions.Notifications.Channels.Mail;
+using Revo.Infrastructure.Jobs;
 
 namespace Revo.Extensions.Notifications
 {
@@ -11,34 +14,32 @@ namespace Revo.Extensions.Notifications
     {
         public override void Load()
         {
-            Bind<INotificationTypeCache, IApplicationStartListener>()
+            Bind<INotificationTypeCache, IApplicationConfigurer>()
                 .To<NotificationTypeCache>()
                 .InSingletonScope();
 
             Bind<INotificationSerializer>()
                 .To<NotificationSerializer>()
                 .InSingletonScope();
+            
+            Bind<IApplicationStartListener>()
+                .To<BufferedNotificationStartup>()
+                .InSingletonScope();
 
             Bind<INotificationBus>()
                 .To<NotificationBus>()
-                .InSingletonScope();
+                .InTaskScope();
 
-            Bind<BufferedNotificationDaemon, IApplicationStartListener>()
-                .To<BufferedNotificationDaemon>()
-                .InSingletonScope();
-
-            Bind<BufferedNotificationProcessJob>()
-                .ToSelf()
-                .InTransientScope();
-            
             Bind<IBufferedNotificationStore>()
                 .To<BufferedNotificationStore>()
                 .InTaskScope();
 
-            Bind<ICrudRepository>()
-                //.To<CrudRepository>()
-                .ToMethod(ctx => ctx.Kernel.Get<Func<ICrudRepository>>()()) // TODO probably won't work & needs an explicit factory
-                .WhenInjectedInto<BufferedNotificationStore>()
+            Bind<IJobHandler<SendMailNotificationJob>>()
+                .To<SendMailNotificationJobHandler>()
+                .InTaskScope();
+
+            Bind<IJobHandler<ProcessBufferedNotificationsJob>>()
+                .To<ProcessBufferedNotificationsJobHandler>()
                 .InTransientScope();
         }
     }

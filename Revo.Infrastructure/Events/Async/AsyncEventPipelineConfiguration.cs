@@ -4,10 +4,6 @@ namespace Revo.Infrastructure.Events.Async
 {
     public class AsyncEventPipelineConfiguration : IAsyncEventPipelineConfiguration
     {
-        public AsyncEventPipelineConfiguration()
-        {
-        }
-
         public int CatchUpProcessingParallelism { get; set; } = 80;
         public int SyncQueueProcessingParallelism { get; set; } = 5;
 

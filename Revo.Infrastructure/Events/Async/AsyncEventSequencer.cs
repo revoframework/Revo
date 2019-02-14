@@ -17,6 +17,11 @@ namespace Revo.Infrastructure.Events.Async
             return Enumerable.Empty<EventSequencing>();
         }
 
+        /*public virtual IAsyncEventQueueGovernor GetQueueGovernor(IReadOnlyCollection<IAsyncEventQueueRecord> events)
+        {
+            return null;
+        }*/
+
         public bool ShouldAttemptSynchronousDispatch(IEventMessage message)
         {
             if (message is IEventMessage<TEvent> castedMessage)

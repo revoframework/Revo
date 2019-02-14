@@ -16,7 +16,7 @@ namespace Revo.AspNet.IO.Notifications
             this.razorEngineTemplates = razorEngineTemplates;
         }
 
-        public async Task<IEnumerable<SerializableMailMessage>> FormatNotificationMessage(IEnumerable<INotification> notifications)
+        public async Task<IEnumerable<SerializableMailMessage>> FormatNotificationMessage(IReadOnlyCollection<INotification> notifications)
         {
             List<SerializableMailMessage> messages = new List<SerializableMailMessage>();
 
@@ -32,7 +32,7 @@ namespace Revo.AspNet.IO.Notifications
             return messages;
         }
 
-        protected abstract Task<IEnumerable<MessageTemplate>> GetMessageTemplate(IEnumerable<INotification> notifications);
+        protected abstract Task<IEnumerable<MessageTemplate>> GetMessageTemplate(IReadOnlyCollection<INotification> notifications);
 
         protected virtual SerializableMailMessage RenderNotificationMessage(MessageTemplate messageTemplate)
         {

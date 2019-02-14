@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Revo.DataAccess.Entities;
 using Revo.Domain.Entities;
 
 namespace Revo.Infrastructure.Repositories
@@ -16,6 +17,8 @@ namespace Revo.Infrastructure.Repositories
 
         IQueryable<T> FindAll<T>() where T : class, IAggregateRoot, IQueryableEntity;
         Task<IList<T>> FindAllAsync<T>() where T : class, IAggregateRoot, IQueryableEntity;
+        Task<IList<T>> FindAllAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity;
+        IAsyncQueryableResolver GetQueryableResolver<T>() where T : class, IAggregateRoot, IQueryableEntity;
 
         IQueryable<T> Where<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity;
     }

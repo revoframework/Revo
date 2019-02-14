@@ -2,15 +2,9 @@
 
 namespace Revo.Extensions.Notifications.Channels.Fcm
 {
-    public class FcmAppConfiguration
+    public class FcmAppConfiguration : IFcmAppConfiguration
     {
-        public FcmAppConfiguration(string appId, GcmConfiguration apnsConfiguration)
-        {
-            AppId = appId;
-            FcmConfiguration = apnsConfiguration;
-        }
-
-        public string AppId { get; private set; }
-        public GcmConfiguration FcmConfiguration { get; private set; }
+        public string AppId { get; set; }
+        public GcmConfiguration FcmConfiguration { get; set; }
     }
 }

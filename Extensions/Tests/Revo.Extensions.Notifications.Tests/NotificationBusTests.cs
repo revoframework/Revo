@@ -24,8 +24,8 @@ namespace Revo.Extensions.Notifications.Tests
         {
             Notification1 n1 = new Notification1();
             Notification2 n2 = new Notification2();
-            await sut.PushNotification(n1);
-            await sut.PushNotification(n2);
+            await sut.PushNotificationAsync(n1);
+            await sut.PushNotificationAsync(n2);
 
             notificationChannel1.Received(1).PushNotificationAsync(n1);
             notificationChannel2.Received(1).PushNotificationAsync(n2);
@@ -35,7 +35,7 @@ namespace Revo.Extensions.Notifications.Tests
         public async Task PushNotification_SendsDerivedToCorrectChannel()
         {
             Notification2Derived n2 = new Notification2Derived();
-            await sut.PushNotification(n2);
+            await sut.PushNotificationAsync(n2);
 
             notificationChannel1.ReceivedWithAnyArgs(0).PushNotificationAsync(null);
             notificationChannel2.Received(1).PushNotificationAsync(n2);
@@ -47,7 +47,7 @@ namespace Revo.Extensions.Notifications.Tests
             Notification1 n1First = new Notification1();
             Notification1 n1Second = new Notification1();
             Notification2 n2 = new Notification2();
-            await sut.PushNotifications(new INotification[] {n1First, n2, n1Second});
+            await sut.PushNotificationsAsync(new INotification[] {n1First, n2, n1Second});
 
             notificationChannel1.Received(1).PushNotificationAsync(n1First);
             notificationChannel1.Received(1).PushNotificationAsync(n1Second);
@@ -58,7 +58,7 @@ namespace Revo.Extensions.Notifications.Tests
         public async Task PushNotifications_SendsDerivedToCorrectChannel()
         {
             Notification2Derived n2 = new Notification2Derived();
-            await sut.PushNotifications(new INotification[] { n2 });
+            await sut.PushNotificationsAsync(new INotification[] { n2 });
 
             notificationChannel1.ReceivedWithAnyArgs(0).PushNotificationAsync(null);
             notificationChannel2.Received(1).PushNotificationAsync(n2);

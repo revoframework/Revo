@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Revo.Extensions.Notifications.Channels.Buffering;
 
 namespace Revo.Extensions.Notifications.Channels.Apns
 {
@@ -17,7 +18,7 @@ namespace Revo.Extensions.Notifications.Channels.Apns
             this.apnsBrokerDispatcher = apnsBrokerDispatcher;
         }
 
-        public async Task SendNotificationsAsync(IEnumerable<INotification> notifications)
+        public async Task SendNotificationsAsync(IReadOnlyCollection<INotification> notifications)
         {
             IEnumerable<WrappedApnsNotification> apnsNotifications = null;
             foreach (IApnsNotificationFormatter formatter in pushNotificationFormatters)

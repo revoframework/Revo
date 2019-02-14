@@ -137,7 +137,7 @@ namespace Revo.AspNetCore
 
             Kernel.Bind<IViewBufferScope>().ToMethod(ctx => app.GetRequestService<IViewBufferScope>());
             Kernel.Bind<ILoggerFactory>().ToConstant(loggerFactory);
-            //Kernel.Bind<IServiceProvider>().ToMethod(ctx => app.ApplicationServices);
+            Kernel.Bind<IServiceProvider>().ToMethod(ctx => app.ApplicationServices);
             Kernel.Bind<IHttpContextAccessor>()
                 .ToMethod(ctx => app.ApplicationServices.GetRequiredService<IHttpContextAccessor>())
                 .InTransientScope();

@@ -2,15 +2,9 @@
 
 namespace Revo.Extensions.Notifications.Channels.Apns
 {
-    public class ApnsAppConfiguration
+    public class ApnsAppConfiguration : IApnsAppConfiguration
     {
-        public ApnsAppConfiguration(string appId, ApnsConfiguration apnsConfiguration)
-        {
-            AppId = appId;
-            ApnsConfiguration = apnsConfiguration;
-        }
-
-        public string AppId { get; private set; }
-        public ApnsConfiguration ApnsConfiguration { get; private set; }
+        public string AppId { get; set; }
+        public ApnsConfiguration ApnsConfiguration { get; set; }
     }
 }

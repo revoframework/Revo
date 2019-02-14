@@ -6,7 +6,7 @@ using Revo.Core.Types;
 
 namespace Revo.Extensions.Notifications
 {
-    public class NotificationTypeCache : IApplicationStartListener, INotificationTypeCache
+    public class NotificationTypeCache : IApplicationConfigurer, INotificationTypeCache
     {
         private readonly ITypeExplorer typeExplorer;
         private Dictionary<string, Type> namesToTypes;
@@ -15,8 +15,8 @@ namespace Revo.Extensions.Notifications
         {
             this.typeExplorer = typeExplorer;
         }
-
-        public void OnApplicationStarted()
+        
+        public void Configure()
         {
             EnsureLoaded();
         }

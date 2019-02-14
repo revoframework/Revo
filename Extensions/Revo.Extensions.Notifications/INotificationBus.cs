@@ -5,8 +5,8 @@ namespace Revo.Extensions.Notifications
 {
     public interface INotificationBus
     {
-        Task PushNotification(INotification notification);
-        Task PushNotifications(IEnumerable<INotification> notifications);
+        Task PushNotificationAsync(INotification notification);
+        Task PushNotificationsAsync(IEnumerable<INotification> notifications);
         Task CommitAsync();
     }
 }

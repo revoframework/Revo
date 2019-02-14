@@ -39,15 +39,10 @@ namespace Revo.Infrastructure.Repositories
         {
             crudRepository.Add(aggregate);
         }
-
-        public T Get<T>(Guid id) where T : class, IAggregateRoot
+        
+        public bool CanHandleAggregateType(Type aggregateType)
         {
-            return crudRepository.Get<T>(id);
-        }
-
-        public Task<T> GetAsync<T>(Guid id) where T : class, IAggregateRoot
-        {
-            return crudRepository.GetAsync<T>(id);
+            return aggregateType.GetCustomAttributes(typeof(DatabaseEntityAttribute), true).Any();
         }
 
         public T Find<T>(Guid id) where T : class, IAggregateRoot
@@ -58,16 +53,6 @@ namespace Revo.Infrastructure.Repositories
         public Task<T> FindAsync<T>(Guid id) where T : class, IAggregateRoot
         {
             return crudRepository.FindAsync<T>(id);
-        }
-
-        public IEnumerable<IAggregateRoot> GetTrackedAggregates()
-        {
-            return crudRepository.GetEntities<IAggregateRoot>();
-        }
-
-        public bool CanHandleAggregateType(Type aggregateType)
-        {
-            return aggregateType.GetCustomAttributes(typeof(DatabaseEntityAttribute), true).Any();
         }
 
         public T FirstOrDefault<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
@@ -100,6 +85,31 @@ namespace Revo.Infrastructure.Repositories
             return crudRepository.FindAllAsync<T>();
         }
 
+        public async Task<IList<T>> FindAllAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
+        {
+            return await crudRepository.Where<T>(predicate).ToListAsync(crudRepository);
+        }
+
+        public T Get<T>(Guid id) where T : class, IAggregateRoot
+        {
+            return crudRepository.Get<T>(id);
+        }
+
+        public Task<T> GetAsync<T>(Guid id) where T : class, IAggregateRoot
+        {
+            return crudRepository.GetAsync<T>(id);
+        }
+
+        public IEnumerable<IAggregateRoot> GetTrackedAggregates()
+        {
+            return crudRepository.GetEntities<IAggregateRoot>();
+        }
+
+        public IAsyncQueryableResolver GetQueryableResolver<T>() where T : class, IAggregateRoot, IQueryableEntity
+        {
+            return crudRepository;
+        }
+        
         public IQueryable<T> Where<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
         {
             return crudRepository.Where(predicate);

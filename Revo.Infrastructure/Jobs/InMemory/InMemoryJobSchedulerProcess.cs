@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using NLog;
 using Revo.Core.Core;
@@ -12,8 +10,6 @@ namespace Revo.Infrastructure.Jobs.InMemory
 {
     public class InMemoryJobSchedulerProcess : IApplicationStartListener, IApplicationStopListener, IInMemoryJobSchedulerProcess
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
         private readonly IInMemoryJobWorkerProcess workerProcess;
         private readonly BlockingCollection<ScheduledJob> unscheduledJobs = new BlockingCollection<ScheduledJob>();
         private readonly SortedList<DateTimeOffset, ScheduledJob> scheduledJobs = new SortedList<DateTimeOffset, ScheduledJob>();
@@ -84,14 +80,7 @@ namespace Revo.Infrastructure.Jobs.InMemory
                 i--;
             }
 
-            try
-            {
-                enqueued.ForEach(x => workerProcess.EnqueueJob(x.Job, x.ErrorHandler));
-            }
-            catch (InvalidOperationException e)
-            {
-                Logger.Debug($"Not scheduling job(s) because scheduler worker process is already stopped");
-            }
+            enqueued.ForEach(x => workerProcess.EnqueueJob(x.Job, x.ErrorHandler));
         }
 
         private class ScheduledJob

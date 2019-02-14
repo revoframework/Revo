@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Revo.DataAccess.Entities;
 using Revo.Domain.ReadModel;
 
@@ -21,5 +22,6 @@ namespace Revo.Extensions.Notifications.Model
         public Guid Id { get; private set; }
         public Guid PipelineId { get; private set; }
         public Guid GovernorId { get; set; }
+        public List<BufferedNotification> Notifications { get; set; }
     }
 }

@@ -11,9 +11,10 @@ namespace Revo.Extensions.Notifications.Channels.Apns
     public class ApnsBrokerDispatcher : IApnsBrokerDispatcher, IApplicationStartListener, IDisposable
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         private readonly Dictionary<string, ApnsServiceBroker> apnsServiceBrokers; // TODO might pool multiple instances?
         
-        public ApnsBrokerDispatcher(IEnumerable<ApnsAppConfiguration> apnsAppConfigurations)
+        public ApnsBrokerDispatcher(IReadOnlyCollection<IApnsAppConfiguration> apnsAppConfigurations)
         {
             if (apnsAppConfigurations.DistinctBy(x => x.AppId).Count() != apnsAppConfigurations.Count())
             {
