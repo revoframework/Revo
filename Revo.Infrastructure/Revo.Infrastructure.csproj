@@ -19,8 +19,4 @@ Framework infrastruture package - event stores, projections, jobs, etc.</Descrip
     <ProjectReference Include="..\Revo.Domain\Revo.Domain.csproj" />
   </ItemGroup>
   
-  <ItemGroup>
-    <Folder Include="Messages\" />
-  </ItemGroup>
-  
 </Project>

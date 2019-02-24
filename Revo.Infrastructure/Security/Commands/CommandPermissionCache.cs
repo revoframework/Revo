@@ -15,7 +15,7 @@ namespace Revo.Infrastructure.Security.Commands
         private readonly IPermissionTypeRegistry permissionTypeRegistry;
         private readonly PermissionTypeIndexer permissionTypeIndexer;
         private readonly ITypeExplorer typeExplorer;
-        private Lazy<MultiValueDictionary<Type, Permission>> commandTypePermissions;
+        private Lazy<Dictionary<Type, CommandTypeInfo>> commandTypePermissions;
 
         public CommandPermissionCache(IPermissionTypeRegistry permissionTypeRegistry,
             PermissionTypeIndexer permissionTypeIndexer,
@@ -35,20 +35,31 @@ namespace Revo.Infrastructure.Security.Commands
 
         public IReadOnlyCollection<Permission> GetCommandPermissions(ICommandBase command)
         {
-            if (commandTypePermissions.Value.TryGetValue(command.GetType(), out var permissions))
+            if (commandTypePermissions.Value.TryGetValue(command.GetType(), out var info))
             {
-                return permissions;
+                return info.Permissions;
             }
 
             throw new ArgumentException(
-                $"Unknown command type to GetCommandPermissions for: {command.GetType().FullName}");
+                $"Unknown command type passed to GetCommandPermissions: {command.GetType().FullName}");
+        }
+
+        public bool IsAuthenticationRequired(ICommandBase command)
+        {
+            if (commandTypePermissions.Value.TryGetValue(command.GetType(), out var info))
+            {
+                return info.IsAuthenticationRequired;
+            }
+
+            throw new ArgumentException(
+                $"Unknown command type passed to IsAuthenticationRequired: {command.GetType().FullName}");
         }
 
         private void Clear()
         {
-            commandTypePermissions = new Lazy<MultiValueDictionary<Type, Permission>>(() =>
+            commandTypePermissions = new Lazy<Dictionary<Type, CommandTypeInfo>>(() =>
             {
-                var dict = new MultiValueDictionary<Type, Permission>();
+                var dict = new Dictionary<Type, CommandTypeInfo>();
                 permissionTypeIndexer.EnsureIndexed();
 
                 foreach (var commandType in typeExplorer
@@ -56,7 +67,9 @@ namespace Revo.Infrastructure.Security.Commands
                     .Where(x => x.IsClass && !x.IsAbstract && !x.IsGenericTypeDefinition)
                     .Where(x => typeof(ICommandBase).IsAssignableFrom(x)))
                 {
-                    dict.AddRange(commandType, GetCommandTypePermissions(commandType));
+                    var permissions = GetCommandTypePermissions(commandType).ToArray();
+                    bool isAuthenticated = IsAuthenticationRequired(commandType);
+                    dict.Add(commandType, new CommandTypeInfo(isAuthenticated, permissions));
                 }
 
                 return dict;
@@ -72,6 +85,24 @@ namespace Revo.Infrastructure.Security.Commands
                     null, null));
             
             return permissions;
+        }
+
+        private bool IsAuthenticationRequired(Type type)
+        {
+            var attributes = type.GetCustomAttributes(typeof(AuthenticatedAttribute), true);
+            return attributes.Length > 0;
+        }
+
+        public class CommandTypeInfo
+        {
+            public CommandTypeInfo(bool isAuthenticationRequired, IReadOnlyCollection<Permission> permissions)
+            {
+                IsAuthenticationRequired = isAuthenticationRequired;
+                Permissions = permissions;
+            }
+
+            public bool IsAuthenticationRequired { get; }
+            public IReadOnlyCollection<Permission> Permissions { get; }
         }
     }
 }

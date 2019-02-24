@@ -7,5 +7,6 @@ namespace Revo.Infrastructure.Security.Commands
     public interface ICommandPermissionCache
     {
         IReadOnlyCollection<Permission> GetCommandPermissions(ICommandBase command);
+        bool IsAuthenticationRequired(ICommandBase command);
     }
 }
