@@ -34,6 +34,11 @@ namespace Revo.EFCore.DataAccess.Conventions
 
             foreach (var child in entity.GetDerivedTypes())
             {
+                if (child.BaseType != entity)
+                {
+                    continue;
+                }
+
                 var childPrefixAttribute = GetTablePrefixAttribute(child);
                 PrefixEntitiesRecursive(child, childPrefixAttribute, tableName);
             }

@@ -2,6 +2,9 @@
 
 ## [1.8.0] - 2019-??-??
 
+### Fixed
+- EFCore's PrefixConvention with deeper inheritance hierarchies
+
 ### Removed
 - obsolete Globalization stuff (messages, locales, translatable entities, ASP.NET localization helpers...)
 
