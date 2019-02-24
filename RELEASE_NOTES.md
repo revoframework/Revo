@@ -1,5 +1,7 @@
 # RELEASE NOTES
 
+## [1.8.0] - 2019-??-??
+
 ## [1.7.0] - 2019-02-14
 
 ### Added
@@ -10,8 +12,6 @@
 
 - FakeClock now uses AsyncLocal instead of ThreadLocal
 - refactored Revo.Extensions.Notifications for .NET Core compatibility and better configuration
-
-### Fixed
 
 ## [1.6.0] - 2019-01-17
 
