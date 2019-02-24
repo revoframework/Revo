@@ -15,4 +15,8 @@
     <ProjectReference Include="..\..\Revo.AspNet\Revo.AspNet.csproj" />
   </ItemGroup>
   
+  <ItemGroup>
+    <Folder Include="Web\" />
+  </ItemGroup>
+  
 </Project>

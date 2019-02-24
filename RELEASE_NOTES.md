@@ -2,6 +2,9 @@
 
 ## [1.8.0] - 2019-??-??
 
+### Removed
+- obsolete Globalization stuff (messages, locales, translatable entities, ASP.NET localization helpers...)
+
 ## [1.7.0] - 2019-02-14
 
 ### Added

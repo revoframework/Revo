@@ -1,6 +1,5 @@
 ﻿using System;
 using Revo.AspNet.Core;
-using Revo.AspNet.Globalization;
 using Revo.AspNet.IO.Templates;
 using Revo.AspNet.Security;
 using Revo.Core.Configuration;
@@ -26,7 +25,6 @@ namespace Revo.AspNet
                     c.LoadModule(new CorePlatformModule(hangfireConfigurationSection));
                     c.LoadModule(new SecurityModule());
                     c.LoadModule(new NullAspNetIdentityModule());
-                    c.LoadModule(new GlobalizationModule());
                     c.LoadModule(new TemplatesModule());
                 }
             });
