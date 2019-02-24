@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using Revo.Core.Events;
@@ -23,6 +24,11 @@ namespace Revo.Infrastructure.Events
             Formatting = Formatting.None
         };
 
+        static EventSerializer()
+        {
+            JsonSerializerSettings.Converters.Add(new StringEnumConverter());
+        }
+
         private readonly IVersionedTypeRegistry versionedTypeRegistry;
 
         public EventSerializer(IVersionedTypeRegistry versionedTypeRegistry)
@@ -35,11 +41,11 @@ namespace Revo.Infrastructure.Events
             try
             {
                 Type clrType = versionedTypeRegistry.GetTypeInfo<IEvent>(typeId).ClrType;
-                return (IEvent)JsonConvert.DeserializeObject(eventJson, clrType);
+                return (IEvent)JsonConvert.DeserializeObject(eventJson, clrType, JsonSerializerSettings);
             }
             catch (JsonException e)
             {
-                throw new IOException($"Invalid event read from EF6 event store, error deserializing event JSON: {e.ToString()}", e);
+                throw new IOException($"Invalid event read from event store, error deserializing event JSON: {e}", e);
             }
         }
 

@@ -2,6 +2,9 @@
 
 ## [1.8.0] - 2019-??-??
 
+### Changed
+- default EventSerializer and NotificationSerializer now use the same JSON serializer settings
+
 ### Fixed
 - EFCore's PrefixConvention with deeper inheritance hierarchies
 
