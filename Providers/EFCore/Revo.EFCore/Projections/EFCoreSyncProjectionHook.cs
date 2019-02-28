@@ -14,6 +14,7 @@ namespace Revo.EFCore.Projections
     {
         private readonly ICommandContext commandContext;
         private readonly IEFCoreProjectionSubSystem projectionSubSystem;
+        private readonly List<IEventMessage> projectedEvents = new List<IEventMessage>();
 
         public EFCoreSyncProjectionHook(ICommandContext commandContext, IEFCoreProjectionSubSystem projectionSubSystem)
         {
@@ -25,22 +26,33 @@ namespace Revo.EFCore.Projections
         {
             if (commandContext.UnitOfWork != null)
             {
-                await projectionSubSystem.ExecuteProjectionsAsync(
-                    commandContext.UnitOfWork.EventBuffer.Events
-                        .OfType<IEventMessage<DomainAggregateEvent>>()
-                        .ToArray(),
-                    commandContext.UnitOfWork,
-                    new EFCoreEventProjectionOptions(true));
+                var newEvents = commandContext.UnitOfWork.EventBuffer.Events
+                    .SkipWhile((x, i) => projectedEvents.Count > i && projectedEvents[i] == x)
+                    .ToArray();
+
+                if (newEvents.Length > 0)
+                {
+                    projectedEvents.AddRange(newEvents);
+
+                    await projectionSubSystem.ExecuteProjectionsAsync(
+                        commandContext.UnitOfWork.EventBuffer.Events
+                            .OfType<IEventMessage<DomainAggregateEvent>>()
+                            .ToArray(),
+                        commandContext.UnitOfWork,
+                        new EFCoreEventProjectionOptions(true));
+                }
             }
         }
 
         public Task OnCommitSucceededAsync()
         {
+            projectedEvents.Clear();
             return Task.CompletedTask;
         }
 
         public Task OnCommitFailedAsync()
         {
+            projectedEvents.Clear();
             return Task.CompletedTask;
         }
     }

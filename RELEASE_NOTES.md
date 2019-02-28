@@ -6,7 +6,8 @@
 - default EventSerializer and NotificationSerializer now use the same JSON serializer settings
 
 ### Fixed
-- EFCore's PrefixConvention with deeper inheritance hierarchies
+- EF Core's PrefixConvention with deeper inheritance hierarchies
+- EF Core sync projectors are invoked not invoked multiple times with the same events
 
 ### Removed
 - obsolete Globalization stuff (messages, locales, translatable entities, ASP.NET localization helpers...)
