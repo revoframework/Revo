@@ -1,6 +1,6 @@
 # RELEASE NOTES
 
-## [1.8.0] - 2019-??-??
+## [1.8.0] - 2019-03-04
 
 ### Changed
 - default EventSerializer and NotificationSerializer now use the same JSON serializer settings
