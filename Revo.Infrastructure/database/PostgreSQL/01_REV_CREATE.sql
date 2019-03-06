@@ -66,17 +66,3 @@ CREATE TABLE IF NOT EXISTS rev_saga_metadata_key (
 	rev_smk_key_name text NOT NULL,
 	rev_smk_key_value text NOT NULL
 );
-
-/******
-GLOBALIZATION
-******/
-
-CREATE TABLE IF NOT EXISTS rev_localization_message (
-	rev_lom_localization_message_id uuid primary key,
-	rev_lom_version int not null,
-	rev_lom_tenant_id uuid,
-	rev_lom_class_name text not null,
-	rev_lom_key text not null,
-	rev_lom_message text,
-	rev_lom_locale_code text not null
-);

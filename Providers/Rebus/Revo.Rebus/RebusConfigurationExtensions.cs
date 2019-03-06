@@ -6,7 +6,6 @@ namespace Revo.Rebus
     public static class RebusConfigurationExtensions
     {
         public static IRevoConfiguration UseRebus(this IRevoConfiguration configuration,
-            bool? useAsPrimaryRepository = true,
             RebusConnectionConfiguration connection = null,
             Action<RebusConfigurationSection> advancedAction = null)
         {

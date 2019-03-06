@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Revo.Core.Events
 {
-    public class EventMessage
+    public static class EventMessage
     {
         public static IEventMessage FromEvent(IEvent @event, IReadOnlyDictionary<string, string> metadata)
         {

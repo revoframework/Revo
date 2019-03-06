@@ -42,7 +42,7 @@ namespace Revo.Core.Commands
                 }
 
                 await PostFilterAsync(message);
-            } 
+            }
         }
 
         private async Task PreFilterAsync(T message)
