@@ -1,6 +1,6 @@
 # RELEASE NOTES
 
-## [1.9.0] - 2019-??-??
+## [1.9.0] - 2019-03-15
 
 ### Added
 - new Revo.EasyNetQ module for simple integrations with RabbitMQ
