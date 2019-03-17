@@ -52,8 +52,9 @@ Abstraction layer for _Entity Framework 6_, _RavenDB,_ testable _in-memory datab
 [**Projections**](https://revoframework.gitbook.io/revo/reference-guide/projections)  
 Support for read-model projections with various backends \(e.g. _Entity Framework Core_ (_PostgreSQL_, _MSSQL_...), _Entity Framework 6_, _RavenDB_...\), automatic idempotency- and concurrency-handling, etc.
 
-[**SOA and integration**](https://revoframework.gitbook.io/revo/reference-guide/integrations)  
-Scale and integrate by publishing and receiving events, commands and queries using common messaging patterns,<br>e.g. with _RabbitMQ_ message queue and/or uses _Rebus_ service bus.
+[**SOA, messaging and integration**](https://revoframework.gitbook.io/revo/reference-guide/integrations)  
+Scale and integrate by [publishing and receiving events](https://docs.revoframework.net/~/drafts/-LaA9ji7E8zsIXVOg-qo/primary/reference-guide/integrations#rabbitmq-messaging-with-easynetq), commands and queries using common messaging patterns,<br>
+e.g. with _RabbitMQ_ message queue (using _EasyNetQ_ connector or _Rebus_ service bus).
 
 [**Sagas**](https://revoframework.gitbook.io/revo/reference-guide/sagas)  
 Coordinating long-running processes or inter-aggregate cooperation with sagas that react to events<br>\(a.k.a. _process managers_\).
@@ -367,7 +368,31 @@ Binaries are up for grabs in form of NuGet packages:
 <table border="0" cellpadding="0" cellspacing="0" style="float:left;">
   <tr>
     <th colspan="2">
-      Other integrations & extensions
+      Integrations
+    </th>
+  </tr>
+  <tr>
+    <td>
+      Revo.EasyNetQ (RabbitMQ connector)
+    </td>
+    <td>
+      <a href="https://www.nuget.org/packages/Revo.EasyNetQ/"><img src="https://img.shields.io/nuget/v/Revo.EasyNetQ.svg" alt="NuGet package version"></a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Revo.Rebus (service bus, deprecated)
+    </td>
+    <td>
+      <a href="https://www.nuget.org/packages/Revo.Rebus/"><img src="https://img.shields.io/nuget/v/Revo.Rebus.svg" alt="NuGet package version"></a>
+    </td>
+  </tr>
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" style="float:left;">
+  <tr>
+    <th colspan="2">
+      Other extensions
     </th>
   </tr>
   <tr>
@@ -392,14 +417,6 @@ Binaries are up for grabs in form of NuGet packages:
     </td>
     <td>
       <a href="https://www.nuget.org/packages/Revo.Extensions.Notifications/"><img src="https://img.shields.io/nuget/v/Revo.Extensions.Notifications.svg" alt="NuGet package version"></a>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      Revo.Rebus
-    </td>
-    <td>
-      <a href="https://www.nuget.org/packages/Revo.Rebus/"><img src="https://img.shields.io/nuget/v/Revo.Rebus.svg" alt="NuGet package version"></a>
     </td>
   </tr>
 </table>
