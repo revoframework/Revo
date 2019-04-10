@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Microsoft.AspNet.OData.Query;
 using Ninject;
 using Ninject.Modules;
 using Revo.AspNetCore.IO.OData;
@@ -17,7 +18,8 @@ namespace Revo.EFCore.AspNetCoreOData
                 : null;
             
             Bind<IQueryableToODataResultConverter>()
-                .ToMethod(ctx => new EFCoreQueryableToODataResultConverter(section?.DisableAsyncQueryableResolution ?? false))
+                .ToMethod(ctx => new EFCoreQueryableToODataResultConverter(section?.DisableAsyncQueryableResolution ?? false,
+                    section?.ODataQuerySettings ?? new ODataQuerySettings()))
                 .InSingletonScope();
         }
     }

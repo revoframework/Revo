@@ -1,4 +1,5 @@
-﻿using Revo.Core.Configuration;
+﻿using Microsoft.AspNet.OData.Query;
+using Revo.Core.Configuration;
 
 namespace Revo.EFCore.AspNetCoreOData.Configuration
 {
@@ -9,5 +10,7 @@ namespace Revo.EFCore.AspNetCoreOData.Configuration
         /// DTOs mapped by AutoMapper). When true, executes queries synchronously, which prevents the bug from manifesting.
         /// </summary>
         public bool DisableAsyncQueryableResolution { get; set; }
+
+        public ODataQuerySettings ODataQuerySettings { get; set; } = new ODataQuerySettings();
     }
 }

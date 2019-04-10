@@ -2,6 +2,11 @@
 
 ## [1.10.0] - 2019-?-?
 
+## [1.9.1] - 2019-?-?
+
+### Changed
+- now possible to configure ODataQuerySettings for EFCoreQueryableToODataResultConverter
+
 ## [1.9.0] - 2019-03-15
 
 ### Added
