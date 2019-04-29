@@ -5,10 +5,8 @@ using System.Threading.Tasks;
 using Revo.Core.Events;
 using Revo.DataAccess.Entities;
 using Revo.Domain.Entities;
-using Revo.Domain.Entities.EventSourcing;
 using Revo.Domain.Events;
 using Revo.Domain.ReadModel;
-using Revo.Domain.Tenancy;
 using Revo.Domain.Tenancy.Events;
 
 namespace Revo.Infrastructure.Projections

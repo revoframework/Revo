@@ -284,7 +284,7 @@ namespace Revo.DataAccess.InMemory
             return Task.FromResult(queryable.ToDictionary(keySelector, elementSelector, comparer));
         }
 
-        public void Remove<T>(T entity) where T : class
+        public virtual void Remove<T>(T entity) where T : class
         {
             EntityEntry entry = EntityEntries.FirstOrDefault(x => x.Instance == entity);
             if (entry != null)

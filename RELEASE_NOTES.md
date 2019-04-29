@@ -4,6 +4,9 @@
 
 ## [1.9.1] - 2019-?-?
 
+### Added
+- CrudAggregateStore now automatically removes entities that have been marked with IsDeleted
+
 ### Changed
 - now possible to configure ODataQuerySettings for EFCoreQueryableToODataResultConverter
 - removed IEventSourcedAggregateRoot constraints from EF Core and EF6 projectors (now can be any IAggregateRoot)

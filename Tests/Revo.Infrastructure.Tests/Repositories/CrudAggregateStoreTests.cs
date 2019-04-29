@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentAssertions;
 using NSubstitute;
 using Revo.Core.Events;
+using Revo.DataAccess.Entities;
 using Revo.DataAccess.InMemory;
 using Revo.Domain.Entities;
 using Revo.Domain.Entities.Attributes;
@@ -29,7 +31,7 @@ namespace Revo.Infrastructure.Tests.Repositories
 
         public CrudAggregateStoreTests()
         {
-            crudRepository = new InMemoryCrudRepository();
+            crudRepository = Substitute.ForPartsOf<InMemoryCrudRepository>();
             entityTypeManager = Substitute.For<IEntityTypeManager>();
             publishEventBuffer = Substitute.For<IPublishEventBuffer>();
 
@@ -88,7 +90,7 @@ namespace Revo.Infrastructure.Tests.Repositories
         [Fact]
         public async Task SaveChanges_CommitsAggregates()
         {
-            TestAggregate testAggregate = Substitute.ForPartsOf<TestAggregate>(new object[] { Guid.NewGuid() });
+            TestAggregate testAggregate = Substitute.ForPartsOf<TestAggregate>(Guid.NewGuid());
             domainClasses.Add(new DomainClassInfo(TestAggregateClassId, null, testAggregate.GetType()));
 
             sut.Add(testAggregate);
@@ -102,7 +104,7 @@ namespace Revo.Infrastructure.Tests.Repositories
         [Fact]
         public async Task SaveChanges_CommitsOnlyChangedAggregates()
         {
-            TestAggregate testAggregate = Substitute.ForPartsOf<TestAggregate>(new object[] {Guid.NewGuid()});
+            TestAggregate testAggregate = Substitute.ForPartsOf<TestAggregate>(Guid.NewGuid());
             domainClasses.Add(new DomainClassInfo(TestAggregateClassId, null, testAggregate.GetType()));
 
             sut.Add(testAggregate);
@@ -112,6 +114,31 @@ namespace Revo.Infrastructure.Tests.Repositories
             testAggregate.Received(0).Commit();
         }
 
+        [Fact]
+        public async Task SaveChanges_RemovesDeleted()
+        {
+            TestAggregate testAggregate = new TestAggregate(Guid.NewGuid());
+            crudRepository.Add(testAggregate);
+            await crudRepository.SaveChangesAsync();
+
+            testAggregate = await sut.GetAsync<TestAggregate>(testAggregate.Id);
+            testAggregate.Do();
+            var event1 = testAggregate.UncommittedEvents.First();
+            testAggregate.Remove();
+
+            await sut.SaveChangesAsync();
+
+            Received.InOrder(() =>
+            {
+                crudRepository.SaveChangesAsync();
+                crudRepository.Remove(testAggregate);
+                crudRepository.SaveChangesAsync();
+            });
+
+            publishEventBuffer.Received(1).PushEvent(Arg.Is<IEventMessage>(x => x.Event == event1));
+            crudRepository.GetEntityState(testAggregate).Should().Be(EntityState.Detached);
+        }
+
         [DomainClassId(TestAggregateClassIdString)]
         public class TestAggregate : BasicClassAggregateRoot
         {
@@ -119,13 +146,18 @@ namespace Revo.Infrastructure.Tests.Repositories
             {
             }
 
-            public TestAggregate()
+            protected TestAggregate()
             {
             }
 
             public void Do()
             {
                 Publish(new Event1());
+            }
+
+            public void Remove()
+            {
+                MarkDeleted();
             }
         }
 

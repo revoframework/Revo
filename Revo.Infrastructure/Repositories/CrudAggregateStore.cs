@@ -4,7 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Revo.Core.Events;
-using Revo.Core.Transactions;
 using Revo.DataAccess.Entities;
 using Revo.Domain.Entities;
 using Revo.Domain.Entities.Basic;
@@ -150,6 +149,11 @@ namespace Revo.Infrastructure.Repositories
                     var eventMessages = await CreateEventMessagesAsync(aggregate, aggregate.UncommittedEvents);
                     eventMessages.ForEach(publishEventBuffer.PushEvent);
                     aggregate.Commit();
+                }
+
+                if (aggregate.IsDeleted)
+                {
+                    crudRepository.Remove(aggregate);
                 }
             }
         }
