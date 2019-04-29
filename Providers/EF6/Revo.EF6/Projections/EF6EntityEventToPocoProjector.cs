@@ -1,4 +1,5 @@
-﻿using Revo.Domain.Entities.EventSourcing;
+﻿using Revo.Domain.Entities;
+using Revo.Domain.Entities.EventSourcing;
 using Revo.EF6.DataAccess.Entities;
 using Revo.Infrastructure.Projections;
 
@@ -21,7 +22,7 @@ namespace Revo.EF6.Projections
     public class EF6EntityEventToPocoProjector<TSource, TTarget> :
         CrudEntityEventToPocoProjector<TSource, TTarget>,
         IEF6EntityEventProjector<TSource>
-        where TSource : class, IEventSourcedAggregateRoot
+        where TSource : class, IAggregateRoot
         where TTarget : class, new()
     {
         public EF6EntityEventToPocoProjector(IEF6CrudRepository repository)  : base(repository)

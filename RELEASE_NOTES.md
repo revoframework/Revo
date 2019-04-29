@@ -6,6 +6,7 @@
 
 ### Changed
 - now possible to configure ODataQuerySettings for EFCoreQueryableToODataResultConverter
+- removed IEventSourcedAggregateRoot constraints from EF Core and EF6 projectors (now can be any IAggregateRoot)
 
 ## [1.9.0] - 2019-03-15
 
