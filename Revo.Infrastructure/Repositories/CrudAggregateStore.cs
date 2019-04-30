@@ -122,7 +122,9 @@ namespace Revo.Infrastructure.Repositories
         public virtual async Task SaveChangesAsync()
         {
             InjectClassIds();
-            await CommitAggregatesAsync();
+            await PushAggregateEventsAsync();
+            RemoveDeletedEntities();
+            CommitAggregates();
             await crudRepository.SaveChangesAsync();
         }
 
@@ -140,7 +142,18 @@ namespace Revo.Infrastructure.Repositories
             }
         }
 
-        protected async Task CommitAggregatesAsync()
+        protected void RemoveDeletedEntities()
+        {
+            foreach (var aggregate in GetTrackedAggregates())
+            {
+                if (aggregate.IsDeleted)
+                {
+                    crudRepository.Remove((dynamic) aggregate);
+                }
+            }
+        }
+
+        protected async Task PushAggregateEventsAsync()
         {
             foreach (var aggregate in GetTrackedAggregates())
             {
@@ -148,12 +161,17 @@ namespace Revo.Infrastructure.Repositories
                 {
                     var eventMessages = await CreateEventMessagesAsync(aggregate, aggregate.UncommittedEvents);
                     eventMessages.ForEach(publishEventBuffer.PushEvent);
-                    aggregate.Commit();
                 }
+            }
+        }
 
-                if (aggregate.IsDeleted)
+        protected void CommitAggregates()
+        {
+            foreach (var aggregate in GetTrackedAggregates())
+            {
+                if (aggregate.IsChanged)
                 {
-                    crudRepository.Remove(aggregate);
+                    aggregate.Commit();
                 }
             }
         }
@@ -163,6 +181,7 @@ namespace Revo.Infrastructure.Repositories
             var messages = new List<IEventMessageDraft>();
             Guid? aggregateClassId = entityTypeManager.TryGetClassInfoByClrType(aggregate.GetType())?.Id;
 
+            int eventNumber = aggregate.Version * 50;
             foreach (DomainAggregateEvent ev in events)
             {
                 IEventMessageDraft message = await eventMessageFactory.CreateMessageAsync(ev);
@@ -180,6 +199,8 @@ namespace Revo.Infrastructure.Repositories
                 {
                     message.SetMetadata(BasicEventMetadataNames.EventId, Guid.NewGuid().ToString());
                 }
+
+                message.SetMetadata(BasicEventMetadataNames.AggregateVersion, aggregate.Version.ToString());
 
                 messages.Add(message);
             }

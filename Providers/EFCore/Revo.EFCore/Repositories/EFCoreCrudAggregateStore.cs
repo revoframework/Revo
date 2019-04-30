@@ -28,19 +28,22 @@ namespace Revo.EFCore.Repositories
             return transactionCoordinator.CommitAsync();
         }
 
-        public Task OnBeforeCommitAsync()
+        public async Task OnBeforeCommitAsync()
         {
             InjectClassIds();
-            return Task.CompletedTask;
+            await PushAggregateEventsAsync();
+            RemoveDeletedEntities();
+            CommitAggregates();
         }
 
-        public async Task OnCommitSucceededAsync()
+        public Task OnCommitSucceededAsync()
         {
-            await CommitAggregatesAsync();
+            return Task.CompletedTask;
         }
 
         public Task OnCommitFailedAsync()
         {
+            // TODO do a rollback on commited aggregates?
             return Task.CompletedTask;
         }
     }

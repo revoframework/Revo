@@ -1,19 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Castle.Components.DictionaryAdapter;
 using FluentAssertions;
 using MoreLinq;
 using Revo.Core.Events;
 using Revo.Domain.ReadModel;
-using Revo.Infrastructure.Events;
 using Revo.Infrastructure.Projections;
 using Revo.Testing.Infrastructure;
 using NSubstitute;
 using Revo.DataAccess.Entities;
-using Revo.Domain.Entities.EventSourcing;
 using Revo.Domain.Events;
 using Xunit;
 
@@ -51,6 +47,30 @@ namespace Revo.Infrastructure.Tests.Projections
         [Fact]
         public async Task ProjectEventsAsync_CreatesTargetOnFirstEvent()
         {
+            sut = Substitute.ForPartsOf<TestEntityEventToPocoProjector>();
+            sut.WhenForAnyArgs(x => x.Apply(null, Guid.Empty, null))
+                .Do(ci =>
+                {
+                    sut.Target.Should().NotBeNull();
+                    sut.Target.Should().Be(sut.LastCreatedTarget);
+                    sut.Target.Should().Be(ci.ArgAt<TestReadModel>(2));
+                });
+
+            await sut.ProjectEventsAsync(aggregateId, eventMessages);
+
+            sut.LastCreatedTarget.Should().NotBeNull();
+            sut.LastFoundTarget.Should().BeNull();
+        }
+        
+        [Fact]
+        public async Task ProjectEventsAsync_CreatesTargetOnAggregateVersion0()
+        {
+            foreach (var message in eventMessages)
+            {
+                message.SetMetadata(BasicEventMetadataNames.StreamSequenceNumber, null);
+                message.SetMetadata(BasicEventMetadataNames.AggregateVersion, 0.ToString());
+            }
+
             sut = Substitute.ForPartsOf<TestEntityEventToPocoProjector>();
             sut.WhenForAnyArgs(x => x.Apply(null, Guid.Empty, null))
                 .Do(ci =>

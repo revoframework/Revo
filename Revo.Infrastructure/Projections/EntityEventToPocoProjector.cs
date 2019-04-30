@@ -51,10 +51,28 @@ namespace Revo.Infrastructure.Projections
             }
 
             TTarget target;
-            long firstEventNumber = events.First().Metadata.GetStreamSequenceNumber()
-                                    ?? throw new InvalidOperationException(
-                                        $"Cannot project events for aggregate with ID {aggregateId}, unknown StreamSequenceNumber for first batch of events");
-            if (firstEventNumber == 1)
+            bool? createTarget = null;
+            long? firstEventNumber = events.First().Metadata.GetStreamSequenceNumber();
+            if (firstEventNumber != null)
+            {
+                createTarget = firstEventNumber == 1;
+            }
+            else
+            {
+                int? aggregateVersion = events.First().Metadata.GetAggregateVersion();
+                if (aggregateVersion != null)
+                {
+                    createTarget = aggregateVersion == 0;
+                }
+            }
+
+            if (createTarget == null)
+            {
+                throw new InvalidOperationException(
+                    $"Cannot project events for aggregate with ID {aggregateId}, unknown both StreamSequenceNumber and AggregateVersion for first batch of events");
+            }
+            
+            if (createTarget == true)
             {
                 target = await CreateProjectionTargetAsync(aggregateId, events);
             }

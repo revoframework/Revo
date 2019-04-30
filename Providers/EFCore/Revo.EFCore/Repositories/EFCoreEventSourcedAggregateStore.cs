@@ -36,6 +36,7 @@ namespace Revo.EFCore.Repositories
 
         public Task OnCommitFailedAsync()
         {
+            // TODO do a rollback on commited aggregates?
             return Task.CompletedTask;
         }
     }
