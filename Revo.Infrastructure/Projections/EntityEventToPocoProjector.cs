@@ -149,7 +149,7 @@ namespace Revo.Infrastructure.Projections
             }
             finally
             {
-                Target = default;
+                Target = default(TTarget);
             }
         }
         
