@@ -85,8 +85,31 @@ namespace Revo.Infrastructure.Tests.Repositories
             publishEventBuffer.Received(1).PushEvent(Arg.Is<IEventMessage>(x => x.Event == event1));
         }
 
-        // TODO test pushed event metadata
+        [Fact]
+        public async Task SaveChanges_PublishedEventsHaveMetadata()
+        {
+            TestAggregate testAggregate = new TestAggregate(Guid.NewGuid());
+            sut.Add(testAggregate);
+            testAggregate.Do();
+            var event1 = testAggregate.UncommittedEvents.First();
 
+            List<IEventMessage> publishedMessages = new List<IEventMessage>();
+            publishEventBuffer.WhenForAnyArgs(x => x.PushEvent(null))
+                .Do(ci => publishedMessages.Add(ci.ArgAt<IEventMessage>(0)));
+
+            await sut.SaveChangesAsync();
+
+            publishedMessages.Should().HaveCount(1);
+            publishedMessages[0].Event.Should().Be(event1);
+            publishedMessages[0].Metadata.Should().Contain(x => x.Key == BasicEventMetadataNames.EventId
+                                                                && Guid.Parse(x.Value) != Guid.Empty);
+            publishedMessages[0].Metadata.Should().Contain(x => x.Key == BasicEventMetadataNames.AggregateVersion
+                                                                && int.Parse(x.Value) == 1);
+            publishedMessages[0].Metadata.Should().Contain(x => x.Key == BasicEventMetadataNames.AggregateClassId
+                                                                && Guid.Parse(x.Value) == Guid.Parse(TestAggregateClassIdString));
+            // TODO TenantId
+        }
+        
         [Fact]
         public async Task SaveChanges_CommitsAggregates()
         {

@@ -200,7 +200,7 @@ namespace Revo.Infrastructure.Repositories
                     message.SetMetadata(BasicEventMetadataNames.EventId, Guid.NewGuid().ToString());
                 }
 
-                message.SetMetadata(BasicEventMetadataNames.AggregateVersion, aggregate.Version.ToString());
+                message.SetMetadata(BasicEventMetadataNames.AggregateVersion, (aggregate.Version + 1).ToString());
 
                 messages.Add(message);
             }

@@ -6,6 +6,7 @@
 
 ### Added
 - CrudAggregateStore now automatically removes entities that have been marked with IsDeleted
+- IEventNumberVersioned and EventEntityReadModel for read models with additional arbitrary versioning (concurrency control)
 
 ### Changed
 - now possible to configure ODataQuerySettings for EFCoreQueryableToODataResultConverter

@@ -5,8 +5,8 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Revo.Core.Events;
 using Revo.DataAccess.Entities;
-using Revo.Domain.Entities;
 using Revo.Domain.Events;
+using Revo.Domain.ReadModel;
 
 namespace Revo.Infrastructure.Projections
 {
@@ -16,8 +16,8 @@ namespace Revo.Infrastructure.Projections
     /// and also supports sub-projectors.
     /// </summary>
     /// <remarks>
-    /// If TTarget is IManuallyRowVersioned, automatically handles read model versioning and projection
-    /// idempotency using event sequence numbers.
+    /// If TTarget is IManuallyRowVersioned or IEventNumberVersioned, automatically handles read model versioning and projection
+    /// idempotence using event sequence numbers.
     /// </remarks>
     /// <typeparam name="TSource">Aggregate type.</typeparam>
     /// <typeparam name="TTarget">Read model type.</typeparam>
@@ -51,25 +51,18 @@ namespace Revo.Infrastructure.Projections
             }
 
             TTarget target;
-            bool? createTarget = null;
-            long? firstEventNumber = events.First().Metadata.GetStreamSequenceNumber();
-            if (firstEventNumber != null)
-            {
-                createTarget = firstEventNumber == 1;
-            }
-            else
-            {
-                int? aggregateVersion = events.First().Metadata.GetAggregateVersion();
-                if (aggregateVersion != null)
-                {
-                    createTarget = aggregateVersion == 0;
-                }
-            }
+            bool? createTarget = events
+                .Select(x => x.Metadata.GetStreamSequenceNumber() != null
+                    ? (bool?) (x.Metadata.GetStreamSequenceNumber() == 1)
+                    : (x.Metadata.GetAggregateVersion() != null
+                        ? (bool?) (x.Metadata.GetAggregateVersion() == 1)
+                        : null))
+                .FirstOrDefault(x => x != null);
 
             if (createTarget == null)
             {
                 throw new InvalidOperationException(
-                    $"Cannot project events for aggregate with ID {aggregateId}, unknown both StreamSequenceNumber and AggregateVersion for first batch of events");
+                    $"Cannot project events for aggregate with ID {aggregateId}, needs StreamSequenceNumber or AggregateVersion");
             }
             
             if (createTarget == true)
@@ -90,13 +83,42 @@ namespace Revo.Infrastructure.Projections
             
             var appliedEvents = events;
 
-            var targetRowVersioned = target as IManuallyRowVersioned;
-            if (targetRowVersioned != null)
+            int? lastEventNumberProjected = null;
+            IEventNumberVersioned eventNumberVersionedTarget = target as IEventNumberVersioned;
+            IManuallyRowVersioned manuallyRowVersionedTarget = target as IManuallyRowVersioned;
+            
+            if (eventNumberVersionedTarget != null)
             {
-                appliedEvents = appliedEvents
-                    .SkipWhile(x =>
-                        x.Metadata.GetStreamSequenceNumber().HasValue && targetRowVersioned.Version >= x.Metadata.GetStreamSequenceNumber())
-                    .ToList();
+                lastEventNumberProjected = eventNumberVersionedTarget.EventNumber;
+            }
+            else if (manuallyRowVersionedTarget != null)
+            {
+                lastEventNumberProjected = manuallyRowVersionedTarget.Version;
+            }
+
+            if (lastEventNumberProjected != null)
+            {
+                int? lastSkippedIndex = appliedEvents
+                    .Select((x, i) => new {Event = x, Index = i})
+                    .LastOrDefault(x =>
+                    {
+                        long? eventNumber = x.Event.Metadata.GetStreamSequenceNumber()
+                                          ?? x.Event.Metadata.GetAggregateVersion();
+                        if (eventNumber != null)
+                        {
+                            return lastEventNumberProjected >= eventNumber;
+                        }
+
+                        return false;
+                    })
+                    ?.Index;
+
+                if (lastSkippedIndex != null)
+                {
+                    appliedEvents = appliedEvents
+                        .Skip(lastSkippedIndex.Value + 1)
+                        .ToList();
+                }
             }
             
             try
@@ -105,17 +127,29 @@ namespace Revo.Infrastructure.Projections
                 {
                     await base.ProjectEventsAsync(aggregateId, appliedEvents);
 
-                    if (targetRowVersioned != null)
+                    long? newLastEventNumber = appliedEvents.Select(x =>
+                                                       x.Metadata?.GetStreamSequenceNumber() ?? x.Metadata?.GetAggregateVersion())
+                                                   .LastOrDefault(x => x != null)
+                                               ?? lastEventNumberProjected;
+
+                    if (eventNumberVersionedTarget != null)
                     {
-                        long newVersion = appliedEvents.LastOrDefault()?.Metadata?.GetStreamSequenceNumber()
-                                          ?? targetRowVersioned.Version + appliedEvents.Count();
-                        targetRowVersioned.Version = (int)newVersion;
+                        eventNumberVersionedTarget.EventNumber = (int)newLastEventNumber.Value;
+
+                        if (manuallyRowVersionedTarget != null)
+                        {
+                            manuallyRowVersionedTarget.Version++;
+                        }
+                    }
+                    else if (manuallyRowVersionedTarget != null)
+                    {
+                        manuallyRowVersionedTarget.Version = (int) newLastEventNumber.Value;
                     }
                 }
             }
             finally
             {
-                Target = default(TTarget);
+                Target = default;
             }
         }
         

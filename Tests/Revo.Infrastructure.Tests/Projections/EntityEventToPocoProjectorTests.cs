@@ -63,12 +63,12 @@ namespace Revo.Infrastructure.Tests.Projections
         }
         
         [Fact]
-        public async Task ProjectEventsAsync_CreatesTargetOnAggregateVersion0()
+        public async Task ProjectEventsAsync_CreatesTargetOnAggregateVersion1()
         {
             foreach (var message in eventMessages)
             {
                 message.SetMetadata(BasicEventMetadataNames.StreamSequenceNumber, null);
-                message.SetMetadata(BasicEventMetadataNames.AggregateVersion, 0.ToString());
+                message.SetMetadata(BasicEventMetadataNames.AggregateVersion, 1.ToString());
             }
 
             sut = Substitute.ForPartsOf<TestEntityEventToPocoProjector>();
@@ -127,7 +127,7 @@ namespace Revo.Infrastructure.Tests.Projections
         [Fact]
         public async Task ProjectEventsAsync_IdempotentSkipsEventsWithLowerNumber()
         {
-            var sut2 = Substitute.ForPartsOf<TestEntityEventToPocoProjectorVersioning>();
+            var sut2 = Substitute.ForPartsOf<TestEntityEventToPocoProjectorVersioning<TestReadModelVersioned>>();
             sut2.CreatedTarget = new TestReadModelVersioned()
             {
                 Version = 1
@@ -142,7 +142,7 @@ namespace Revo.Infrastructure.Tests.Projections
         [Fact]
         public async Task ProjectEventsAsync_DoesNotSkipEventsWithoutNumber()
         {
-            var sut2 = Substitute.ForPartsOf<TestEntityEventToPocoProjectorVersioning>();
+            var sut2 = Substitute.ForPartsOf<TestEntityEventToPocoProjectorVersioning<TestReadModelVersioned>>();
             sut2.CreatedTarget = new TestReadModelVersioned()
             {
                 Version = 1
@@ -156,9 +156,9 @@ namespace Revo.Infrastructure.Tests.Projections
         }
 
         [Fact]
-        public async Task ProjectEventsAsync_UpdatesVersionFromEventNumber()
+        public async Task ProjectEventsAsync_Versioned_UpdatesVersionFromEventNumber()
         {
-            var sut2 = Substitute.ForPartsOf<TestEntityEventToPocoProjectorVersioning>();
+            var sut2 = Substitute.ForPartsOf<TestEntityEventToPocoProjectorVersioning<TestReadModelVersioned>>();
             sut2.CreatedTarget = new TestReadModelVersioned()
             {
                 Version = 1
@@ -171,18 +171,92 @@ namespace Revo.Infrastructure.Tests.Projections
         }
 
         [Fact]
-        public async Task ProjectEventsAsync_UpdatesVersionFromEventCount()
+        public async Task ProjectEventsAsync_Versioned_UpdatesVersionFromAggregateVersion()
         {
-            var sut2 = Substitute.ForPartsOf<TestEntityEventToPocoProjectorVersioning>();
+            var sut2 = Substitute.ForPartsOf<TestEntityEventToPocoProjectorVersioning<TestReadModelVersioned>>();
             sut2.CreatedTarget = new TestReadModelVersioned()
             {
+                Version = 0
+            };
+
+            eventMessages[0].SetMetadata(BasicEventMetadataNames.StreamSequenceNumber, null);
+            eventMessages[0].SetMetadata(BasicEventMetadataNames.AggregateVersion, 1.ToString());
+            eventMessages[1].SetMetadata(BasicEventMetadataNames.StreamSequenceNumber, null);
+            eventMessages[0].SetMetadata(BasicEventMetadataNames.AggregateVersion, 1.ToString());
+
+            await sut2.ProjectEventsAsync(aggregateId, eventMessages);
+
+            sut2.CreatedTarget.Version.Should().Be(1);
+        }
+
+        [Fact]
+        public async Task ProjectEventsAsync_EventNumbered_UpdatesEventNumber()
+        {
+            var sut2 = Substitute.ForPartsOf<TestEntityEventToPocoProjectorVersioning<TestReadModelEventNumbered>>();
+            sut2.CreatedTarget = new TestReadModelEventNumbered()
+            {
+                EventNumber = 1
+            };
+
+            eventMessages.Last().SetMetadata(BasicEventMetadataNames.StreamSequenceNumber, 10.ToString());
+            await sut2.ProjectEventsAsync(aggregateId, eventMessages);
+
+            sut2.CreatedTarget.EventNumber.Should().Be(10);
+        }
+
+        [Fact]
+        public async Task ProjectEventsAsync_EventNumbered_UpdatesEventNumberFromAggregateVersion()
+        {
+            var sut2 = Substitute.ForPartsOf<TestEntityEventToPocoProjectorVersioning<TestReadModelEventNumbered>>();
+            sut2.CreatedTarget = new TestReadModelEventNumbered()
+            {
+                EventNumber = 0
+            };
+            
+            eventMessages[0].SetMetadata(BasicEventMetadataNames.StreamSequenceNumber, null);
+            eventMessages[0].SetMetadata(BasicEventMetadataNames.AggregateVersion, 1.ToString());
+            eventMessages[1].SetMetadata(BasicEventMetadataNames.StreamSequenceNumber, null);
+            eventMessages[0].SetMetadata(BasicEventMetadataNames.AggregateVersion, 1.ToString());
+            await sut2.ProjectEventsAsync(aggregateId, eventMessages);
+
+            sut2.CreatedTarget.EventNumber.Should().Be(1);
+        }
+
+        [Fact]
+        public async Task ProjectEventsAsync_VersionedAndEventNumbered_UpdatesBoth()
+        {
+            var sut2 = Substitute.ForPartsOf<TestEntityEventToPocoProjectorVersioning<TestReadModelVersionedEventNumbered>>();
+            sut2.CreatedTarget = new TestReadModelVersionedEventNumbered()
+            {
+                EventNumber = 1,
                 Version = 1
             };
 
-            eventMessages[1].SetMetadata(BasicEventMetadataNames.StreamSequenceNumber, null);
+            eventMessages.Last().SetMetadata(BasicEventMetadataNames.StreamSequenceNumber, 10.ToString());
             await sut2.ProjectEventsAsync(aggregateId, eventMessages);
 
+            sut2.CreatedTarget.EventNumber.Should().Be(10);
             sut2.CreatedTarget.Version.Should().Be(2);
+        }
+
+        [Fact]
+        public async Task ProjectEventsAsync_VersionedAndEventNumbered_UpdatesFromAggregateVersion()
+        {
+            var sut2 = Substitute.ForPartsOf<TestEntityEventToPocoProjectorVersioning<TestReadModelVersionedEventNumbered>>();
+            sut2.CreatedTarget = new TestReadModelVersionedEventNumbered()
+            {
+                EventNumber = 0,
+                Version = 0
+            };
+
+            eventMessages[0].SetMetadata(BasicEventMetadataNames.StreamSequenceNumber, null);
+            eventMessages[0].SetMetadata(BasicEventMetadataNames.AggregateVersion, 1.ToString());
+            eventMessages[1].SetMetadata(BasicEventMetadataNames.StreamSequenceNumber, null);
+            eventMessages[0].SetMetadata(BasicEventMetadataNames.AggregateVersion, 1.ToString());
+            await sut2.ProjectEventsAsync(aggregateId, eventMessages);
+
+            sut2.CreatedTarget.EventNumber.Should().Be(1);
+            sut2.CreatedTarget.Version.Should().Be(1);
         }
 
         public class TestReadModel : ReadModelBase
@@ -192,6 +266,16 @@ namespace Revo.Infrastructure.Tests.Projections
         public class TestReadModelVersioned : ReadModelBase, IManuallyRowVersioned
         {
             public int Version { get; set; }
+        }
+
+        public class TestReadModelVersionedEventNumbered : TestReadModelVersioned, IEventNumberVersioned
+        {
+            public int EventNumber { get; set; }
+        }
+
+        public class TestReadModelEventNumbered : ReadModelBase, IEventNumberVersioned
+        {
+            public int EventNumber { get; set; }
         }
 
         public class TestEntityEventToPocoProjector : EntityEventToPocoProjector<TestReadModel>
@@ -232,21 +316,21 @@ namespace Revo.Infrastructure.Tests.Projections
             }
         }
 
-        public class TestEntityEventToPocoProjectorVersioning : EntityEventToPocoProjector<TestReadModelVersioned>
+        public class TestEntityEventToPocoProjectorVersioning<T> : EntityEventToPocoProjector<T>
         {
-            public TestReadModelVersioned CreatedTarget { get; set; }
-            public TestReadModelVersioned FoundTarget { get; set; }
+            public T CreatedTarget { get; set; }
+            public T FoundTarget { get; set; }
 
             public override async Task CommitChangesAsync()
             {
             }
 
-            protected override async Task<TestReadModelVersioned> CreateProjectionTargetAsync(Guid aggregateId, IReadOnlyCollection<IEventMessage<DomainAggregateEvent>> events)
+            protected override async Task<T> CreateProjectionTargetAsync(Guid aggregateId, IReadOnlyCollection<IEventMessage<DomainAggregateEvent>> events)
             {
                 return CreatedTarget;
             }
 
-            protected override async Task<TestReadModelVersioned> GetProjectionTargetAsync(Guid aggregateId)
+            protected override async Task<T> GetProjectionTargetAsync(Guid aggregateId)
             {
                 return FoundTarget;
             }
