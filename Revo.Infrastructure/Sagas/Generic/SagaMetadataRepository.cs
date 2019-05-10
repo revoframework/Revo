@@ -104,7 +104,7 @@ namespace Revo.Infrastructure.Sagas.Generic
                     .Include(crudRepository, x => x.Keys)
                     .Where(query)
                     .ToArrayAsync(crudRepository))
-                .Where(x => (crudRepository.GetEntityState(x) & EntityState.Deleted) == 0);
+                .Where(x => crudRepository.GetEntityState(x) != EntityState.Deleted);
 
             var withCachedKeys = databaseKeys
                 .Concat(metadataRecords.Values) // merge with keys in cache they might've gotten updated in the meantime

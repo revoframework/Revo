@@ -12,6 +12,9 @@
 - now possible to configure ODataQuerySettings for EFCoreQueryableToODataResultConverter
 - removed IEventSourcedAggregateRoot constraints from EF Core and EF6 projectors (now can be any IAggregateRoot)
 
+### Fixed
+- FakeRepository now correctly removes entites that have been flagged as IsDeleted
+
 ## [1.9.0] - 2019-03-15
 
 ### Added

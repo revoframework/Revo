@@ -31,8 +31,9 @@ namespace Revo.Infrastructure.Repositories
             this.eventMessageFactory = eventMessageFactory;
         }
 
-        public virtual bool NeedsSave => crudRepository
-            .GetEntities<object>(EntityState.Added, EntityState.Deleted, EntityState.Modified).Any();
+        public virtual bool NeedsSave => crudRepository.GetEntities<object>(
+            EntityState.Added, EntityState.Deleted, EntityState.Modified).Any()
+            || GetAttachedAggregates().Any(x => x.IsChanged || x.IsDeleted);
 
         public void Add<T>(T aggregate) where T : class, IAggregateRoot
         {
@@ -104,6 +105,13 @@ namespace Revo.Infrastructure.Repositories
             return crudRepository.GetEntities<IAggregateRoot>();
         }
 
+        public IEnumerable<IAggregateRoot> GetAttachedAggregates()
+        {
+            return crudRepository.GetEntities<IAggregateRoot>()
+                .Where(x => crudRepository.GetEntityState(x) != EntityState.Detached
+                            && crudRepository.GetEntityState(x) != EntityState.Deleted);
+        }
+
         public IAsyncQueryableResolver GetQueryableResolver<T>() where T : class, IAggregateRoot, IQueryableEntity
         {
             return crudRepository;
@@ -130,8 +138,9 @@ namespace Revo.Infrastructure.Repositories
 
         protected void InjectClassIds()
         {
-            var addedClassEntitites =
-                crudRepository.GetEntities<IBasicClassIdEntity>(Revo.DataAccess.Entities.EntityState.Added, Revo.DataAccess.Entities.EntityState.Modified);
+            var addedClassEntitites = crudRepository.GetEntities<IBasicClassIdEntity>(
+                Revo.DataAccess.Entities.EntityState.Added, Revo.DataAccess.Entities.EntityState.Modified)
+                .Where(x => crudRepository.GetEntityState(x) != EntityState.Deleted && crudRepository.GetEntityState(x) != EntityState.Detached);
 
             foreach (IBasicClassIdEntity entity in addedClassEntitites)
             {
@@ -144,7 +153,7 @@ namespace Revo.Infrastructure.Repositories
 
         protected void RemoveDeletedEntities()
         {
-            foreach (var aggregate in GetTrackedAggregates())
+            foreach (var aggregate in GetAttachedAggregates())
             {
                 if (aggregate.IsDeleted)
                 {
@@ -155,7 +164,7 @@ namespace Revo.Infrastructure.Repositories
 
         protected async Task PushAggregateEventsAsync()
         {
-            foreach (var aggregate in GetTrackedAggregates())
+            foreach (var aggregate in GetAttachedAggregates())
             {
                 if (aggregate.IsChanged)
                 {
@@ -167,7 +176,7 @@ namespace Revo.Infrastructure.Repositories
 
         protected void CommitAggregates()
         {
-            foreach (var aggregate in GetTrackedAggregates())
+            foreach (var aggregate in GetAttachedAggregates())
             {
                 if (aggregate.IsChanged)
                 {

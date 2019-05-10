@@ -137,13 +137,13 @@ namespace Revo.Testing.Infrastructure.Repositories
             foreach (EntityEntry entry in Aggregates.ToList())
             {
                 if (entry.EntityState == EntityState.Added || entry.EntityState == EntityState.Modified
-                    || entry.Instance.UncommittedEvents.Any())
+                    || entry.Instance.IsChanged || entry.Instance.IsDeleted)
                 {
                     if (entry.EntityState == EntityState.Added)
                     {
                         added.Add(entry);
                     }
-                    else
+                    else if (entry.EntityState == EntityState.Modified || entry.Instance.IsChanged)
                     {
                         modified.Add(entry);
                     }
@@ -155,9 +155,17 @@ namespace Revo.Testing.Infrastructure.Repositories
                         publishedEvents.Add(entry, domainEvent);
                     }
 
-                    entry.Instance.Commit();
+                    if (entry.Instance.IsDeleted)
+                    {
+                        entry.EntityState = EntityState.Removed;
+                    }
+                    else
+                    {
+                        entry.Instance.Commit();
+                    }
                 }
-                else if (entry.EntityState == EntityState.Removed)
+
+                if (entry.EntityState == EntityState.Removed)
                 {
                     removed.Add(entry);
                     Aggregates.Remove(entry);
