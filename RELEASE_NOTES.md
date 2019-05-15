@@ -1,11 +1,8 @@
 # RELEASE NOTES
 
-## [1.10.0] - 2019-?-?
-
-## [1.9.1] - 2019-?-?
+## [1.9.1] - 2019-05-15
 
 ### Added
-- CrudAggregateStore now automatically removes entities that have been marked with IsDeleted
 - IEventNumberVersioned and EventEntityReadModel for read models with additional arbitrary versioning (concurrency control)
 
 ### Changed
@@ -13,6 +10,7 @@
 - removed IEventSourcedAggregateRoot constraints from EF Core and EF6 projectors (now can be any IAggregateRoot)
 
 ### Fixed
+- CrudAggregateStore now automatically removes entities that have been marked with IsDeleted
 - FakeRepository now correctly removes entites that have been flagged as IsDeleted
 
 ## [1.9.0] - 2019-03-15
