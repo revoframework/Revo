@@ -176,6 +176,11 @@ namespace Revo.RavenDB.DataAccess
             throw new NotImplementedException();
         }
 
+        public Task<bool> AnyAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return queryable.AnyAsync(cancellationToken);
+        }
+
         public Task<int> CountAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default(CancellationToken))
         {
             return queryable.CountAsync(cancellationToken);

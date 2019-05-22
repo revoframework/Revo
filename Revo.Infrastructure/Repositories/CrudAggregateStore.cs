@@ -107,9 +107,8 @@ namespace Revo.Infrastructure.Repositories
 
         public IEnumerable<IAggregateRoot> GetAttachedAggregates()
         {
-            return crudRepository.GetEntities<IAggregateRoot>()
-                .Where(x => crudRepository.GetEntityState(x) != EntityState.Detached
-                            && crudRepository.GetEntityState(x) != EntityState.Deleted);
+            return crudRepository.GetEntities<IAggregateRoot>(
+                EntityState.Added, EntityState.Modified, EntityState.Unchanged);
         }
 
         public IAsyncQueryableResolver GetQueryableResolver<T>() where T : class, IAggregateRoot, IQueryableEntity

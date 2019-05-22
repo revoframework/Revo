@@ -1,6 +1,9 @@
 # RELEASE NOTES
 
-## [1.10.0] - 2019-??-??
+## [1.9.2] - 2019-??-??
+
+### Added
+- IAsyncQueryableResolver.AnyAsync
 
 ## [1.9.1] - 2019-05-15
 

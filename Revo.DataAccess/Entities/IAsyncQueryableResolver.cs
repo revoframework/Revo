@@ -9,6 +9,7 @@ namespace Revo.DataAccess.Entities
 {
     public interface IAsyncQueryableResolver
     {
+        Task<bool> AnyAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default(CancellationToken));
         Task<int> CountAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default(CancellationToken));
         IQueryable<T> Include<T, TProperty>(IQueryable<T> queryable, Expression<Func<T, TProperty>> navigationPropertyPath) where T : class;
         IQueryable<T> Include<T>(IQueryable<T> queryable, string navigationPropertyPath) where T : class;

@@ -244,6 +244,11 @@ namespace Revo.Testing.Infrastructure.Repositories
 
         public class FakeAsyncQueryableResolver : IAsyncQueryableResolver
         {
+            public Task<bool> AnyAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                return Task.FromResult(queryable.Any());
+            }
+
             public Task<int> CountAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default(CancellationToken))
             {
                 return Task.FromResult(queryable.Count());

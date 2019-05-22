@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,6 +9,12 @@ namespace Revo.DataAccess.Entities
 {
     public static class QueryableRepositoryExtensions
     {
+        public static Task<bool> AnyAsync<T>(this IQueryable<T> queryable, IAsyncQueryableResolver repository,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return repository.AnyAsync(queryable, cancellationToken);
+        }
+
         public static Task<int> CountAsync<T>(this IQueryable<T> queryable, IAsyncQueryableResolver repository,
             CancellationToken cancellationToken = default(CancellationToken))
         {

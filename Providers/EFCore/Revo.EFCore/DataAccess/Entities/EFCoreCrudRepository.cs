@@ -197,6 +197,11 @@ namespace Revo.EFCore.DataAccess.Entities
                 .Union(addedEntities);
         }
 
+        public Task<bool> AnyAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return queryable.AnyAsync(cancellationToken);
+        }
+
         public Task<int> CountAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default(CancellationToken))
         {
             return queryable.CountAsync(cancellationToken);
@@ -289,14 +294,13 @@ namespace Revo.EFCore.DataAccess.Entities
         {
             var efStates = entityStates.Select(x => EntityStateToEF(x)).ToArray();
 
-            var entries = DatabaseAccess.DbContexts.Values.SelectMany(x => x.ChangeTracker.Entries());
+            var entries = DatabaseAccess.DbContexts.Values.SelectMany(x => x.ChangeTracker.Entries<T>());
             if (entityStates?.Length > 0)
             {
-                entries = entries.Where(x => efStates.Any(s => (s & x.State) == s));
+                entries = entries.Where(x => efStates.Contains(x.State));
             }
 
-            return entries.Select(x => x.Entity)
-                .OfType<T>();
+            return entries.Select(x => x.Entity);
         }
 
         public Revo.DataAccess.Entities.EntityState GetEntityState<T>(T entity) where T : class
