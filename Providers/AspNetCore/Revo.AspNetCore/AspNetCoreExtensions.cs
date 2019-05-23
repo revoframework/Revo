@@ -31,12 +31,26 @@ namespace Revo.AspNetCore
 
             return GetRequestServiceProvider(builder).GetService<T>();
         }
+        
+        public static object GetRequestService(this IApplicationBuilder builder, Type serviceType)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+            return GetRequestServiceProvider(builder).GetService(serviceType);
+        }
 
         public static T GetRequiredRequestService<T>(this IApplicationBuilder builder) where T : class
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
             return GetRequestServiceProvider(builder).GetRequiredService<T>();
+        }
+
+        public static object GetRequiredRequestService(this IApplicationBuilder builder, Type serviceType)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+            return GetRequestServiceProvider(builder).GetRequiredService(serviceType);
         }
 
         private static IServiceProvider GetRequestServiceProvider(IApplicationBuilder builder)

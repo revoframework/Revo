@@ -11,27 +11,34 @@ using Microsoft.AspNetCore.Mvc.Razor.Internal;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
+using Ninject;
+using Revo.Core.Types;
 
 namespace Revo.AspNetCore
 {
     public static class AspNetCoreMvcExtensions
     {
-        public static void AddCustomControllerActivation(this IServiceCollection services, Func<Type, object> activator)
+        public static void AddCustomControllerActivation(this IServiceCollection services)
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
-            if (activator == null) throw new ArgumentNullException(nameof(activator));
 
-            services.AddSingleton<IControllerActivator>(new DelegatingControllerActivator(
-                context => activator(context.ActionDescriptor.ControllerTypeInfo.AsType())));
+            services.AddSingleton<IControllerActivator, DelegatingControllerActivator>();
+        }
+        
+        public static void AddCustomHubActivation(this IServiceCollection services)
+        {
+            if (services == null) throw new ArgumentNullException(nameof(services));
+
+            services.AddScoped(typeof(IHubActivator<>), typeof(DelegatingHubActivator<>));
         }
 
-        public static void AddCustomViewComponentActivation(this IServiceCollection services, Func<Type, object> activator)
+        public static void AddCustomViewComponentActivation(this IServiceCollection services)
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
-            if (activator == null) throw new ArgumentNullException(nameof(activator));
 
-            services.AddSingleton<IViewComponentActivator>(new DelegatingViewComponentActivator(activator));
+            services.AddSingleton<IViewComponentActivator, DelegatingViewComponentActivator>();
         }
 
         public static void AddCustomTagHelperActivation(this IServiceCollection services, Func<Type, object> activator,
@@ -64,6 +71,14 @@ namespace Revo.AspNetCore
             return feature.Controllers.Select(t => t.AsType()).ToArray();
         }
 
+        public static Type[] GetHubTypes(this IApplicationBuilder builder)
+        {
+            var typeExplorer = new TypeExplorer();
+            return typeExplorer.GetAllTypes()
+                .Where(x => x.IsClass && !x.IsAbstract && typeof(Hub).IsAssignableFrom(x))
+                .ToArray();
+        }
+
         public static Type[] GetViewComponentTypes(this IApplicationBuilder builder)
         {
             var manager = builder.ApplicationServices.GetRequiredService<ApplicationPartManager>();
@@ -75,39 +90,52 @@ namespace Revo.AspNetCore
         }
     }
 
-    public sealed class DelegatingControllerActivator : IControllerActivator
+    internal sealed class DelegatingControllerActivator : IControllerActivator
     {
-        private readonly Func<ControllerContext, object> controllerCreator;
-        private readonly Action<ControllerContext, object> controllerReleaser;
+        private readonly IKernel kernel;
 
-        public DelegatingControllerActivator(Func<ControllerContext, object> controllerCreator,
-            Action<ControllerContext, object> controllerReleaser = null)
+        public DelegatingControllerActivator(IKernel kernel)
         {
-            this.controllerCreator = controllerCreator ?? throw new ArgumentNullException(nameof(controllerCreator));
-            this.controllerReleaser = controllerReleaser ?? ((_, __) => { });
+            this.kernel = kernel;
         }
 
-        public object Create(ControllerContext context) => this.controllerCreator(context);
-        public void Release(ControllerContext context, object controller) => this.controllerReleaser(context, controller);
+        public object Create(ControllerContext context) => kernel.Get(context.ActionDescriptor.ControllerTypeInfo.AsType());
+
+        public void Release(ControllerContext context, object controller)
+        {
+        }
     }
 
-    public sealed class DelegatingViewComponentActivator : IViewComponentActivator
+    internal sealed class DelegatingHubActivator<T> : IHubActivator<T>
+        where T : Hub
     {
-        private readonly Func<Type, object> viewComponentCreator;
-        private readonly Action<object> viewComponentReleaser;
+        private readonly IKernel kernel;
 
-        public DelegatingViewComponentActivator(Func<Type, object> viewComponentCreator,
-            Action<object> viewComponentReleaser = null)
+        public DelegatingHubActivator(IKernel kernel)
         {
-            this.viewComponentCreator = viewComponentCreator ?? throw new ArgumentNullException(nameof(viewComponentCreator));
-            this.viewComponentReleaser = viewComponentReleaser ?? (_ => { });
+            this.kernel = kernel;
         }
 
-        public object Create(ViewComponentContext context) =>
-            this.viewComponentCreator(context.ViewComponentDescriptor.TypeInfo.AsType());
+        public T Create() => kernel.Get<T>();
+        public void Release(T hub)
+        {
+        }
+    }
 
-        public void Release(ViewComponentContext context, object viewComponent) =>
-           this.viewComponentReleaser(viewComponent);
+    internal sealed class DelegatingViewComponentActivator : IViewComponentActivator
+    {
+        private readonly IKernel kernel;
+
+        public DelegatingViewComponentActivator(IKernel kernel)
+        {
+            this.kernel = kernel;
+        }
+
+        public object Create(ViewComponentContext context) => kernel.Get(context.ViewComponentDescriptor.TypeInfo.AsType());
+
+        public void Release(ViewComponentContext context, object viewComponent)
+        {
+        }
     }
 
     internal sealed class DelegatingTagHelperActivator : ITagHelperActivator

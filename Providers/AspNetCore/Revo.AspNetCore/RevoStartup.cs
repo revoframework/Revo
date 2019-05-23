@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures.Internal;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Ninject;
@@ -76,8 +77,9 @@ namespace Revo.AspNetCore
             services.AddSingleton(sp => Kernel);
 
             services.AddRequestScopingMiddleware(() => scopeProvider.Value = new Scope());
-            services.AddCustomControllerActivation(Resolve);
-            services.AddCustomViewComponentActivation(Resolve);
+            services.AddCustomControllerActivation();
+            services.AddCustomHubActivation();
+            services.AddCustomViewComponentActivation();
 
             kernelBootstrapper = new KernelBootstrapper(Kernel, revoConfiguration);
             
@@ -135,7 +137,13 @@ namespace Revo.AspNetCore
                 Kernel.Bind(ctrlType).ToSelf().InScope(RequestScope);
             }
 
+            foreach (var hubType in app.GetHubTypes())
+            {
+                Kernel.Bind(hubType).ToSelf().InScope(RequestScope);
+            }
+
             Kernel.Bind<IViewBufferScope>().ToMethod(ctx => app.GetRequestService<IViewBufferScope>());
+            Kernel.Bind(typeof(IHubContext<>)).ToMethod(ctx => app.GetRequestService(ctx.Request.Service));
             Kernel.Bind<ILoggerFactory>().ToConstant(loggerFactory);
             Kernel.Bind<IServiceProvider>().ToMethod(ctx => app.ApplicationServices);
             Kernel.Bind<IHttpContextAccessor>()
