@@ -143,7 +143,7 @@ namespace Revo.AspNetCore
             }
 
             Kernel.Bind<IViewBufferScope>().ToMethod(ctx => app.GetRequestService<IViewBufferScope>());
-            Kernel.Bind(typeof(IHubContext<>)).ToMethod(ctx => app.GetRequestService(ctx.Request.Service));
+            Kernel.Bind(typeof(IHubContext<>), typeof(IHubContext<,>)).ToMethod(ctx => app.GetRequestService(ctx.Request.Service));
             Kernel.Bind<ILoggerFactory>().ToConstant(loggerFactory);
             Kernel.Bind<IServiceProvider>().ToMethod(ctx => app.ApplicationServices);
             Kernel.Bind<IHttpContextAccessor>()
