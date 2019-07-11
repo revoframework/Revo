@@ -7,6 +7,7 @@
 
 ### Changed
 - IRepository.FindAllAsync now returns an array instead of IList<T>
+- improved StaticClassifierDatabaseInitializer, now also supporting event sourced aggregates
 
 ## [1.10.0] - 2019-06-03
 

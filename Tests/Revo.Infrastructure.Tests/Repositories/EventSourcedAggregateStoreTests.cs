@@ -33,7 +33,7 @@ namespace Revo.Infrastructure.Tests.Repositories
         public void Get_GetsFromRepository()
         {
             TestAggregate aggregate1 = new TestAggregate(Guid.NewGuid());
-            eventSourcedRepository.Get<TestAggregate>(aggregate1.Id).Returns(aggregate1);
+            eventSourcedRepository.Get(aggregate1.Id).Returns(aggregate1);
 
             Assert.Equal(aggregate1, sut.Get<TestAggregate>(aggregate1.Id));
         }
@@ -42,7 +42,7 @@ namespace Revo.Infrastructure.Tests.Repositories
         public async Task GetAsync_GetsFromRepositoryAsync()
         {
             TestAggregate aggregate1 = new TestAggregate(Guid.NewGuid());
-            eventSourcedRepository.GetAsync<TestAggregate>(aggregate1.Id).Returns(aggregate1);
+            eventSourcedRepository.GetAsync(aggregate1.Id).Returns(aggregate1);
 
             Assert.Equal(aggregate1, await sut.GetAsync<TestAggregate>(aggregate1.Id));
         }

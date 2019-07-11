@@ -10,7 +10,7 @@ using Revo.Infrastructure.Repositories;
 namespace Revo.Infrastructure.DataAccess
 {
     public abstract class StaticClassifierDatabaseInitializer<T> : IDatabaseInitializer
-        where T : class, IAggregateRoot, IQueryableEntity
+        where T : class, IAggregateRoot
     {
         public virtual IEnumerable<T> All
         {
@@ -24,11 +24,11 @@ namespace Revo.Infrastructure.DataAccess
 
         public async Task InitializeAsync(IRepository repository)
         {
-            IList<T> existing = await repository.FindAllAsync<T>();
-            IEnumerable<T> known = this.All;
+            var known = All;
+            var knownIds = known.Select(x => x.Id).ToArray();
+            var existing = await repository.FindManyAsync<T>(knownIds);
 
-            foreach (T entity in /*known.Except(existing)*/
-                known.Where(x => !existing.Any(y => y.Id == x.Id)))
+            foreach (T entity in known.Where(x => !existing.Any(y => y.Id == x.Id)))
             {
                 repository.Add(entity);
             }
