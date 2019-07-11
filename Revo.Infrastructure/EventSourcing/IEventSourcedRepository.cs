@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Revo.Core.Transactions;
 using Revo.DataAccess.Entities;
 using Revo.Domain.Entities.EventSourcing;
 
@@ -19,11 +18,15 @@ namespace Revo.Infrastructure.EventSourcing
         TBase Find(Guid id);
         Task<T> FindAsync<T>(Guid id) where T : class, TBase;
         Task<TBase> FindAsync(Guid id);
+        Task<T[]> FindManyAsync<T>(params Guid[] ids) where T : class, TBase;
+        Task<TBase[]> FindManyAsync(params Guid[] ids);
 
         T Get<T>(Guid id) where T : class, TBase;
         TBase Get(Guid id);
         Task<T> GetAsync<T>(Guid id) where T : class, TBase;
         Task<TBase> GetAsync(Guid id);
+        Task<T[]> GetManyAsync<T>(params Guid[] ids) where T : class, TBase;
+        Task<TBase[]> GetManyAsync(params Guid[] ids);
 
         IEnumerable<TBase> GetLoadedAggregates();
 

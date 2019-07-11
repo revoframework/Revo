@@ -110,13 +110,13 @@ namespace Revo.DataAccess.InMemory
                 .OfType<T>());
         }
 
-        public Task<IList<T>> FindAllAsync<T>(CancellationToken cancellationToken = default(CancellationToken)) where T : class
+        public Task<T[]> FindAllAsync<T>(CancellationToken cancellationToken = default(CancellationToken)) where T : class
         {
-            return Task.FromResult((IList<T>)EntityEntries
+            return Task.FromResult(EntityEntries
                 .Where(x => (x.State & EntityState.Added) == 0 && (x.State & EntityState.Detached) == 0)
                 .Select(x => x.Instance)
                 .OfType<T>()
-                .ToList());
+                .ToArray());
         }
 
         public IEnumerable<T> FindAllWithAdded<T>() where T : class

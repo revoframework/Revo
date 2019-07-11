@@ -73,10 +73,35 @@ namespace Revo.Testing.Infrastructure.Repositories
             return Task.FromResult(
                 Aggregates.Select(x => x.Instance).OfType<T>().FirstOrDefault(x => x.Id.Equals(id)));
         }
-
-        public Task<IList<T>> FindAllAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
+        
+        public virtual IQueryable<T> FindAll<T>() where T : class, IAggregateRoot, IQueryableEntity
         {
-            return Task.FromResult<IList<T>>(Where(predicate).ToList());
+            return GetSavedAggregates<T>().AsQueryable();
+        }
+
+        public virtual Task<T[]> FindAllAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
+        {
+            return Task.FromResult(Where(predicate).ToArray());
+        }
+
+        public virtual Task<T[]> FindAllAsync<T>() where T : class, IAggregateRoot, IQueryableEntity
+        {
+            return Task.FromResult(FindAll<T>().ToArray());
+        }
+
+        public virtual Task<T[]> FindManyAsync<T>(params Guid[] ids) where T : class, IAggregateRoot
+        {
+            var result = new List<T>();
+            foreach (Guid id in ids)
+            {
+                var aggregate = Aggregates.Select(x => x.Instance).OfType<T>().FirstOrDefault(x => x.Id.Equals(id));
+                if (aggregate != null)
+                {
+                    result.Add(aggregate);
+                }
+            }
+
+            return Task.FromResult(result.ToArray());
         }
 
         public virtual T Get<T>(Guid id) where T : class, IAggregateRoot
@@ -89,19 +114,21 @@ namespace Revo.Testing.Infrastructure.Repositories
             return Task.FromResult(Get<T>(id));
         }
 
-        public IAsyncQueryableResolver GetQueryableResolver<T>() where T : class, IAggregateRoot, IQueryableEntity
+        public virtual Task<T[]> GetManyAsync<T>(params Guid[] ids) where T : class, IAggregateRoot
+        {
+            var result = new List<T>();
+            foreach (Guid id in ids)
+            {
+                var aggregate = Get<T>(id);
+                result.Add(aggregate);
+            }
+
+            return Task.FromResult(result.ToArray());
+        }
+
+        public virtual IAsyncQueryableResolver GetQueryableResolver<T>() where T : class, IAggregateRoot, IQueryableEntity
         {
             return AsyncQueryableResolver;
-        }
-
-        public virtual IQueryable<T> FindAll<T>() where T : class, IAggregateRoot, IQueryableEntity
-        {
-            return GetSavedAggregates<T>().AsQueryable();
-        }
-
-        public virtual Task<IList<T>> FindAllAsync<T>() where T : class, IAggregateRoot, IQueryableEntity
-        {
-            return Task.FromResult((IList<T>)FindAll<T>().ToList());
         }
 
         public virtual IQueryable<T> Where<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
@@ -206,7 +233,7 @@ namespace Revo.Testing.Infrastructure.Repositories
                 .Select(x => x.Instance)
                 .OfType<T>();
         }
-
+        
         public enum EntityState
         {
             Added, Unchanged, Modified, Removed

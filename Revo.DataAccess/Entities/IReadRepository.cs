@@ -31,9 +31,9 @@ namespace Revo.DataAccess.Entities
         Task<T> FindAsync<T>(CancellationToken cancellationToken, object id) where T : class;
 
         IQueryable<T> FindAll<T>() where T : class;
-        Task<IList<T>> FindAllAsync<T>(CancellationToken cancellationToken = default(CancellationToken)) where T : class;
+        Task<T[]> FindAllAsync<T>(CancellationToken cancellationToken = default(CancellationToken)) where T : class;
         IEnumerable<T> FindAllWithAdded<T>() where T : class;
-
+        
         IQueryable<T> Where<T>(Expression<Func<T, bool>> predicate) where T : class;
         IEnumerable<T> WhereWithAdded<T>(Expression<Func<T, bool>> predicate) where T : class;
         

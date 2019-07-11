@@ -15,9 +15,11 @@ namespace Revo.Infrastructure.Repositories
 
         T Find<T>(Guid id) where T : class, IAggregateRoot;
         Task<T> FindAsync<T>(Guid id) where T : class, IAggregateRoot;
+        Task<T[]> FindManyAsync<T>(params Guid[] ids) where T : class, IAggregateRoot;
 
         T Get<T>(Guid id) where T : class, IAggregateRoot;
         Task<T> GetAsync<T>(Guid id) where T : class, IAggregateRoot;
+        Task<T[]> GetManyAsync<T>(params Guid[] ids) where T : class, IAggregateRoot;
 
         IEnumerable<IAggregateRoot> GetTrackedAggregates();
 

@@ -182,9 +182,9 @@ namespace Revo.EFCore.DataAccess.Entities
             }
         }
 
-        public async Task<IList<T>> FindAllAsync<T>(CancellationToken cancellationToken) where T : class
+        public async Task<T[]> FindAllAsync<T>(CancellationToken cancellationToken) where T : class
         {
-            return await FindAll<T>().ToListAsync(cancellationToken);
+            return await FindAll<T>().ToArrayAsync(cancellationToken);
         }
 
         public IEnumerable<T> FindAllWithAdded<T>() where T : class

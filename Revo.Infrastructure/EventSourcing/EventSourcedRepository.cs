@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Revo.Core.Events;
-using Revo.Core.Transactions;
 using Revo.DataAccess.Entities;
 using Revo.Domain.Entities;
 using Revo.Domain.Entities.EventSourcing;
@@ -96,6 +95,16 @@ namespace Revo.Infrastructure.EventSourcing
             return DoFindAsync<TBase>(id, false);
         }
 
+        public async Task<T[]> FindManyAsync<T>(params Guid[] ids) where T : class, TBase
+        {
+            return await DoFindManyAsync<T>(ids, false);
+        }
+
+        public async Task<TBase[]> FindManyAsync(params Guid[] ids)
+        {
+            return await DoFindManyAsync<TBase>(ids, false);
+        }
+
         public T Get<T>(Guid id) where T : class, TBase
         {
             throw new NotImplementedException();
@@ -114,6 +123,16 @@ namespace Revo.Infrastructure.EventSourcing
         public Task<TBase> GetAsync(Guid id)
         {
             return DoFindAsync<TBase>(id, true);
+        }
+
+        public async Task<T[]> GetManyAsync<T>(params Guid[] ids) where T : class, TBase
+        {
+            return await DoFindManyAsync<T>(ids, true);
+        }
+
+        public async Task<TBase[]> GetManyAsync(params Guid[] ids)
+        {
+            return await DoFindManyAsync<TBase>(ids, true);
         }
 
         public IEnumerable<TBase> GetLoadedAggregates()
@@ -254,18 +273,8 @@ namespace Revo.Infrastructure.EventSourcing
             return messages;
         }
 
-        private async Task<T> DoFindAsync<T>(Guid id, bool throwOnError) where T : class, TBase
+        private T CheckAggregate<T>(Guid id, TBase aggregate, bool throwOnError) where T : class, TBase
         {
-            TBase aggregate = FindLoadedAggregate(id);
-            if (aggregate == null)
-            {
-                aggregate = await LoadAggregateAsync(id);
-                if (aggregate != null)
-                {
-                    aggregates.Add(aggregate.Id, aggregate);
-                }
-            }
-
             if (aggregate != null)
             {
                 aggregate = FilterResult(aggregate);
@@ -304,6 +313,67 @@ namespace Revo.Infrastructure.EventSourcing
             }
 
             return typedAggregate;
+        }
+
+        private async Task<T> DoFindAsync<T>(Guid id, bool throwOnError, bool load = true) where T : class, TBase
+        {
+            TBase aggregate = FindLoadedAggregate(id);
+            if (aggregate == null)
+            {
+                aggregate = await LoadAggregateAsync(id);
+                if (aggregate != null)
+                {
+                    aggregates.Add(aggregate.Id, aggregate);
+                }
+            }
+
+            return CheckAggregate<T>(id, aggregate, throwOnError);
+        }
+
+        private async Task<T[]> DoFindManyAsync<T>(Guid[] ids, bool throwOnError) where T : class, TBase
+        {
+            var result = new List<T>();
+            List<Guid> missingIds = null;
+            foreach (Guid id in ids)
+            {
+                TBase aggregate = FindLoadedAggregate(id);
+                if (aggregate != null)
+                {
+                    var typedAggregate = CheckAggregate<T>(id, aggregate, throwOnError);
+                    result.Add(typedAggregate);
+                }
+                else
+                {
+                    if (missingIds == null)
+                    {
+                        missingIds = new List<Guid>();
+                    }
+
+                    missingIds.Add(id);
+                }
+            }
+
+            if (missingIds?.Count > 0)
+            {
+                var loaded = await LoadAggregatesAsync(missingIds.ToArray());
+
+                if (throwOnError)
+                {
+                    var notFoundIds = missingIds.Where(x => !loaded.ContainsKey(x)).ToArray();
+                    if (notFoundIds.Length > 0)
+                    {
+                        throw new EntityNotFoundException($"Aggregate(s) of type {typeof(T)} with ID(s) {string.Join(", ", notFoundIds)} were not found");
+                    }
+                }
+
+                foreach (var aggregatePair in loaded)
+                {
+                    var typedAggregate = CheckAggregate<T>(aggregatePair.Key, aggregatePair.Value, throwOnError);
+                    result.Add(typedAggregate);
+                }
+            }
+
+            return result.ToArray();
         }
 
         private T FilterResult<T>(T result) where T : class
@@ -364,22 +434,39 @@ namespace Revo.Infrastructure.EventSourcing
 
         private async Task<TBase> LoadAggregateAsync(Guid aggregateId)
         {
-            IReadOnlyDictionary<string, string> eventStreamMetadata;
-            try
-            {
-                eventStreamMetadata = await eventStore.GetStreamMetadataAsync(aggregateId);
-            }
-            catch (EntityNotFoundException e)
+            IReadOnlyDictionary<string, string> eventStreamMetadata = eventStreamMetadata = await eventStore.FindStreamMetadataAsync(aggregateId);
+            if (eventStreamMetadata == null)
             {
                 return null;
             }
             
-            var eventRecords = await eventStore.GetEventsAsync(aggregateId);
-            int version = (int) (eventRecords.LastOrDefault()?.StreamSequenceNumber ?? 0);
+            IReadOnlyCollection<IEventStoreRecord> eventRecords = await eventStore.FindEventsAsync(aggregateId);
+
+            return ConstructAndLoadEntityFromEvents(aggregateId, eventStreamMetadata,
+                eventRecords?.Count > 0 ? eventRecords : new IEventStoreRecord[0]);
+        }
+
+        private async Task<Dictionary<Guid, TBase>> LoadAggregatesAsync(Guid[] aggregateIds)
+        {
+            IReadOnlyDictionary<Guid, IReadOnlyDictionary<string, string>> eventStreamMetadata = await eventStore.BatchFindStreamMetadataAsync(aggregateIds);
+            IDictionary<Guid, IReadOnlyCollection<IEventStoreRecord>> eventRecords = await eventStore.BatchFindEventsAsync(aggregateIds);
+            return eventStreamMetadata.ToDictionary(x => x.Key,
+                x =>
+                {
+                    eventRecords.TryGetValue(x.Key, out var events);
+                    return ConstructAndLoadEntityFromEvents(x.Key, x.Value,
+                        events?.Count > 0 ? events : new IEventStoreRecord[0]);
+                });
+        }
+
+        private TBase ConstructAndLoadEntityFromEvents(Guid aggregateId, IReadOnlyDictionary<string, string> eventStreamMetadata,
+            IReadOnlyCollection<IEventStoreRecord> eventRecords)
+        {
+            int version = (int)(eventRecords.LastOrDefault()?.StreamSequenceNumber ?? 0);
             var events = eventRecords.Select(x => x.Event as DomainAggregateEvent
                                                   ?? throw new InvalidOperationException(
                                                       $"Cannot load event sourced aggregate ID {aggregateId}: event stream contains non-DomainAggregateEvent events of type {x.Event.GetType().FullName}"))
-                                                      .ToList();
+                .ToList();
 
             AggregateState state = new AggregateState(version, events);
 
@@ -391,7 +478,7 @@ namespace Revo.Infrastructure.EventSourcing
             Guid classId = Guid.Parse(classIdString);
             Type entityType = entityTypeManager.GetClassInfoByClassId(classId).ClrType;
 
-            TBase aggregate = (TBase) ConstructEntity(entityType, aggregateId);
+            TBase aggregate = (TBase)ConstructEntity(entityType, aggregateId);
             aggregate.LoadState(state);
 
             return aggregate;

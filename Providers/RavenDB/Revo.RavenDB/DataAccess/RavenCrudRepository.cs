@@ -116,9 +116,10 @@ namespace Revo.RavenDB.DataAccess
             return asyncDocumentSession.Query<T>();
         }
 
-        public async Task<IList<T>> FindAllAsync<T>(CancellationToken cancellationToken) where T : class
+        public async Task<T[]> FindAllAsync<T>(CancellationToken cancellationToken) where T : class
         {
-            return await asyncDocumentSession.Query<T>().ToListAsync(cancellationToken);
+            var result = await asyncDocumentSession.Query<T>().ToListAsync(cancellationToken);
+            return result.ToArray();
         }
 
         public IEnumerable<T> FindAllWithAdded<T>() where T : class

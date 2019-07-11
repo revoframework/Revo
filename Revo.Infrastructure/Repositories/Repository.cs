@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Revo.Core.Events;
 using Revo.Core.Transactions;
 using Revo.DataAccess.Entities;
 using Revo.Domain.Entities;
@@ -110,19 +109,26 @@ namespace Revo.Infrastructure.Repositories
             return aggregate;
         }
 
+        public async Task<T[]> FindManyAsync<T>(params Guid[] ids) where T : class, IAggregateRoot
+        {
+            var aggregateStore = GetAggregateStore<T>();
+            var aggregates = await aggregateStore.FindManyAsync<T>(ids);
+            return aggregates;
+        }
+
         public IQueryable<T> FindAll<T>() where T : class, IAggregateRoot, IQueryableEntity
         {
             var aggregateStore = GetQueyrableAggregateStore<T>();
             return aggregateStore.FindAll<T>();
         }
 
-        public Task<IList<T>> FindAllAsync<T>() where T : class, IAggregateRoot, IQueryableEntity
+        public Task<T[]> FindAllAsync<T>() where T : class, IAggregateRoot, IQueryableEntity
         {
             var aggregateStore = GetQueyrableAggregateStore<T>();
             return aggregateStore.FindAllAsync<T>();
         }
 
-        public Task<IList<T>> FindAllAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
+        public Task<T[]> FindAllAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
         {
             var aggregateStore = GetQueyrableAggregateStore<T>();
             return aggregateStore.FindAllAsync<T>(predicate);
@@ -140,6 +146,13 @@ namespace Revo.Infrastructure.Repositories
             var aggregateStore = GetAggregateStore<T>();
             T aggregate = await aggregateStore.GetAsync<T>(id);
             return aggregate;
+        }
+
+        public async Task<T[]> GetManyAsync<T>(params Guid[] ids) where T : class, IAggregateRoot
+        {
+            var aggregateStore = GetAggregateStore<T>();
+            var aggregates = await aggregateStore.GetManyAsync<T>(ids);
+            return aggregates;
         }
 
         public IAsyncQueryableResolver GetQueryableResolver<T>() where T : class, IAggregateRoot, IQueryableEntity

@@ -49,7 +49,7 @@ namespace Revo.Infrastructure.Tests.EventSourcing
             
             FakeClock.Setup();
 
-            eventStore.GetEventsAsync(entity2Id)
+            eventStore.FindEventsAsync(entity2Id)
                 .Returns(new List<IEventStoreRecord>()
                 {
                     new FakeEventStoreRecord()
@@ -62,14 +62,14 @@ namespace Revo.Infrastructure.Tests.EventSourcing
                     }
                 });
 
-            eventStore.GetStreamMetadataAsync(entity2Id)
+            eventStore.FindStreamMetadataAsync(entity2Id)
                 .Returns(new Dictionary<string, string>()
                 {
                     { "TestKey", "TestValue" },
                     { AggregateEventStreamMetadataNames.ClassId, entity2ClassId.ToString() }
                 });
 
-            eventStore.GetStreamMetadataAsync(entity3Id)
+            eventStore.FindStreamMetadataAsync(entity3Id)
                 .Returns(new Dictionary<string, string>()
                 {
                     { "TestKey", "TestValue" },
@@ -141,8 +141,8 @@ namespace Revo.Infrastructure.Tests.EventSourcing
         public async Task FindAsync_ReturnsNullIfNotFound()
         {
             Guid nonexistentId = Guid.Parse("E9C6FCB7-A832-4534-921D-843B6E910CBD");
-            eventStore.GetEventsAsync(nonexistentId).Throws(new EntityNotFoundException());
-            eventStore.GetStreamMetadataAsync(nonexistentId).Throws(new EntityNotFoundException());
+            eventStore.FindEventsAsync(nonexistentId).Returns(new List<IEventStoreRecord>());
+            eventStore.FindStreamMetadataAsync(nonexistentId).Returns((IReadOnlyDictionary<string, string>) null);
 
             var result = await sut.FindAsync(nonexistentId);
             result.Should().BeNull();
@@ -187,7 +187,7 @@ namespace Revo.Infrastructure.Tests.EventSourcing
         [Fact]
         public async Task GetAsync_ThrowsIfDeleted()
         {
-            eventStore.GetEventsAsync(entity3Id)
+            eventStore.FindEventsAsync(entity3Id)
                 .Returns(new List<IEventStoreRecord>()
                 {
                     new FakeEventStoreRecord()
@@ -222,8 +222,8 @@ namespace Revo.Infrastructure.Tests.EventSourcing
         public async Task GetAsync_ThrowsIfNotFound()
         {
             Guid nonexistentId = Guid.Parse("E9C6FCB7-A832-4534-921D-843B6E910CBD");
-            eventStore.GetEventsAsync(nonexistentId).Throws(new EntityNotFoundException());
-            eventStore.GetStreamMetadataAsync(nonexistentId).Throws(new EntityNotFoundException());
+            eventStore.FindEventsAsync(nonexistentId).Throws(new EntityNotFoundException());
+            eventStore.FindStreamMetadataAsync(nonexistentId).Throws(new EntityNotFoundException());
             
             await Assert.ThrowsAsync<EntityNotFoundException>(async () =>
             {

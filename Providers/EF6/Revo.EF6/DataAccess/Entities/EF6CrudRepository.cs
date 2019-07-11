@@ -8,7 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Revo.Core.Transactions;
 using Revo.DataAccess.Entities;
-using Revo.EF6.DataAccess.Model;
 using EntityState = System.Data.Entity.EntityState;
 
 namespace Revo.EF6.DataAccess.Entities
@@ -168,9 +167,9 @@ namespace Revo.EF6.DataAccess.Entities
             return FilterResults(DatabaseAccess.GetDbContext(typeof(T)).Set<T>());
         }
         
-        public async Task<IList<T>> FindAllAsync<T>(CancellationToken cancellationToken) where T : class
+        public async Task<T[]> FindAllAsync<T>(CancellationToken cancellationToken) where T : class
         {
-            return await FilterResults(DatabaseAccess.GetDbContext(typeof(T)).Set<T>()).ToListAsync(cancellationToken);
+            return await FilterResults(DatabaseAccess.GetDbContext(typeof(T)).Set<T>()).ToArrayAsync(cancellationToken);
         }
 
         public IEnumerable<T> FindAllWithAdded<T>() where T : class

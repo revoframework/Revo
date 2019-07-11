@@ -64,6 +64,19 @@ namespace Revo.Infrastructure.Tests.Repositories
             var foundEntity = await sut.GetAsync<MyEntity1>(entity.Id);
             Assert.Equal(entity, foundEntity);
         }
+
+        [Fact]
+        public async Task GetManyAsync_FindsCorrectEntities()
+        {
+            var entity1 = new MyEntity1();
+            var entity2 = new MyEntity1();
+            aggregateStore1.GetManyAsync<MyEntity1>(
+                    Arg.Is<Guid[]>(x => x.Length == 2 && x.Contains(entity1.Id) && x.Contains(entity2.Id)))
+                .Returns(new[] {entity1, entity2});
+
+            var result = await sut.GetManyAsync<MyEntity1>(entity1.Id, entity2.Id);
+            result.Should().BeEquivalentTo(entity1, entity2);
+        }
         
         [Fact]
         public async Task Constructor_AddsSaveTransactionToUoW()

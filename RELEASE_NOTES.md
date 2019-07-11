@@ -1,5 +1,13 @@
 # RELEASE NOTES
 
+## [1.11.0] - 2019-??-??
+
+### Added
+- IRepository.FindManyAsync and GetManyAsync with optimized batch-loading of event sourced aggregates
+
+### Changed
+- IRepository.FindAllAsync now returns an array instead of IList<T>
+
 ## [1.10.0] - 2019-06-03
 
 ### Added

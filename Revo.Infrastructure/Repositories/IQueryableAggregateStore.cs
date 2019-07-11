@@ -16,8 +16,8 @@ namespace Revo.Infrastructure.Repositories
         Task<T> FirstAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity;
 
         IQueryable<T> FindAll<T>() where T : class, IAggregateRoot, IQueryableEntity;
-        Task<IList<T>> FindAllAsync<T>() where T : class, IAggregateRoot, IQueryableEntity;
-        Task<IList<T>> FindAllAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity;
+        Task<T[]> FindAllAsync<T>() where T : class, IAggregateRoot, IQueryableEntity;
+        Task<T[]> FindAllAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity;
         IAsyncQueryableResolver GetQueryableResolver<T>() where T : class, IAggregateRoot, IQueryableEntity;
 
         IQueryable<T> Where<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity;

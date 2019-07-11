@@ -62,6 +62,17 @@ namespace Revo.Infrastructure.Tests.Repositories
         }
 
         [Fact]
+        public async Task GetManyAsync_FindsCorrectEntities()
+        {
+            var entity1 = new TestAggregate(Guid.NewGuid());
+            var entity2 = new TestAggregate(Guid.NewGuid());
+            crudRepository.AttachRange(new[] { entity1, entity2 });
+
+            var result = await sut.GetManyAsync<TestAggregate>(entity1.Id, entity2.Id);
+            result.Should().BeEquivalentTo(entity1, entity2);
+        }
+
+        [Fact]
         public async Task SaveChanges_InjectsClassIds()
         {
             TestAggregate testAggregate = new TestAggregate(Guid.NewGuid());

@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using MoreLinq;
 using Revo.Core.Core;
 using Revo.Core.Types;
 using Revo.DataAccess.Entities;
@@ -38,28 +39,38 @@ namespace Revo.Infrastructure.EventStores.Generic
 
         public async Task<EventStreamInfo> GetStreamInfoAsync(Guid streamId)
         {
-            var lastRow = await QueryStreamRows(streamId, true).FirstOrDefaultAsync(crudRepository);
+            var lastRow = await QueryStreamRows(true, streamId).FirstOrDefaultAsync(crudRepository);
             if (lastRow == null)
             {
-                await GetEventStreamAsync(streamId); //verify stream existence
+                await GetEventStreamAsync(streamId, true); //verify stream existence
                 return new EventStreamInfo(streamId, 0, 0);
             }
             else
             {
-                var eventCount = await QueryStreamRows(streamId).LongCountAsync(crudRepository);
+                var eventCount = await QueryStreamRows(false, streamId).LongCountAsync(crudRepository);
                 return new EventStreamInfo(streamId, eventCount, lastRow.StreamSequenceNumber);
             }
         }
 
+        public async Task<IDictionary<Guid, IReadOnlyCollection<IEventStoreRecord>>> BatchFindEventsAsync(Guid[] streamIds)
+        {
+            return await ResolveEventRecordsAsync(QueryStreamRows(false, streamIds), streamIds, false);
+        }
+
         public async Task<IReadOnlyCollection<IEventStoreRecord>> GetEventsAsync(Guid streamId)
         {
-            return await ResolveEventRecordsAsync(QueryStreamRows(streamId), streamId);
+            return await ResolveEventRecordsAsync(QueryStreamRows(false, streamId), streamId, true);
+        }
+
+        public async Task<IReadOnlyCollection<IEventStoreRecord>> FindEventsAsync(Guid streamId)
+        {
+            return await ResolveEventRecordsAsync(QueryStreamRows(false, streamId), streamId, false);
         }
 
         public async Task<IReadOnlyCollection<IEventStoreRecord>> GetEventRangeAsync(Guid streamId, long? minSequenceNumber = null,
             long? maxSequenceNumber = null, int? maxCount = null)
         {
-            var rows = QueryStreamRows(streamId);
+            var rows = QueryStreamRows(false, streamId);
             if (minSequenceNumber != null)
             {
                 rows = rows.Where(x => x.StreamSequenceNumber >= minSequenceNumber.Value);
@@ -75,7 +86,7 @@ namespace Revo.Infrastructure.EventStores.Generic
                 rows = rows.Take(maxCount.Value);
             }
 
-            return await ResolveEventRecordsAsync(rows, streamId);
+            return await ResolveEventRecordsAsync(rows, streamId, true);
         }
 
         public void SetStreamMetadata(Guid streamId, IReadOnlyDictionary<string, string> metadata)
@@ -149,13 +160,26 @@ namespace Revo.Infrastructure.EventStores.Generic
 
         public async Task<IReadOnlyDictionary<string, string>> GetStreamMetadataAsync(Guid streamId)
         {
-            var eventStream = await GetEventStreamAsync(streamId);
+            var eventStream = await GetEventStreamAsync(streamId, true);
             return eventStream.Metadata;
+        }
+
+        public async Task<IReadOnlyDictionary<string, string>> FindStreamMetadataAsync(Guid streamId)
+        {
+            var eventStream = await GetEventStreamAsync(streamId, false);
+            return eventStream?.Metadata;
+        }
+
+        public async Task<IReadOnlyDictionary<Guid, IReadOnlyDictionary<string, string>>> BatchFindStreamMetadataAsync(
+            Guid[] streamIds)
+        {
+            var eventStreams = await GetEventStreamsAsync(streamIds, false);
+            return eventStreams.ToDictionary(x => x.Id, x => x.Metadata);
         }
 
         public async Task<IEventStoreRecord> GetEventAsync(Guid streamId, long sequenceNumber)
         {
-            var row = await QueryStreamRows(streamId)
+            var row = await QueryStreamRows(false, streamId)
                 .Where(x => x.StreamSequenceNumber == sequenceNumber)
                 .FirstOrDefaultAsync(crudRepository);
             if (row == null)
@@ -291,10 +315,9 @@ namespace Revo.Infrastructure.EventStores.Generic
             streams.Clear();
         }
 
-        private IQueryable<EventStreamRow> QueryStreamRows(Guid streamId, bool reverseOrder = false)
+        private IQueryable<EventStreamRow> QueryStreamRows(bool reverseOrder, params Guid[] streamIds)
         {
-            var rows = crudRepository.FindAll<EventStreamRow>()
-                .Where(x => x.StreamId == streamId);
+            var rows = crudRepository.Where<EventStreamRow>(x => streamIds.Contains(x.StreamId));
 
             if (!reverseOrder)
             {
@@ -308,25 +331,58 @@ namespace Revo.Infrastructure.EventStores.Generic
             return rows;
         }
 
-        private async Task<IReadOnlyCollection<IEventStoreRecord>> ResolveEventRecordsAsync(IQueryable<EventStreamRow> rows, Guid streamId)
+        private async Task<IReadOnlyCollection<IEventStoreRecord>> ResolveEventRecordsAsync(IQueryable<EventStreamRow> rows, Guid streamId, bool throwOnStreamEmpty)
         {
             var rowList = await rows.ToListAsync(crudRepository);
 
-            if (rowList.Count == 0
-                && await crudRepository.FindAsync<EventStream>(streamId) == null)
+            if (throwOnStreamEmpty)
             {
-                throw new EntityNotFoundException($"No events found for stream ID {streamId}");
+                if (rowList.Count == 0
+                    && await crudRepository.FindAsync<EventStream>(streamId) == null)
+                {
+                    throw new EntityNotFoundException($"No events found for stream ID {streamId}");
+                }
             }
 
             return rowList.Select(SelectEventRecordFromRow).ToList();
         }
 
-        private async Task<EventStream> GetEventStreamAsync(Guid streamId)
+        private async Task<Dictionary<Guid, IReadOnlyCollection<IEventStoreRecord>>> ResolveEventRecordsAsync(IQueryable<EventStreamRow> rows, Guid[] streamIds, bool throwOnStreamEmpty)
+        {
+            var rowList = await rows.ToListAsync(crudRepository);
+
+            var streamEvents = rowList.GroupBy(x => x.StreamId)
+                .ToDictionary(x => x.Key,
+                    x => (IReadOnlyCollection<IEventStoreRecord>) x.Select(SelectEventRecordFromRow).ToList());
+
+            if (throwOnStreamEmpty)
+            {
+                foreach (var streamPair in streamEvents)
+                {
+                    if (streamPair.Value.Count == 0
+                        && await crudRepository.FindAsync<EventStream>(streamPair.Key) == null)
+                    {
+                        throw new EntityNotFoundException($"No events found for stream ID {streamPair.Key}");
+                    }
+                }
+            }
+
+            return streamEvents;
+        }
+
+        private async Task<EventStream> GetEventStreamAsync(Guid streamId, bool throwOnNotFound)
         {
             EventStream eventStream = await crudRepository.FindAsync<EventStream>(streamId);
             if (eventStream == null)
             {
-                throw new EntityNotFoundException($"Event stream with ID {streamId} not found");
+                if (throwOnNotFound)
+                {
+                    throw new EntityNotFoundException($"Event stream with ID {streamId} not found");
+                }
+                else
+                {
+                    return null;
+                }
             }
 
             if (streams.TryGetValue(streamId, out StreamBuffer streamBuffer))
@@ -344,6 +400,60 @@ namespace Revo.Infrastructure.EventStores.Generic
             return eventStream;
         }
 
+        private async Task<List<EventStream>> GetEventStreamsAsync(Guid[] streamIds, bool throwOnNotFound)
+        {
+            var result = new List<EventStream>();
+
+            StreamBuffer streamBuffer;
+            List<Guid> missingStreamIds = null;
+            foreach (Guid streamId in streamIds)
+            {
+                if (streams.TryGetValue(streamId, out streamBuffer)
+                    && streamBuffer.EventStream != null)
+                {
+                    result.Add(streamBuffer.EventStream);
+                }
+                else
+                {
+                    if (missingStreamIds == null)
+                    {
+                        missingStreamIds = new List<Guid>();
+                    }
+
+                    missingStreamIds.Add(streamId);
+                }
+            }
+
+            if (missingStreamIds?.Count > 0)
+            {
+                EventStream[] loadedEventStreams = await crudRepository.Where<EventStream>(x => missingStreamIds.Contains(x.Id)).ToArrayAsync(crudRepository);
+                if (throwOnNotFound)
+                {
+                    var notFoundIds = missingStreamIds.Where(x => !loadedEventStreams.Any(y => y.Id == x)).ToArray();
+                    if (notFoundIds.Length > 0)
+                    {
+                        throw new EntityNotFoundException($"Event stream(s) with ID(s) {string.Join(", ", notFoundIds)} not found");
+                    }
+                }
+
+                foreach (var eventStream in loadedEventStreams)
+                {
+                    if (streams.TryGetValue(eventStream.Id, out streamBuffer))
+                    {
+                        streamBuffer.EventStream = eventStream;
+                    }
+                    else
+                    {
+                        streams[eventStream.Id] = new StreamBuffer() { EventStream = eventStream };
+                    }
+                }
+
+                result.AddRange(loadedEventStreams);
+            }
+            
+            return result;
+        }
+
         private IEventStoreRecord SelectEventRecordFromRow(EventStreamRow row)
         {
             return new EventStoreRecordAdapter(row, eventSerializer);
@@ -357,7 +467,7 @@ namespace Revo.Infrastructure.EventStores.Generic
                 return streamBuffer.StreamVersion.Value;
             }
 
-            var lastRow = await QueryStreamRows(streamId, true).FirstOrDefaultAsync(crudRepository);
+            var lastRow = await QueryStreamRows(true, streamId).FirstOrDefaultAsync(crudRepository);
             if (lastRow != null)
             {
                 return lastRow.StreamSequenceNumber;

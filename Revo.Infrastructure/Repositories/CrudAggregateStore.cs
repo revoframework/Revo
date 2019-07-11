@@ -80,14 +80,19 @@ namespace Revo.Infrastructure.Repositories
             return crudRepository.FindAll<T>();
         }
 
-        public Task<IList<T>> FindAllAsync<T>() where T : class, IAggregateRoot, IQueryableEntity
+        public Task<T[]> FindAllAsync<T>() where T : class, IAggregateRoot, IQueryableEntity
         {
             return crudRepository.FindAllAsync<T>();
         }
 
-        public async Task<IList<T>> FindAllAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
+        public async Task<T[]> FindAllAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
         {
-            return await crudRepository.Where<T>(predicate).ToListAsync(crudRepository);
+            return await crudRepository.Where<T>(predicate).ToArrayAsync(crudRepository);
+        }
+
+        public async Task<T[]> FindManyAsync<T>(params Guid[] ids) where T : class, IAggregateRoot
+        {
+            return await crudRepository.Where<T>(x => ids.Contains(x.Id)).ToArrayAsync(crudRepository);
         }
 
         public T Get<T>(Guid id) where T : class, IAggregateRoot
@@ -98,6 +103,20 @@ namespace Revo.Infrastructure.Repositories
         public Task<T> GetAsync<T>(Guid id) where T : class, IAggregateRoot
         {
             return crudRepository.GetAsync<T>(id);
+        }
+
+        public async Task<T[]> GetManyAsync<T>(params Guid[] ids) where T : class, IAggregateRoot
+        {
+            var result = await crudRepository.Where<T>(x => ids.Contains(x.Id)).ToArrayAsync(crudRepository);
+            foreach (Guid id in ids)
+            {
+                if (!result.Any(x => x.Id == id))
+                {
+                    Revo.DataAccess.Entities.RepositoryHelpers.ThrowIfGetFailed<T>(null, id);
+                }
+            }
+
+            return result;
         }
 
         public IEnumerable<IAggregateRoot> GetTrackedAggregates()
