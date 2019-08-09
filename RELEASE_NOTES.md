@@ -9,6 +9,9 @@
 - IRepository.FindAllAsync now returns an array instead of IList<T>
 - improved StaticClassifierDatabaseInitializer, now also supporting event sourced aggregates
 
+### Fixed
+- EF Core's PrefixConvention now correctly prefixes columns defined in abstract classes annotated with TablePrefixAttribute
+
 ## [1.10.0] - 2019-06-03
 
 ### Added

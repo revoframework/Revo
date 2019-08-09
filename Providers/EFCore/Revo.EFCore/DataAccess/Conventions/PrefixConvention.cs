@@ -53,14 +53,28 @@ namespace Revo.EFCore.DataAccess.Conventions
                     continue;
                 }
 
-                if (columnPrefix?.Length > 0)
+                string propertyNamespacePrefix = namespacePrefix;
+                string propertyColumnPrefix = columnPrefix;
+
+                Type clrDeclaringType = property.PropertyInfo?.DeclaringType
+                    ?? property.FieldInfo?.DeclaringType;
+                TablePrefixAttribute clrTypePrefixAttribute;
+                if (clrDeclaringType != null
+                    && property.DeclaringEntityType.ClrType != clrDeclaringType
+                    && (clrTypePrefixAttribute = GetTablePrefixAttribute(clrDeclaringType)) != null) //this might happen e.g. if clrDeclaringType is abstract but not 
                 {
-                    property.Relational().ColumnName = $"{columnPrefix}_{property.Relational().ColumnName}";
+                    propertyNamespacePrefix = clrTypePrefixAttribute.NamespacePrefix;
+                    propertyColumnPrefix = clrTypePrefixAttribute.ColumnPrefix;
                 }
 
-                if (namespacePrefix?.Length > 0)
+                if (propertyColumnPrefix?.Length > 0)
                 {
-                    property.Relational().ColumnName = $"{namespacePrefix}_{property.Relational().ColumnName}";
+                    property.Relational().ColumnName = $"{propertyColumnPrefix}_{property.Relational().ColumnName}";
+                }
+
+                if (propertyNamespacePrefix?.Length > 0)
+                {
+                    property.Relational().ColumnName = $"{propertyNamespacePrefix}_{property.Relational().ColumnName}";
                 }
             }
         }
@@ -75,6 +89,12 @@ namespace Revo.EFCore.DataAccess.Conventions
                 tablePrefixAttribute = readModelForEntityAttribute.EntityType.GetCustomAttribute<TablePrefixAttribute>();
             }
 
+            return tablePrefixAttribute;
+        }
+
+        private TablePrefixAttribute GetTablePrefixAttribute(Type entityType)
+        {
+            var tablePrefixAttribute = entityType.GetCustomAttribute<TablePrefixAttribute>();
             return tablePrefixAttribute;
         }
     }
