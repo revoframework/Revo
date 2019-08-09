@@ -8,6 +8,7 @@
 ### Changed
 - IRepository.FindAllAsync now returns an array instead of IList<T>
 - improved StaticClassifierDatabaseInitializer, now also supporting event sourced aggregates
+- Cake script now uses VS2019 build toolset
 
 ### Fixed
 - EF Core's PrefixConvention now correctly prefixes columns defined in abstract classes annotated with TablePrefixAttribute

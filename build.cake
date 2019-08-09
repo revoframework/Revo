@@ -78,7 +78,7 @@ Task("Clean")
       var msbuildSettings = new MSBuildSettings
         {
           Verbosity = Verbosity.Minimal,
-          ToolVersion = MSBuildToolVersion.VS2017,
+          ToolVersion = MSBuildToolVersion.VS2019,
           Configuration = Configuration,
           PlatformTarget = PlatformTarget.MSIL,
           ArgumentCustomization = args => args
@@ -115,7 +115,7 @@ Task("Build")
         new MSBuildSettings
         {
           Verbosity = Verbosity.Minimal,
-          ToolVersion = MSBuildToolVersion.VS2017,
+          ToolVersion = MSBuildToolVersion.VS2019,
           Configuration = Configuration,
           PlatformTarget = PlatformTarget.MSIL,
           ArgumentCustomization = args => args
