@@ -92,6 +92,8 @@ function GetProxyEnabledWebClient
 
 Write-Host "Preparing to run build script..."
 
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
 if(!$PSScriptRoot){
     $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent
 }
