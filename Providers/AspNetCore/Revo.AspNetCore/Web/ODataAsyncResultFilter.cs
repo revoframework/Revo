@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
-using System.Net.Http;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNet.OData;
-using Microsoft.AspNet.OData.Builder;
 using Microsoft.AspNet.OData.Extensions;
 using Microsoft.AspNet.OData.Query;
 using Microsoft.AspNetCore.Http;
@@ -118,9 +114,9 @@ namespace Revo.AspNetCore.Web
                 ODataQueryOptions<T> queryOptions, CancellationToken cancellationToken)
             {
                 var filtered = queryable.ApplyOptions(queryOptions);
-                var list = filtered is IAsyncEnumerable<T> asyncEnumerable
-                    ? await asyncEnumerable.ToList(cancellationToken)
-                    : filtered.ToList();
+                var list = /*filtered is IAsyncEnumerable<T> asyncEnumerable
+                    ? await asyncEnumerable.WithCancellation(cancellationToken).ToList()
+                    :*/ filtered.ToList();
                 
                 return new ODataResult<T>(list);
             }
@@ -129,15 +125,15 @@ namespace Revo.AspNetCore.Web
                 ODataQueryOptions<T> queryOptions, CancellationToken cancellationToken)
             {
                 var filtered = queryable.ApplyOptions(queryOptions);
-                var list = filtered is IAsyncEnumerable<T> asyncFiltered
-                    ? await asyncFiltered.ToList(cancellationToken)
-                    : filtered.ToList();
+                var list = /*filtered is IAsyncEnumerable<T> asyncFiltered
+                    ? await asyncFiltered.WithCancellation(cancellationToken).ToList()
+                    :*/ filtered.ToList();
 
                 var filteredUnranged = ((IQueryable<T>) queryOptions
                     .ApplyTo(queryable, AllowedQueryOptions.Skip | AllowedQueryOptions.Top));
-                long count = filteredUnranged is IAsyncEnumerable<T> asyncCounted
-                    ? await asyncCounted.LongCount(cancellationToken)
-                    : filteredUnranged.LongCount();
+                long count = /*filteredUnranged is IAsyncEnumerable<T> asyncCounted
+                    ? await asyncCounted.WithCancellation(cancellationToken).LongCount()
+                    :*/ filteredUnranged.LongCount();
 
                 return new ODataResultWithCount<T>(list, count);
             }

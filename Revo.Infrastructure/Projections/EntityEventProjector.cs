@@ -49,7 +49,7 @@ namespace Revo.Infrastructure.Projections
 
             try
             {
-                await ApplyEvents(events);
+                await ApplyEventsAsync(events);
             }
             finally
             {
@@ -73,7 +73,7 @@ namespace Revo.Infrastructure.Projections
             publishedEvents.Add(ev);
         }
 
-        protected async Task ExecuteHandler<T>(T evt) where T : IEventMessage<DomainAggregateEvent>
+        protected async Task ExecuteHandlerAsync<T>(T evt) where T : IEventMessage<DomainAggregateEvent>
         {
             IReadOnlyCollection<Func<IEventMessage<DomainAggregateEvent>, Task>> handlers;
             if (applyHandlers.Value.TryGetValue(evt.Event.GetType(), out handlers))
@@ -85,11 +85,11 @@ namespace Revo.Infrastructure.Projections
             }
         }
 
-        protected virtual async Task ApplyEvents(IEnumerable<IEventMessage<DomainAggregateEvent>> events)
+        protected virtual async Task ApplyEventsAsync(IReadOnlyCollection<IEventMessage<DomainAggregateEvent>> events)
         {
             foreach (IEventMessage<DomainAggregateEvent> ev in events)
             {
-                await ExecuteHandler(ev);
+                await ExecuteHandlerAsync(ev);
             }
         }
 

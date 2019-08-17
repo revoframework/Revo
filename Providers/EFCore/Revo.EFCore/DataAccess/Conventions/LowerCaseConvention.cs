@@ -12,26 +12,26 @@ namespace Revo.EFCore.DataAccess.Conventions
         {
             foreach (var entity in modelBuilder.Model.GetEntityTypes())
             {
-                entity.Relational().TableName = entity.Relational().TableName.ToLowerInvariant();
+                entity.SetTableName(entity.GetTableName().ToLowerInvariant());
                 
                 foreach (var property in entity.GetProperties())
                 {
-                    property.Relational().ColumnName = property.Relational().ColumnName.ToLowerInvariant();
+                    property.SetColumnName(property.GetColumnName().ToLowerInvariant());
                 }
 
                 foreach (var key in entity.GetKeys())
                 {
-                    key.Relational().Name = key.Relational().Name.ToLowerInvariant();
+                    key.SetName(key.GetName().ToLowerInvariant());
                 }
 
                 foreach (var key in entity.GetForeignKeys())
                 {
-                    key.Relational().Name = key.Relational().Name.ToLowerInvariant();
+                    key.SetConstraintName(key.GetConstraintName().ToLowerInvariant());
                 }
 
                 foreach (var index in entity.GetIndexes())
                 {
-                    index.Relational().Name = index.Relational().Name.ToLowerInvariant();
+                    index.SetName(index.GetName().ToLowerInvariant());
                 }
             }
         }

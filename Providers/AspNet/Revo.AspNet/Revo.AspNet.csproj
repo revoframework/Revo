@@ -49,6 +49,7 @@ ASP.NET platform integration package (user context, authentication using Identit
     <PackageReference Include="Owin" Version="1.0" />
     <PackageReference Include="RazorEngine" Version="3.10.0" />
     <PackageReference Include="WebActivatorEx" Version="2.2.0" />
+    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19367-01" />
   </ItemGroup>
   
   <ItemGroup>

@@ -37,7 +37,7 @@ namespace Revo.AspNetCore.Core
                 });
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
             if (hangfireConfigurationSection.UseDashboard)
             {

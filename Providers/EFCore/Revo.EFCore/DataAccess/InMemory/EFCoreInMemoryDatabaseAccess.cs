@@ -17,12 +17,12 @@ namespace Revo.EFCore.DataAccess.InMemory
         {
         }
 
-        public IQueryable<T> FromSql<T>(FormattableString sql) where T : class
+        public IQueryable<T> FromSqlInterpolated<T>(FormattableString sql) where T : class
         {
             throw new NotImplementedException();
         }
 
-        public IQueryable<T> FromSql<T>(RawSqlString sql, params object[] parameters) where T : class
+        public IQueryable<T> FromSqlRaw<T>(string sql, params object[] parameters) where T : class
         {
             throw new NotImplementedException();
         }

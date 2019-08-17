@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 
@@ -30,26 +29,18 @@ namespace Revo.EFCore.DataAccess.Entities
         {
         }
 
-        public IQueryable<T> FromSql<T>([NotParameterized] FormattableString sql)
+        public IQueryable<T> FromSqlInterpolated<T>([NotParameterized] FormattableString sql)
             where T : class
         {
             var dbContext = GetDbContext(typeof(T));
-            var entityType = dbContext.Model.FindEntityType(typeof(T));
-            if (entityType == null || entityType.IsQueryType)
-            {
-                return GetDbContext(typeof(T)).Query<T>().FromSql(sql);
-            }
-            else
-            {
-                return GetDbContext(typeof(T)).Set<T>().FromSql(sql);
-            }
+            return GetDbContext(typeof(T)).Set<T>().FromSqlInterpolated(sql);
         }
 
-        public IQueryable<T> FromSql<T>([NotParameterized] RawSqlString sql,
+        public IQueryable<T> FromSqlRaw<T>([NotParameterized] string sql,
             params object[] parameters)
             where T : class
         {
-            return GetDbContext(typeof(T)).Set<T>().FromSql(sql, parameters);
+            return GetDbContext(typeof(T)).Set<T>().FromSqlRaw(sql, parameters);
         }
 
         public DbContext GetDbContext(string schemaSpace)

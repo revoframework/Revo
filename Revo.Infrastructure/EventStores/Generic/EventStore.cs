@@ -198,7 +198,7 @@ namespace Revo.Infrastructure.EventStores.Generic
             {
                 await crudRepository.SaveChangesAsync();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 await DoOnCommitFailedAsync();
                 throw;

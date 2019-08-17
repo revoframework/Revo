@@ -2,7 +2,6 @@
 using Revo.Core.Commands;
 using Revo.Core.Core;
 using Revo.Core.Lifecycle;
-using Revo.DataAccess.Entities;
 using Revo.Infrastructure.Security.Commands;
 
 namespace Revo.Infrastructure.Security

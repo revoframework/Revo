@@ -5,7 +5,6 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using Revo.DataAccess.Entities;
 using EntityState = Revo.DataAccess.Entities.EntityState;
 
@@ -171,15 +170,7 @@ namespace Revo.EFCore.DataAccess.Entities
         public IQueryable<T> FindAll<T>() where T : class
         {
             var dbContext = DatabaseAccess.GetDbContext(typeof(T));
-            var entityType = dbContext.Model.FindEntityType(typeof(T));
-            if (entityType == null || entityType.IsQueryType)
-            {
-                return FilterResults(dbContext.Query<T>());
-            }
-            else
-            {
-                return FilterResults(dbContext.Set<T>());
-            }
+            return FilterResults(dbContext.Set<T>());
         }
 
         public async Task<T[]> FindAllAsync<T>(CancellationToken cancellationToken) where T : class

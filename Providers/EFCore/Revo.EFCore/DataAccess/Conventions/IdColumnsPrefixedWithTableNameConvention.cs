@@ -22,7 +22,7 @@ namespace Revo.EFCore.DataAccess.Conventions
                 {
                     if (property.IsPrimaryKey() && property.Name == "Id")
                     {
-                        property.Relational().ColumnName = $"{entity.ClrType.Name}Id";
+                        property.SetColumnName($"{entity.ClrType.Name}Id");
                     }
                 }
             }

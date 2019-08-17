@@ -40,8 +40,8 @@ namespace Revo.EFCore.Domain
                     entityBuilder.HasOne(originalEntity.ClrType).WithOne().HasForeignKey(entity.ClrType, "Id");
                     entity.FindPrimaryKey().Relational().Name = originalEntity.FindPrimaryKey().Relational().Name;*/
 
-                    entity.Relational().TableName = configurationSection.ReadModelTablePrefix + originalEntity.Relational().TableName + configurationSection.ReadModelTableSuffix;
-                    entity.FindProperty("Id").Relational().ColumnName = originalEntity.FindProperty("Id").Relational().ColumnName;
+                    entity.SetTableName(configurationSection.ReadModelTablePrefix + originalEntity.GetTableName() + configurationSection.ReadModelTableSuffix);
+                    entity.FindProperty("Id").SetColumnName(originalEntity.FindProperty("Id").GetColumnName());
                 }
             }
         }

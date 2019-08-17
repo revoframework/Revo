@@ -20,8 +20,8 @@ namespace Revo.EFCore.DataAccess.Conventions
             {
                 var tablePrefixAttribute = GetTablePrefixAttribute(entity);
                 string tableName = tablePrefixAttribute?.NamespacePrefix?.Length > 0
-                    ? $"{tablePrefixAttribute.NamespacePrefix}_{entity.Relational().TableName}"
-                    : entity.Relational().TableName;
+                    ? $"{tablePrefixAttribute.NamespacePrefix}_{entity.GetTableName()}"
+                    : entity.GetTableName();
 
                 PrefixEntitiesRecursive(entity, tablePrefixAttribute, tableName);
             }
@@ -29,7 +29,7 @@ namespace Revo.EFCore.DataAccess.Conventions
 
         private void PrefixEntitiesRecursive(IMutableEntityType entity, TablePrefixAttribute entityPrefixAttribute, string tableName)
         {
-            entity.Relational().TableName = tableName;
+            entity.SetTableName(tableName);
             PrefixColumnNames(entity, entityPrefixAttribute?.NamespacePrefix, entityPrefixAttribute?.ColumnPrefix);
 
             foreach (var child in entity.GetDerivedTypes())
@@ -69,12 +69,12 @@ namespace Revo.EFCore.DataAccess.Conventions
 
                 if (propertyColumnPrefix?.Length > 0)
                 {
-                    property.Relational().ColumnName = $"{propertyColumnPrefix}_{property.Relational().ColumnName}";
+                    property.SetColumnName($"{propertyColumnPrefix}_{property.GetColumnName()}");
                 }
 
                 if (propertyNamespacePrefix?.Length > 0)
                 {
-                    property.Relational().ColumnName = $"{propertyNamespacePrefix}_{property.Relational().ColumnName}";
+                    property.SetColumnName($"{propertyNamespacePrefix}_{property.GetColumnName()}");
                 }
             }
         }

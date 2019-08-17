@@ -15,22 +15,22 @@ namespace Revo.EFCore.DataAccess.Conventions
             {
                 foreach (var property in entity.GetProperties())
                 {
-                    property.Relational().ColumnName = ToSnakeCase(property.Relational().ColumnName);
+                    property.SetColumnName(ToSnakeCase(property.GetColumnName()));
                 }
 
                 foreach (var key in entity.GetKeys())
                 {
-                    key.Relational().Name = ToSnakeCase(key.Relational().Name);
+                    key.SetName(ToSnakeCase(key.GetName()));
                 }
 
                 foreach (var key in entity.GetForeignKeys())
                 {
-                    key.Relational().Name = ToSnakeCase(key.Relational().Name);
+                    key.SetConstraintName(ToSnakeCase(key.GetConstraintName()));
                 }
 
                 foreach (var index in entity.GetIndexes())
                 {
-                    index.Relational().Name = ToSnakeCase(index.Relational().Name);
+                    index.SetName(ToSnakeCase(index.GetName()));
                 }
             }
         }

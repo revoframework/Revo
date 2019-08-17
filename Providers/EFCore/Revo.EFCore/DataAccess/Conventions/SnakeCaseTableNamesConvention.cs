@@ -14,7 +14,7 @@ namespace Revo.EFCore.DataAccess.Conventions
         {
             foreach (var entity in modelBuilder.Model.GetEntityTypes())
             {
-                entity.Relational().TableName = ToSnakeCase(entity.Relational().TableName);
+                entity.SetTableName(ToSnakeCase(entity.GetTableName()));
             }
         }
 
