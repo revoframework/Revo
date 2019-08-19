@@ -46,7 +46,7 @@ namespace Revo.Examples.Todos
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseMvcWithDefaultRoute();
+            app.UseRouting();
 
             app.UseMvc(rb =>
             {

@@ -29,7 +29,11 @@ namespace Revo.EFCore.DataAccess.Conventions
 
         private void PrefixEntitiesRecursive(IMutableEntityType entity, TablePrefixAttribute entityPrefixAttribute, string tableName)
         {
-            entity.SetTableName(tableName);
+            if (entity.BaseType == null)
+            {
+                entity.SetTableName(tableName);
+            }
+
             PrefixColumnNames(entity, entityPrefixAttribute?.NamespacePrefix, entityPrefixAttribute?.ColumnPrefix);
 
             foreach (var child in entity.GetDerivedTypes())

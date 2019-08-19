@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Linq;
+using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Revo.EFCore.DataAccess.Conventions
@@ -12,7 +13,7 @@ namespace Revo.EFCore.DataAccess.Conventions
 
         public override void Finalize(ModelBuilder modelBuilder)
         {
-            foreach (var entity in modelBuilder.Model.GetEntityTypes())
+            foreach (var entity in modelBuilder.Model.GetEntityTypes().Where(x => x.BaseType == null))
             {
                 entity.SetTableName(ToSnakeCase(entity.GetTableName()));
             }

@@ -10,8 +10,6 @@ Entity Framework 6 (EF6) data access and infrastructure services.</Description>
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="DelegateDecompiler" Version="0.24.0" />
-    <PackageReference Include="DelegateDecompiler.EntityFramework" Version="0.24.0" />
     <PackageReference Include="EntityFramework" Version="6.2.0" />
   </ItemGroup>
   

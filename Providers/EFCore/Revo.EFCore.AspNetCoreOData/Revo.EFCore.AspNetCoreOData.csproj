@@ -18,6 +18,12 @@ Entity Framework Core (EF Core) IQueryable converters for async ASP.NET Core ODa
     <ProjectReference Include="..\Revo.EFCore\Revo.EFCore.csproj" />
   </ItemGroup>
   
+  <ItemGroup>
+    <Reference Include="Microsoft.AspNetCore.OData">
+      <HintPath>..\..\..\..\vendor\OData-WebApi\bin\Debug\netcoreapp3.0\Microsoft.AspNetCore.OData.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  
   <Target Name="WorkaroundNetStandard" AfterTargets="ResolvePackageAssets">
     <ItemGroup>
       <TransitiveFrameworkReference Remove="NETStandard.Library" />

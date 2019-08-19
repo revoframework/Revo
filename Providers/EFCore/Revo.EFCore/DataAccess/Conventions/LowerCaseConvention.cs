@@ -12,7 +12,10 @@ namespace Revo.EFCore.DataAccess.Conventions
         {
             foreach (var entity in modelBuilder.Model.GetEntityTypes())
             {
-                entity.SetTableName(entity.GetTableName().ToLowerInvariant());
+                if (entity.BaseType == null)
+                {
+                    entity.SetTableName(entity.GetTableName().ToLowerInvariant());
+                }
                 
                 foreach (var property in entity.GetProperties())
                 {
