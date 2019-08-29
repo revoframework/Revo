@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Revo.Core.Core;
 using Revo.Core.Events;
 using Revo.DataAccess.Entities;
 using Revo.Infrastructure.Events;
@@ -33,9 +32,13 @@ namespace Revo.Infrastructure.Tests.EventSourcing
         private Guid entityId = Guid.NewGuid();
         private Guid entity2Id = Guid.NewGuid();
         private Guid entity3Id = Guid.NewGuid();
+        private Guid entity4Id = Guid.NewGuid();
         private Guid entityClassId = Guid.NewGuid();
         private Guid entity2ClassId = Guid.NewGuid();
         private Guid entity3ClassId = Guid.NewGuid();
+
+        private Dictionary<Guid, IReadOnlyDictionary<string, string>> entityMetadata;
+        private Dictionary<Guid, IReadOnlyCollection<IEventStoreRecord>> entityEvents;
 
         private EventSourcedAggregateRepository sut;
 
@@ -49,31 +52,121 @@ namespace Revo.Infrastructure.Tests.EventSourcing
             
             FakeClock.Setup();
 
-            eventStore.FindEventsAsync(entity2Id)
-                .Returns(new List<IEventStoreRecord>()
+            entityEvents = new Dictionary<Guid, IReadOnlyCollection<IEventStoreRecord>>()
+            {
                 {
-                    new FakeEventStoreRecord()
+                    entity2Id,
+                    new List<IEventStoreRecord>()
                     {
-                        Event = new SetFooEvent()
+                        new FakeEventStoreRecord()
                         {
-                            AggregateId = entity2Id
-                        },
-                        StreamSequenceNumber = 1
+                            Event = new SetFooEvent()
+                            {
+                                AggregateId = entity2Id
+                            },
+                            StreamSequenceNumber = 1
+                        }
                     }
+                },
+                {
+                    entity4Id,
+                    new List<IEventStoreRecord>()
+                    {
+                        new FakeEventStoreRecord()
+                        {
+                            Event = new SetFooEvent()
+                            {
+                                AggregateId = entity4Id
+                            },
+                            StreamSequenceNumber = 1
+                        }
+                    }
+                }
+            };
+
+            eventStore.FindEventsAsync(Arg.Any<Guid>())
+                .Returns(ci =>
+                {
+                    var id = ci.ArgAt<Guid>(0);
+                    if (entityEvents.TryGetValue(id, out var events))
+                    {
+                        return events;
+                    }
+
+                    return new List<IEventStoreRecord>();
                 });
 
-            eventStore.FindStreamMetadataAsync(entity2Id)
-                .Returns(new Dictionary<string, string>()
+
+            eventStore.BatchFindEventsAsync(Arg.Any<Guid[]>())
+                .Returns(ci =>
                 {
-                    { "TestKey", "TestValue" },
-                    { AggregateEventStreamMetadataNames.ClassId, entity2ClassId.ToString() }
+                    var ids = ci.ArgAt<Guid[]>(0);
+                    var result = new Dictionary<Guid, IReadOnlyCollection<IEventStoreRecord>>();
+                    foreach (Guid id in ids)
+                    {
+                        if (entityEvents.TryGetValue(id, out var events))
+                        {
+                            result.Add(id, events);
+                        }
+                    }
+
+                    return result;
                 });
 
-            eventStore.FindStreamMetadataAsync(entity3Id)
-                .Returns(new Dictionary<string, string>()
+            entityMetadata = new Dictionary<Guid, IReadOnlyDictionary<string, string>>()
+            {
                 {
-                    { "TestKey", "TestValue" },
-                    { AggregateEventStreamMetadataNames.ClassId, entity3ClassId.ToString() }
+                    entity2Id,
+                    new Dictionary<string, string>()
+                    {
+                        {"TestKey", "TestValue"},
+                        {AggregateEventStreamMetadataNames.ClassId, entity2ClassId.ToString()}
+                    }
+                },
+                {
+                    entity3Id,
+                    new Dictionary<string, string>()
+                    {
+                        {"TestKey", "TestValue"},
+                        {AggregateEventStreamMetadataNames.ClassId, entity3ClassId.ToString()}
+                    }
+                },
+                {
+                    entity4Id,
+                    new Dictionary<string, string>()
+                    {
+                        {"TestKey", "TestValue"},
+                        {AggregateEventStreamMetadataNames.ClassId, entity2ClassId.ToString()}
+                    }
+                }
+            };
+
+            eventStore.FindStreamMetadataAsync(Arg.Any<Guid>())
+                .Returns(ci =>
+                {
+                    var id = ci.ArgAt<Guid>(0);
+                    if (entityMetadata.TryGetValue(id, out var metadata))
+                    {
+                        return metadata;
+                    }
+
+                    return new Dictionary<string, string>();
+                });
+
+            eventStore.BatchFindStreamMetadataAsync(Arg.Any<Guid[]>())
+                .Returns(ci =>
+                {
+                    var ids = ci.ArgAt<Guid[]>(0);
+                    var result = new Dictionary<Guid, IReadOnlyDictionary<string, string>> ();
+                    foreach (Guid id in ids)
+                    {
+                        if (entityMetadata.TryGetValue(id, out var metadata))
+                        {
+                            result.Add(id, metadata);
+                        }
+                    }
+
+                    return result;
                 });
 
             eventStore.PushEventsAsync(Guid.Empty, null, null).ReturnsForAnyArgs(ci =>
@@ -153,6 +246,26 @@ namespace Revo.Infrastructure.Tests.EventSourcing
         {
             var result = await sut.FindAsync<MyEntity3LoadsAsDeleted>(entity2Id);
             result.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task FindManyAsync_ReturnsOnlyThoseFound()
+        {
+            Guid nonexistentId = Guid.Parse("E9C6FCB7-A832-4534-921D-843B6E910CBD");
+            eventStore.FindEventsAsync(nonexistentId).Returns(new List<IEventStoreRecord>());
+            eventStore.FindStreamMetadataAsync(nonexistentId).Returns((IReadOnlyDictionary<string, string>)null);
+
+            var result = await sut.FindManyAsync(nonexistentId, entity2Id);
+            result.Should().HaveCount(1);
+            result.Should().Contain(x => x.Id == entity2Id);
+        }
+
+        [Fact]
+        public async Task FindManyAsync_ReturnsNullIfDifferentType()
+        {
+            var result = await sut.FindManyAsync<MyEntity2>(entity2Id, entity3Id);
+            result.Should().HaveCount(1);
+            result.Should().Contain(x => x.Id == entity2Id);
         }
 
         [Fact]
@@ -238,6 +351,32 @@ namespace Revo.Infrastructure.Tests.EventSourcing
             {
                 await sut.GetAsync<MyEntity3LoadsAsDeleted>(entity2Id);
             });
+        }
+
+        [Fact]
+        public async Task GetManyAsync_ReturnsCorrectAggregates()
+        {
+            var entities = await sut.GetManyAsync<MyEntity2>(entity2Id, entity4Id);
+
+            entities.Should().HaveCount(2);
+            entities.Should().NotContainNulls();
+            entities.Should().Contain(x => x.Id == entity2Id);
+            entities.Should().Contain(x => x.Id == entity4Id);
+        }
+
+        [Fact]
+        public async Task GetManyAsync_CachesReturnedEntities()
+        {
+            var entities = await sut.GetManyAsync<MyEntity2>(entity2Id, entity4Id);
+            var entities2 = await sut.GetManyAsync<MyEntity2>(entity2Id, entity4Id);
+            entities2.Should().Equal(entities);
+        }
+
+        [Fact]
+        public async Task GetManyAsync_ReturnsCorrectDescendant()
+        {
+            var entities = await sut.GetManyAsync<MyEntity>(entity2Id, entity4Id);
+            entities.Should().AllBeOfType<MyEntity2>();
         }
 
         [Fact]

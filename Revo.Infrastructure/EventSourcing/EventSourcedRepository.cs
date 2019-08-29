@@ -369,7 +369,11 @@ namespace Revo.Infrastructure.EventSourcing
                 foreach (var aggregatePair in loaded)
                 {
                     var typedAggregate = CheckAggregate<T>(aggregatePair.Key, aggregatePair.Value, throwOnError);
-                    result.Add(typedAggregate);
+                    if (typedAggregate != null)
+                    {
+                        result.Add(typedAggregate);
+                        aggregates.Add(aggregatePair.Key, aggregatePair.Value);
+                    }
                 }
             }
 
