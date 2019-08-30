@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using Revo.Core.Core;
 using Revo.Core.Events;
 using Revo.Domain.Events;
 
@@ -27,6 +29,8 @@ namespace Revo.Testing.Infrastructure
                 if (aggregateClassId != null)
                 {
                     message.SetMetadata(BasicEventMetadataNames.AggregateClassId, aggregateClassId.ToString());
+                    message.SetMetadata(BasicEventMetadataNames.StoreDate, Clock.Current.Now.ToString(CultureInfo.InvariantCulture));
+                    message.SetMetadata(BasicEventMetadataNames.PublishDate, Clock.Current.Now.ToString(CultureInfo.InvariantCulture));
                 }
                 return message;
             }).ToList();
