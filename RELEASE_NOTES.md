@@ -1,6 +1,6 @@
 # RELEASE NOTES
 
-## [1.11.0] - 2019-??-??
+## [1.11.0] - 2019-09-03
 
 ### Added
 - IRepository.FindManyAsync and GetManyAsync with optimized batch-loading of event sourced aggregates
