@@ -17,13 +17,13 @@ namespace Revo.Core.Tests.ValueObjects
         }
 
         [Theory]
-        [InlineData()]
+        [InlineData(null)]
         [InlineData("eins", "zwei")]
         [InlineData("eins", "zwei", "drei", "vier")]
         public void Equals_IsFalseForDifferentElements(params string[] yElements)
         {
             IEnumerable<string> x = new[] {"eins", "zwei", "drei"}.ToImmutableHashSet().AsValueObject();
-            IEnumerable<string> y = yElements.ToImmutableHashSet().AsValueObject();
+            IEnumerable<string> y = (yElements ?? new string[0]).ToImmutableHashSet().AsValueObject();
             x.Equals(y).Should().BeFalse();
         }
 
@@ -36,13 +36,13 @@ namespace Revo.Core.Tests.ValueObjects
         }
 
         [Theory]
-        [InlineData()]
+        [InlineData(null)]
         [InlineData("eins", "zwei")]
         [InlineData("eins", "zwei", "drei", "vier")]
         public void GetHashCode_IsFalseForDifferentElements(params string[] yElements)
         {
             IEnumerable<string> x = new[] {"eins", "zwei", "drei"}.ToImmutableHashSet().AsValueObject();
-            IEnumerable<string> y = yElements.ToImmutableHashSet().AsValueObject();
+            IEnumerable<string> y = (yElements ?? new string[0]).ToImmutableHashSet().AsValueObject();
             x.GetHashCode().Should().NotBe(y.GetHashCode());
         }
     }
