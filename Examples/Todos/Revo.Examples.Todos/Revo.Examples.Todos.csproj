@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <PackageReference Include="Hangfire.PostgreSql" Version="1.6.2" />
-	<PackageReference Include="Microsoft.AspNetCore.OData" Version="7.2.1" />
     <PackageReference Include="Npgsql" Version="4.1.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.0.0" />
   </ItemGroup>

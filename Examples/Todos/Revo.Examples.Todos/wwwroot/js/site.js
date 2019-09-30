@@ -1,5 +1,5 @@
 ﻿function newGuid() {
-    return '{xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx}'.replace(/[xy]/g, function (c) {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);
     });
@@ -59,7 +59,7 @@ function reloadTodoLists() {
         function (data) {
             $("#todoLists").empty();
 
-            for (let todoList of data.value) {
+            for (let todoList of data) {
                 let div = $('<div/>')
                     .addClass('todoList')
                     .appendTo($("#todoLists"));
@@ -93,7 +93,12 @@ function reloadTodoLists() {
                     let input = $('<input/>')
                         .prop('type', 'checkbox')
                         .prop('checked', todo.isComplete)
-                        .change(function () { invertTodoChecked(todo); return false; })
+                        .click(function($event) {
+                            invertTodoChecked(todo);
+                            $event.stopPropagation();
+                            $event.preventDefault();
+                        })
+                        .change(function () { invertTodoChecked(todo); })
                         .appendTo(li);
                     let span = $('<span/>')
                         .text(todo.text)
