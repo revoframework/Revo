@@ -8,12 +8,8 @@ namespace Revo.AspNet
     {
         public static void Register(HttpConfiguration config, IRevoConfiguration revoConfiguration)
         {
-            var aspNetConfig = revoConfiguration.GetSection<AspNetConfigurationSection>();
-
-            if (aspNetConfig.UseODataExtensions)
-            {
-                config.Filters.Add(new ODataActionFilterAttribute()); //also applies the OData filters (instead of a global AddODataQueryFilter(...)
-            }
+            //var aspNetConfig = revoConfiguration.GetSection<AspNetConfigurationSection>();
+            //nothing to configure right now (e.g. filters)
         }
     }
 }

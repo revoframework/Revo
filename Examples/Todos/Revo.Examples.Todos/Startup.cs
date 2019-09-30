@@ -10,7 +10,6 @@ using Microsoft.Extensions.Logging;
 using Revo.AspNetCore;
 using Revo.AspNetCore.Configuration;
 using Revo.Core.Configuration;
-using Revo.EFCore.AspNetCoreOData.Configuration;
 using Revo.EFCore.Configuration;
 using Revo.EFCore.DataAccess.Configuration;
 using Revo.EFCore.DataAccess.Conventions;
@@ -76,7 +75,6 @@ namespace Revo.Examples.Todos
                             /*.AddConvention<ShortConstraintNamesEFCoreConvention>(2)*/;
                     })
                 .UseAllEFCoreInfrastructure()
-                .ConfigureEFCoreAspNetCoreOData(cfg => cfg.DisableAsyncQueryableResolution = true)
                 .UseHangfire(new PostgreSqlStorage(connectionString));
         }
     }

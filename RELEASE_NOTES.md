@@ -2,6 +2,12 @@
 
 ## [1.12.0] - 2019-??-??
 
+### Changed
+- upgraded to ASP.NET Core 3.0 and Entity Framework Core 3.0
+
+### Removed
+- dropped OData out-of-the-box integration on ASP.NET & ASP.NET Core platforms altogether (OData is not supported on ASP.NET Core 3.0 now), you have to integrate it by yourself now
+
 ## [1.11.0] - 2019-09-03
 
 ### Added

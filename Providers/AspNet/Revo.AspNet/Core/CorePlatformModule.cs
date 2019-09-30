@@ -2,11 +2,9 @@
 using Ninject.Modules;
 using Revo.AspNet.Core.Lifecycle;
 using Revo.AspNet.IO.Resources;
-using Revo.AspNet.IO.Stache;
 using Revo.AspNet.Web.VirtualPath;
 using Revo.Core.Core;
 using Revo.Core.IO.Resources;
-using Revo.Core.Lifecycle;
 using Revo.Core.Types;
 using Revo.Hangfire;
 
@@ -31,11 +29,7 @@ namespace Revo.AspNet.Core
             Bind<VirtualPathProvider>()
                 .ToMethod(ctx => HostingEnvironment.VirtualPathProvider)
                 .InSingletonScope();
-
-            Bind<StacheRenderer>()
-                .To<WebStacheRenderer>()
-                .InTransientScope();
-
+            
             Bind<EmbeddedResourceVirtualPathProvider>()
                 .ToSelf()
                 .InSingletonScope();

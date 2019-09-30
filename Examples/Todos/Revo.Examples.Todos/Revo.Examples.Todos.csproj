@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Providers\AspNetCore\Revo.AspNetCore\Revo.AspNetCore.csproj" />
-    <ProjectReference Include="..\..\..\Providers\EFCore\Revo.EFCore.AspNetCoreOData\Revo.EFCore.AspNetCoreOData.csproj" />
     <ProjectReference Include="..\..\..\Providers\EFCore\Revo.EFCore\Revo.EFCore.csproj" />
     <ProjectReference Include="..\..\..\Providers\Hangfire\Revo.Hangfire\Revo.Hangfire.csproj" />
     <ProjectReference Include="..\..\..\Revo.Domain\Revo.Domain.csproj" />

@@ -62,13 +62,7 @@ namespace Revo.AspNetCore
             var aspNetCoreConfig = revoConfiguration.GetSection<AspNetCoreConfigurationSection>();
 
             services
-                .AddMvc(options =>
-                {
-                    if (aspNetCoreConfig.UseODataExtensions)
-                    {
-                        options.Filters.Add(new ODataAsyncResultFilter());
-                    }
-                })
+                .AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
