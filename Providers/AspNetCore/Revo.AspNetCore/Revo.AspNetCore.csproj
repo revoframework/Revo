@@ -11,6 +11,7 @@ Entity Framework (EF) Core data-access layer implementation.</Description>
   
   <ItemGroup>
     <PackageReference Include="Hangfire" Version="1.6.20" />
+    <PackageReference Include="Microsoft.AspNetCore.OData" Version="7.2.1" />
     <PackageReference Include="Microsoft.OData.Edm" Version="7.6.0" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.5.3" />
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
@@ -20,12 +21,6 @@ Entity Framework (EF) Core data-access layer implementation.</Description>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Revo.Infrastructure\Revo.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Hangfire\Revo.Hangfire\Revo.Hangfire.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Reference Include="Microsoft.AspNetCore.OData">
-      <HintPath>..\..\..\..\vendor\OData-WebApi\bin\Debug\netcoreapp3.0\Microsoft.AspNetCore.OData.dll</HintPath>
-    </Reference>
   </ItemGroup>
   
   <Target Name="WorkaroundNetStandard" AfterTargets="ResolvePackageAssets">

@@ -48,10 +48,9 @@ namespace Revo.Examples.Todos
             app.UseStaticFiles();
             app.UseRouting();
 
-            app.UseMvc(rb =>
+            app.UseEndpoints(endpoints =>
             {
-                rb.Count().Filter().OrderBy().Expand().Select().MaxTop(null);
-                rb.EnableDependencyInjection();
+                endpoints.MapControllers();
             });
         }
 
@@ -62,7 +61,7 @@ namespace Revo.Examples.Todos
             string connectionString = Configuration.GetConnectionString("TodosPostgreSQL");
 
             return new RevoConfiguration()
-                .UseAspNetCore(config => config.UseODataExtensions = true)
+                .UseAspNetCore()
                 .UseEFCoreDataAccess(
                     contextBuilder => contextBuilder
                         .UseNpgsql(connectionString),

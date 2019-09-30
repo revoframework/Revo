@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27004.2005
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29324.140
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2_Providers", "2_Providers", "{25A48354-8863-4FC8-B85D-EDE6E2974EE5}"
 EndProject
@@ -116,7 +116,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{5A3C5A38
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.EasyNetQ", "Providers\EasyNetQ\Revo.EasyNetQ\Revo.EasyNetQ.csproj", "{EFDAE739-E880-4449-BBBA-4346D3443E7B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.EasyNetQ.Tests", "Providers\EasyNetQ\Tests\Revo.EasyNetQ.Tests\Revo.EasyNetQ.Tests.csproj", "{EC0E18C4-B6EA-47AE-AB6E-7FCC654C1FE9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.EasyNetQ.Tests", "Providers\EasyNetQ\Tests\Revo.EasyNetQ.Tests\Revo.EasyNetQ.Tests.csproj", "{EC0E18C4-B6EA-47AE-AB6E-7FCC654C1FE9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
