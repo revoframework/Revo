@@ -25,8 +25,9 @@ namespace Revo.Extensions.Notifications.Channels.Buffering
             DateTimeOffset maxDate = Clock.Current.Now.Subtract(minTimeDelay);
             var notifications = readRepository.FindAll<BufferedNotification>()
                 .Where(x => x.TimeQueued <= maxDate && x.Buffer.GovernorId == Id);
-            var buffers = await notifications.Select(x => x.Buffer)
-                .Include(readRepository, x => x.Notifications)
+            var buffers = await notifications
+                .Include(readRepository, x => x.Buffer.Notifications)
+                .Select(x => x.Buffer)
                 .ToListAsync(readRepository);
 
             var res = new MultiValueDictionary<NotificationBuffer, BufferedNotification>();
