@@ -66,6 +66,7 @@ namespace Revo.Examples.Todos
                     advancedAction: cfg =>
                     {
                         cfg
+                            .AddConvention<BaseTypeAttributeConvention>(-200)
                             .AddConvention<IdColumnsPrefixedWithTableNameConvention>(-110)
                             .AddConvention<PrefixConvention>(-9)
                             .AddConvention<SnakeCaseTableNamesConvention>(1)
