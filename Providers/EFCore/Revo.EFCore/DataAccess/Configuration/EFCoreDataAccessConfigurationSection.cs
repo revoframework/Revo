@@ -26,8 +26,6 @@ namespace Revo.EFCore.DataAccess.Configuration
         public bool UseAsPrimaryRepository { get; set; }
         public IReadOnlyCollection<Func<IContext, IEFCoreConvention>> Conventions => conventions;
         public Action<DbContextOptionsBuilder> Configurer { get; set; }
-        public string ReadModelTablePrefix { get; set; } = "";
-        public string ReadModelTableSuffix { get; set; } = "View";
 
         public EFCoreDataAccessConfigurationSection AddConvention(IEFCoreConvention convention, int? order = null)
         {

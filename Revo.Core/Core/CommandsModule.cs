@@ -15,7 +15,8 @@ namespace Revo.Core.Core
 
             Bind<IPreCommandFilter<ICommandBase>, IPostCommandFilter<ICommandBase>,
                     IExceptionCommandFilter<ICommandBase>>()
-                .To<UnitOfWorkCommandFilter>();
+                .To<UnitOfWorkCommandFilter>()
+                .InTransientScope();
         }
     }
 }

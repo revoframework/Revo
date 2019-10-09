@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Revo.Domain.ReadModel;
 using Revo.EFCore.DataAccess.Configuration;
 using Revo.EFCore.DataAccess.Conventions;
@@ -25,6 +26,12 @@ namespace Revo.EFCore.Domain
 
         public override void Finalize(ModelBuilder modelBuilder)
         {
+            foreach (var entity in modelBuilder.Model.GetEntityTypes()
+                .Where(x => typeof(EntityReadModel).IsAssignableFrom(x.ClrType)))
+            {
+                entity.FindProperty(nameof(EntityReadModel.Id)).ValueGenerated = ValueGenerated.Never;
+            }
+
             foreach (var entity in modelBuilder.Model.GetEntityTypes())
             {
                 var attr = entity.ClrType.GetCustomAttribute<ReadModelForEntityAttribute>();
@@ -32,18 +39,6 @@ namespace Revo.EFCore.Domain
                 {
                     var originalEntity = modelBuilder.Model.GetEntityTypes().FirstOrDefault(x => x.ClrType == attr.EntityType)
                                          ?? throw new InvalidOperationException($"Cannot map {entity.ClrType} as ReadModelForEntity for {attr.EntityType} because the latter is not part of the model.");
-
-                    /*entity.Relational().TableName = originalEntity.Relational().TableName;
-                    entity.FindProperty("Id").Relational().ColumnName = originalEntity.FindProperty("Id").Relational().ColumnName;
-
-                    var entityBuilder = modelBuilder.Entity(entity.ClrType);
-                    entityBuilder.HasOne(originalEntity.ClrType).WithOne().HasForeignKey(entity.ClrType, "Id");
-                    entity.FindPrimaryKey().Relational().Name = originalEntity.FindPrimaryKey().Relational().Name;*/
-
-                    if (entity.BaseType == null)
-                    {
-                        entity.SetTableName(configurationSection.ReadModelTablePrefix + originalEntity.GetTableName() + configurationSection.ReadModelTableSuffix);
-                    }
 
                     entity.FindProperty("Id").SetColumnName(originalEntity.FindProperty("Id").GetColumnName());
                 }

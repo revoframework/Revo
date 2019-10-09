@@ -52,12 +52,6 @@ namespace Revo.EFCore.Domain
                     entityBuilder.Property(nameof(BasicEntity.Id)).ValueGeneratedNever();
                 }
             }
-
-            foreach (var entity in modelBuilder.Model.GetEntityTypes()
-                .Where(x => typeof(EntityReadModel).IsAssignableFrom(x.ClrType)))
-            {
-                entity.FindProperty(nameof(EntityReadModel.Id)).ValueGenerated = ValueGenerated.Never;
-            }
         }
     }
 }

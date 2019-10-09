@@ -4,6 +4,7 @@
 
 ### Changed
 - upgraded to ASP.NET Core 3.0 and Entity Framework Core 3.0
+- ReadModelForEntityAttribute no longer overrides mapped table name (leaves default)
 
 ### Removed
 - dropped OData out-of-the-box integration on ASP.NET & ASP.NET Core platforms altogether (OData is not supported on ASP.NET Core 3.0 now), you have to integrate it by yourself now
