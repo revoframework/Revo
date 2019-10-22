@@ -1,6 +1,9 @@
 # RELEASE NOTES
 
-## [1.12.0] - 2019-??-??
+## [1.12.0] - 2019-10-22
+
+### Added
+- new BaseTypeAttribute for EF Core mapping - overrides the mapped entity base type
 
 ### Changed
 - upgraded to ASP.NET Core 3.0 and Entity Framework Core 3.0
