@@ -124,15 +124,18 @@ namespace Revo.Infrastructure.Tests.Events.Async
         }
 
         [Fact]
-        public async Task DispatchToQueuesAsync_DoesNotEnqueueWhenNoQueues()
+        public async Task DispatchToQueuesAsync_EnqueuesEvenWhenNoQueues()
         {
+            var notListenedEvent = new EventMessage<Event1>(new Event1(), new Dictionary<string, string>());
+
             await sut.DispatchToQueuesAsync(new[]
                 {
-                    new EventMessage<Event1>(new Event1(), new Dictionary<string, string>())
+                    notListenedEvent
                 },
                 "eventSource", "checkpoint");
 
-            asyncEventQueueManager.DidNotReceiveWithAnyArgs().EnqueueEventAsync(null, null);
+            asyncEventQueueManager.Received(1).EnqueueEventAsync(notListenedEvent,
+                    Arg.Is<IEnumerable<EventSequencing>>(x => !x.Any()));
         }
 
         [Fact]

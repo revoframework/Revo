@@ -33,12 +33,11 @@ namespace Revo.Infrastructure.Events.Async
             foreach (var message in eventMessages)
             {
                 var queues = GetEventQueues(message);
-                if (queues.Count > 0)
-                {
-                    await asyncEventQueueManager.EnqueueEventAsync(message, queues.Select(x => x.Sequencing));
-                    queues.Where(x => !x.SynchronousDispatch).ForEach(x => queuesForAsyncDispatch.Add(x.Sequencing.SequenceName));
-                    queues.Where(x => x.SynchronousDispatch).ForEach(x => queuesForSyncDispatch.Add(x.Sequencing.SequenceName));
-                }
+
+                // we need to call EnqueueEventAsync even when queues are empty so that the event record gets marked as dispatched
+                await asyncEventQueueManager.EnqueueEventAsync(message, queues.Select(x => x.Sequencing));
+                queues.Where(x => !x.SynchronousDispatch).ForEach(x => queuesForAsyncDispatch.Add(x.Sequencing.SequenceName));
+                queues.Where(x => x.SynchronousDispatch).ForEach(x => queuesForSyncDispatch.Add(x.Sequencing.SequenceName));
             }
 
             if (eventSourceName != null)
