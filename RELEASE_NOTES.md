@@ -5,6 +5,9 @@
 ### Fixed
 - events are now correctly marked as dispatched even when there are no listeners for them
 
+### Changed
+- NLog updated to 4.6.7
+
 ## [1.12.0] - 2019-10-22
 
 ### Added
