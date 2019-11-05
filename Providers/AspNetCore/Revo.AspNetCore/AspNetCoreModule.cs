@@ -30,6 +30,10 @@ namespace Revo.AspNetCore
                 .To<NinjectServiceLocator>()
                 .InSingletonScope();
 
+            Bind<IEnvironmentProvider>()
+                .To<AspNetCoreEnvironmentProvider>()
+                .InSingletonScope();
+
             if (hangfireConfigurationSection.IsActive)
             {
                 Bind<IAspNetCoreStartupConfigurer>()

@@ -14,10 +14,8 @@ using Ninject.Activation;
 using Ninject.Extensions.ContextPreservation;
 using Ninject.Extensions.Factory;
 using Ninject.Infrastructure.Disposal;
-using Revo.AspNetCore.Configuration;
 using Revo.AspNetCore.Core;
 using Revo.AspNetCore.Ninject;
-using Revo.AspNetCore.Web;
 using Revo.Core.Configuration;
 using Revo.Core.Core;
 using Revo.Core.Types;
@@ -59,8 +57,6 @@ namespace Revo.AspNetCore
                 }
             }
             
-            var aspNetCoreConfig = revoConfiguration.GetSection<AspNetCoreConfigurationSection>();
-
             services
                 .AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
@@ -85,9 +81,7 @@ namespace Revo.AspNetCore
                 .Where(a => !a.IsDynamic).ToList();
 
             kernelBootstrapper.LoadAssemblies(assemblies);
-
-            kernelBootstrapper.RunAppConfigurers();
-
+            
             var aspNetCoreConfigurers = Kernel.GetAll<IAspNetCoreStartupConfigurer>();
             foreach (var aspNetCoreConfigurer in aspNetCoreConfigurers)
             {
@@ -98,7 +92,8 @@ namespace Revo.AspNetCore
         public virtual void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
             RegisterAspNetCoreService(app, loggerFactory);
-            
+            kernelBootstrapper.RunAppConfigurers();
+
             var aspNetCoreConfigurers = Kernel.GetAll<IAspNetCoreStartupConfigurer>();
             foreach (var aspNetCoreConfigurer in aspNetCoreConfigurers)
             {
@@ -139,6 +134,7 @@ namespace Revo.AspNetCore
             Kernel.Bind(typeof(IHubContext<>), typeof(IHubContext<,>)).ToMethod(ctx => app.GetRequestService(ctx.Request.Service));
             Kernel.Bind<ILoggerFactory>().ToConstant(loggerFactory);
             Kernel.Bind<IServiceProvider>().ToMethod(ctx => app.ApplicationServices);
+            Kernel.Bind<IWebHostEnvironment>().ToMethod(ctx => app.ApplicationServices.GetRequiredService<IWebHostEnvironment>());
             Kernel.Bind<IHttpContextAccessor>()
                 .ToMethod(ctx => app.ApplicationServices.GetRequiredService<IHttpContextAccessor>())
                 .InTransientScope();

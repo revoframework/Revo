@@ -37,6 +37,11 @@ namespace Revo.Core.Core
                     .InSingletonScope();
             }
 
+            Bind<IEnvironment>()
+                .To<Environment>()
+                .InSingletonScope()
+                .WithPropertyValue(nameof(Environment.IsDevelopmentOverride), coreConfigurationSection.IsDevelopmentEnvironment);
+
             Bind<IEventBus>()
                 .To<EventBus>()
                 .InTaskScope();

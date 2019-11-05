@@ -61,6 +61,10 @@ namespace Revo.AspNet.Core
                     .InSingletonScope()
                     .WithConstructorArgument("jobStorage", ctx => hangfireConfigurationSection.JobStorage);
             }
+
+            Bind<IEnvironmentProvider>()
+                .To<AspNetEnvironmentProvider>()
+                .InSingletonScope();
         }
     }
 }

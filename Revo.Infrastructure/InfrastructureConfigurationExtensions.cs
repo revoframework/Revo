@@ -32,11 +32,8 @@ namespace Revo.Infrastructure
                     c.Kernel.Bind<DatabaseMigrationsConfiguration>().ToConstant(section.DatabaseMigrations);
                 }
 
-                if (section.DatabaseMigrations.ApplyMigrationsUponStartup == true)
-                {
-                    c.LoadModule(new DatabaseMigrationsModule(section.DatabaseMigrations));
-                }
-                
+                c.LoadModule(new DatabaseMigrationsModule(section.DatabaseMigrations));
+
                 if (section.EnableSagas)
                 {
                     c.LoadModule<SagasModule>();
