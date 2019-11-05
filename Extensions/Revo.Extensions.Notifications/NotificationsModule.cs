@@ -1,15 +1,13 @@
-﻿using System;
-using Ninject;
-using Ninject.Modules;
+﻿using Ninject.Modules;
 using Revo.Core.Core;
 using Revo.Core.Lifecycle;
-using Revo.DataAccess.Entities;
 using Revo.Extensions.Notifications.Channels.Buffering;
 using Revo.Extensions.Notifications.Channels.Mail;
 using Revo.Infrastructure.Jobs;
 
 namespace Revo.Extensions.Notifications
 {
+    [AutoLoadModule(false)]
     public class NotificationsModule : NinjectModule
     {
         public override void Load()

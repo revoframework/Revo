@@ -10,6 +10,16 @@ Configurable user notifications extension package.</Description>
   </PropertyGroup>
   
   <ItemGroup>
+    <None Remove="Sql\rno_baseline_1_mssql.sql" />
+    <None Remove="Sql\rno_baseline_1_pgsql.sql" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <EmbeddedResource Include="Sql\rno_baseline_1_mssql.sql" />
+    <EmbeddedResource Include="Sql\rno_baseline_1_pgsql.sql" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <PackageReference Include="PushSharp.Core" Version="1.0.0" />
   </ItemGroup>
   

@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MoreLinq;
-using Revo.EFCore.DataAccess.Configuration;
+
 using Revo.EFCore.DataAccess.Conventions;
 using Revo.EFCore.DataAccess.Model;
 

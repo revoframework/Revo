@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Revo.Core.Configuration;
-using Revo.EFCore.DataAccess.Conventions;
+using Revo.EFCore.DataAccess.Migrations;
 
 namespace Revo.EFCore.DataAccess.Configuration
 {
@@ -24,6 +24,11 @@ namespace Revo.EFCore.DataAccess.Configuration
                 if (section.IsActive)
                 {
                     c.LoadModule(new EFCoreDataAccessModule(section));
+
+                    if (section.EnableMigrationProvider)
+                    {
+                        c.LoadModule(new EFCoreMigrationsModule(section));
+                    }
                 }
             });
 

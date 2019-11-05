@@ -4,6 +4,7 @@ using Revo.Core.Lifecycle;
 
 namespace Revo.Extensions.History.ChangeTracking
 {
+    [AutoLoadModule(false)]
     public class HistoryModule : NinjectModule
     {
         public override void Load()

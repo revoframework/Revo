@@ -12,9 +12,8 @@ ASP.NET platform integration package (user context, authentication using Identit
   <ItemGroup>
     <PackageReference Include="CryptSharpOfficial" Version="2.1.0.0" />
     <PackageReference Include="EntityFramework" Version="6.2.0" />
-    <PackageReference Include="Hangfire" Version="1.6.20" />
-    <PackageReference Include="Hangfire.Core" Version="1.6.20" />
-    <PackageReference Include="Hangfire.MemoryStorage" Version="1.5.2" />
+    <PackageReference Include="Hangfire" Version="1.7.7" />
+    <PackageReference Include="Hangfire.MemoryStorage" Version="1.6.3" />
     <PackageReference Include="Hangfire.Ninject" Version="1.2.0" />
     <PackageReference Include="Knoema.Localization.Core" Version="0.1.90" />
     <PackageReference Include="Knoema.Localization.Mvc" Version="0.1.90" />

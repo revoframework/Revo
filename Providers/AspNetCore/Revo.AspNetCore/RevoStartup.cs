@@ -86,6 +86,8 @@ namespace Revo.AspNetCore
 
             kernelBootstrapper.LoadAssemblies(assemblies);
 
+            kernelBootstrapper.RunAppConfigurers();
+
             var aspNetCoreConfigurers = Kernel.GetAll<IAspNetCoreStartupConfigurer>();
             foreach (var aspNetCoreConfigurer in aspNetCoreConfigurers)
             {
@@ -103,7 +105,6 @@ namespace Revo.AspNetCore
                 aspNetCoreConfigurer.Configure(app, env, loggerFactory);
             }
             
-            kernelBootstrapper.RunAppConfigurers();
             kernelBootstrapper.RunAppStartListeners();
         }
 

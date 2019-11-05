@@ -24,6 +24,7 @@ namespace Revo.EFCore.DataAccess.Configuration
 
         public bool IsActive { get; set; }
         public bool UseAsPrimaryRepository { get; set; }
+        public bool EnableMigrationProvider { get; set; } = true;
         public IReadOnlyCollection<Func<IContext, IEFCoreConvention>> Conventions => conventions;
         public Action<DbContextOptionsBuilder> Configurer { get; set; }
 

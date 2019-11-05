@@ -9,7 +9,7 @@ namespace Revo.Hangfire
     public static class HangfireConfigurationExtensions
     {
         public static IRevoConfiguration UseHangfire(this IRevoConfiguration configuration,
-            JobStorage jobStorage = null,
+            Func<JobStorage> jobStorage = null,
             Action<HangfireConfigurationSection> advancedAction = null)
         {
             configuration.UseInMemoryJobs(false);

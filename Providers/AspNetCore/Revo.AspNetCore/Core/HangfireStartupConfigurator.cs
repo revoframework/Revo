@@ -25,7 +25,7 @@ namespace Revo.AspNetCore.Core
             services
                 .AddHangfire(globalCfg =>
                 {
-                    globalCfg.UseStorage(hangfireConfigurationSection.JobStorage);
+                    globalCfg.UseStorage(hangfireConfigurationSection.JobStorage());
 
                     foreach (var action in hangfireConfigurationSection.ConfigurationActions)
                     {

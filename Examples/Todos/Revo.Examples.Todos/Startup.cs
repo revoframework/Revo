@@ -13,6 +13,8 @@ using Revo.EFCore.Configuration;
 using Revo.EFCore.DataAccess.Configuration;
 using Revo.EFCore.DataAccess.Conventions;
 using Revo.Hangfire;
+using Revo.Infrastructure;
+using Revo.Infrastructure.DataAccess.Migrations;
 
 namespace Revo.Examples.Todos
 {
@@ -60,6 +62,13 @@ namespace Revo.Examples.Todos
 
             return new RevoConfiguration()
                 .UseAspNetCore()
+                .ConfigureInfrastructure(config =>
+                {
+                    config.DatabaseMigrations.ApplyMigrationsUponStartup = true;
+                    config.DatabaseMigrations.AddScannedAssembly(
+                        new ResourceDatabaseMigrationDiscoveryAssembly(GetType().Assembly.FullName, "Sql")
+                    );
+                })
                 .UseEFCoreDataAccess(
                     contextBuilder => contextBuilder
                         .UseNpgsql(connectionString),
@@ -71,11 +80,10 @@ namespace Revo.Examples.Todos
                             .AddConvention<PrefixConvention>(-9)
                             .AddConvention<SnakeCaseTableNamesConvention>(1)
                             .AddConvention<SnakeCaseColumnNamesConvention>(1)
-                            .AddConvention<LowerCaseConvention>(2)
-                            /*.AddConvention<ShortConstraintNamesEFCoreConvention>(2)*/;
+                            .AddConvention<LowerCaseConvention>(2);
                     })
                 .UseAllEFCoreInfrastructure()
-                .UseHangfire(new PostgreSqlStorage(connectionString));
+                .UseHangfire(() => new PostgreSqlStorage(connectionString));
         }
     }
 }

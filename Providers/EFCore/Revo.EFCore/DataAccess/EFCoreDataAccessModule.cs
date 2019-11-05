@@ -61,7 +61,7 @@ namespace Revo.EFCore.DataAccess
                 .ToSelf()
                 .InSingletonScope();
 
-            Bind<IDbContextFactory, IApplicationStartListener>()
+            Bind<IDbContextFactory>()
                 .To<DbContextFactory>()
                 .InSingletonScope();
             

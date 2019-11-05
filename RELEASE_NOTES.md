@@ -1,12 +1,16 @@
 # RELEASE NOTES
 
-## [1.12.1] - 2019-??-??
+## [1.13.0] - 2019-??-??
+
+### Added
+- database migrations - new own system for managing database schema version migrations (incl. module dependencies)
 
 ### Fixed
 - events are now correctly marked as dispatched even when there are no listeners for them
 
 ### Changed
 - NLog updated to 4.6.7
+- Revo.Extensions.Notifications and Revo.Extensions.History now need to be explicitly registered in Revo configuration using AddHistoryExtension and AddNotificationsExtension
 
 ## [1.12.0] - 2019-10-22
 
