@@ -1,15 +1,10 @@
-﻿using System.Collections.Generic;
-using Revo.Infrastructure.DataAccess.Migrations.Providers;
+﻿using Revo.Infrastructure.DataAccess.Migrations.Providers;
 
 namespace Revo.Infrastructure.DataAccess.Migrations
 {
-    public interface IDatabaseMigrationsConfiguration
+    public interface IDatabaseMigrationsConfiguration : IDatabaseMigrationExecutionOptions
     {
-        IReadOnlyCollection<DatabaseMigrationSpecifier> MigrateOnlySpecifiedModules { get; }
         bool? ApplyMigrationsUponStartup { get; }
-        string[] EnvironmentTags { get; }
-        IReadOnlyCollection<FileDatabaseMigrationDiscoveryPath> ScannedFilePaths { get; }
         IDatabaseMigrationScripter OverrideDatabaseMigrationScripter { get; }
-        IReadOnlyCollection<ResourceDatabaseMigrationDiscoveryAssembly> ScannedAssemblies { get; }
     }
 }

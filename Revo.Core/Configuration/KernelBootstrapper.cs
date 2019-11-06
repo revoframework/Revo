@@ -77,7 +77,7 @@ namespace Revo.Core.Configuration
         private INinjectModule[] GetNinjectModules(Assembly assembly)
         {
             return assembly.IsDynamic
-                ? new INinjectModule[] { }
+                ? new INinjectModule[0]
                 : assembly.ExportedTypes.Where(IsLoadableModule)
                     .Select(type => Activator.CreateInstance(type) as INinjectModule)
                     .ToArray();

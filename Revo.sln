@@ -16,7 +16,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.Domain", "Revo.Domain\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.Testing", "Revo.Testing\Revo.Testing.csproj", "{A95BFBAD-E0F3-4631-A873-BC03B66182DA}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4_Examples", "4_Examples", "{1D1A12B3-9916-430C-8ACB-B7243FF6B656}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "5_Examples", "5_Examples", "{1D1A12B3-9916-430C-8ACB-B7243FF6B656}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1_Core", "1_Core", "{FB1689F5-32FB-46A9-AA47-647A7F4A1686}"
 EndProject
@@ -111,6 +111,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.EasyNetQ", "Providers\EasyNetQ\Revo.EasyNetQ\Revo.EasyNetQ.csproj", "{EFDAE739-E880-4449-BBBA-4346D3443E7B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.EasyNetQ.Tests", "Providers\EasyNetQ\Tests\Revo.EasyNetQ.Tests\Revo.EasyNetQ.Tests.csproj", "{EC0E18C4-B6EA-47AE-AB6E-7FCC654C1FE9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4_Tools", "4_Tools", "{80BDC064-0388-4205-BA2A-ADB72ED29B38}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.Tools.DatabaseMigrator", "Tools\Revo.Tools.DatabaseMigrator\Revo.Tools.DatabaseMigrator.csproj", "{DD6B984E-3F40-4735-A030-1331F56EBACC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -238,6 +242,10 @@ Global
 		{EC0E18C4-B6EA-47AE-AB6E-7FCC654C1FE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC0E18C4-B6EA-47AE-AB6E-7FCC654C1FE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC0E18C4-B6EA-47AE-AB6E-7FCC654C1FE9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD6B984E-3F40-4735-A030-1331F56EBACC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD6B984E-3F40-4735-A030-1331F56EBACC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD6B984E-3F40-4735-A030-1331F56EBACC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD6B984E-3F40-4735-A030-1331F56EBACC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -291,6 +299,7 @@ Global
 		{5A3C5A38-4A06-43D0-BFDC-243A2CBB36EE} = {3C46ACB0-08B6-40E0-8C66-5333C50A95F1}
 		{EFDAE739-E880-4449-BBBA-4346D3443E7B} = {3C46ACB0-08B6-40E0-8C66-5333C50A95F1}
 		{EC0E18C4-B6EA-47AE-AB6E-7FCC654C1FE9} = {5A3C5A38-4A06-43D0-BFDC-243A2CBB36EE}
+		{DD6B984E-3F40-4735-A030-1331F56EBACC} = {80BDC064-0388-4205-BA2A-ADB72ED29B38}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C98B2018-4C0A-4011-94CB-77D70109215F}

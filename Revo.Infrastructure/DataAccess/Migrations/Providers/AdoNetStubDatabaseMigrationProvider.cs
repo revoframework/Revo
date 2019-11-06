@@ -87,7 +87,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
                                 }
                             }
                             
-                            Logger.Debug($"Executed database migration using ADO.NET provider: {migration}");
+                            Logger.Info($"Applied database migration using ADO.NET provider: {migration}");
                         }
                     }
                     catch (Exception e)
@@ -159,7 +159,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
                         }
                     }
                         
-                    Logger.Debug($"Commiting {migrations.Count} database migration using ADO.NET provider");
+                    Logger.Debug($"Commiting {migrations.Count} database migrations using ADO.NET provider");
                     transaction.Commit();
                 }
                 catch (Exception e)
@@ -176,6 +176,11 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
 
         public virtual string[] GetProviderEnvironmentTags()
         {
+            if (Scripter.DatabaseTypeTag != null)
+            {
+                return new[] {Scripter.DatabaseTypeTag};
+            }
+
             return new string[0];
         }
 

@@ -28,13 +28,8 @@ namespace Revo.EFCore.DataAccess.Migrations
 
         public override string[] GetProviderEnvironmentTags()
         {
-            List<string> tags = new List<string>();
+            List<string> tags = new List<string>(base.GetProviderEnvironmentTags());
             tags.Add("efcore");
-
-            if (Scripter.DatabaseTypeTag != null)
-            {
-                tags.Add(Scripter.DatabaseTypeTag);
-            }
 
             return tags.ToArray();
         }

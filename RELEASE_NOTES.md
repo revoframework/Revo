@@ -4,6 +4,7 @@
 
 ### Added
 - database migrations - new own system for managing database schema version migrations (incl. module dependencies)
+- standalone database migration tool Revo.Tools.DatabaseMigrator (also invokable as global .NET Core tool revo-dbmigrate)
 
 ### Fixed
 - events are now correctly marked as dispatched even when there are no listeners for them

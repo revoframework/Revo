@@ -33,24 +33,10 @@ namespace Revo.Infrastructure.DataAccess.Migrations
                 .To<DatabaseMigrationExecutionHook>()
                 .InSingletonScope();
 
-            foreach (var path in configuration.ScannedFilePaths)
-            {
-                Bind<FileDatabaseMigrationDiscoveryPath>()
-                    .ToConstant(path)
-                    .InSingletonScope();
-            }
-
             Bind<IDatabaseMigrationDiscovery>()
                 .To<FileDatabaseMigrationDiscovery>()
                 .InSingletonScope();
             
-            foreach (var assembly in configuration.ScannedAssemblies)
-            {
-                Bind<ResourceDatabaseMigrationDiscoveryAssembly>()
-                    .ToConstant(assembly)
-                    .InSingletonScope();
-            }
-
             Bind<IDatabaseMigrationDiscovery>()
                 .To<ResourceDatabaseMigrationDiscovery>()
                 .InSingletonScope();

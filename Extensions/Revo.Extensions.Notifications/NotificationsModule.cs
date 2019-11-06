@@ -3,6 +3,7 @@ using Revo.Core.Core;
 using Revo.Core.Lifecycle;
 using Revo.Extensions.Notifications.Channels.Buffering;
 using Revo.Extensions.Notifications.Channels.Mail;
+using Revo.Infrastructure.DataAccess.Migrations;
 using Revo.Infrastructure.Jobs;
 
 namespace Revo.Extensions.Notifications
@@ -39,6 +40,11 @@ namespace Revo.Extensions.Notifications
             Bind<IJobHandler<ProcessBufferedNotificationsJob>>()
                 .To<ProcessBufferedNotificationsJobHandler>()
                 .InTransientScope();
+            
+            Bind<ResourceDatabaseMigrationDiscoveryAssembly>()
+                .ToConstant(new ResourceDatabaseMigrationDiscoveryAssembly(
+                    typeof(NotificationsModule).Assembly.FullName, "Sql"))
+                .InSingletonScope();
         }
     }
 }

@@ -6,7 +6,6 @@ using Revo.EFCore.EventStores;
 using Revo.EFCore.Projections;
 using Revo.EFCore.Sagas;
 using Revo.Infrastructure;
-using Revo.Infrastructure.DataAccess.Migrations;
 
 namespace Revo.EFCore.Configuration
 {
@@ -27,14 +26,6 @@ namespace Revo.EFCore.Configuration
         public static IRevoConfiguration UseEFCoreEventStore(this IRevoConfiguration configuration,
             Action<EFCoreInfrastructureConfigurationSection> advancedAction = null)
         {
-            configuration.ConfigureInfrastructure(config =>
-            {
-                config.DatabaseMigrations.AddScannedAssembly(
-                    new ResourceDatabaseMigrationDiscoveryAssembly(
-                        typeof(InfrastructureConfigurationSection).Assembly.FullName,
-                        "Sql"));
-            });
-
             var section = configuration.GetSection<EFCoreInfrastructureConfigurationSection>();
             section.UseEventStore = true;
 
@@ -72,14 +63,6 @@ namespace Revo.EFCore.Configuration
         public static IRevoConfiguration UseEFCoreSagas(this IRevoConfiguration configuration,
             Action<EFCoreInfrastructureConfigurationSection> advancedAction = null)
         {
-            configuration.ConfigureInfrastructure(config =>
-            {
-                config.DatabaseMigrations.AddScannedAssembly(
-                    new ResourceDatabaseMigrationDiscoveryAssembly(
-                        typeof(InfrastructureConfigurationSection).Assembly.FullName,
-                        "Sql"));
-            });
-
             var section = configuration.GetSection<EFCoreInfrastructureConfigurationSection>();
             section.UseSagas = true;
 
@@ -120,14 +103,6 @@ namespace Revo.EFCore.Configuration
         public static IRevoConfiguration UseEFCoreAsyncEvents(this IRevoConfiguration configuration,
             Action<EFCoreInfrastructureConfigurationSection> advancedAction = null)
         {
-            configuration.ConfigureInfrastructure(config =>
-            {
-                config.DatabaseMigrations.AddScannedAssembly(
-                    new ResourceDatabaseMigrationDiscoveryAssembly(
-                        typeof(InfrastructureConfigurationSection).Assembly.FullName,
-                        "Sql"));
-            });
-
             configuration.ConfigureInfrastructure();
 
             var section = configuration.GetSection<EFCoreInfrastructureConfigurationSection>();

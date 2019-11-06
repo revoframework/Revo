@@ -1,6 +1,7 @@
 ﻿using Ninject.Modules;
 using Revo.Core.Core;
 using Revo.Core.Lifecycle;
+using Revo.Infrastructure.DataAccess.Migrations;
 
 namespace Revo.Extensions.History.ChangeTracking
 {
@@ -24,6 +25,11 @@ namespace Revo.Extensions.History.ChangeTracking
             Bind<IEntityAttributeChangeLogger>()
                 .To<EntityAttributeChangeLogger>()
                 .InTaskScope();
+
+            Bind<ResourceDatabaseMigrationDiscoveryAssembly>()
+                .ToConstant(new ResourceDatabaseMigrationDiscoveryAssembly(
+                    typeof(HistoryModule).Assembly.FullName, "Sql"))
+                .InSingletonScope();
         }
     }
 }

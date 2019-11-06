@@ -16,7 +16,7 @@ namespace Revo.AspNet.Core
         
         public void ConfigureApp(IAppBuilder app)
         {
-            GlobalConfiguration.Configuration.UseStorage(hangfireConfigurationSection.JobStorage);
+            GlobalConfiguration.Configuration.UseStorage(hangfireConfigurationSection.JobStorage());
 
             if (hangfireConfigurationSection.UseDashboard)
             {

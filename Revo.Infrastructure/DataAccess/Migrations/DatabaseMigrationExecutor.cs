@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NLog;
@@ -13,29 +14,43 @@ namespace Revo.Infrastructure.DataAccess.Migrations
         private readonly IDatabaseMigrationRegistry migrationRegistry;
         private readonly IDatabaseMigrationDiscovery[] migrationDiscoveries;
         private readonly IDatabaseMigrationSelector migrationSelector;
-        private readonly DatabaseMigrationsConfiguration configuration;
+        private readonly IDatabaseMigrationExecutionOptions options;
+        private bool hasDiscoveryRun = false;
 
         public DatabaseMigrationExecutor(IDatabaseMigrationProvider[] migrationProviders,
             IDatabaseMigrationRegistry migrationRegistry,
             IDatabaseMigrationDiscovery[] migrationDiscoveries,
             IDatabaseMigrationSelector migrationSelector,
-            DatabaseMigrationsConfiguration configuration)
+            IDatabaseMigrationExecutionOptions options)
         {
             this.migrationProviders = migrationProviders;
             this.migrationRegistry = migrationRegistry;
             this.migrationDiscoveries = migrationDiscoveries;
             this.migrationSelector = migrationSelector;
-            this.configuration = configuration;
+            this.options = options;
         }
 
-        public async Task ExecuteAsync()
+        public async Task<IReadOnlyCollection<PendingModuleMigration>> ExecuteAsync()
         {
             DiscoverAndRegister();
-            await SelectAndExecuteMigrationsAsync();
+            return await SelectAndExecuteMigrationsAsync();
+        }
+
+        public async Task<IReadOnlyCollection<PendingModuleMigration>> PreviewAsync()
+        {
+            DiscoverAndRegister();
+
+            var migrations = await SelectMigrationsAsync();
+            return migrations.ToArray();
         }
 
         private void DiscoverAndRegister()
         {
+            if (hasDiscoveryRun)
+            {
+                return;
+            }
+
             int migrationCount = 0;
 
             foreach (var discovery in migrationDiscoveries)
@@ -49,31 +64,69 @@ namespace Revo.Infrastructure.DataAccess.Migrations
             }
 
             Logger.Debug($"Discovered {migrationCount} database migrations");
+            hasDiscoveryRun = true;
         }
 
-        private async Task SelectAndExecuteMigrationsAsync()
+        private async Task<IReadOnlyCollection<PendingModuleMigration>> SelectAndExecuteMigrationsAsync()
         {
-            if (configuration.MigrateOnlySpecifiedModules != null)
+            var migrations = await SelectMigrationsAsync();
+
+            foreach (var migration in migrations)
             {
-                foreach (var migratedModule in configuration.MigrateOnlySpecifiedModules)
+                await MigrateModuleAsync(migration.Specifier, migration.Migrations, migration.Provider);
+            }
+
+            return migrations;
+        }
+        
+        private async Task<IReadOnlyCollection<PendingModuleMigration>> SelectMigrationsAsync()
+        {
+            var migrations = new List<PendingModuleMigration>();
+
+            if (options.MigrateOnlySpecifiedModules != null)
+            {
+                foreach (var migratedModule in options.MigrateOnlySpecifiedModules)
                 {
-                    await MigrateModuleAsync(migratedModule);
+                    var moduleMigrations = await SelectModuleMigrationsAsync(migratedModule);
+
+                    if (moduleMigrations.Migrations.Count > 0)
+                    {
+                        migrations.Add(new PendingModuleMigration()
+                        {
+                            Migrations = moduleMigrations.Migrations,
+                            Provider = moduleMigrations.Provider,
+                            Specifier = migratedModule
+                        });
+                    }
                 }
             }
             else
             {
                 foreach (var moduleName in migrationRegistry.GetAvailableModules())
                 {
-                    await MigrateModuleAsync(new DatabaseMigrationSpecifier(moduleName, null));
+                    var migratedModule = new DatabaseMigrationSpecifier(moduleName, null);
+                    var moduleMigrations = await SelectModuleMigrationsAsync(migratedModule);
+
+                    if (moduleMigrations.Migrations.Count > 0)
+                    {
+                        migrations.Add(new PendingModuleMigration()
+                        {
+                            Migrations = moduleMigrations.Migrations,
+                            Provider = moduleMigrations.Provider,
+                            Specifier = migratedModule
+                        });
+                    }
                 }
             }
+
+            return migrations;
         }
 
-        private async Task MigrateModuleAsync(DatabaseMigrationSpecifier migratedModule)
+        private async Task<(IReadOnlyCollection<IDatabaseMigration> Migrations, IDatabaseMigrationProvider Provider)> SelectModuleMigrationsAsync(DatabaseMigrationSpecifier migratedModule)
         {
             foreach (var provider in migrationProviders)
             {
-                var environmentTags = configuration.EnvironmentTags
+                var environmentTags = options.EnvironmentTags
                     .Concat(provider.GetProviderEnvironmentTags())
                     .ToArray();
 
@@ -82,20 +135,27 @@ namespace Revo.Infrastructure.DataAccess.Migrations
 
                 if (selectedMigrations.Count > 0 && selectedMigrations.All(provider.SupportsMigration))
                 {
-                    var highestVersion = selectedMigrations.Where(x =>
-                            string.Equals(x.ModuleName, migratedModule.ModuleName,
-                                StringComparison.InvariantCultureIgnoreCase)
-                            && x.Version != null)
-                        .OrderByDescending(x => x.Version)
-                        .FirstOrDefault();
-
-                    Logger.Info($"About to apply {selectedMigrations.Count} migrations to database for module {migratedModule.ModuleName} (up to version {highestVersion?.Version})");
-                    await provider.ApplyMigrationsAsync(selectedMigrations);
-
-                    Logger.Info($"Successfully migrated {migratedModule.ModuleName} module database to version {highestVersion?.Version}");
-                    return;
+                    return (selectedMigrations, provider);
                 }
             }
+
+            return (new IDatabaseMigration[0], null);
+        }
+
+        private async Task MigrateModuleAsync(DatabaseMigrationSpecifier migratedModule, IReadOnlyCollection<IDatabaseMigration> selectedMigrations, IDatabaseMigrationProvider provider)
+        {
+            var highestVersion = selectedMigrations.Where(x =>
+                    string.Equals(x.ModuleName, migratedModule.ModuleName,
+                        StringComparison.InvariantCultureIgnoreCase)
+                    && x.Version != null)
+                .OrderByDescending(x => x.Version)
+                .FirstOrDefault();
+
+            Logger.Info($"About to apply {selectedMigrations.Count} migrations to database for module {migratedModule.ModuleName} (up to version {highestVersion?.Version})");
+
+            await provider.ApplyMigrationsAsync(selectedMigrations);
+
+            Logger.Info($"Successfully migrated {migratedModule.ModuleName} module database to version {highestVersion?.Version}");
         }
     }
 }

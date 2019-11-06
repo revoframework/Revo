@@ -62,13 +62,6 @@ namespace Revo.Examples.Todos
 
             return new RevoConfiguration()
                 .UseAspNetCore()
-                .ConfigureInfrastructure(config =>
-                {
-                    config.DatabaseMigrations.ApplyMigrationsUponStartup = true;
-                    config.DatabaseMigrations.AddScannedAssembly(
-                        new ResourceDatabaseMigrationDiscoveryAssembly(GetType().Assembly.FullName, "Sql")
-                    );
-                })
                 .UseEFCoreDataAccess(
                     contextBuilder => contextBuilder
                         .UseNpgsql(connectionString),

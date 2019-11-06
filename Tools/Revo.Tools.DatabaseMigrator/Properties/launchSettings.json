@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "Revo.Tools.DatabaseMigrator": {
+      "commandName": "Project"
+    }
+  }
+}

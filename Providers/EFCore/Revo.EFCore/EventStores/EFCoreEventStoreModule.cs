@@ -2,6 +2,8 @@
 using Revo.Core.Core;
 using Revo.DataAccess.Entities;
 using Revo.EFCore.DataAccess.Entities;
+using Revo.Infrastructure;
+using Revo.Infrastructure.DataAccess.Migrations;
 using Revo.Infrastructure.Events;
 using Revo.Infrastructure.Events.Async;
 using Revo.Infrastructure.EventStores;
@@ -34,6 +36,12 @@ namespace Revo.EFCore.EventStores
                 .To<EFCoreCrudRepository>()
                 .WhenInjectedInto<EventSourceCatchUp>()
                 .InTransientScope();
+
+            Bind<ResourceDatabaseMigrationDiscoveryAssembly>()
+                .ToConstant(new ResourceDatabaseMigrationDiscoveryAssembly(
+                    typeof(InfrastructureConfigurationSection).Assembly.FullName,
+                    "Sql"))
+                .InSingletonScope();
         }
     }
 }
