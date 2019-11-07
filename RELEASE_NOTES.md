@@ -11,8 +11,9 @@
 - fixed missing IExternalEventStore registration for EF6 provider
 
 ### Changed
-- NLog updated to 4.6.7
+- Entity Framework 6 provider updated to EF6.3 version and is now targeting both net472 and netstandard2.1
 - Revo.Extensions.Notifications and Revo.Extensions.History now need to be explicitly registered in Revo configuration using AddHistoryExtension and AddNotificationsExtension
+- NLog updated to 4.6.7
 
 ## [1.12.0] - 2019-10-22
 
