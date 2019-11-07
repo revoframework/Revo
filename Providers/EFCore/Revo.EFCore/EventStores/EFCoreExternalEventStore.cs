@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MoreLinq;
+﻿using MoreLinq;
 using Revo.Core.Transactions;
 using Revo.DataAccess.Entities;
 using Revo.EFCore.Repositories;
 using Revo.Infrastructure.Events;
 using Revo.Infrastructure.Events.Async.Generic;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Revo.Infrastructure.EventStores.Generic;
 
 namespace Revo.EFCore.EventStores
 {

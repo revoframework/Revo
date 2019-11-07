@@ -41,6 +41,12 @@ namespace Revo.EF6.EventStores
                 .To<EF6CrudRepository>()
                 .WhenInjectedInto<EventSourceCatchUp>()
                 .InTransientScope();
+
+            Bind<ResourceDatabaseMigrationDiscoveryAssembly>()
+                .ToConstant(new ResourceDatabaseMigrationDiscoveryAssembly(
+                    typeof(InfrastructureConfigurationSection).Assembly.FullName,
+                    "Sql"))
+                .InSingletonScope();
         }
     }
 }

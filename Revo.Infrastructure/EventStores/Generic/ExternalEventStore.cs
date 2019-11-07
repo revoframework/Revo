@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
 using Revo.Core.Events;
 using Revo.Core.Types;
 using Revo.DataAccess.Entities;
 using Revo.Domain.Events;
+using Revo.Infrastructure.Events;
 using Revo.Infrastructure.Events.Async.Generic;
 
-namespace Revo.Infrastructure.Events
+namespace Revo.Infrastructure.EventStores.Generic
 {
     public class ExternalEventStore : IExternalEventStore
     {

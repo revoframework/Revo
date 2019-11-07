@@ -76,6 +76,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
                             using (var dbCommand = dbConnection.CreateCommand())
                             {
                                 dbCommand.CommandText = sqlCommand;
+                                dbCommand.Transaction = transaction;
 
                                 if (dbCommand is DbCommand dbCommandAsync)
                                 {
@@ -101,6 +102,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
                     using (var dbCommand = dbConnection.CreateCommand())
                     {
                         dbCommand.CommandText = Scripter.InsertMigrationRecordSql;
+                        dbCommand.Transaction = transaction;
 
                         foreach (var migration in migrations)
                         {
@@ -121,13 +123,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
                             param.ParameterName = "ModuleName";
                             param.Value = migration.ModuleName;
                             dbCommand.Parameters.Add(param);
-
-                            param = dbCommand.CreateParameter();
-                            param.DbType = DbType.String;
-                            param.ParameterName = "FileName";
-                            param.Value = (migration as FileSqlDatabaseMigration)?.FileName;
-                            dbCommand.Parameters.Add(param);
-
+                            
                             param = dbCommand.CreateParameter();
                             param.DbType = DbType.String;
                             param.ParameterName = "FileName";
@@ -143,7 +139,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
                             param = dbCommand.CreateParameter();
                             param.DbType = DbType.DateTimeOffset;
                             param.ParameterName = "TimeApplied";
-                            param.Value = Clock.Current.Now;
+                            param.Value = Clock.Current.Now.UtcDateTime;
                             dbCommand.Parameters.Add(param);
 
                             Logger.Debug($"Inserting {migrations} database migration record");
@@ -210,14 +206,21 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
             {
                 selectDbCommand.CommandText = Scripter.SelectMigrationSchemaExistsSql;
 
+                object existsResult;
                 if (selectDbCommand is DbCommand selectDbCommandAsync)
                 {
-                    exists = (bool)await selectDbCommandAsync.ExecuteScalarAsync();
+                    existsResult = await selectDbCommandAsync.ExecuteScalarAsync();
                 }
                 else
                 {
-                    exists = (bool)selectDbCommand.ExecuteScalar();
+                    existsResult = selectDbCommand.ExecuteScalar();
                 }
+
+                exists = existsResult is Boolean
+                    ? (bool) existsResult
+                    : (existsResult is Int64
+                        ? ((Int64) existsResult) > 0
+                        : ((Int32) existsResult) > 0);
             }
             
             if (!exists)

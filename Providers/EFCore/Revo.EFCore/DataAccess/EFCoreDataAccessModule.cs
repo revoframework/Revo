@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Ninject.Modules;
 using Revo.Core.Core;
-using Revo.Core.Lifecycle;
 using Revo.DataAccess.Entities;
 using Revo.EFCore.DataAccess.Configuration;
 using Revo.EFCore.DataAccess.Conventions;

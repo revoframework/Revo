@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Linq;
-using Ninject.Extensions.ContextPreservation;
 using Ninject.Modules;
 using Revo.Core.Core;
 using Revo.Core.Lifecycle;

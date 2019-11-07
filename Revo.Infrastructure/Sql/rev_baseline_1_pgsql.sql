@@ -3,13 +3,13 @@
 
 -- EVENT STORE
 
-CREATE TABLE IF NOT EXISTS res_event_stream (
+CREATE TABLE res_event_stream (
 	res_evs_event_stream_id uuid NOT NULL PRIMARY KEY,
 	res_evs_version int NOT NULL,
 	res_evs_metadata_json text
 );
 
-CREATE TABLE IF NOT EXISTS res_event_stream_row (
+CREATE TABLE res_event_stream_row (
 	res_esr_event_stream_row_id uuid NOT NULL PRIMARY KEY,
 	res_esr_global_sequence_number bigint not null GENERATED ALWAYS AS IDENTITY UNIQUE,
 	res_esr_stream_id uuid NOT NULL REFERENCES res_event_stream,
@@ -25,13 +25,13 @@ CREATE TABLE IF NOT EXISTS res_event_stream_row (
 
 -- ASYNC EVENTS
 
-CREATE TABLE IF NOT EXISTS rae_async_event_queue (
+CREATE TABLE rae_async_event_queue (
 	rae_aeq_async_event_queue_id text NOT NULL PRIMARY KEY,
 	rae_aeq_version int NOT NULL,
 	rae_aeq_last_sequence_number_processed bigint
 );
 
-CREATE TABLE IF NOT EXISTS rae_external_event_record (
+CREATE TABLE rae_external_event_record (
 	rae_eer_external_event_record_id uuid NOT NULL PRIMARY KEY,
 	rae_eer_version int NOT NULL,
 	rae_eer_event_name text NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS rae_external_event_record (
 	rae_eer_is_dispatched_to_async_queues boolean NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS rae_queued_async_event (
+CREATE TABLE rae_queued_async_event (
 	rae_qae_queued_async_event_id uuid NOT NULL PRIMARY KEY,
 	rae_qae_queue_id text NOT NULL REFERENCES rae_async_event_queue,
 	rae_qae_sequence_number bigint,
@@ -52,12 +52,12 @@ CREATE TABLE IF NOT EXISTS rae_queued_async_event (
 
 -- SAGAS
 
-CREATE TABLE IF NOT EXISTS rev_saga_metadata_record (
+CREATE TABLE rev_saga_metadata_record (
 	rev_smr_saga_metadata_record_id uuid NOT NULL PRIMARY KEY,
 	rev_smr_class_id uuid NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS rev_saga_metadata_key (
+CREATE TABLE rev_saga_metadata_key (
 	rev_smk_saga_metadata_key_id uuid NOT NULL PRIMARY KEY,
 	rev_smk_saga_id uuid NOT NULL REFERENCES rev_saga_metadata_record,
 	rev_smk_key_name text NOT NULL,

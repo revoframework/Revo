@@ -16,19 +16,7 @@ namespace Revo.EF6.DataAccess.Model
             {
                 entityName = entityName.Substring(0, chevronOpenI);
             }
-
-            bool isView = entityName.EndsWith("View");
-            if (isView)
-            {
-                entityName = entityName.Substring(0, entityName.Length - "View".Length);
-            }
-
-            bool isReadModel = clrType.Name.EndsWith("ReadModel");
-            if (isReadModel && clrType == mappedType && entityName.EndsWith("ReadModel"))
-            {
-                entityName = entityName.Substring(0, entityName.Length - "ReadModel".Length);
-            }
-
+            
             return entityName;
         }
 
@@ -40,18 +28,7 @@ namespace Revo.EF6.DataAccess.Model
             GetEntityPrefixes(mappedType, out namespacePrefix, out columnPrefix);
 
             string tableName = ConvertNameToSnakeCase(entityName);
-
-            if (clrType.Name.EndsWith("View"))
-            {
-                tableName = "VW_" + tableName;
-            }
-
-            bool isReadModel = clrType.Name.EndsWith("ReadModel");
-            if (isReadModel && clrType != mappedType && !tableName.EndsWith("_READ_MODEL"))
-            {
-                tableName += "_READ_MODEL";
-            }
-
+            
             if (namespacePrefix != null)
             {
                 tableName = namespacePrefix + "_" + tableName;

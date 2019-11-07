@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.Entity.ModelConfiguration.Conventions;
 using Revo.Core.Configuration;
+using Revo.EF6.DataAccess.Migrations;
 
 namespace Revo.EF6.DataAccess
 {
@@ -23,6 +24,12 @@ namespace Revo.EF6.DataAccess
                 if (section.IsActive)
                 {
                     c.LoadModule(new EF6DataAccessModule(section));
+
+
+                    if (section.EnableMigrationProvider)
+                    {
+                        c.LoadModule(new EF6MigrationsModule(section));
+                    }
                 }
             });
 

@@ -30,16 +30,14 @@ ORDER BY {TimeAppliedColumn};
 ";
 
         public virtual string SelectMigrationSchemaExistsSql => $@"
-SELECT EXISTS (
-    SELECT 1
-    FROM information_schema.tables
-    WHERE table_name = '{DatabaseMigrationRecordTable}'
-);";
+SELECT COUNT(*)
+FROM information_schema.tables
+WHERE table_name = '{DatabaseMigrationRecordTable}';";
 
         public virtual string CreateMigrationSchemaSql => $@"
 CREATE TABLE {DatabaseMigrationRecordTable} (
     {RecordIdColumn} CHAR(36) NOT NULL,
-    {TimeAppliedColumn} TIMESTAMP WITH TIME ZONE NOT NULL,
+    {TimeAppliedColumn} TIMESTAMP NOT NULL,
     {ModuleNameColumn} VARCHAR (MAX) NOT NULL,
     {VersionColumn} VARCHAR (MAX),
     {ChecksumColumn} VARCHAR (MAX) NOT NULL,

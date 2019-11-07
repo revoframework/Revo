@@ -14,7 +14,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
 
         public override void Load()
         {
-            Bind<IDatabaseMigrationsConfiguration>()
+            Bind<IDatabaseMigrationsConfiguration, IDatabaseMigrationExecutionOptions>()
                 .ToConstant(configuration);
 
             Bind<IDatabaseMigrationRegistry>()

@@ -90,7 +90,7 @@ namespace Revo.EF6.DataAccess.Entities
                 modelDefinition.OnModelCreating(modelBuilder);
             }
 
-            DbConnection dbConnection = Database.DefaultConnectionFactory.CreateConnection(connectionConfiguration.NameOrConnectionString);
+            DbConnection dbConnection = connectionConfiguration.ConnectionFactory.CreateConnection(connectionConfiguration.NameOrConnectionString);
             return modelBuilder.Build(dbConnection);
         }
 

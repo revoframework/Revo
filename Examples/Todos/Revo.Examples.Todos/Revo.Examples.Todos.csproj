@@ -5,11 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Sql\todos_baseline_1.sql" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Sql\todos_baseline_1.sql" />
+    <EmbeddedResource Include="Sql\todos_baseline_1_mssql.sql" />
+    <EmbeddedResource Include="Sql\todos_baseline_1_pgsql.sql" />
   </ItemGroup>
 
   <ItemGroup>

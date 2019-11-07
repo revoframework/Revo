@@ -16,7 +16,7 @@
         public override string CreateMigrationSchemaSql => $@"
 CREATE TABLE {DatabaseMigrationRecordTable} (
 	{RecordIdColumn} uuid PRIMARY KEY,
-	{TimeAppliedColumn} timestamptz NOT NULL,
+	{TimeAppliedColumn} timestamp NOT NULL,
 	{ModuleNameColumn} text NOT NULL,
 	{VersionColumn} text,
     {ChecksumColumn} text NOT NULL,

@@ -9,7 +9,7 @@
         public override string CreateMigrationSchemaSql => $@"
 CREATE TABLE [dbo].[{DatabaseMigrationRecordTable}] (
 	[{RecordIdColumn}] [UNIQUEIDENTIFIER] NOT NULL,
-	[{TimeAppliedColumn}] [DATETIMEOFFSET] NOT NULL,
+	[{TimeAppliedColumn}] [DATETIME] NOT NULL,
 	[{ModuleNameColumn}] [NVARCHAR] (MAX) NOT NULL,
 	[{VersionColumn}] [NVARCHAR] (MAX),
 	[{ChecksumColumn}] [NVARCHAR] (MAX) NOT NULL,

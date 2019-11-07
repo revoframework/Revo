@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using Revo.Core.Events;
 using Revo.DataAccess.Entities;
 
 namespace Revo.Infrastructure.Events.Async.Generic

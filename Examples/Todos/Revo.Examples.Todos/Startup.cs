@@ -13,8 +13,6 @@ using Revo.EFCore.Configuration;
 using Revo.EFCore.DataAccess.Configuration;
 using Revo.EFCore.DataAccess.Conventions;
 using Revo.Hangfire;
-using Revo.Infrastructure;
-using Revo.Infrastructure.DataAccess.Migrations;
 
 namespace Revo.Examples.Todos
 {
