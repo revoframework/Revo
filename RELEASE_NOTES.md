@@ -8,6 +8,7 @@
 
 ### Fixed
 - events are now correctly marked as dispatched even when there are no listeners for them
+- fixed missing IExternalEventStore registration for EF6 provider
 
 ### Changed
 - NLog updated to 4.6.7
