@@ -1,4 +1,3 @@
-using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +11,6 @@ using Revo.Core.Configuration;
 using Revo.EFCore.Configuration;
 using Revo.EFCore.DataAccess.Configuration;
 using Revo.EFCore.DataAccess.Conventions;
-using Revo.Hangfire;
 
 namespace Revo.Examples.Todos
 {
@@ -54,18 +52,16 @@ namespace Revo.Examples.Todos
 
         protected override IRevoConfiguration CreateRevoConfiguration()
         {
-            /** TODO bugfix: for some reason, directly reading from Configuration in the closures in the UseXyz below
-            causes occassional ArgumentNullExceptions (config is all null), using this as a workaround **/
-            string connectionString = Configuration.GetConnectionString("TodosPostgreSQL");
-
             return new RevoConfiguration()
                 .UseAspNetCore()
                 .UseEFCoreDataAccess(
                     contextBuilder => contextBuilder
-                        .UseNpgsql(connectionString),
-                    advancedAction: cfg =>
+                        .UseSqlite("Data Source=todos.db"), // NOTE: By default, this example uses SQLite database for simplicity. For real applications, you'll want to switch to more featured RDBMS as shown below.
+                        // .UseNpgsql(connectionString) // for PostgreSQL
+                        // .UseSqlServer(connectionString) // for SQL Server you will also need to comment out SnakeCaseColumnNamesConvention and LowerCaseConventionbelow
+                    advancedAction: config =>
                     {
-                        cfg
+                        config
                             .AddConvention<BaseTypeAttributeConvention>(-200)
                             .AddConvention<IdColumnsPrefixedWithTableNameConvention>(-110)
                             .AddConvention<PrefixConvention>(-9)
@@ -73,8 +69,7 @@ namespace Revo.Examples.Todos
                             .AddConvention<SnakeCaseColumnNamesConvention>(1)
                             .AddConvention<LowerCaseConvention>(2);
                     })
-                .UseAllEFCoreInfrastructure()
-                .UseHangfire(() => new PostgreSqlStorage(connectionString));
+                .UseAllEFCoreInfrastructure();
         }
     }
 }

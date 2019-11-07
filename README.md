@@ -34,7 +34,7 @@ Furthermore, its extensions implement other useful features like entity history 
 Building blocks for rich DDD-style domain models \([aggregates](https://revoframework.gitbook.io/revo/reference-guide/domain-building-blocks#aggregates), [entities](https://revoframework.gitbook.io/revo/reference-guide/domain-building-blocks#entities), [value objects](https://revoframework.gitbook.io/revo/reference-guide/domain-building-blocks#value-objects), [domain events](https://revoframework.gitbook.io/revo/reference-guide/domain-building-blocks#domain-events), [repositories](https://revoframework.gitbook.io/revo/reference-guide/data-persistence#aggregate-repository)...\).
 
 [**Event Sourcing**](https://revoframework.gitbook.io/revo/reference-guide/events)  
-Implementing event-sourced entity persistence with support for multiple event store backends \(PostgreSQL, MSSQL...\).
+Implementing event-sourced entity persistence with support for multiple event store backends \(PostgreSQL, MSSQL, SQLite...\).
 
 [**CQRS**](https://revoframework.gitbook.io/revo/reference-guide/commands-and-queries)  
 Segregating command and query responsibilities with:
@@ -50,7 +50,7 @@ Support for both [synchronous](https://revoframework.gitbook.io/revo/reference-g
 Abstraction layer for _Entity Framework 6_, _RavenDB,_ testable _in-memory database_ or other data providers.
 
 [**Projections**](https://revoframework.gitbook.io/revo/reference-guide/projections)  
-Support for read-model projections with various backends \(e.g. _Entity Framework Core_ (_PostgreSQL_, _MSSQL_...), _Entity Framework 6_, _RavenDB_...\), automatic idempotency- and concurrency-handling, etc.
+Support for read-model projections with various backends \(e.g. _Entity Framework Core_ (_PostgreSQL_, _MSSQL_, _SQLite_,...), _Entity Framework 6_, _RavenDB_...\), automatic idempotency- and concurrency-handling, etc.
 
 [**SOA, messaging and integration**](https://revoframework.gitbook.io/revo/reference-guide/integrations)  
 Scale and integrate by [publishing and receiving events](https://docs.revoframework.net/~/drafts/-LaA9ji7E8zsIXVOg-qo/primary/reference-guide/integrations#rabbitmq-messaging-with-easynetq), commands and queries using common messaging patterns,<br>

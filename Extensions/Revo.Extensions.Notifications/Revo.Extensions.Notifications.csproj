@@ -8,15 +8,11 @@
     <Description>Event Sourcing, CQRS and DDD framework for modern C#/.NET applications.
 Configurable user notifications extension package.</Description>
   </PropertyGroup>
-  
-  <ItemGroup>
-    <None Remove="Sql\rno_baseline_1_mssql.sql" />
-    <None Remove="Sql\rno_baseline_1_pgsql.sql" />
-  </ItemGroup>
-  
+    
   <ItemGroup>
     <EmbeddedResource Include="Sql\rno_baseline_1_mssql.sql" />
     <EmbeddedResource Include="Sql\rno_baseline_1_pgsql.sql" />
+    <EmbeddedResource Include="Sql\rno_baseline_1_sqlite.sql" />
   </ItemGroup>
   
   <ItemGroup>

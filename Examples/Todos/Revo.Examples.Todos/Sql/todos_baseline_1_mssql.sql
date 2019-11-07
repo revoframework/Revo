@@ -1,5 +1,5 @@
 -- Revo.Examples.Todos SQL baseline schema
--- standard SQL version
+-- MSSQL version
 
 -- description: simple example app with tasks and task lists
 

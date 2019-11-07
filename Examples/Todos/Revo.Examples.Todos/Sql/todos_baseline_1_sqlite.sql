@@ -1,5 +1,5 @@
 -- Revo.Examples.Todos SQL baseline schema
--- PgSQL version
+-- SQLite version
 
 -- description: simple example app with tasks and task lists
 

@@ -1,5 +1,5 @@
 ﻿-- Revo.Infrastructure SQL baseline schema for common providers (EF Core, EF6)
--- PgSQL version
+-- SQLite version
 
 -- EVENT STORE
 
@@ -10,8 +10,8 @@ CREATE TABLE res_event_stream (
 );
 
 CREATE TABLE res_event_stream_row (
-	res_esr_event_stream_row_id uuid NOT NULL PRIMARY KEY,
-	res_esr_global_sequence_number bigint NOT NULL GENERATED ALWAYS AS IDENTITY UNIQUE,
+	res_esr_event_stream_row_id uuid NOT NULL UNIQUE,
+	res_esr_global_sequence_number INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 	res_esr_stream_id uuid NOT NULL REFERENCES res_event_stream,
 	res_esr_stream_sequence_number bigint NOT NULL,
 	res_esr_store_date timestamptz NOT NULL,
@@ -45,7 +45,7 @@ CREATE TABLE rae_queued_async_event (
 	rae_qae_queued_async_event_id uuid NOT NULL PRIMARY KEY,
 	rae_qae_queue_id text NOT NULL REFERENCES rae_async_event_queue,
 	rae_qae_sequence_number bigint,
-	rae_qae_event_stream_row_id uuid REFERENCES res_event_stream_row,
+	rae_qae_event_stream_row_id uuid REFERENCES res_event_stream_row(res_esr_event_stream_row_id),
 	rae_qae_external_event_record_id uuid REFERENCES rae_external_event_record,
 	UNIQUE(rae_qae_queue_id, rae_qae_sequence_number)
 );

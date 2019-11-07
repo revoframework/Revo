@@ -81,6 +81,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
                                 if (dbCommand is DbCommand dbCommandAsync)
                                 {
                                     await dbCommandAsync.ExecuteNonQueryAsync();
+                
                                 }
                                 else
                                 {

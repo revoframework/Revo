@@ -12,7 +12,7 @@ namespace Revo.EFCore.DataAccess.Migrations
         {
             { new []{ "npgsql", "postgresql" }, new PgsqlMigrationScripter() },
             { new []{ "sqlserver" }, new MssqlMigrationScripter() },
-            { new []{ "sqlite" }, new GenericSqlDatabaseMigrationScripter("sqlite") },
+            { new []{ "sqlite" }, new SqliteMigrationScripter() },
             { new []{ "firebird" }, new GenericSqlDatabaseMigrationScripter("firebird") },
             { new []{ "oracle" }, new GenericSqlDatabaseMigrationScripter("oracle") }
         };

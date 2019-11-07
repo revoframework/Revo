@@ -10,11 +10,6 @@ Framework infrastruture package - event stores, projections, jobs, etc.</Descrip
   </PropertyGroup>
   
   <ItemGroup>
-    <None Remove="Sql\rev_baseline_1_mssql.sql" />
-    <None Remove="Sql\rev_baseline_1_pgsql.sql" />
-  </ItemGroup>
-  
-  <ItemGroup>
     <PackageReference Include="LinqKit.Core" Version="1.1.15" />
     <PackageReference Include="morelinq" Version="3.1.0" />
     <PackageReference Include="Nito.AsyncEx" Version="5.0.0" />
@@ -27,6 +22,7 @@ Framework infrastruture package - event stores, projections, jobs, etc.</Descrip
   <ItemGroup>
     <EmbeddedResource Include="Sql\rev_baseline_1_mssql.sql" />
     <EmbeddedResource Include="Sql\rev_baseline_1_pgsql.sql" />
+    <EmbeddedResource Include="Sql\rev_baseline_1_sqlite.sql" />
   </ItemGroup>
   
 </Project>
