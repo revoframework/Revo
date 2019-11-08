@@ -17,12 +17,24 @@ namespace Revo.Infrastructure.DataAccess.Migrations
             this.migrationProvider = migrationProvider;
         }
         
-        public async Task<IReadOnlyCollection<IDatabaseMigration>> SelectMigrationsAsync(string moduleName, string[] tags,
-            DatabaseVersion targetVersion = null)
+        public async Task<IReadOnlyCollection<SelectedModuleMigrations>> SelectMigrationsAsync(DatabaseMigrationSpecifier[] modules, string[] tags)
         {
             try
             {
-                return await DoSelectMigrationsAsync(moduleName, tags, targetVersion, new List<DatabaseMigrationSpecifier>());
+                var queuedMigrations = new List<DatabaseMigrationSpecifier>();
+                var result = new List<SelectedModuleMigrations>();
+
+                foreach (var module in modules)
+                {
+                    var migrations = await DoSelectMigrationsAsync(module.ModuleName, tags, module.Version, queuedMigrations);
+
+                    if (migrations.Count > 0)
+                    {
+                        result.Add(new SelectedModuleMigrations(module, migrations));
+                    }
+                }
+
+                return result;
             }
             finally
             {
@@ -88,12 +100,17 @@ namespace Revo.Infrastructure.DataAccess.Migrations
             else
             {
                 result.AddRange(moduleMigrations
-                    .Where(x => !x.IsRepeatable && x.Version.CompareTo(version) > 0));
+                    .Where(x => !x.IsRepeatable && !x.IsBaseline && x.Version.CompareTo(version) > 0));
 
                 if (result.Count > 0)
                 {
                     result.AddRange(moduleMigrations.Where(x => x.IsRepeatable));
                 }
+            }
+
+            foreach (var migration in result)
+            {
+                queuedMigrations.Add(new DatabaseMigrationSpecifier(migration.ModuleName, migration.Version));
             }
 
             await AddRequiredDependenciesAsync(result, queuedMigrations, tags);
@@ -106,12 +123,14 @@ namespace Revo.Infrastructure.DataAccess.Migrations
             for (int i = 0; i < migrations.Count; i++)
             {
                 var migration = migrations[i];
+
                 var dependencySpecs = await GetRequiredMigrationDependenciesAsync(migration, queuedMigrations);
                 foreach (var dependencySpec in dependencySpecs)
                 {
                     var dependencyMigrations = await DoSelectMigrationsAsync(dependencySpec.ModuleName, tags,
                         dependencySpec.Version, queuedMigrations);
                     migrations.InsertRange(i, dependencyMigrations);
+                    queuedMigrations.AddRange(dependencyMigrations.Select(x => new DatabaseMigrationSpecifier(x.ModuleName, x.Version)));
                     i += dependencyMigrations.Count;
                 }
             }
@@ -138,8 +157,18 @@ namespace Revo.Infrastructure.DataAccess.Migrations
                         .OrderByDescending(x => x.Version).FirstOrDefault();
                     version = lastMigration?.Version;
                 }
-                
-                if (version == null || version.CompareTo(dependency.Version) < 0)
+
+                var realDependencyVersion = dependency.Version
+                    ?? migrationRegistry.Migrations.Where(x => x.ModuleName == dependency.ModuleName
+                                                               && x.Version != null && (version == null || !x.IsBaseline)
+                                                               && !x.IsRepeatable)
+                        .OrderByDescending(x => x.Version)
+                        .Select(x => x.Version)
+                        .FirstOrDefault()
+                    ?? version
+                    ?? throw new DatabaseMigrationException($"Database migration {migration} specifies dependency to latest version of {dependency.ModuleName}, but no versions of that module were found");
+
+                if (version == null || version.CompareTo(realDependencyVersion) < 0)
                 {
                     dependencies.Add(dependency);
                 }

@@ -69,93 +69,68 @@ namespace Revo.Infrastructure.DataAccess.Migrations
 
         private async Task<IReadOnlyCollection<PendingModuleMigration>> SelectAndExecuteMigrationsAsync()
         {
-            var migrations = await SelectMigrationsAsync();
+            var pendingModuleMigrations = await SelectMigrationsAsync();
 
-            foreach (var migration in migrations)
+            foreach (var pendingModuleMigration in pendingModuleMigrations)
             {
-                await MigrateModuleAsync(migration.Specifier, migration.Migrations, migration.Provider);
+                await MigrateModuleAsync(pendingModuleMigration);
             }
 
-            return migrations;
+            return pendingModuleMigrations;
         }
         
         private async Task<IReadOnlyCollection<PendingModuleMigration>> SelectMigrationsAsync()
         {
-            var migrations = new List<PendingModuleMigration>();
-
+            IReadOnlyCollection<PendingModuleMigration> migrations;
             if (options.MigrateOnlySpecifiedModules != null)
             {
-                foreach (var migratedModule in options.MigrateOnlySpecifiedModules)
-                {
-                    var moduleMigrations = await SelectModuleMigrationsAsync(migratedModule);
-
-                    if (moduleMigrations.Migrations.Count > 0)
-                    {
-                        migrations.Add(new PendingModuleMigration()
-                        {
-                            Migrations = moduleMigrations.Migrations,
-                            Provider = moduleMigrations.Provider,
-                            Specifier = migratedModule
-                        });
-                    }
-                }
+                migrations = await SelectModuleMigrationsAsync(options.MigrateOnlySpecifiedModules.ToArray());
             }
             else
             {
-                foreach (var moduleName in migrationRegistry.GetAvailableModules())
-                {
-                    var migratedModule = new DatabaseMigrationSpecifier(moduleName, null);
-                    var moduleMigrations = await SelectModuleMigrationsAsync(migratedModule);
-
-                    if (moduleMigrations.Migrations.Count > 0)
-                    {
-                        migrations.Add(new PendingModuleMigration()
-                        {
-                            Migrations = moduleMigrations.Migrations,
-                            Provider = moduleMigrations.Provider,
-                            Specifier = migratedModule
-                        });
-                    }
-                }
+                migrations = await SelectModuleMigrationsAsync(
+                    migrationRegistry.GetAvailableModules()
+                        .Select(x => new DatabaseMigrationSpecifier(x, null)).ToArray());
             }
 
             return migrations;
         }
 
-        private async Task<(IReadOnlyCollection<IDatabaseMigration> Migrations, IDatabaseMigrationProvider Provider)> SelectModuleMigrationsAsync(DatabaseMigrationSpecifier migratedModule)
+        private async Task<IReadOnlyCollection<PendingModuleMigration>> SelectModuleMigrationsAsync(DatabaseMigrationSpecifier[] migratedModules)
         {
+            var migrations = new List<PendingModuleMigration>();
             foreach (var provider in migrationProviders)
             {
                 var environmentTags = options.EnvironmentTags
                     .Concat(provider.GetProviderEnvironmentTags())
                     .ToArray();
 
-                var selectedMigrations = await migrationSelector.SelectMigrationsAsync(migratedModule.ModuleName,
-                    environmentTags, migratedModule.Version);
+                var selectedMigrations = await migrationSelector.SelectMigrationsAsync(migratedModules, environmentTags);
 
-                if (selectedMigrations.Count > 0 && selectedMigrations.All(provider.SupportsMigration))
+                if (selectedMigrations.Count > 0 && selectedMigrations.SelectMany(x => x.Migrations)
+                        .All(provider.SupportsMigration))
                 {
-                    return (selectedMigrations, provider);
+                    migrations.AddRange(selectedMigrations.Select(x => new PendingModuleMigration(x.Specifier, x.Migrations, provider)));
                 }
             }
 
-            return (new IDatabaseMigration[0], null);
+            return migrations;
         }
 
-        private async Task MigrateModuleAsync(DatabaseMigrationSpecifier migratedModule, IReadOnlyCollection<IDatabaseMigration> selectedMigrations, IDatabaseMigrationProvider provider)
+        private async Task MigrateModuleAsync(PendingModuleMigration migration)
         {
-            var highestVersion = selectedMigrations.Where(x =>
-                    string.Equals(x.ModuleName, migratedModule.ModuleName,
+            var highestVersion = migration.Migrations.Where(x =>
+                    string.Equals(x.ModuleName, migration.Specifier.ModuleName,
                         StringComparison.InvariantCultureIgnoreCase)
                     && x.Version != null)
                 .OrderByDescending(x => x.Version)
                 .FirstOrDefault();
 
-            Logger.Info($"About to apply {selectedMigrations.Count} migrations to database for module {migratedModule.ModuleName} (up to version {highestVersion?.Version})");
+            Logger.Info($"About to apply {migration.Migrations.Count} migrations to database for module {migration.Specifier.ModuleName} (up to version {highestVersion?.Version})");
 
-            await provider.ApplyMigrationsAsync(selectedMigrations);
+            await migration.Provider.ApplyMigrationsAsync(migration.Migrations);
 
-            Logger.Info($"Successfully migrated {migratedModule.ModuleName} module database to version {highestVersion?.Version}");
+            Logger.Info($"Successfully migrated {migration.Specifier.ModuleName} module database to version {highestVersion?.Version}");
         }
     }
 }

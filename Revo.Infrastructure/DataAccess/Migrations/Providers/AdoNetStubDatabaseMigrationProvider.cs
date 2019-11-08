@@ -100,13 +100,12 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
 
                 try
                 {
-                    using (var dbCommand = dbConnection.CreateCommand())
+                    foreach (var migration in migrations)
                     {
-                        dbCommand.CommandText = Scripter.InsertMigrationRecordSql;
-                        dbCommand.Transaction = transaction;
-
-                        foreach (var migration in migrations)
+                        using (var dbCommand = dbConnection.CreateCommand())
                         {
+                            dbCommand.CommandText = Scripter.InsertMigrationRecordSql;
+                            dbCommand.Transaction = transaction;
                             var param = dbCommand.CreateParameter();
                             param.DbType = DbType.Guid;
                             param.ParameterName = "Id";
@@ -116,7 +115,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
                             param = dbCommand.CreateParameter();
                             param.DbType = DbType.String;
                             param.ParameterName = "Version";
-                            param.Value = migration.Version.ToString();
+                            param.Value = (object)migration.Version?.ToString() ?? DBNull.Value;
                             dbCommand.Parameters.Add(param);
 
                             param = dbCommand.CreateParameter();
@@ -124,11 +123,11 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
                             param.ParameterName = "ModuleName";
                             param.Value = migration.ModuleName;
                             dbCommand.Parameters.Add(param);
-                            
+
                             param = dbCommand.CreateParameter();
                             param.DbType = DbType.String;
                             param.ParameterName = "FileName";
-                            param.Value = (migration as FileSqlDatabaseMigration)?.FileName;
+                            param.Value = (object)(migration as FileSqlDatabaseMigration)?.FileName ?? DBNull.Value;
                             dbCommand.Parameters.Add(param);
 
                             param = dbCommand.CreateParameter();
@@ -155,7 +154,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
                             }
                         }
                     }
-                        
+
                     Logger.Debug($"Commiting {migrations.Count} database migrations using ADO.NET provider");
                     transaction.Commit();
                 }

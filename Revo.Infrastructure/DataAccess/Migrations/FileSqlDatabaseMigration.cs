@@ -40,13 +40,13 @@ namespace Revo.Infrastructure.DataAccess.Migrations
             moduleName = match.Groups["module"].Captures.Count > 0
                 ? match.Groups["module"].Captures[0].Value
                 : throw new FormatException($"Invalid FileSqlDatabaseMigration file name: missing module name in '{FileName}'");
+            
+            isBaseline = match.Groups["baseline"].Captures.Count > 0;
+            isRepeatable = match.Groups["repeatable"].Captures.Count > 0;
 
             version = match.Groups["version"].Captures.Count > 0
                 ? DatabaseVersion.Parse(match.Groups["version"].Captures[0].Value)
-                : throw new FormatException($"Invalid FileSqlDatabaseMigration file name: missing version in '{FileName}'");
-
-            isBaseline = match.Groups["baseline"].Captures.Count > 0;
-            isRepeatable = match.Groups["repeatable"].Captures.Count > 0;
+                : (isRepeatable ? (DatabaseVersion) null : throw new FormatException($"Invalid FileSqlDatabaseMigration file name: missing version in '{FileName}'"));
 
             tags = match.Groups["tag"].Captures.Count > 0
                 ? new[] { match.Groups["tag"].Captures.OfType<Capture>().Select(x => x.Value).ToArray() }
