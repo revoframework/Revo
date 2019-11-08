@@ -27,6 +27,8 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             sut.FileName.Should().Be(fileName);
             sut.ModuleName.Should().Be(expModuleName);
             sut.Version.ToString().Should().Be(expVersionString);
+            sut.IsBaseline.Should().Be(isBaseline);
+            sut.IsRepeatable.Should().Be(isRepeatable);
 
             if (expTags != null)
             {

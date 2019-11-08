@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NSubstitute;
+using Revo.Core.Core;
 using Revo.Infrastructure.DataAccess.Migrations;
 using Xunit;
 
@@ -558,7 +559,32 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
         }
 
         [Fact]
-        public async Task SelectMigrationsAsync_RepeatablesNotRunWhenVersionsMatch()
+        public async Task SelectMigrationsAsync_RepeatablesAppliedFirstTime()
+        {
+            migrationRegistry.Migrations.Returns(new List<IDatabaseMigration>()
+            {
+                new FakeDatabaseMigration()
+                {
+                    ModuleName = "appModule1",
+                    Tags = new string[0][],
+                    Dependencies = new DatabaseMigrationSpecifier[0],
+                    IsRepeatable = true,
+                    Checksum = "xyz"
+                }
+            });
+
+            var migrations = await sut.SelectMigrationsAsync(
+                new[] { new DatabaseMigrationSpecifier("appModule1", null) },
+                new string[0]);
+
+            migrations.Should().HaveCount(1);
+            migrations.First().Specifier.Should().Be(new DatabaseMigrationSpecifier("appModule1", null));
+            migrations.First().Migrations.Should().Equal(
+                migrationRegistry.Migrations.ElementAt(0));
+        }
+        
+        [Fact]
+        public async Task SelectMigrationsAsync_RepeatablesNotRunWhenChecksumsMatch()
         {
             migrationProvider.GetMigrationHistoryAsync()
                 .Returns(new[]
@@ -566,7 +592,8 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                     new FakeDatabaseMigrationRecord()
                     {
                         ModuleName = "appModule1",
-                        Version = DatabaseVersion.Parse("1.0.0")
+                        Checksum = "xyz",
+                        TimeApplied = Clock.Current.Now
                     }
                 });
 
@@ -575,16 +602,10 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
-                    Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
-                },
-                new FakeDatabaseMigration()
-                {
-                    ModuleName = "appModule1",
                     Tags = new string[0][],
                     Dependencies = new DatabaseMigrationSpecifier[0],
-                    IsRepeatable = true
+                    IsRepeatable = true,
+                    Checksum = "xyz"
                 }
             });
 
@@ -592,6 +613,83 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 new[] { new DatabaseMigrationSpecifier("appModule1", null) },
                 new string[0]);
             migrations.Should().BeEmpty();
+        }
+        
+        [Fact]
+        public async Task SelectMigrationsAsync_RepeatablesRerunWhenChecksumsNotMatch()
+        {
+            migrationProvider.GetMigrationHistoryAsync()
+                .Returns(new[]
+                {
+                    new FakeDatabaseMigrationRecord()
+                    {
+                        ModuleName = "appModule1",
+                        Checksum = "abc",
+                        TimeApplied = Clock.Current.Now
+                    }
+                });
+
+            migrationRegistry.Migrations.Returns(new List<IDatabaseMigration>()
+            {
+                new FakeDatabaseMigration()
+                {
+                    ModuleName = "appModule1",
+                    Tags = new string[0][],
+                    Dependencies = new DatabaseMigrationSpecifier[0],
+                    IsRepeatable = true,
+                    Checksum = "xyz"
+                }
+            });
+
+            var migrations = await sut.SelectMigrationsAsync(
+                new[] { new DatabaseMigrationSpecifier("appModule1", null) },
+                new string[0]);
+
+            migrations.Should().HaveCount(1);
+            migrations.First().Specifier.Should().Be(new DatabaseMigrationSpecifier("appModule1", null));
+            migrations.First().Migrations.Should().Equal(
+                migrationRegistry.Migrations.ElementAt(0));
+        }
+
+        [Fact]
+        public async Task SelectMigrationsAsync_RepeatablesOnlyRunOnce()
+        {
+            migrationRegistry.Migrations.Returns(new List<IDatabaseMigration>()
+            {
+                new FakeDatabaseMigration()
+                {
+                    ModuleName = "appModule1",
+                    Tags = new string[0][],
+                    Dependencies = new[] { new DatabaseMigrationSpecifier("baseModule1", null) },
+                    Version = DatabaseVersion.Parse("1.0.0")
+                },
+                new FakeDatabaseMigration()
+                {
+                    ModuleName = "appModule1",
+                    Tags = new string[0][],
+                    Dependencies = new[] { new DatabaseMigrationSpecifier("baseModule1", null) },
+                    Version = DatabaseVersion.Parse("1.0.1")
+                },
+                new FakeDatabaseMigration()
+                {
+                    ModuleName = "baseModule1",
+                    Tags = new string[0][],
+                    Dependencies = new DatabaseMigrationSpecifier[0],
+                    IsRepeatable = true,
+                    Checksum = "xyz"
+                }
+            });
+
+            var migrations = await sut.SelectMigrationsAsync(
+                new[] { new DatabaseMigrationSpecifier("appModule1", null) },
+                new string[0]);
+
+            migrations.Should().HaveCount(1);
+            migrations.First().Specifier.Should().Be(new DatabaseMigrationSpecifier("appModule1", null));
+            migrations.First().Migrations.Should().Equal(
+                migrationRegistry.Migrations.ElementAt(2),
+                migrationRegistry.Migrations.ElementAt(0),
+                migrationRegistry.Migrations.ElementAt(1));
         }
 
         [Fact]

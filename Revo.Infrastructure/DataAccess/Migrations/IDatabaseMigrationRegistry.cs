@@ -8,5 +8,6 @@ namespace Revo.Infrastructure.DataAccess.Migrations
 
         IEnumerable<string> GetAvailableModules();
         void AddMigration(IDatabaseMigration migration);
+        void ValidateMigrations();
     }
 }

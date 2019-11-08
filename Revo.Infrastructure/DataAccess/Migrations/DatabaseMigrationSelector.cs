@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MoreLinq;
 
 namespace Revo.Infrastructure.DataAccess.Migrations
 {
@@ -58,53 +59,79 @@ namespace Revo.Infrastructure.DataAccess.Migrations
                 .OrderBy(x => x.Version)
                 .ToArray();
 
-            if (targetVersion != null
-                && !Equals(moduleMigrations.LastOrDefault()?.Version, targetVersion))
+            if (targetVersion != null)
             {
-                throw new DatabaseMigrationException($"Cannot select database migrations for module '{moduleName}': migration for required version {targetVersion} was not found");
+                if (!Equals(moduleMigrations.LastOrDefault()?.Version, targetVersion))
+                {
+                    throw new DatabaseMigrationException($"Cannot select database migrations for module '{moduleName}': migration for required version {targetVersion} was not found");
+                }
             }
-
-            var version = queuedMigrations
-                .Where(x => string.Equals(x.ModuleName, moduleName, StringComparison.InvariantCultureIgnoreCase))
-                .OrderByDescending(x => x.Version)
-                .Select(x => x.Version)
-                .FirstOrDefault();
-
-            if (version == null)
+            else if (!moduleMigrations.Any())
             {
-                history = history ?? await migrationProvider.GetMigrationHistoryAsync();
-                var lastMigration = history
-                    .Where(x => string.Equals(x.ModuleName, moduleName, StringComparison.InvariantCultureIgnoreCase))
-                    .OrderByDescending(x => x.Version).FirstOrDefault();
-                version = lastMigration?.Version;
+                throw new DatabaseMigrationException($"Cannot select database migrations for module '{moduleName}': no version for specified module were found");
             }
-
+            
             List<IDatabaseMigration> result = new List<IDatabaseMigration>();
 
-            if (version == null)
+            if (targetVersion == null && moduleMigrations.Last().IsRepeatable)
             {
-                var baseline = moduleMigrations.FirstOrDefault(x => x.IsBaseline);
-                if (baseline != null)
+                if (!queuedMigrations.Any(x => string.Equals(x.ModuleName, moduleName, StringComparison.InvariantCultureIgnoreCase)))
                 {
-                    result.Add(baseline);
-                    result.AddRange(moduleMigrations
-                        .Where(x => !x.IsRepeatable && x.Version.CompareTo(baseline.Version) > 0));
-                }
-                else
-                {
-                    result.AddRange(moduleMigrations.Where(x => !x.IsRepeatable));
-                }
+                    history = history ?? await migrationProvider.GetMigrationHistoryAsync();
+                    string lastMigrationChecksum = history
+                        .Where(x => string.Equals(x.ModuleName, moduleName, StringComparison.InvariantCultureIgnoreCase))
+                        .OrderByDescending(x => x.TimeApplied)
+                        .Select(x => x.Checksum).FirstOrDefault();
 
-                result.AddRange(moduleMigrations.Where(x => x.IsRepeatable));
+                    var migration = moduleMigrations.Last();
+                    if (lastMigrationChecksum != migration.Checksum)
+                    {
+                        result.Add(migration);
+                    }
+                }
             }
             else
             {
-                result.AddRange(moduleMigrations
-                    .Where(x => !x.IsRepeatable && !x.IsBaseline && x.Version.CompareTo(version) > 0));
+                var version = queuedMigrations
+                    .Where(x => string.Equals(x.ModuleName, moduleName, StringComparison.InvariantCultureIgnoreCase))
+                    .OrderByDescending(x => x.Version)
+                    .Select(x => x.Version)
+                    .FirstOrDefault();
 
-                if (result.Count > 0)
+                if (version == null)
                 {
+                    history = history ?? await migrationProvider.GetMigrationHistoryAsync();
+                    var lastMigration = history
+                        .Where(x => string.Equals(x.ModuleName, moduleName, StringComparison.InvariantCultureIgnoreCase))
+                        .OrderByDescending(x => x.Version).FirstOrDefault();
+                    version = lastMigration?.Version;
+                }
+
+                if (version == null)
+                {
+                    var baseline = moduleMigrations.FirstOrDefault(x => x.IsBaseline);
+                    if (baseline != null)
+                    {
+                        result.Add(baseline);
+                        result.AddRange(moduleMigrations
+                            .Where(x => !x.IsRepeatable && x.Version.CompareTo(baseline.Version) > 0));
+                    }
+                    else
+                    {
+                        result.AddRange(moduleMigrations.Where(x => !x.IsRepeatable));
+                    }
+
                     result.AddRange(moduleMigrations.Where(x => x.IsRepeatable));
+                }
+                else
+                {
+                    result.AddRange(moduleMigrations
+                        .Where(x => !x.IsRepeatable && !x.IsBaseline && x.Version.CompareTo(version) > 0));
+
+                    if (result.Count > 0)
+                    {
+                        result.AddRange(moduleMigrations.Where(x => x.IsRepeatable));
+                    }
                 }
             }
 
@@ -144,34 +171,72 @@ namespace Revo.Infrastructure.DataAccess.Migrations
             history = history ?? await migrationProvider.GetMigrationHistoryAsync();
             foreach (var dependency in migration.Dependencies)
             {
-                var version = queuedMigrations
-                    .Where(x => string.Equals(x.ModuleName, dependency.ModuleName, StringComparison.InvariantCultureIgnoreCase))
-                    .OrderByDescending(x => x.Version)
-                    .Select(x => x.Version)
-                    .FirstOrDefault();
-
-                if (version == null)
+                // repeatable dependencies
+                var repeatableMigration = migrationRegistry.Migrations.FirstOrDefault(x => x.ModuleName == dependency.ModuleName && x.IsRepeatable);
+                if (dependency.Version == null && repeatableMigration != null)
                 {
+                    if (queuedMigrations.Any(x => x.ModuleName == dependency.ModuleName))
+                    {
+                        continue;
+                    }
+
                     var lastMigration = history
                         .Where(x => string.Equals(x.ModuleName, dependency.ModuleName, StringComparison.InvariantCultureIgnoreCase))
-                        .OrderByDescending(x => x.Version).FirstOrDefault();
-                    version = lastMigration?.Version;
-                }
+                        .OrderByDescending(x => x.TimeApplied).FirstOrDefault();
 
-                var realDependencyVersion = dependency.Version
-                    ?? migrationRegistry.Migrations.Where(x => x.ModuleName == dependency.ModuleName
-                                                               && x.Version != null && (version == null || !x.IsBaseline)
-                                                               && !x.IsRepeatable)
-                        .OrderByDescending(x => x.Version)
-                        .Select(x => x.Version)
-                        .FirstOrDefault()
-                    ?? version
-                    ?? throw new DatabaseMigrationException($"Database migration {migration} specifies dependency to latest version of {dependency.ModuleName}, but no versions of that module were found");
+                    if (lastMigration?.Checksum == repeatableMigration.Checksum)
+                    {
+                        continue;
+                    }
 
-                if (version == null || version.CompareTo(realDependencyVersion) < 0)
-                {
                     dependencies.Add(dependency);
                 }
+                // versioned dependencies
+                else
+                {
+                    var version = queuedMigrations
+                        .Where(x => string.Equals(x.ModuleName, dependency.ModuleName, StringComparison.InvariantCultureIgnoreCase))
+                        .OrderByDescending(x => x.Version)
+                        .Select(x => x.Version)
+                        .FirstOrDefault();
+
+                    if (version == null)
+                    {
+                        var lastMigration = history
+                            .Where(x => string.Equals(x.ModuleName, dependency.ModuleName, StringComparison.InvariantCultureIgnoreCase))
+                            .OrderByDescending(x => x.Version).FirstOrDefault();
+                        version = lastMigration?.Version;
+                    }
+
+                    IEnumerable<IDatabaseMigration> matchingDependencies = migrationRegistry.Migrations
+                        .Where(x => x.ModuleName == dependency.ModuleName)
+                        .OrderByDescending(x => x.Version);
+
+                    if (dependency.Version == null)
+                    {
+                        if (version != null)
+                        {
+                            matchingDependencies = matchingDependencies.Where(x => !x.IsBaseline);
+                        }
+                    }
+                    else
+                    {
+                        matchingDependencies = matchingDependencies.Where(x => dependency.Version.Equals(x.Version));
+                    }
+
+                    var bestMatch = matchingDependencies.FirstOrDefault();
+
+                    if (bestMatch == null)
+                    {
+                        throw new DatabaseMigrationException($"Database migration {migration} specifies dependency to {dependency.ModuleName}@{dependency.Version?.ToString() ?? "latest"}, but no matching migrations to that version were found");
+                    }
+
+                    if (version == null || version.CompareTo(bestMatch.Version) < 0)
+                    {
+                        dependencies.Add(dependency);
+                    }
+                }
+                
             }
 
             return dependencies;

@@ -9,8 +9,8 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
         public bool IsBaseline { get; set; }
         public bool IsRepeatable { get; set; }
         public DatabaseVersion Version { get; set; }
-        public IReadOnlyCollection<DatabaseMigrationSpecifier> Dependencies { get; set; }
-        public string[][] Tags { get; set; }
+        public IReadOnlyCollection<DatabaseMigrationSpecifier> Dependencies { get; set; } = new DatabaseMigrationSpecifier[0];
+        public string[][] Tags { get; set; } = new string[0][];
         public string Description { get; set; }
         public string Checksum { get; set; }
     }

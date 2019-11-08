@@ -63,6 +63,8 @@ namespace Revo.Infrastructure.DataAccess.Migrations
                 }
             }
 
+            migrationRegistry.ValidateMigrations();
+
             Logger.Debug($"Discovered {migrationCount} database migrations");
             hasDiscoveryRun = true;
         }
@@ -103,6 +105,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
             {
                 var environmentTags = options.EnvironmentTags
                     .Concat(provider.GetProviderEnvironmentTags())
+                    .Distinct()
                     .ToArray();
 
                 var selectedMigrations = await migrationSelector.SelectMigrationsAsync(migratedModules, environmentTags);
