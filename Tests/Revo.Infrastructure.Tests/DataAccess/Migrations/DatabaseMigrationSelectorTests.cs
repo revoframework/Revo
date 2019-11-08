@@ -22,7 +22,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
 
             sut = new DatabaseMigrationSelector(migrationRegistry, migrationProvider);
         }
-        
+
         [Fact]
         public async Task SelectMigrationsAsync()
         {
@@ -31,23 +31,17 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
-                    Version = DatabaseVersion.Parse("1.0.1"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.1")
                 },
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
-                    Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.0")
                 },
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule2",
-                    Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.0")
                 }
             });
 
@@ -70,23 +64,17 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
-                    Version = DatabaseVersion.Parse("1.0.1"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.1")
                 },
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
-                    Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.0")
                 },
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule2",
-                    Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.0")
                 }
             });
 
@@ -121,22 +109,18 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 {
                     ModuleName = "appModule1",
                     Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
                     Dependencies = new [] { new DatabaseMigrationSpecifier("baseModule1", DatabaseVersion.Parse("1.0.0")) }
                 },
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule2",
                     Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
                     Dependencies = new [] { new DatabaseMigrationSpecifier("baseModule1", DatabaseVersion.Parse("1.0.0")) }
                 },
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "baseModule1",
-                    Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.0")
                 }
             });
 
@@ -190,23 +174,17 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
-                    Version = DatabaseVersion.Parse("1.0.2"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.2")
                 },
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
-                    Version = DatabaseVersion.Parse("1.0.1"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.1")
                 },
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
-                    Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.0")
                 }
             });
 
@@ -238,9 +216,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
-                    Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.0")
                 }
             });
 
@@ -263,8 +239,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                     {
                         new [] { "DEV", "CI" },
                         new [] { "CUSTOMER2" }
-                    },
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    }
                 },
                 new FakeDatabaseMigration()
                 {
@@ -274,8 +249,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                     {
                         new [] { "DEV", "CI" },
                         new [] { "CUSTOMER3" }
-                    },
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    }
                 },
                 new FakeDatabaseMigration()
                 {
@@ -285,8 +259,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                     {
                         new [] { "DEV", "CI" },
                         new [] { "CUSTOMER1", "CUSTOMER2" }
-                    },
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    }
                 },
                 new FakeDatabaseMigration()
                 {
@@ -295,14 +268,13 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                     Tags = new []
                     {
                         new [] { "PROD" }
-                    },
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    }
                 }
             });
 
             var migrations = await sut.SelectMigrationsAsync(
                 new[] { new DatabaseMigrationSpecifier("appModule1", null) },
-                new []
+                new[]
                 {
                     "CI", "CUSTOMER2"
                 });
@@ -322,23 +294,17 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
-                    Version = DatabaseVersion.Parse("1.0.2"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.2")
                 },
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
-                    Version = DatabaseVersion.Parse("1.0.1"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.1")
                 },
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
-                    Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.0")
                 }
             });
 
@@ -361,16 +327,12 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
-                    Version = DatabaseVersion.Parse("1.0.2"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.2")
                 },
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
-                    Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.0")
                 }
             });
 
@@ -389,21 +351,17 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
-                    Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.0")
                 },
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
-                    Version = DatabaseVersion.Parse("1.0.1"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.1")
                 }
             });
 
             var migrations = await sut.SelectMigrationsAsync(
-                new[] { new DatabaseMigrationSpecifier("appModule1",null) },
+                new[] { new DatabaseMigrationSpecifier("appModule1", null) },
                 new string[0]);
 
             migrations.Should().HaveCount(1);
@@ -421,31 +379,23 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
-                    Version = DatabaseVersion.Parse("1.0.2"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.2")
+                },
+                new FakeDatabaseMigration()
+                {
+                    ModuleName = "appModule1",
+                    Version = DatabaseVersion.Parse("1.0.1")
+                },
+                new FakeDatabaseMigration()
+                {
+                    ModuleName = "appModule1",
+                    Version = DatabaseVersion.Parse("1.0.0")
                 },
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
                     Version = DatabaseVersion.Parse("1.0.1"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
-                },
-                new FakeDatabaseMigration()
-                {
-                    ModuleName = "appModule1",
-                    Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
-                },
-                new FakeDatabaseMigration()
-                {
-                    ModuleName = "appModule1",
-                    Version = DatabaseVersion.Parse("1.0.1"),
-                    Tags = new string[0][],
-                    IsBaseline = true,
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    IsBaseline = true
                 }
             });
 
@@ -478,24 +428,18 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
-                    Version = DatabaseVersion.Parse("1.0.1"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.1")
                 },
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
-                    Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.0")
                 },
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
                     Version = DatabaseVersion.Parse("1.0.1"),
-                    Tags = new string[0][],
-                    IsBaseline = true,
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    IsBaseline = true
                 }
             });
 
@@ -527,22 +471,16 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
-                    Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.0")
                 },
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
-                    Version = DatabaseVersion.Parse("1.0.1"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.1")
                 },
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0],
                     IsRepeatable = true
                 }
             });
@@ -566,8 +504,6 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0],
                     IsRepeatable = true,
                     Checksum = "xyz"
                 }
@@ -582,7 +518,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             migrations.First().Migrations.Should().Equal(
                 migrationRegistry.Migrations.ElementAt(0));
         }
-        
+
         [Fact]
         public async Task SelectMigrationsAsync_RepeatablesNotRunWhenChecksumsMatch()
         {
@@ -602,8 +538,6 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0],
                     IsRepeatable = true,
                     Checksum = "xyz"
                 }
@@ -614,7 +548,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 new string[0]);
             migrations.Should().BeEmpty();
         }
-        
+
         [Fact]
         public async Task SelectMigrationsAsync_RepeatablesRerunWhenChecksumsNotMatch()
         {
@@ -634,8 +568,6 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0],
                     IsRepeatable = true,
                     Checksum = "xyz"
                 }
@@ -659,22 +591,18 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
-                    Tags = new string[0][],
                     Dependencies = new[] { new DatabaseMigrationSpecifier("baseModule1", null) },
                     Version = DatabaseVersion.Parse("1.0.0")
                 },
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
-                    Tags = new string[0][],
                     Dependencies = new[] { new DatabaseMigrationSpecifier("baseModule1", null) },
                     Version = DatabaseVersion.Parse("1.0.1")
                 },
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "baseModule1",
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0],
                     IsRepeatable = true,
                     Checksum = "xyz"
                 }
@@ -701,7 +629,6 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 {
                     ModuleName = "appModule1",
                     Version = DatabaseVersion.Parse("1.0.1"),
-                    Tags = new string[0][],
                     Dependencies = new []
                     {
                         new DatabaseMigrationSpecifier("baseModule1", DatabaseVersion.Parse("1.0.1")),
@@ -711,7 +638,6 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 {
                     ModuleName = "appModule1",
                     Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
                     Dependencies = new []
                     {
                         new DatabaseMigrationSpecifier("baseModule1", DatabaseVersion.Parse("1.0.0")),
@@ -720,16 +646,12 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "baseModule1",
-                    Version = DatabaseVersion.Parse("1.0.1"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.1")
                 },
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "baseModule1",
-                    Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.0")
                 }
             });
 
@@ -755,7 +677,6 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 {
                     ModuleName = "appModule1",
                     Version = DatabaseVersion.Parse("1.0.1"),
-                    Tags = new string[0][],
                     Dependencies = new []
                     {
                         new DatabaseMigrationSpecifier("baseModule1", DatabaseVersion.Parse("1.0.1")),
@@ -765,7 +686,6 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 {
                     ModuleName = "appModule1",
                     Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
                     Dependencies = new []
                     {
                         new DatabaseMigrationSpecifier("baseModule1", DatabaseVersion.Parse("1.0.0")),
@@ -775,7 +695,6 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 {
                     ModuleName = "baseModule1",
                     Version = DatabaseVersion.Parse("1.0.1"),
-                    Tags = new string[0][],
                     Dependencies = new []
                     {
                         new DatabaseMigrationSpecifier("baseModule2", DatabaseVersion.Parse("1.0.1")),
@@ -785,7 +704,6 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 {
                     ModuleName = "baseModule1",
                     Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
                     Dependencies = new []
                     {
                         new DatabaseMigrationSpecifier("baseModule2", DatabaseVersion.Parse("1.0.0")),
@@ -794,16 +712,12 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "baseModule2",
-                    Version = DatabaseVersion.Parse("1.0.1"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.1")
                 },
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "baseModule2",
-                    Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.0")
                 }
             });
 
@@ -821,7 +735,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 migrationRegistry.Migrations.ElementAt(2),
                 migrationRegistry.Migrations.ElementAt(0));
         }
-        
+
         [Fact]
         public async Task SelectMigrationsAsync_DependenciesToLatestVersions()
         {
@@ -831,7 +745,6 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 {
                     ModuleName = "appModule1",
                     Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
                     Dependencies = new []
                     {
                         new DatabaseMigrationSpecifier("baseModule1", null),
@@ -840,16 +753,12 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "baseModule1",
-                    Version = DatabaseVersion.Parse("1.0.1"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.1")
                 },
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "baseModule1",
-                    Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.0")
                 }
             });
 
@@ -874,7 +783,6 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 {
                     ModuleName = "appModule1",
                     Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
                     Dependencies = new []
                     {
                         new DatabaseMigrationSpecifier("baseModule1", null),
@@ -885,29 +793,23 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 {
                     ModuleName = "baseModule1",
                     Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
                     Dependencies = new []{ new DatabaseMigrationSpecifier("baseModule3", null) }
                 },
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "baseModule2",
                     Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
                     Dependencies = new []{ new DatabaseMigrationSpecifier("baseModule3", null) }
                 },
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "baseModule3",
-                    Version = DatabaseVersion.Parse("1.0.1"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.1")
                 },
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "baseModule3",
-                    Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.0")
                 }
             });
 
@@ -934,7 +836,6 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 {
                     ModuleName = "appModule1",
                     Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
                     Dependencies = new []
                     {
                         new DatabaseMigrationSpecifier("baseModule1", null),
@@ -944,7 +845,6 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 {
                     ModuleName = "appModule2",
                     Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
                     Dependencies = new []
                     {
                         new DatabaseMigrationSpecifier("baseModule1", null),
@@ -953,16 +853,12 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "baseModule1",
-                    Version = DatabaseVersion.Parse("1.0.1"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.1")
                 },
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "baseModule1",
-                    Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.0")
                 }
             });
 
@@ -981,7 +877,58 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 migrationRegistry.Migrations.ElementAt(3),
                 migrationRegistry.Migrations.ElementAt(2),
                 migrationRegistry.Migrations.ElementAt(0));
-            
+
+            migrations.ElementAt(1).Specifier.Should().Be(new DatabaseMigrationSpecifier("appModule2", null));
+            migrations.ElementAt(1).Migrations.Should().Equal(
+                migrationRegistry.Migrations.ElementAt(1));
+        }
+
+        [Fact]
+        public async Task SelectMigrationsAsync_OverlappingDependenciesToLatestVersionsWithBaseline()
+        {
+            migrationRegistry.Migrations.Returns(new List<IDatabaseMigration>()
+            {
+                new FakeDatabaseMigration()
+                {
+                    ModuleName = "appModule1",
+                    Version = DatabaseVersion.Parse("1.0.0"),
+                    Dependencies = new []
+                    {
+                        new DatabaseMigrationSpecifier("baseModule1", null),
+                    }
+                },
+                new FakeDatabaseMigration()
+                {
+                    ModuleName = "appModule2",
+                    Version = DatabaseVersion.Parse("1.0.0"),
+                    Dependencies = new []
+                    {
+                        new DatabaseMigrationSpecifier("baseModule1", null),
+                    }
+                },
+                new FakeDatabaseMigration()
+                {
+                    ModuleName = "baseModule1",
+                    Version = DatabaseVersion.Parse("1.0.0"),
+                    IsBaseline = true
+                }
+            });
+
+            var migrations = await sut.SelectMigrationsAsync(
+                new[]
+                {
+                    new DatabaseMigrationSpecifier("appModule1", null),
+                    new DatabaseMigrationSpecifier("appModule2", null)
+                },
+                new string[0]);
+
+            migrations.Should().HaveCount(2);
+
+            migrations.First().Specifier.Should().Be(new DatabaseMigrationSpecifier("appModule1", null));
+            migrations.First().Migrations.Should().Equal(
+                migrationRegistry.Migrations.ElementAt(2),
+                migrationRegistry.Migrations.ElementAt(0));
+
             migrations.ElementAt(1).Specifier.Should().Be(new DatabaseMigrationSpecifier("appModule2", null));
             migrations.ElementAt(1).Migrations.Should().Equal(
                 migrationRegistry.Migrations.ElementAt(1));
@@ -996,7 +943,6 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 {
                     ModuleName = "appModule1",
                     Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
                     Dependencies = new []
                     {
                         new DatabaseMigrationSpecifier("baseModule1", DatabaseVersion.Parse("1.0.0")),
@@ -1007,7 +953,6 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 {
                     ModuleName = "baseModule1",
                     Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
                     Dependencies = new []
                     {
                         new DatabaseMigrationSpecifier("baseModule3", DatabaseVersion.Parse("1.0.0")),
@@ -1017,7 +962,6 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 {
                     ModuleName = "baseModule2",
                     Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
                     Dependencies = new []
                     {
                         new DatabaseMigrationSpecifier("baseModule3", DatabaseVersion.Parse("1.0.1")),
@@ -1026,16 +970,12 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "baseModule3",
-                    Version = DatabaseVersion.Parse("1.0.1"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.1")
                 },
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "baseModule3",
-                    Version = DatabaseVersion.Parse("1.0.0"),
-                    Tags = new string[0][],
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    Version = DatabaseVersion.Parse("1.0.0")
                 }
             });
 
@@ -1078,8 +1018,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                     Tags = new []
                     {
                         new [] { "PROD" }
-                    },
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    }
                 },
                 new FakeDatabaseMigration()
                 {
@@ -1088,8 +1027,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                     Tags = new []
                     {
                         new [] { "DEV" }
-                    },
-                    Dependencies = new DatabaseMigrationSpecifier[0]
+                    }
                 }
             });
 

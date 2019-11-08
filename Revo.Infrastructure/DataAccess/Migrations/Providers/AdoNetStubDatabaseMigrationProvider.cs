@@ -251,9 +251,9 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
                 reader.GetGuid(columnDict["id"]),
                 reader.GetDateTime(columnDict["time_applied"]),
                 reader.GetString(columnDict["module_name"]),
-                DatabaseVersion.Parse(reader.GetString(columnDict["version"])),
+                reader.IsDBNull(columnDict["version"]) ? null : DatabaseVersion.Parse(reader.GetString(columnDict["version"])),
                 reader.GetString(columnDict["checksum"]),
-                reader.GetString(columnDict["file_name"]));
+                reader.IsDBNull(columnDict["file_name"]) ? null : reader.GetString(columnDict["file_name"]));
         }
     }
 }

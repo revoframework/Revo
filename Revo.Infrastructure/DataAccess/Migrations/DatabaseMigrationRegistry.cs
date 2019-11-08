@@ -33,27 +33,29 @@ namespace Revo.Infrastructure.DataAccess.Migrations
             {
                 if (module.Any(x => x.IsRepeatable))
                 {
-                    if (module.Count() > 1)
+                    if (module.GroupBy(x => GroupMigrationTags(x.Tags)).Any(x => x.Count() > 1))
                     {
                         throw new DatabaseMigrationException(
                             $"Failed to validate database migrations for module '{module.Key}': there can be only one migration if the module has a repeatable migration");
                     }
 
-                    if (module.First().Version != null)
+                    var versioned = module.FirstOrDefault(x => x.Version != null);
+                    if (versioned != null)
                     {
                         throw new DatabaseMigrationException(
-                            $"Failed to validate database migrations for module '{module.Key}': repeatable migrations {module.First()} cannot specify version (they are re-applied only when their contents changes)");
+                            $"Failed to validate database migrations for module '{module.Key}': repeatable migrations {versioned} cannot specify version (they are re-applied only when their contents changes)");
                     }
 
-                    if (module.First().IsBaseline)
+                    var baseline = module.FirstOrDefault(x => x.IsBaseline);
+                    if (baseline != null)
                     {
                         throw new DatabaseMigrationException(
-                            $"Failed to validate database migrations for module '{module.Key}': {module.First()} cannot be both baseline and repeatable");
+                            $"Failed to validate database migrations for module '{module.Key}': {baseline} cannot be both baseline and repeatable");
                     }
                 }
                 else
                 {
-                    if (module.Count(x => x.IsBaseline) > 1)
+                    if (module.GroupBy(x => GroupMigrationTags(x.Tags)).Any(group => group.Count(x => x.IsBaseline) > 1))
                     {
                         throw new DatabaseMigrationException(
                             $"Failed to validate database migrations for module '{module.Key}': there cannot be more than one baseline migration");
@@ -84,6 +86,12 @@ namespace Revo.Infrastructure.DataAccess.Migrations
 
                 // TODO check for cyclic dependencies
             }
+        }
+
+        private string GroupMigrationTags(string[][] tags)
+        {
+            return string.Join(",",
+                tags.Select(tagGroup => "[" + string.Join(",", tagGroup) + "]"));
         }
     }
 }

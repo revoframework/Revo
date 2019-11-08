@@ -120,6 +120,46 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
         }
 
         [Fact]
+        public void Validate_MultipleRepeatablesThrows()
+        {
+            sut.AddMigration(new FakeDatabaseMigration()
+            {
+                ModuleName = "appModule1",
+                IsRepeatable = true
+            });
+
+            sut.AddMigration(new FakeDatabaseMigration()
+            {
+                ModuleName = "appModule1",
+                IsRepeatable = true
+            });
+
+            sut.Invoking(x => x.ValidateMigrations())
+                .Should().Throw<DatabaseMigrationException>();
+        }
+
+        [Fact]
+        public void Validate_MultipleRepeatablesWithDifferentTagsNotThrows()
+        {
+            sut.AddMigration(new FakeDatabaseMigration()
+            {
+                ModuleName = "appModule1",
+                IsRepeatable = true,
+                Tags = new[] { new[] { "xyz" } }
+            });
+
+            sut.AddMigration(new FakeDatabaseMigration()
+            {
+                ModuleName = "appModule1",
+                IsRepeatable = true,
+                Tags = new[] { new[] { "abc" } }
+            });
+
+            sut.Invoking(x => x.ValidateMigrations())
+                .Should().NotThrow<DatabaseMigrationException>();
+        }
+
+        [Fact]
         public void Validate_MultipleBaselinesThrows()
         {
             sut.AddMigration(new FakeDatabaseMigration()
@@ -138,6 +178,29 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
 
             sut.Invoking(x => x.ValidateMigrations())
                 .Should().Throw<DatabaseMigrationException>();
+        }
+
+        [Fact]
+        public void Validate_MultipleBaselinesDifferentTagsNotThrows()
+        {
+            sut.AddMigration(new FakeDatabaseMigration()
+            {
+                ModuleName = "appModule1",
+                Version = DatabaseVersion.Parse("1.0.0"),
+                IsBaseline = true,
+                Tags = new [] { new [] { "xyz" } }
+            });
+
+            sut.AddMigration(new FakeDatabaseMigration()
+            {
+                ModuleName = "appModule1",
+                Version = DatabaseVersion.Parse("1.0.1"),
+                IsBaseline = true,
+                Tags = new[] { new[] { "abc" } }
+            });
+
+            sut.Invoking(x => x.ValidateMigrations())
+                .Should().NotThrow<DatabaseMigrationException>();
         }
 
         [Fact]

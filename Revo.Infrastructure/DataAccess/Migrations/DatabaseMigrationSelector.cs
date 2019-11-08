@@ -151,7 +151,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
             {
                 var migration = migrations[i];
 
-                var dependencySpecs = await GetRequiredMigrationDependenciesAsync(migration, queuedMigrations);
+                var dependencySpecs = await GetRequiredMigrationDependenciesAsync(migration, queuedMigrations, tags);
                 foreach (var dependencySpec in dependencySpecs)
                 {
                     var dependencyMigrations = await DoSelectMigrationsAsync(dependencySpec.ModuleName, tags,
@@ -164,15 +164,19 @@ namespace Revo.Infrastructure.DataAccess.Migrations
         }
 
         private async Task<List<DatabaseMigrationSpecifier>> GetRequiredMigrationDependenciesAsync(
-            IDatabaseMigration migration, List<DatabaseMigrationSpecifier> queuedMigrations)
+            IDatabaseMigration migration, List<DatabaseMigrationSpecifier> queuedMigrations, string[] tags)
         {
             var dependencies = new List<DatabaseMigrationSpecifier>();
 
             history = history ?? await migrationProvider.GetMigrationHistoryAsync();
+
+            var tagMatchingMigrations = migrationRegistry.Migrations
+                .Where(x => x.Tags.All(tagGroup => tags.Any(tagGroup.Contains)));
+
             foreach (var dependency in migration.Dependencies)
             {
                 // repeatable dependencies
-                var repeatableMigration = migrationRegistry.Migrations.FirstOrDefault(x => x.ModuleName == dependency.ModuleName && x.IsRepeatable);
+                var repeatableMigration = tagMatchingMigrations.FirstOrDefault(x => x.ModuleName == dependency.ModuleName && x.IsRepeatable);
                 if (dependency.Version == null && repeatableMigration != null)
                 {
                     if (queuedMigrations.Any(x => x.ModuleName == dependency.ModuleName))
@@ -208,33 +212,51 @@ namespace Revo.Infrastructure.DataAccess.Migrations
                         version = lastMigration?.Version;
                     }
 
-                    IEnumerable<IDatabaseMigration> matchingDependencies = migrationRegistry.Migrations
+                    IEnumerable<IDatabaseMigration> matchingDependencies = tagMatchingMigrations
                         .Where(x => x.ModuleName == dependency.ModuleName)
                         .OrderByDescending(x => x.Version);
 
-                    if (dependency.Version == null)
+                    if (dependency.Version != null)
                     {
-                        if (version != null)
+                        matchingDependencies = matchingDependencies.Where(x => dependency.Version.Equals(x.Version));
+
+                        if (matchingDependencies.Any() && version != null && version.CompareTo(matchingDependencies.First().Version) >= 0)
                         {
-                            matchingDependencies = matchingDependencies.Where(x => !x.IsBaseline);
+                            continue; // nothing to upgrade, case when !matchingDependencies.Any() is handled later
                         }
                     }
                     else
                     {
-                        matchingDependencies = matchingDependencies.Where(x => dependency.Version.Equals(x.Version));
+                        if (matchingDependencies.Any())
+                        {
+                            var maxVersion = matchingDependencies.Select(x => x.Version).Max();
+                            if (version != null && version.CompareTo(maxVersion) >= 0)
+                            {
+                                continue; // nothing to upgrade, case when !matchingDependencies.Any() is handled later
+                            }
+
+                            matchingDependencies = matchingDependencies.Where(x => maxVersion.Equals(x.Version));
+                        }
                     }
-
-                    var bestMatch = matchingDependencies.FirstOrDefault();
-
-                    if (bestMatch == null)
+                    
+                    if (!matchingDependencies.Any())
                     {
                         throw new DatabaseMigrationException($"Database migration {migration} specifies dependency to {dependency.ModuleName}@{dependency.Version?.ToString() ?? "latest"}, but no matching migrations to that version were found");
                     }
+                    
+                    matchingDependencies = matchingDependencies.ToArray();
 
-                    if (version == null || version.CompareTo(bestMatch.Version) < 0)
+                    if (version != null)
                     {
-                        dependencies.Add(dependency);
+                        matchingDependencies = matchingDependencies.Where(x => !x.IsBaseline);
+
+                        if (!matchingDependencies.Any())
+                        {
+                            throw new DatabaseMigrationException($"Database migration {migration} specifies dependency to {dependency.ModuleName}@{dependency.Version?.ToString() ?? "latest"}, for which there is a baseline migration, but no upgrade migration from version {version}");
+                        }
                     }
+
+                    dependencies.Add(dependency);
                 }
                 
             }
