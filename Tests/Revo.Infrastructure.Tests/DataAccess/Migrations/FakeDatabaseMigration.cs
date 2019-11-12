@@ -13,5 +13,9 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
         public string[][] Tags { get; set; } = new string[0][];
         public string Description { get; set; }
         public string Checksum { get; set; }
+        public string ToString(bool includeClassName)
+        {
+            return "";
+        }
     }
 }

@@ -87,11 +87,16 @@ namespace Revo.Tools.DatabaseMigrator
             }
             else
             {
-                var perModule = appliedMigrations.GroupBy(x => x.Specifier.ModuleName);
+                string GetMigrationLines(PendingModuleMigration moduleMigration)
+                {
+                    return string.Join('\n',
+                        moduleMigration.Migrations.Select((x, i) =>
+                            $"  {i + 1}. {x.ToString(false)}{(x.ModuleName != moduleMigration.Specifier.ModuleName ? " (dependency)" : "")}"));
+                }
 
-                var moduleInfos = perModule.Select(x => $"{x.Key} to version {x.SelectMany(y => y.Migrations).OrderByDescending(y => y.Version).First().Version} ({x.SelectMany(y => y.Migrations).Count()} migration(s))");
-                string moduleInfosLines = string.Join('\n', moduleInfos);
-                Logger.Info($"There are {appliedMigrations.Count} modules to be migrated:\n{moduleInfosLines}");
+                var moduleInfos = appliedMigrations.Select(x => $"{x.Specifier.ModuleName} to version {x.Migrations.OrderByDescending(y => y.Version).First().Version} ({x.Migrations.Count()} migration(s)):\n{GetMigrationLines(x)}");
+                string moduleInfosLines = string.Join("\n\n", moduleInfos);
+                Logger.Info($"There are {appliedMigrations.Count} modules to be migrated:\n\n{moduleInfosLines}");
             }
         }
 

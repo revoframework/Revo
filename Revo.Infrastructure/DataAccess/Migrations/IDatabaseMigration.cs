@@ -44,5 +44,6 @@ namespace Revo.Infrastructure.DataAccess.Migrations
 
         string Description { get; }
         string Checksum { get; }
+        string ToString(bool includeClassName);
     }
 }

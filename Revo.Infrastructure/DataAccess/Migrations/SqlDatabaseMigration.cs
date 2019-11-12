@@ -37,9 +37,21 @@ namespace Revo.Infrastructure.DataAccess.Migrations
 
         public abstract string[] SqlCommands { get; }
 
+        public virtual string ToString(bool includeClassName)
+        {
+            if (!includeClassName)
+            {
+                return $"{ModuleName}{(Version != null ? $"@{Version}" : "")}{(IsBaseline ? " (baseline)" : "")}{(IsRepeatable ? " (repeatable)" : "")}";
+            }
+            else
+            {
+                return $"{nameof(SqlDatabaseMigration)} {{{ToString(false)}}}";
+            }
+        }
+
         public override string ToString()
         {
-            return $"{nameof(SqlDatabaseMigration)} {{{ModuleName}@{Version}}}";
+            return ToString(true);
         }
     }
 }

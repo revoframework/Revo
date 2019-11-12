@@ -102,9 +102,16 @@ namespace Revo.Infrastructure.DataAccess.Migrations
             }
         }
 
-        public override string ToString()
+        public override string ToString(bool includeClassName)
         {
-            return $"{nameof(SqlDatabaseMigration)} {{{ModuleName}@{Version} from {FileName}}}";
+            if (includeClassName)
+            {
+                return base.ToString(true);
+            }
+            else
+            {
+                return $"{base.ToString(false)} from {FileName}";
+            }
         }
 
         protected abstract string ReadSqlFileContents();

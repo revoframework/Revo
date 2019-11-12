@@ -26,14 +26,14 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
             }
         }
 
-        protected override async Task<IDbConnection> GetDbConnectionAsync()
+        protected override Task<IDbConnection> GetDbConnectionAsync()
         {
             if (DbConnection.State == ConnectionState.Closed)
             {
                 DbConnection.Open();
             }
 
-            return DbConnection;
+            return Task.FromResult(DbConnection);
         }
     }
 }
