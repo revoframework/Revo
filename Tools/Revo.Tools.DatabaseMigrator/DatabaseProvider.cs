@@ -3,6 +3,7 @@
     public enum DatabaseProvider
     {
         Npgsql,
-        SqlServer
+        SqlServer,
+        SQLite
     }
 }

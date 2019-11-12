@@ -12,6 +12,7 @@
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="CommandLineParser" Version="2.6.0" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="3.0.0" />
     <PackageReference Include="Npgsql" Version="4.1.1" />
     <PackageReference Include="System.Data.SqlClient" Version="4.7.0" />
   </ItemGroup>

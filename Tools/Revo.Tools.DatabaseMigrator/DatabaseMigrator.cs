@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.Data.Sqlite;
 using Ninject;
 using Ninject.Modules;
 using NLog;
@@ -239,6 +240,12 @@ namespace Revo.Tools.DatabaseMigrator
                     dbConnection = new SqlConnection(Options.ConnectionString);
                     scripter = new MssqlMigrationScripter();
                     Logger.Info("Using SQL Server database provider with MSSQL scripter");
+                    break;
+                
+                case DatabaseProvider.SQLite:
+                    dbConnection = new SqliteConnection(Options.ConnectionString);
+                    scripter = new SqliteMigrationScripter();
+                    Logger.Info("Using SQLite file database provider with SQLite scripter");
                     break;
 
                 default:

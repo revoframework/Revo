@@ -8,7 +8,7 @@ namespace Revo.Tools.DatabaseMigrator
         [Option('c', "connectionString", Required = true, HelpText = "Connection string for the database provider.")]
         string ConnectionString { get; set; }
 
-        [Option('p', "databaseProvider", Required = true, HelpText = "Used database provider. Currently supported values are: Npgsql, SqlServer.")]
+        [Option('p', "databaseProvider", Required = true, HelpText = "Used database provider. Currently supported values are: Npgsql, SqlServer, SQLite.")]
         DatabaseProvider DatabaseProvider { get; set; }
 
         [Option('a', "assemblies", Required = false, HelpText = "Assemblies containing NinjectModules to load. Migrator will execute all migrations registered in these modules.")]

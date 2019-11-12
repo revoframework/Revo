@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Ninject;
 using Revo.Domain.Entities;
 using Revo.Infrastructure.Repositories;
 
