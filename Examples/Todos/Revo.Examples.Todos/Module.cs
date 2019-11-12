@@ -8,7 +8,7 @@ namespace Revo.Examples.Todos
         public override void Load()
         {
             Bind<ResourceDatabaseMigrationDiscoveryAssembly>()
-                .ToConstant(new ResourceDatabaseMigrationDiscoveryAssembly(GetType().Assembly.FullName, "Sql"))
+                .ToConstant(new ResourceDatabaseMigrationDiscoveryAssembly(GetType().Assembly, "Sql"))
                 .InSingletonScope();
         }
     }

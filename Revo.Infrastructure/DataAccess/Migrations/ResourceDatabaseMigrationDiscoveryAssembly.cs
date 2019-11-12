@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using Revo.Core.ValueObjects;
 
@@ -6,15 +7,15 @@ namespace Revo.Infrastructure.DataAccess.Migrations
 {
     public class ResourceDatabaseMigrationDiscoveryAssembly : ValueObject<ResourceDatabaseMigrationDiscoveryAssembly>
     {
-        public ResourceDatabaseMigrationDiscoveryAssembly(string assemblyName, string directoryPath,
+        public ResourceDatabaseMigrationDiscoveryAssembly(Assembly assembly, string directoryPath,
             Regex fileNameRegex = null)
         {
-            AssemblyName = assemblyName;
+            Assembly = assembly;
             DirectoryPath = directoryPath;
             FileNameRegex = fileNameRegex ?? FileSqlDatabaseMigration.DefaultFileNameRegex;
         }
 
-        public string AssemblyName { get; }
+        public Assembly Assembly { get; }
         public string DirectoryPath { get; }
 
         /// <summary>
@@ -26,7 +27,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
 
         protected override IEnumerable<(string Name, object Value)> GetValueComponents()
         {
-            yield return (nameof(AssemblyName), AssemblyName);
+            yield return (nameof(Assembly), Assembly);
             yield return (nameof(DirectoryPath), DirectoryPath);
             yield return (nameof(FileNameRegex), FileNameRegex.ToString());
         }

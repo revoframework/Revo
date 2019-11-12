@@ -44,8 +44,7 @@ namespace Revo.EF6.EventStores
 
             Bind<ResourceDatabaseMigrationDiscoveryAssembly>()
                 .ToConstant(new ResourceDatabaseMigrationDiscoveryAssembly(
-                    typeof(InfrastructureConfigurationSection).Assembly.FullName,
-                    "Sql"))
+                    typeof(InfrastructureConfigurationSection).Assembly, "Sql"))
                 .InSingletonScope();
         }
     }

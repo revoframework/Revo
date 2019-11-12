@@ -43,7 +43,7 @@ namespace Revo.Extensions.Notifications
             
             Bind<ResourceDatabaseMigrationDiscoveryAssembly>()
                 .ToConstant(new ResourceDatabaseMigrationDiscoveryAssembly(
-                    typeof(NotificationsModule).Assembly.FullName, "Sql"))
+                    typeof(NotificationsModule).Assembly, "Sql"))
                 .InSingletonScope();
         }
     }

@@ -28,7 +28,7 @@ namespace Revo.Extensions.History.ChangeTracking
 
             Bind<ResourceDatabaseMigrationDiscoveryAssembly>()
                 .ToConstant(new ResourceDatabaseMigrationDiscoveryAssembly(
-                    typeof(HistoryModule).Assembly.FullName, "Sql"))
+                    typeof(HistoryModule).Assembly, "Sql"))
                 .InSingletonScope();
         }
     }

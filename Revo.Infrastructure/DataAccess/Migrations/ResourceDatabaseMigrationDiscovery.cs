@@ -17,13 +17,12 @@ namespace Revo.Infrastructure.DataAccess.Migrations
         {
             foreach (var registeredAssembly in registeredAssemblies)
             {
-                var assembly = Assembly.Load(registeredAssembly.AssemblyName);
-                var pathPrefix = assembly.GetName().Name.ToLowerInvariant() + "." + registeredAssembly.DirectoryPath
+                var pathPrefix = registeredAssembly.Assembly.GetName().Name.ToLowerInvariant() + "." + registeredAssembly.DirectoryPath
                     .Trim('/', '\\').Replace('/', '.').Replace('\\', '.')
                     .ToLowerInvariant()
                     + ".";
 
-                foreach (var resourceName in assembly.GetManifestResourceNames())
+                foreach (var resourceName in registeredAssembly.Assembly.GetManifestResourceNames())
                 {
                     string resourceNameLower = resourceName.ToLowerInvariant();
                     if (resourceNameLower.StartsWith(pathPrefix))
@@ -32,7 +31,8 @@ namespace Revo.Infrastructure.DataAccess.Migrations
 
                         if (registeredAssembly.FileNameRegex.Match(fileName).Success)
                         {
-                            yield return new ResourceFileSqlDatabaseMigration(assembly, resourceName, fileName, registeredAssembly.FileNameRegex);
+                            yield return new ResourceFileSqlDatabaseMigration(registeredAssembly.Assembly, resourceName,
+                                fileName, registeredAssembly.FileNameRegex);
                         }
                     }
                 }

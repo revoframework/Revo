@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using McMaster.NETCore.Plugins;
 using Microsoft.Data.Sqlite;
 using Ninject;
 using Ninject.Modules;
@@ -29,39 +29,12 @@ namespace Revo.Tools.DatabaseMigrator
         private AdoNetDatabaseMigrationProvider migrationProvider;
         private IDatabaseMigrationDiscovery[] migrationDiscoveries;
 
-        private static HashSet<string> assemblySearchPaths = new HashSet<string>();
-
-        static DatabaseMigrator()
-        {
-            assemblySearchPaths.Add(Path.GetDirectoryName("."));
-            assemblySearchPaths.Add(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
-
-            AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(LoadFromRegisteredPaths);
-        }
-
         public DatabaseMigrator(ICommonOptions options)
         {
             this.Options = options;
         }
 
         public ICommonOptions Options { get; }
-
-        private static Assembly LoadFromRegisteredPaths(object sender, ResolveEventArgs args)
-        {
-            foreach (string searchPath in assemblySearchPaths)
-            {
-                string assemblyPath = Path.Combine(searchPath, new AssemblyName(args.Name).Name + ".dll");
-                if (!File.Exists(assemblyPath))
-                {
-                    continue;
-                }
-
-                Assembly assembly = Assembly.LoadFrom(assemblyPath);
-                return assembly;
-            }
-
-            return null;
-        }
 
         public async Task UpgradeAsync(UpgradeVerb verb)
         {
@@ -94,7 +67,7 @@ namespace Revo.Tools.DatabaseMigrator
                             $"  {i + 1}. {x.ToString(false)}{(x.ModuleName != moduleMigration.Specifier.ModuleName ? " (dependency)" : "")}"));
                 }
 
-                var moduleInfos = appliedMigrations.Select(x => $"{x.Specifier.ModuleName} to version {x.Migrations.OrderByDescending(y => y.Version).First().Version} ({x.Migrations.Count()} migration(s)):\n{GetMigrationLines(x)}");
+                var moduleInfos = appliedMigrations.Select(x => $"{x.Specifier.ModuleName}{(x.Migrations.Any(y => y.Version != null) ? $" to version {x.Migrations.OrderByDescending(y => y.Version).First().Version}" : "")} ({x.Migrations.Count()} migration(s)):\n{GetMigrationLines(x)}");
                 string moduleInfosLines = string.Join("\n\n", moduleInfos);
                 Logger.Info($"There are {appliedMigrations.Count} modules to be migrated:\n\n{moduleInfosLines}");
             }
@@ -163,17 +136,18 @@ namespace Revo.Tools.DatabaseMigrator
 
             foreach (var assemblyName in Options.Assemblies)
             {
-                var assembly = Assembly.LoadFile(assemblyName);
-                loadedAssemblies.Add(assembly.GetName().Name, assembly);
+                var pluginLoader = PluginLoader.CreateFromAssemblyFile(
+                    assemblyFile: assemblyName, new[] { typeof(INinjectModule), typeof(ResourceDatabaseMigrationDiscoveryAssembly) },
+                    config =>
+                    {
+                        config.PreferSharedTypes = true;
+                    });
 
-                if (assemblyName.Contains(".dll"))
-                {
-                    string assemblyPath = Path.GetFullPath(assemblyName);
-                    string assemblyDirectory = Path.GetDirectoryName(assemblyPath);
-                    assemblySearchPaths.Add(assemblyDirectory);
-                }
+                Assembly mainAssembly = pluginLoader.LoadDefaultAssembly();
+                
+                loadedAssemblies.Add(mainAssembly.GetName().Name, mainAssembly);
 
-                LoadReferencedAssembliesRecursive(assembly, loadedAssemblies);
+                LoadReferencedAssembliesRecursive(mainAssembly, pluginLoader, loadedAssemblies);
             }
 
             LoadAssemblyModules(loadedAssemblies.Values);
@@ -205,15 +179,24 @@ namespace Revo.Tools.DatabaseMigrator
         {
             foreach (var assembly in assemblies)
             {
-                var modules = GetNinjectModules(assembly).Where(x => !kernel.HasModule(x.Name)).ToArray();
-                if (modules.Length > 0)
+                try
                 {
-                    kernel.Load(modules);
+                    var modules = GetNinjectModules(assembly).Where(x => !kernel.HasModule(x.Name)).ToArray();
+                    if (modules.Length > 0)
+                    {
+                        kernel.Load(modules);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Warn(e, $"Failed to load referenced assembly");
+                    throw;
                 }
             }
         }
 
-        private void LoadReferencedAssembliesRecursive(Assembly assembly, Dictionary<string, Assembly> loadedAssemblies)
+        private void LoadReferencedAssembliesRecursive(Assembly assembly, PluginLoader pluginLoader,
+            Dictionary<string, Assembly> loadedAssemblies)
         {
             foreach (var assemblyName in assembly.GetReferencedAssemblies())
             {
@@ -221,9 +204,10 @@ namespace Revo.Tools.DatabaseMigrator
                     && !assemblyName.Name.StartsWith("Microsoft.")
                     && !assemblyName.Name.StartsWith("System."))
                 {
-                    var referencedAssembly = Assembly.Load(assemblyName);
+                    var referencedAssembly = pluginLoader.LoadAssembly(assemblyName);
+
                     loadedAssemblies.Add(referencedAssembly.GetName().Name, referencedAssembly);
-                    LoadReferencedAssembliesRecursive(referencedAssembly, loadedAssemblies);
+                    LoadReferencedAssembliesRecursive(referencedAssembly, pluginLoader, loadedAssemblies);
                 }
             }
         }
