@@ -16,12 +16,6 @@ namespace Revo.Infrastructure.Repositories
         Task<T> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity;
         Task<T> FirstAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity;
         
-        /// <summary>
-        /// Finds an aggregate by 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="id"></param>
-        /// <returns></returns>
         T Find<T>(Guid id) where T : class, IAggregateRoot;
         Task<T> FindAsync<T>(Guid id) where T : class, IAggregateRoot;
         Task<T[]> FindManyAsync<T>(params Guid[] ids) where T : class, IAggregateRoot;
@@ -38,7 +32,5 @@ namespace Revo.Infrastructure.Repositories
         IQueryable<T> Where<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity;
         
         void Remove<T>(T aggregate) where T : class, IAggregateRoot;
-
-        Task SaveChangesAsync();
     }
 }

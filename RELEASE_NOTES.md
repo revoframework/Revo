@@ -14,6 +14,7 @@
 ### Changed
 - Entity Framework 6 provider updated to EF6.3 version and is now targeting both net472 and netstandard2.1
 - Revo.Extensions.Notifications and Revo.Extensions.History now need to be explicitly registered in Revo configuration using AddHistoryExtension and AddNotificationsExtension
+- removed IRepository.SaveChangesAsync to avoid confusion - it doesn't work well in certain situations (e.g. with EF Core provider) and IUnitOfWork.CommitAsync should be used instead
 - NLog updated to 4.6.7
 
 ## [1.12.0] - 2019-10-22

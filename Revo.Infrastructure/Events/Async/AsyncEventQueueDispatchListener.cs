@@ -28,7 +28,7 @@ namespace Revo.Infrastructure.Events.Async
 
         public Task OnBeforeWorkCommitAsync(IUnitOfWork unitOfWork)
         {
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
 
         public void OnWorkBegin(IUnitOfWork unitOfWork)
