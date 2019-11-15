@@ -10,6 +10,7 @@
 ### Fixed
 - events are now correctly marked as dispatched even when there are no listeners for them
 - fixed missing IExternalEventStore registration for EF6 provider
+- not resetting DbContexts after EFCoreCoordinatedTransaction finishes
 
 ### Changed
 - Entity Framework 6 provider updated to EF6.3 version and is now targeting both net472 and netstandard2.1

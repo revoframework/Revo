@@ -45,26 +45,11 @@ namespace Revo.Infrastructure.Repositories
             return aggregateType.GetCustomAttributes(typeof(DatabaseEntityAttribute), true).Any();
         }
 
-        public T Find<T>(Guid id) where T : class, IAggregateRoot
-        {
-            return crudRepository.Find<T>(id);
-        }
-
         public Task<T> FindAsync<T>(Guid id) where T : class, IAggregateRoot
         {
             return crudRepository.FindAsync<T>(id);
         }
-
-        public T FirstOrDefault<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
-        {
-            return crudRepository.FirstOrDefault(predicate);
-        }
-
-        public T First<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
-        {
-            return crudRepository.First(predicate);
-        }
-
+        
         public Task<T> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
         {
             return crudRepository.FirstOrDefaultAsync(predicate);
@@ -93,11 +78,6 @@ namespace Revo.Infrastructure.Repositories
         public async Task<T[]> FindManyAsync<T>(params Guid[] ids) where T : class, IAggregateRoot
         {
             return await crudRepository.Where<T>(x => ids.Contains(x.Id)).ToArrayAsync(crudRepository);
-        }
-
-        public T Get<T>(Guid id) where T : class, IAggregateRoot
-        {
-            return crudRepository.Get<T>(id);
         }
 
         public Task<T> GetAsync<T>(Guid id) where T : class, IAggregateRoot
@@ -157,7 +137,7 @@ namespace Revo.Infrastructure.Repositories
         protected void InjectClassIds()
         {
             var addedClassEntitites = crudRepository.GetEntities<IBasicClassIdEntity>(
-                Revo.DataAccess.Entities.EntityState.Added, Revo.DataAccess.Entities.EntityState.Modified)
+                EntityState.Added, EntityState.Modified)
                 .Where(x => crudRepository.GetEntityState(x) != EntityState.Deleted && crudRepository.GetEntityState(x) != EntityState.Detached);
 
             foreach (IBasicClassIdEntity entity in addedClassEntitites)

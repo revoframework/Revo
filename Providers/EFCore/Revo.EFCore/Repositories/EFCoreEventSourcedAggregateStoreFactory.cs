@@ -8,11 +8,12 @@ namespace Revo.EFCore.Repositories
 {
     public class EFCoreEventSourcedAggregateStoreFactory : EventSourcedAggregateStoreFactory
     {
-        private readonly Func<IPublishEventBuffer, IEventSourcedAggregateRepository> func;
+        private readonly Func<IPublishEventBuffer, IEFCoreTransactionCoordinator, EFCoreEventSourcedAggregateStore> func;
         private readonly IEFCoreTransactionCoordinator transactionCoordinator;
 
-        public EFCoreEventSourcedAggregateStoreFactory(Func<IPublishEventBuffer, IEventSourcedAggregateRepository> func,
-            IEFCoreTransactionCoordinator transactionCoordinator) : base(func)
+        public EFCoreEventSourcedAggregateStoreFactory(
+            Func<IPublishEventBuffer, IEFCoreTransactionCoordinator, EFCoreEventSourcedAggregateStore> func,
+            IEFCoreTransactionCoordinator transactionCoordinator) : base(null)
         {
             this.func = func;
             this.transactionCoordinator = transactionCoordinator;
@@ -20,7 +21,7 @@ namespace Revo.EFCore.Repositories
 
         public override IAggregateStore CreateAggregateStore(IUnitOfWork unitOfWork)
         {
-            return new EFCoreEventSourcedAggregateStore(func(unitOfWork.EventBuffer), transactionCoordinator);
+            return func(unitOfWork.EventBuffer, transactionCoordinator);
         }
     }
 }

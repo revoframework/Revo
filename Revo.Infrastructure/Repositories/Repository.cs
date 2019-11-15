@@ -67,20 +67,6 @@ namespace Revo.Infrastructure.Repositories
         {
         }
 
-        public T FirstOrDefault<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
-        {
-            var aggregateStore = GetQueyrableAggregateStore<T>();
-            T aggregate = aggregateStore.FirstOrDefault(predicate);
-            return aggregate;
-        }
-
-        public T First<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
-        {
-            var aggregateStore = GetQueyrableAggregateStore<T>();
-            T aggregate = aggregateStore.First(predicate);
-            return aggregate;
-        }
-
         public async Task<T> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
         {
             var aggregateStore = GetQueyrableAggregateStore<T>();
@@ -92,13 +78,6 @@ namespace Revo.Infrastructure.Repositories
         {
             var aggregateStore = GetQueyrableAggregateStore<T>();
             T aggregate = await aggregateStore.FirstAsync(predicate);
-            return aggregate;
-        }
-
-        public T Find<T>(Guid id) where T : class, IAggregateRoot
-        {
-            var aggregateStore = GetAggregateStore<T>();
-            T aggregate = aggregateStore.Find<T>(id);
             return aggregate;
         }
 
@@ -132,13 +111,6 @@ namespace Revo.Infrastructure.Repositories
         {
             var aggregateStore = GetQueyrableAggregateStore<T>();
             return aggregateStore.FindAllAsync<T>(predicate);
-        }
-
-        public T Get<T>(Guid id) where T : class, IAggregateRoot
-        {
-            var aggregateStore = GetAggregateStore<T>();
-            T aggregate = aggregateStore.Get<T>(id);
-            return aggregate;
         }
 
         public async Task<T> GetAsync<T>(Guid id) where T : class, IAggregateRoot

@@ -1,6 +1,10 @@
 ﻿using System.Threading.Tasks;
+using Revo.Core.Events;
 using Revo.Core.Transactions;
-using Revo.Infrastructure.EventSourcing;
+using Revo.DataAccess.Entities;
+using Revo.Domain.Entities;
+using Revo.Infrastructure.Events;
+using Revo.Infrastructure.EventStores;
 using Revo.Infrastructure.Repositories;
 
 namespace Revo.EFCore.Repositories
@@ -9,8 +13,12 @@ namespace Revo.EFCore.Repositories
     {
         private readonly IEFCoreTransactionCoordinator transactionCoordinator;
 
-        public EFCoreEventSourcedAggregateStore(IEventSourcedAggregateRepository eventSourcedRepository,
-            IEFCoreTransactionCoordinator transactionCoordinator) : base(eventSourcedRepository)
+        public EFCoreEventSourcedAggregateStore(IEventStore eventStore, IEntityTypeManager entityTypeManager,
+            IPublishEventBuffer publishEventBuffer, IRepositoryFilter[] repositoryFilters,
+            IEventMessageFactory eventMessageFactory, IEntityFactory entityFactory,
+            IEFCoreTransactionCoordinator transactionCoordinator)
+            : base(eventStore, entityTypeManager, publishEventBuffer, repositoryFilters, eventMessageFactory,
+                entityFactory)
         {
             this.transactionCoordinator = transactionCoordinator;
 

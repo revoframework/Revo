@@ -15,4 +15,8 @@
     <ProjectReference Include="..\..\Revo.Testing\Revo.Testing.csproj" />
   </ItemGroup>
   
+  <ItemGroup>
+    <Folder Include="EventSourcing\" />
+  </ItemGroup>
+  
 </Project>

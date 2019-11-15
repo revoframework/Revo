@@ -11,12 +11,9 @@ namespace Revo.Infrastructure.Repositories
     {
         void Add<T>(T aggregate) where T : class, IAggregateRoot;
 
-        T FirstOrDefault<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity;
-        T First<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity;
         Task<T> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity;
         Task<T> FirstAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity;
         
-        T Find<T>(Guid id) where T : class, IAggregateRoot;
         Task<T> FindAsync<T>(Guid id) where T : class, IAggregateRoot;
         Task<T[]> FindManyAsync<T>(params Guid[] ids) where T : class, IAggregateRoot;
 
@@ -24,7 +21,6 @@ namespace Revo.Infrastructure.Repositories
         Task<T[]> FindAllAsync<T>() where T : class, IAggregateRoot, IQueryableEntity;
         Task<T[]> FindAllAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity;
 
-        T Get<T>(Guid id) where T : class, IAggregateRoot;
         Task<T> GetAsync<T>(Guid id) where T : class, IAggregateRoot;
         Task<T[]> GetManyAsync<T>(params Guid[] ids) where T : class, IAggregateRoot;
         IAsyncQueryableResolver GetQueryableResolver<T>() where T : class, IAggregateRoot, IQueryableEntity;
