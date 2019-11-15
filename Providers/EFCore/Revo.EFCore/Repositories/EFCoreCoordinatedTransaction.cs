@@ -91,7 +91,6 @@ namespace Revo.EFCore.Repositories
 
         public Task OnWorkSucceededAsync(IUnitOfWork unitOfWork)
         {
-            crudRepository.DatabaseAccess.ClearDbContexts();
             return Task.CompletedTask;
         }
 
