@@ -19,7 +19,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
         private string description;
         private List<DatabaseMigrationSpecifier> dependencies = new List<DatabaseMigrationSpecifier>();
         private bool hasParsedFile;
-
+        
         protected FileSqlDatabaseMigration(string fileName, Regex fileNameRegex = null)
         {
             FileName = fileName;
@@ -45,8 +45,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
             isRepeatable = match.Groups["repeatable"].Captures.Count > 0;
 
             version = match.Groups["version"].Captures.Count > 0
-                ? DatabaseVersion.Parse(match.Groups["version"].Captures[0].Value)
-                : (isRepeatable ? (DatabaseVersion) null : throw new FormatException($"Invalid FileSqlDatabaseMigration file name: missing version in '{FileName}'"));
+                ? DatabaseVersion.Parse(match.Groups["version"].Captures[0].Value) : null;
 
             tags = match.Groups["tag"].Captures.Count > 0
                 ? new[] { match.Groups["tag"].Captures.OfType<Capture>().Select(x => x.Value).ToArray() }
@@ -54,7 +53,28 @@ namespace Revo.Infrastructure.DataAccess.Migrations
         }
 
         public string FileName { get; private set; }
-        public override DatabaseVersion Version => version;
+
+        public override DatabaseVersion Version
+        {
+            get
+            {
+                if (version == null && !IsRepeatable)
+                {
+                    if (!hasParsedFile)
+                    {
+                        ParseFile();
+                    }
+
+                    if (version == null)
+                    {
+                        throw new FormatException($"Invalid FileSqlDatabaseMigration: {this} is missing version");
+                    }
+                }
+
+                return version;
+            }
+        }
+
         public override string ModuleName => moduleName;
         public override string[][] Tags => tags;
         public override bool IsBaseline => isBaseline;
@@ -167,6 +187,18 @@ namespace Revo.Infrastructure.DataAccess.Migrations
             {
                 line = line.Substring("description:".Length).Trim();
                 description = line;
+            }
+            else if (line.StartsWith("version:"))
+            {
+                line = line.Substring("version:".Length).Trim();
+                var newVersion = DatabaseVersion.Parse(line);
+
+                if (version != null && !Equals(version, newVersion))
+                {
+                    throw new FormatException($"Version specified in {this} headers ({newVersion}) is different from version specified in its file name ({version})");
+                }
+
+                version = newVersion;
             }
             else if (line.StartsWith("dependency:"))
             {

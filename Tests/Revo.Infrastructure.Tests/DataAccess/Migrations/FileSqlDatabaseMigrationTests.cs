@@ -21,7 +21,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
         public void PropertiesFromFileName(string fileNameRegex, string fileName, string expModuleName, string expVersionString,
             string expTags, bool isBaseline, bool isRepeatable)
         {
-            sut = new TestFileSqlDatabaseMigration(fileName,
+            sut = new TestFileSqlDatabaseMigration(fileName, "",
                 fileNameRegex != null ? new Regex(fileNameRegex, RegexOptions.IgnoreCase) : null);
 
             sut.FileName.Should().Be(fileName);
@@ -44,8 +44,8 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
         [Fact]
         public void SqlCommands()
         {
-            sut = new TestFileSqlDatabaseMigration("myapp_1.0.1.sql", null);
-            sut.SqlFileContents = "CREATE TABLE abc (id int);";
+            var sql = "CREATE TABLE abc (id int);";
+            sut = new TestFileSqlDatabaseMigration("myapp_1.0.1.sql", sql);
 
             sut.SqlCommands.Should()
                 .HaveCount(1)
@@ -55,8 +55,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
         [Fact]
         public void ParsesDescription()
         {
-            sut = new TestFileSqlDatabaseMigration("myapp_1.0.1.sql", null);
-            sut.SqlFileContents = 
+            var sql =
 @"
 -- Hello
 /* Multi
@@ -70,14 +69,56 @@ CREATE TABLE abc (
 DROP TABLE def;
 ";
 
+            sut = new TestFileSqlDatabaseMigration("myapp_1.0.1.sql", sql);
             sut.Description.Should().Be("Lorem ipsum dolor sit amet.");
+        }
+
+        [Fact]
+        public void ParsesVersion()
+        {
+            var sql = 
+@"
+-- Hello
+/* Multi
+line comment */
+-- version: 1.5.0
+
+CREATE TABLE abc (
+    id int
+);
+
+DROP TABLE def;
+";
+
+            sut = new TestFileSqlDatabaseMigration("myapp.sql", sql);
+            sut.Version.Should().Be(DatabaseVersion.Parse("1.5.0"));
+        }
+
+        [Fact]
+        public void ThrowsIfHeaderVersionDifferentFromFileName()
+        {
+            var sql = 
+@"
+-- Hello
+/* Multi
+line comment */
+-- version: 1.6.0
+
+CREATE TABLE abc (
+    id int
+);
+
+DROP TABLE def;
+";
+
+
+            sut = new TestFileSqlDatabaseMigration("myapp_1.5.0.sql", sql);
         }
         
         [Fact]
         public void ParsesDependencies()
         {
-            sut = new TestFileSqlDatabaseMigration("myapp_1.0.1.sql", null);
-            sut.SqlFileContents = 
+            var sql = 
 @"
 -- Hello
 /* Multi
@@ -92,6 +133,7 @@ CREATE TABLE abc (
 DROP TABLE def;
 ";
 
+            sut = new TestFileSqlDatabaseMigration("myapp_1.0.1.sql", sql);
             sut.Dependencies.Should()
                 .BeEquivalentTo(
                     new DatabaseMigrationSpecifier("myapp-base", DatabaseVersion.Parse("1.2.3")),
@@ -101,8 +143,7 @@ DROP TABLE def;
         [Fact]
         public void ShouldNotParseAfterContent()
         {
-            sut = new TestFileSqlDatabaseMigration("myapp_1.0.1.sql", null);
-            sut.SqlFileContents =
+            var sql =
 @"
 -- Hello
 /* Multi
@@ -117,16 +158,19 @@ CREATE TABLE abc (
 DROP TABLE def;
 ";
 
+            sut = new TestFileSqlDatabaseMigration("myapp_1.0.1.sql", sql);
             sut.Description.Should().BeNull();
         }
 
         private class TestFileSqlDatabaseMigration : FileSqlDatabaseMigration
         {
-            public TestFileSqlDatabaseMigration(string fileName, Regex fileNameRegex = null) : base(fileName, fileNameRegex)
+            public TestFileSqlDatabaseMigration(string fileName,
+                string sqlFileContents, Regex fileNameRegex = null) : base(fileName, fileNameRegex)
             {
+                SqlFileContents = sqlFileContents;
             }
 
-            public string SqlFileContents { get; set; }
+            public string SqlFileContents { get; }
 
             protected override string ReadSqlFileContents()
             {
