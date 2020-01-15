@@ -5,8 +5,11 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <Configurations>Debug;Release</Configurations>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>revo-dbmigrate</ToolCommandName>
+    <Description>Event Sourcing, CQRS and DDD framework for modern C#/.NET applications.
+.NET Core global tool for database migrations.</Description> 
   </PropertyGroup>
 
   <ItemGroup>
