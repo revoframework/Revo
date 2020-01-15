@@ -1,6 +1,6 @@
 # RELEASE NOTES
 
-## [1.14.0] - 2020-??-??
+## [1.13.1] - 2020-01-15
 
 ### Added
 - now it's possible to specify FileSqlDatabaseMigration version in its headers
