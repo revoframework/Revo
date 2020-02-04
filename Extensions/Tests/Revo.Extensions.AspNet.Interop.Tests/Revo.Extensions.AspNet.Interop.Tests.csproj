@@ -12,7 +12,6 @@
   
   <ItemGroup>
     <ProjectReference Include="..\..\..\Revo.Testing\Revo.Testing.csproj" />
-    <ProjectReference Include="..\..\Revo.Extensions.AspNet.Interop\Revo.Extensions.AspNet.Interop.csproj" />
   </ItemGroup>
   
 </Project>

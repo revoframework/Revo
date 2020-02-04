@@ -47,7 +47,7 @@ Segregating command and query responsibilities with:
 Support for both [synchronous](https://revoframework.gitbook.io/revo/reference-guide/events#synchronous-event-processing) and [asynchronous](https://revoframework.gitbook.io/revo/reference-guide/events#asynchronous-event-processing) event processing, guaranteed _at-least-once_ delivery, event queues with strict sequence ordering \(optionally\), event source catch-ups, optional [pseudo-synchronous event dispatch](https://revoframework.gitbook.io/revo/reference-guide/events#pseudo-synchronous-event-dispatch) for listeners \(projectors, for example\).
 
 [**Data access**](https://revoframework.gitbook.io/revo/reference-guide/data-persistence)  
-Abstraction layer for _Entity Framework 6_, _RavenDB,_ testable _in-memory database_ or other data providers.
+Thin abstraction layer for easy data persistence (e.g. querying read models) using _Entity Framework Core_, _Entity Framework 6_, _RavenDB,_ testable _in-memory database_ or other data providers.
 
 [**Projections**](https://revoframework.gitbook.io/revo/reference-guide/projections)  
 Support for read-model projections with various backends \(e.g. _Entity Framework Core_ (_PostgreSQL_, _MSSQL_, _SQLite_,...), _Entity Framework 6_, _RavenDB_...\), automatic idempotency- and concurrency-handling, etc.
@@ -66,11 +66,11 @@ Basic permission/role-based ACL for commands and queries, fine-grained row filte
 * [**Validation**](https://revoframework.gitbook.io/revo/reference-guide/validation) for commands, queries and other structures.
 * [**Jobs**](https://revoframework.gitbook.io/revo/reference-guide/jobs)
 * [**Multi-tenancy**](https://revoframework.gitbook.io/revo/reference-guide/multi-tenancy)  
-* [	**Event message metadata**](https://revoframework.gitbook.io/revo/reference-guide/events#event-messages-and-metadata)
+* [**Event message metadata**](https://revoframework.gitbook.io/revo/reference-guide/events#event-messages-and-metadata)
 * [**Event versioning**](https://revoframework.gitbook.io/revo/reference-guide/events#event-versioning)
 * **History and change-tracking**
-* **User notifications:** event-based, with mail/APNS/FCM output channels, supporting aggregation, etc.
-* **ASP.NET Core (.NET Standard) & ASP.NET support**
+* **User notifications:** event-based, with different output channels (mail, etc.), aggregation, buffering, etc.
+* **.NET Core 3.0+, .NET Standard 2.0+ & .NET 4.7.2+ support (with integration for ASP.NET Core and ASP.NET)**
 
 ## Show me how it looks!
 

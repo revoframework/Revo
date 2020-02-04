@@ -1,6 +1,9 @@
 # RELEASE NOTES
 
-## [1.14.0] - 2020-??-??
+## [1.14.0] - 2020-02-04
+
+### Removed
+- removed APNS and FCM (push notification) channel support from Revo.Extensions.Notifications using obsolete PushSharp library
 
 ## [1.13.1] - 2020-01-15
 
