@@ -23,7 +23,11 @@ namespace Revo.Domain.Entities.EventSourcing
         {
             int eventCount = UncommittedEvents.Count();
             base.Commit();
-            Version += eventCount;
+
+            if (eventCount > 0)
+            {
+                Version++;
+            }
         }
 
         public void LoadState(AggregateState state)

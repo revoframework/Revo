@@ -188,7 +188,6 @@ namespace Revo.Infrastructure.Repositories
             var messages = new List<IEventMessageDraft>();
             Guid? aggregateClassId = entityTypeManager.TryGetClassInfoByClrType(aggregate.GetType())?.Id;
 
-            int eventNumber = aggregate.Version * 50;
             foreach (DomainAggregateEvent ev in events)
             {
                 IEventMessageDraft message = await eventMessageFactory.CreateMessageAsync(ev);

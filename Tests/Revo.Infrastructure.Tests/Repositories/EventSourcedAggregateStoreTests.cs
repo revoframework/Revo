@@ -411,7 +411,8 @@ namespace Revo.Infrastructure.Tests.Repositories
                     new Dictionary<string, string>()
                     {
                         { "TestKey", "TestValue" },
-                        { BasicEventMetadataNames.AggregateClassId, entityClassId.ToString() }
+                        { BasicEventMetadataNames.AggregateClassId, entityClassId.ToString() },
+                        { BasicEventMetadataNames.AggregateVersion, "1" }
                     })
             };
 

@@ -52,10 +52,10 @@ namespace Revo.Infrastructure.Projections
 
             TTarget target;
             bool? createTarget = events
-                .Select(x => x.Metadata.GetStreamSequenceNumber() != null
-                    ? (bool?) (x.Metadata.GetStreamSequenceNumber() == 1)
-                    : (x.Metadata.GetAggregateVersion() != null
-                        ? (bool?) (x.Metadata.GetAggregateVersion() == 1)
+                .Select(x => (x.Metadata.GetAggregateVersion() != null
+                    ? (bool?)(x.Metadata.GetAggregateVersion() == 1)
+                    : x.Metadata.GetStreamSequenceNumber() != null
+                        ? (bool?)(x.Metadata.GetStreamSequenceNumber() == 1)
                         : null))
                 .FirstOrDefault(x => x != null);
 
@@ -102,8 +102,8 @@ namespace Revo.Infrastructure.Projections
                     .Select((x, i) => new {Event = x, Index = i})
                     .LastOrDefault(x =>
                     {
-                        long? eventNumber = x.Event.Metadata.GetStreamSequenceNumber()
-                                          ?? x.Event.Metadata.GetAggregateVersion();
+                        long? eventNumber = x.Event.Metadata.GetAggregateVersion()
+                                            ?? x.Event.Metadata.GetStreamSequenceNumber();
                         if (eventNumber != null)
                         {
                             return lastEventNumberProjected >= eventNumber;
@@ -128,7 +128,8 @@ namespace Revo.Infrastructure.Projections
                     await base.ProjectEventsAsync(aggregateId, appliedEvents);
 
                     long? newLastEventNumber = appliedEvents.Select(x =>
-                                                       x.Metadata?.GetStreamSequenceNumber() ?? x.Metadata?.GetAggregateVersion())
+                                                       x.Metadata?.GetAggregateVersion()
+                                                       ?? x.Metadata?.GetStreamSequenceNumber())
                                                    .LastOrDefault(x => x != null)
                                                ?? lastEventNumberProjected;
 

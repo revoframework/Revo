@@ -1,7 +1,5 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Revo.Core.Transactions;
-using Revo.DataAccess.Entities;
 using Revo.EFCore.DataAccess.Entities;
 using Revo.EFCore.Repositories;
 using Revo.Infrastructure.Events;

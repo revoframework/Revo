@@ -13,6 +13,7 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageTags>eventsourcing,cqrs,ddd,aspnet,webapi,framework,netstandard,aspnetcore,event-sourcing,domain-driven-design</PackageTags>
     <RepositoryUrl>https://github.com/revoframework/Revo</RepositoryUrl>
+    <LangVersion>8</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup>

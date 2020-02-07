@@ -24,7 +24,7 @@ namespace Revo.Infrastructure.EventStores
         {
             Record = record;
 
-            Metadata = new NativeBackedMetadata(record.AdditionalMetadata,
+            Metadata = new LayeredMetadata(record.AdditionalMetadata,
                 new Dictionary<string, Func<string>>()
                 {
                     { BasicEventMetadataNames.EventId, () => record.EventId.ToString() },

@@ -36,7 +36,6 @@ namespace Revo.Infrastructure.Repositories
             EntityFactory = entityFactory;
         }
 
-
         public IReadOnlyCollection<IRepositoryFilter> DefaultFilters => repositoryFilters;
         public virtual bool NeedsSave => aggregates.Values.Any(x => x.IsChanged);
         protected virtual IEntityFactory EntityFactory { get; }
@@ -235,6 +234,7 @@ namespace Revo.Infrastructure.Repositories
             {
                 IEventMessageDraft message = await eventMessageFactory.CreateMessageAsync(ev);
                 message.SetMetadata(BasicEventMetadataNames.AggregateClassId, aggregateClassId.Value.ToString());
+                message.SetMetadata(BasicEventMetadataNames.AggregateVersion, (aggregate.Version + 1).ToString());
 
                 if (aggregate is ITenantOwned tenantOwned)
                 {
@@ -247,7 +247,7 @@ namespace Revo.Infrastructure.Repositories
             return messages;
         }
 
-        private async Task<T> DoFindAsync<T>(Guid id, bool throwOnError, bool load = true) where T : class, IAggregateRoot
+        private async Task<T> DoFindAsync<T>(Guid id, bool throwOnError) where T : class, IAggregateRoot
         {
             IEventSourcedAggregateRoot aggregate = FindLoadedAggregate(id);
             if (aggregate == null)
@@ -390,7 +390,10 @@ namespace Revo.Infrastructure.Repositories
         private IEventSourcedAggregateRoot ConstructAndLoadEntityFromEvents(Guid aggregateId, IReadOnlyDictionary<string, string> eventStreamMetadata,
             IReadOnlyCollection<IEventStoreRecord> eventRecords)
         {
-            int version = (int)(eventRecords.LastOrDefault()?.StreamSequenceNumber ?? 0);
+            int version = (int) (eventRecords.LastOrDefault()?.AdditionalMetadata.GetAggregateVersion()
+                                 ?? eventRecords.LastOrDefault()?.StreamSequenceNumber
+                                 ?? 0);
+            
             var events = eventRecords.Select(x => x.Event as DomainAggregateEvent
                                                   ?? throw new InvalidOperationException(
                                                       $"Cannot load event sourced aggregate ID {aggregateId}: event stream contains non-DomainAggregateEvent events of type {x.Event.GetType().FullName}"))
@@ -406,7 +409,7 @@ namespace Revo.Infrastructure.Repositories
             Guid classId = Guid.Parse(classIdString);
             Type entityType = entityTypeManager.GetClassInfoByClassId(classId).ClrType;
 
-            IEventSourcedAggregateRoot aggregate = (IEventSourcedAggregateRoot)ConstructEntity(entityType, aggregateId);
+            IEventSourcedAggregateRoot aggregate = (IEventSourcedAggregateRoot) ConstructEntity(entityType, aggregateId);
             aggregate.LoadState(state);
 
             return aggregate;

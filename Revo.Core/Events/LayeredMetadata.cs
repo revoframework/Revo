@@ -5,12 +5,12 @@ using System.Linq;
 
 namespace Revo.Core.Events
 {
-    public class NativeBackedMetadata : IReadOnlyDictionary<string, string>
+    public class LayeredMetadata : IReadOnlyDictionary<string, string>
     {
         private readonly IReadOnlyDictionary<string, string> values;
         private readonly IReadOnlyDictionary<string, Func<string>> getters;
 
-        public NativeBackedMetadata(IReadOnlyDictionary<string, string> values, IReadOnlyDictionary<string, Func<string>> getters)
+        public LayeredMetadata(IReadOnlyDictionary<string, string> values, IReadOnlyDictionary<string, Func<string>> getters)
         {
             this.values = values;
             this.getters = getters;
@@ -25,7 +25,10 @@ namespace Revo.Core.Events
 
             foreach (var pair in values)
             {
-                yield return pair;
+                if (!getters.ContainsKey(pair.Key))
+                {
+                    yield return pair;
+                }
             }
         }
 
@@ -34,12 +37,47 @@ namespace Revo.Core.Events
             return GetEnumerator();
         }
 
-        public int Count => values.Count + getters.Count;
+        public int Count => values.Keys.Concat(getters.Keys).Distinct().Count();
 
         public string this[string key] => getters.TryGetValue(key, out var getter) ? getter() : values[key];
 
-        public IEnumerable<string> Keys => getters.Keys.Concat(values.Keys);
-        public IEnumerable<string> Values => getters.Values.Select(x => x()).Concat(values.Values);
+        public IEnumerable<string> Keys
+        {
+            get
+            {
+                foreach (KeyValuePair<string, Func<string>> getter in getters)
+                {
+                    yield return getter.Key;
+                }
+
+                foreach (var pair in values)
+                {
+                    if (!getters.ContainsKey(pair.Key))
+                    {
+                        yield return pair.Key;
+                    }
+                }
+            }
+        }
+
+        public IEnumerable<string> Values
+        {
+            get
+            {
+                foreach (KeyValuePair<string, Func<string>> getter in getters)
+                {
+                    yield return getter.Value();
+                }
+
+                foreach (var pair in values)
+                {
+                    if (!getters.ContainsKey(pair.Key))
+                    {
+                        yield return pair.Value;
+                    }
+                }
+            }
+        }
         
         public bool ContainsKey(string key)
         {

@@ -2,6 +2,10 @@
 
 ## [1.14.0] - 2020-02-04
 
+### Changed
+- EventSourcedAggregateRoot.Commit increases Version by 1 (previously by event count)
+- EntityEventToPocoProjector uses AggregateVersion instead of StreamSequenceNumber event metadata for read model versioning
+
 ### Removed
 - removed APNS and FCM (push notification) channel support from Revo.Extensions.Notifications using obsolete PushSharp library
 
