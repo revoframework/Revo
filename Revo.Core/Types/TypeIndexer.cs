@@ -56,7 +56,7 @@ namespace Revo.Core.Types
                 versionBegin--;
             }
 
-            if (versionBegin < 2 || typeName[versionBegin - 1] != 'V')
+            if (versionBegin < 2 || versionBegin == typeName.Length || typeName[versionBegin - 1] != 'V')
             {
                 return;
             }
