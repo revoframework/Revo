@@ -2,6 +2,12 @@
 
 ## [1.14.0] - 2020-02-04
 
+### Added
+- event upgrade support - just implement IEventUpgrade in your code (auto discovery) and Revo upgrades the event streams on-the-fly upon loading the aggregates
+
+### Fixed
+- event version parsed from types whose name ends with V letter without number no longer recognized as versioned name
+
 ### Changed
 - EventSourcedAggregateRoot.Commit increases Version by 1 (previously by event count)
 - EntityEventToPocoProjector uses AggregateVersion instead of StreamSequenceNumber event metadata for read model versioning

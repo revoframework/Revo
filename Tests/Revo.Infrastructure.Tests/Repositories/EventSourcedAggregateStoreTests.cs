@@ -31,17 +31,21 @@ namespace Revo.Infrastructure.Tests.Repositories
         private readonly IRepositoryFilter repositoryFilter1;
         private readonly IRepositoryFilter repositoryFilter2;
         private readonly IEventMessageFactory eventMessageFactory;
+        private readonly IEventSourcedAggregateFactory eventSourcedAggregateFactory;
 
-        private Guid entityId = Guid.NewGuid();
-        private Guid entity2Id = Guid.NewGuid();
-        private Guid entity3Id = Guid.NewGuid();
-        private Guid entity4Id = Guid.NewGuid();
-        private Guid entityClassId = Guid.NewGuid();
-        private Guid entity2ClassId = Guid.NewGuid();
-        private Guid entity3ClassId = Guid.NewGuid();
+        private MyEntity2 entity2;
+        private MyEntity3LoadsAsDeleted entity3;
+        private MyEntity2 entity4;
+        private Guid entityId = Guid.Parse("AC8CDA1A-EA91-4A08-85DF-D7B83F93D9DF");
+        private Guid entity2Id = Guid.Parse("A9A97EF8-6CC1-4744-8773-F9CED4046CEB");
+        private Guid entity3Id = Guid.Parse("3F9B67DE-EF0E-4C39-8AFA-CCFCD3ED1C45");
+        private Guid entity4Id = Guid.Parse("421C9A88-E4A5-4BEA-A00B-75A9F3AD8A8F");
+        private Guid entityClassId = Guid.Parse("5FCCE918-996D-4455-A72D-65B8D836F055");
+        private Guid entity2ClassId = Guid.Parse("96FEC71E-F4B3-413E-B0FD-75E1AB8A977A");
+        private Guid entity3ClassId = Guid.Parse("33168372-0095-44E6-824C-5E46C7DDE687");
 
         private Dictionary<Guid, IReadOnlyDictionary<string, string>> entityMetadata;
-        private Dictionary<Guid, IReadOnlyCollection<IEventStoreRecord>> entityEvents;
+        private Dictionary<Guid, List<IEventStoreRecord>> entityEvents;
 
         public EventSourcedAggregateStoreTests()
         {
@@ -53,7 +57,7 @@ namespace Revo.Infrastructure.Tests.Repositories
 
             FakeClock.Setup();
 
-            entityEvents = new Dictionary<Guid, IReadOnlyCollection<IEventStoreRecord>>()
+            entityEvents = new Dictionary<Guid, List<IEventStoreRecord>>()
             {
                 {
                     entity2Id,
@@ -64,6 +68,20 @@ namespace Revo.Infrastructure.Tests.Repositories
                             Event = new SetFooEvent()
                             {
                                 AggregateId = entity2Id
+                            },
+                            StreamSequenceNumber = 1
+                        }
+                    }
+                },
+                {
+                    entity3Id,
+                    new List<IEventStoreRecord>()
+                    {
+                        new FakeEventStoreRecord()
+                        {
+                            Event = new SetFooEvent()
+                            {
+                                AggregateId = entity3Id
                             },
                             StreamSequenceNumber = 1
                         }
@@ -207,14 +225,34 @@ namespace Revo.Infrastructure.Tests.Repositories
                 return messageDraft;
             }); // TODO something more lightweight?
 
+            eventSourcedAggregateFactory = Substitute.For<IEventSourcedAggregateFactory>();
+
+            entity2 = new MyEntity2(entity2Id);
+            eventSourcedAggregateFactory.ConstructAndLoadEntityFromEvents(entity2Id,
+                    Arg.Is<IReadOnlyDictionary<string, string>>(x => x.SequenceEqual(entityMetadata[entity2Id])),
+                    Arg.Is<IReadOnlyCollection<IEventStoreRecord>>(x => x.SequenceEqual(entityEvents[entity2Id])))
+                .Returns(entity2);
+            
+            entity3 = new MyEntity3LoadsAsDeleted(entity3Id);
+            eventSourcedAggregateFactory.ConstructAndLoadEntityFromEvents(entity3Id,
+                    Arg.Is<IReadOnlyDictionary<string, string>>(x => x.SequenceEqual(entityMetadata[entity3Id])),
+                    Arg.Is<IReadOnlyCollection<IEventStoreRecord>>(x => x.SequenceEqual(entityEvents[entity3Id])))
+                .Returns(entity3);
+            
+            entity4 = new MyEntity2(entity4Id);
+            eventSourcedAggregateFactory.ConstructAndLoadEntityFromEvents(entity4Id,
+                    Arg.Is<IReadOnlyDictionary<string, string>>(x => x.SequenceEqual(entityMetadata[entity4Id])),
+                    Arg.Is<IReadOnlyCollection<IEventStoreRecord>>(x => x.SequenceEqual(entityEvents[entity4Id])))
+                .Returns(entity4);
+
             sut = new EventSourcedAggregateStore(eventStore, entityTypeManager, publishEventBuffer,
-                new IRepositoryFilter[] { }, eventMessageFactory, new EntityFactory());
+                new IRepositoryFilter[] { }, eventMessageFactory, eventSourcedAggregateFactory);
         }
 
         [Fact]
         public void Add_CreatesStreamAndMetadata()
         {
-            var entity = new MyEntity(entityId, 5);
+            var entity = new MyEntity(entityId);
             sut.Add(entity);
             eventStore.Received(1).AddStream(entity.Id);
             eventStore.Received(1).SetStreamMetadata(entity.Id,
@@ -224,7 +262,7 @@ namespace Revo.Infrastructure.Tests.Repositories
         [Fact]
         public async Task AddThenGet_ReturnsTheSame()
         {
-            var entity = new MyEntity(entityId, 5);
+            var entity = new MyEntity(entityId);
             sut.Add(entity);
             var entity2 = await sut.GetAsync<MyEntity>(entity.Id);
 
@@ -272,13 +310,8 @@ namespace Revo.Infrastructure.Tests.Repositories
         [Fact]
         public async Task GetAsync_ReturnsCorrectAggregate()
         {
-            var entity = await sut.GetAsync<MyEntity2>(entity2Id);
-
-            Assert.Equal(entity2Id, entity.Id);
-
-            Assert.Equal(1, entity.LoadedEvents.Count);
-            Assert.IsType<SetFooEvent>(entity.LoadedEvents[0]);
-            Assert.Equal(1, entity.Version);
+            var result = await sut.GetAsync<MyEntity2>(entity2Id);
+            result.Should().Be(entity2);
         }
 
         [Fact]
@@ -301,19 +334,6 @@ namespace Revo.Infrastructure.Tests.Repositories
         [Fact]
         public async Task GetAsync_ThrowsIfDeleted()
         {
-            eventStore.FindEventsAsync(entity3Id)
-                .Returns(new List<IEventStoreRecord>()
-                {
-                    new FakeEventStoreRecord()
-                    {
-                        Event = new SetFooEvent()
-                        {
-                            AggregateId = entityId
-                        },
-                        StreamSequenceNumber = 1
-                    }
-                });
-
             await Assert.ThrowsAsync<EntityDeletedException>(async () =>
             {
                 await sut.GetAsync<MyEntity3LoadsAsDeleted>(entity3Id);
@@ -383,10 +403,10 @@ namespace Revo.Infrastructure.Tests.Repositories
         [Fact]
         public void SaveChangesAsync_AddTwiceWithSameIdsThrows()
         {
-            var entity = new MyEntity(entityId, 5);
+            var entity = new MyEntity(entityId);
             sut.Add(entity);
 
-            var entity2 = new MyEntity(entityId, 5);
+            var entity2 = new MyEntity(entityId);
 
             Assert.Throws<ArgumentException>(() => sut.Add(entity2));
         }
@@ -394,7 +414,7 @@ namespace Revo.Infrastructure.Tests.Repositories
         [Fact]
         public async Task SaveChangesAsync_SavesNewAggregate()
         {
-            var entity = new MyEntity(entityId, 5);
+            var entity = new MyEntity(entityId);
             sut.Add(entity);
 
             entity.UncommittedEvents = new List<DomainAggregateEvent>()
@@ -432,7 +452,7 @@ namespace Revo.Infrastructure.Tests.Repositories
         [Fact]
         public async Task SaveChangesAsync_PushesEventsForPublishing()
         {
-            var entity = new MyEntity(entityId, 5);
+            var entity = new MyEntity(entityId);
             sut.Add(entity);
 
             var event1 = new SetFooEvent()
@@ -453,7 +473,7 @@ namespace Revo.Infrastructure.Tests.Repositories
         [Fact]
         public async Task SaveChangesAsync_PushedEventsHaveMetadata()
         {
-            var entity = new MyEntity(entityId, 5);
+            var entity = new MyEntity(entityId);
             sut.Add(entity);
 
             var event1 = new SetFooEvent()
@@ -484,7 +504,7 @@ namespace Revo.Infrastructure.Tests.Repositories
         [Fact]
         public async Task SaveChangesAsync_CommitsAggregate()
         {
-            var entity = new MyEntity(entityId, 5);
+            var entity = new MyEntity(entityId);
             sut.Add(entity);
 
             entity.UncommittedEvents = new List<DomainAggregateEvent>()
@@ -502,7 +522,7 @@ namespace Revo.Infrastructure.Tests.Repositories
         [Fact]
         public async Task SaveChangesAsync_CommitsOnlyChangedAggregates()
         {
-            var entity = new MyEntity(entityId, 5);
+            var entity = new MyEntity(entityId);
             sut.Add(entity);
 
             await sut.SaveChangesAsync();
@@ -513,7 +533,7 @@ namespace Revo.Infrastructure.Tests.Repositories
         public async Task DefaultFilters_GetsInitialFilters()
         {
             sut = new EventSourcedAggregateStore(eventStore, entityTypeManager, publishEventBuffer,
-                new[] { repositoryFilter1 }, eventMessageFactory, new EntityFactory());
+                new[] { repositoryFilter1 }, eventMessageFactory, eventSourcedAggregateFactory);
             Assert.True(sut.DefaultFilters.SequenceEqual(new[] { repositoryFilter1 }));
         }
 
@@ -521,15 +541,10 @@ namespace Revo.Infrastructure.Tests.Repositories
         public async Task GetAsync_FilterGetsCalled()
         {
             repositoryFilter1.FilterResult<IAggregateRoot>(null)
-                .ReturnsForAnyArgs(ci =>
-                    {
-                        return ci.ArgAt<IAggregateRoot>(0);
-                    }
-                    
-                    );
+                .ReturnsForAnyArgs(ci => ci.ArgAt<IAggregateRoot>(0));
 
             sut = new EventSourcedAggregateStore(eventStore, entityTypeManager, publishEventBuffer,
-                new[] { repositoryFilter1 }, eventMessageFactory, new EntityFactory());
+                new[] { repositoryFilter1 }, eventMessageFactory, eventSourcedAggregateFactory);
 
             await sut.GetAsync<MyEntity2>(entity2Id);
 
@@ -539,12 +554,12 @@ namespace Revo.Infrastructure.Tests.Repositories
         [Fact]
         public async Task GetAsync_FilterReplacesReturnValue()
         {
-            var replacementEntity = new MyEntity2(Guid.NewGuid(), 5);
+            var replacementEntity = new MyEntity2(Guid.NewGuid());
             repositoryFilter1.FilterResult<IAggregateRoot>(null)
                 .ReturnsForAnyArgs(replacementEntity);
 
             sut = new EventSourcedAggregateStore(eventStore, entityTypeManager, publishEventBuffer,
-                new[] { repositoryFilter1 }, eventMessageFactory, new EntityFactory());
+                new[] { repositoryFilter1 }, eventMessageFactory, eventSourcedAggregateFactory);
 
             Assert.Equal(replacementEntity, await sut.GetAsync<MyEntity2>(entity2Id));
         }
@@ -553,9 +568,9 @@ namespace Revo.Infrastructure.Tests.Repositories
         public async Task SaveChangesAsync_FiltersAdded()
         {
             sut = new EventSourcedAggregateStore(eventStore, entityTypeManager, publishEventBuffer,
-                new[] { repositoryFilter1 }, eventMessageFactory, new EntityFactory());
+                new[] { repositoryFilter1 }, eventMessageFactory, eventSourcedAggregateFactory);
 
-            var entity = new MyEntity(entityId, 5);
+            var entity = new MyEntity(entityId);
             sut.Add(entity);
 
             entity.UncommittedEvents = new List<DomainAggregateEvent>()
@@ -575,9 +590,9 @@ namespace Revo.Infrastructure.Tests.Repositories
         public async Task SaveChangesAsync_FiltersModified()
         {
             sut = new EventSourcedAggregateStore(eventStore, entityTypeManager, publishEventBuffer,
-                new[] { repositoryFilter1 }, eventMessageFactory, new EntityFactory());
+                new[] { repositoryFilter1 }, eventMessageFactory, eventSourcedAggregateFactory);
 
-            var entity = new MyEntity(entityId, 5);
+            var entity = new MyEntity(entityId);
             sut.Add(entity);
 
             entity.UncommittedEvents = new List<DomainAggregateEvent>()
@@ -625,17 +640,17 @@ namespace Revo.Infrastructure.Tests.Repositories
         {
         }
 
+        public class SetBarEvent : DomainAggregateEvent
+        {
+        }
+
+        public class SetFooEventV2 : DomainAggregateEvent
+        {
+        }
+
         public class MyEntity : IEventSourcedAggregateRoot
         {
-            public MyEntity(Guid id, int foo) : this(id)
-            {
-                if (foo != 5)
-                {
-                    throw new InvalidOperationException();
-                }
-            }
-
-            protected MyEntity(Guid id)
+            public MyEntity(Guid id)
             {
                 Id = id;
             }
@@ -649,8 +664,6 @@ namespace Revo.Infrastructure.Tests.Repositories
             public bool IsChanged => UncommittedEvents.Any();
             public int Version { get; set; }
 
-            internal List<DomainAggregateEvent> LoadedEvents;
-
             public void Commit()
             {
                 UncommittedEvents = new List<DomainAggregateEvent>();
@@ -659,23 +672,13 @@ namespace Revo.Infrastructure.Tests.Repositories
 
             public virtual void LoadState(AggregateState state)
             {
-                if (LoadedEvents != null)
-                {
-                    throw new InvalidOperationException();
-                }
-
                 Version = state.Version;
-                LoadedEvents = state.Events.ToList();
             }
         }
 
         public class MyEntity2 : MyEntity
         {
-            public MyEntity2(Guid id, int foo) : base(id, foo)
-            {
-            }
-
-            protected MyEntity2(Guid id) : base(id)
+            public MyEntity2(Guid id) : base(id)
             {
             }
         }
@@ -684,11 +687,6 @@ namespace Revo.Infrastructure.Tests.Repositories
         {
             public MyEntity3LoadsAsDeleted(Guid id) : base(id)
             {
-            }
-
-            public override void LoadState(AggregateState state)
-            {
-                base.LoadState(state);
                 IsDeleted = true;
             }
         }

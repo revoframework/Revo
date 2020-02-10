@@ -15,10 +15,10 @@ namespace Revo.EFCore.Repositories
 
         public EFCoreEventSourcedAggregateStore(IEventStore eventStore, IEntityTypeManager entityTypeManager,
             IPublishEventBuffer publishEventBuffer, IRepositoryFilter[] repositoryFilters,
-            IEventMessageFactory eventMessageFactory, IEntityFactory entityFactory,
+            IEventMessageFactory eventMessageFactory, IEventSourcedAggregateFactory eventSourcedAggregateFactory,
             IEFCoreTransactionCoordinator transactionCoordinator)
             : base(eventStore, entityTypeManager, publishEventBuffer, repositoryFilters, eventMessageFactory,
-                entityFactory)
+                eventSourcedAggregateFactory)
         {
             this.transactionCoordinator = transactionCoordinator;
 

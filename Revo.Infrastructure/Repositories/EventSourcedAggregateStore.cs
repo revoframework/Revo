@@ -23,22 +23,22 @@ namespace Revo.Infrastructure.Repositories
         private readonly IPublishEventBuffer publishEventBuffer;
         private readonly IRepositoryFilter[] repositoryFilters;
         private readonly IEventMessageFactory eventMessageFactory;
+        private readonly IEventSourcedAggregateFactory eventSourcedAggregateFactory;
 
         public EventSourcedAggregateStore(IEventStore eventStore, IEntityTypeManager entityTypeManager,
             IPublishEventBuffer publishEventBuffer, IRepositoryFilter[] repositoryFilters,
-            IEventMessageFactory eventMessageFactory, IEntityFactory entityFactory)
+            IEventMessageFactory eventMessageFactory, IEventSourcedAggregateFactory eventSourcedAggregateFactory)
         {
             this.eventStore = eventStore;
             this.entityTypeManager = entityTypeManager;
             this.publishEventBuffer = publishEventBuffer;
             this.repositoryFilters = repositoryFilters;
             this.eventMessageFactory = eventMessageFactory;
-            EntityFactory = entityFactory;
+            this.eventSourcedAggregateFactory = eventSourcedAggregateFactory;
         }
 
         public IReadOnlyCollection<IRepositoryFilter> DefaultFilters => repositoryFilters;
         public virtual bool NeedsSave => aggregates.Values.Any(x => x.IsChanged);
-        protected virtual IEntityFactory EntityFactory { get; }
 
         public void Add<T>(T aggregate) where T : class, IAggregateRoot
         {
@@ -195,7 +195,7 @@ namespace Revo.Infrastructure.Repositories
             {
                 if (throwOnError)
                 {
-                    throw new EntityNotFoundException($"Aggregate root with ID '{id}' is not of requested type '{typeof(T).FullName}'");
+                    throw new EntityNotFoundException($"{aggregate} is not of requested type {typeof(T).FullName}");
                 }
 
                 return null;
@@ -204,10 +204,6 @@ namespace Revo.Infrastructure.Repositories
             return typedAggregate;
         }
 
-        protected virtual IEntity ConstructEntity(Type entityType, Guid id)
-        {
-            return EntityFactory.ConstructEntity(entityType, id);
-        }
 
         protected virtual void CommitAggregates()
         {
@@ -370,7 +366,7 @@ namespace Revo.Infrastructure.Repositories
 
             IReadOnlyCollection<IEventStoreRecord> eventRecords = await eventStore.FindEventsAsync(aggregateId);
 
-            return ConstructAndLoadEntityFromEvents(aggregateId, eventStreamMetadata,
+            return eventSourcedAggregateFactory.ConstructAndLoadEntityFromEvents(aggregateId, eventStreamMetadata,
                 eventRecords?.Count > 0 ? eventRecords : new IEventStoreRecord[0]);
         }
 
@@ -382,38 +378,11 @@ namespace Revo.Infrastructure.Repositories
                 x =>
                 {
                     eventRecords.TryGetValue(x.Key, out var events);
-                    return ConstructAndLoadEntityFromEvents(x.Key, x.Value,
+                    return eventSourcedAggregateFactory.ConstructAndLoadEntityFromEvents(x.Key, x.Value,
                         events?.Count > 0 ? events : new IEventStoreRecord[0]);
                 });
         }
 
-        private IEventSourcedAggregateRoot ConstructAndLoadEntityFromEvents(Guid aggregateId, IReadOnlyDictionary<string, string> eventStreamMetadata,
-            IReadOnlyCollection<IEventStoreRecord> eventRecords)
-        {
-            int version = (int) (eventRecords.LastOrDefault()?.AdditionalMetadata.GetAggregateVersion()
-                                 ?? eventRecords.LastOrDefault()?.StreamSequenceNumber
-                                 ?? 0);
-            
-            var events = eventRecords.Select(x => x.Event as DomainAggregateEvent
-                                                  ?? throw new InvalidOperationException(
-                                                      $"Cannot load event sourced aggregate ID {aggregateId}: event stream contains non-DomainAggregateEvent events of type {x.Event.GetType().FullName}"))
-                .ToList();
-
-            AggregateState state = new AggregateState(version, events);
-
-            if (!eventStreamMetadata.TryGetValue(AggregateEventStreamMetadataNames.ClassId, out string classIdString))
-            {
-                throw new InvalidOperationException($"Cannot load event sourced aggregate ID {aggregateId}: aggregate class ID not found in event stream metadata");
-            }
-
-            Guid classId = Guid.Parse(classIdString);
-            Type entityType = entityTypeManager.GetClassInfoByClassId(classId).ClrType;
-
-            IEventSourcedAggregateRoot aggregate = (IEventSourcedAggregateRoot) ConstructEntity(entityType, aggregateId);
-            aggregate.LoadState(state);
-
-            return aggregate;
-        }
 
         private IEventSourcedAggregateRoot FindLoadedAggregate(Guid id)
         {

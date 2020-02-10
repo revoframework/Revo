@@ -1,6 +1,8 @@
 ﻿using Ninject.Modules;
 using Revo.Core.Core;
+using Revo.Core.Lifecycle;
 using Revo.Infrastructure.Events.Metadata;
+using Revo.Infrastructure.Events.Upgrades;
 
 namespace Revo.Infrastructure.Events
 {
@@ -27,6 +29,18 @@ namespace Revo.Infrastructure.Events
             Bind<IEventMetadataProvider>()
                 .To<CommandContextEventMetadataProvider>()
                 .InTaskScope();
+
+            Bind<IEventStreamUpgrader>()
+                .To<EventStreamUpgrader>()
+                .InSingletonScope();
+
+            Bind<IEventStreamSequenceNumbersUpgrade>()
+                .To<EventStreamSequenceNumbersUpgrade>()
+                .InSingletonScope();
+
+            Bind<IApplicationConfigurer>()
+                .To<EventUpgradeDiscovery>()
+                .InSingletonScope();
         }
     }
 }

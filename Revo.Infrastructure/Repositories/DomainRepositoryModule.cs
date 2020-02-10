@@ -21,6 +21,10 @@ namespace Revo.Infrastructure.Repositories
             Bind<IEntityFactory>()
                 .To<EntityFactory>()
                 .InSingletonScope();
+
+            Bind<IEventSourcedAggregateFactory>()
+                .To<EventSourcedAggregateFactory>()
+                .InSingletonScope();
         }
     }
 }
