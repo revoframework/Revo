@@ -20,6 +20,10 @@ namespace Revo.DataAccess.Entities
 
         T FirstOrDefault<T>(Expression<Func<T, bool>> predicate) where T : class;
         T First<T>(Expression<Func<T, bool>> predicate) where T : class;
+
+        Task<T[]> GetManyAsync<T, TId>(params TId[] ids) where T : class, IHasId<TId>;
+        Task<T[]> GetManyAsync<T, TId>(CancellationToken cancellationToken, params TId[] ids) where T : class, IHasId<TId>;
+
         Task<T> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken)) where T : class;
         Task<T> FirstAsync<T>(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken)) where T : class;
 
@@ -33,7 +37,10 @@ namespace Revo.DataAccess.Entities
         IQueryable<T> FindAll<T>() where T : class;
         Task<T[]> FindAllAsync<T>(CancellationToken cancellationToken = default(CancellationToken)) where T : class;
         IEnumerable<T> FindAllWithAdded<T>() where T : class;
-        
+
+        Task<T[]> FindManyAsync<T, TId>(params TId[] ids) where T : class, IHasId<TId>;
+        Task<T[]> FindManyAsync<T, TId>(CancellationToken cancellationToken, params TId[] ids) where T : class, IHasId<TId>;
+
         IQueryable<T> Where<T>(Expression<Func<T, bool>> predicate) where T : class;
         IEnumerable<T> WhereWithAdded<T>(Expression<Func<T, bool>> predicate) where T : class;
         

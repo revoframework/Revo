@@ -49,6 +49,18 @@ namespace Revo.DataAccess.InMemory
             return GetAsync<T>(id);
         }
 
+        public Task<T[]> GetManyAsync<T, TId>(params TId[] ids) where T : class, IHasId<TId>
+        {
+            return GetManyAsync<T, TId>(default(CancellationToken), ids);
+        }
+
+        public async Task<T[]> GetManyAsync<T, TId>(CancellationToken cancellationToken, params TId[] ids) where T : class, IHasId<TId>
+        {
+            var result = await FindManyAsync<T, TId>(default(CancellationToken), ids);
+            RepositoryHelpers.ThrowIfGetManyFailed(result, ids);
+            return result;
+        }
+
         public T FirstOrDefault<T>(Expression<Func<T, bool>> predicate) where T : class
         {
             return EntityEntries.Select(x => x.Instance).OfType<T>().FirstOrDefault(predicate.Compile());
@@ -124,6 +136,16 @@ namespace Revo.DataAccess.InMemory
             return EntityEntries
                    .Select(x => x.Instance)
                    .OfType<T>();
+        }
+
+        public Task<T[]> FindManyAsync<T, TId>(params TId[] ids) where T : class, IHasId<TId>
+        {
+            return FindManyAsync<T, TId>(default(CancellationToken), ids);
+        }
+
+        public Task<T[]> FindManyAsync<T, TId>(CancellationToken cancellationToken, params TId[] ids) where T : class, IHasId<TId>
+        {
+            return Task.FromResult(Where<T>(x => ids.Contains(x.Id)).ToArray());
         }
 
         public IQueryable<T> Where<T>(Expression<Func<T, bool>> predicate) where T : class

@@ -61,6 +61,18 @@ namespace Revo.RavenDB.DataAccess
             return t;
         }
 
+        public Task<T[]> GetManyAsync<T, TId>(params TId[] ids) where T : class, IHasId<TId>
+        {
+            return GetManyAsync<T, TId>(default(CancellationToken), ids);
+        }
+
+        public async Task<T[]> GetManyAsync<T, TId>(CancellationToken cancellationToken, params TId[] ids) where T : class, IHasId<TId>
+        {
+            var result = await FindManyAsync<T, TId>(default(CancellationToken), ids);
+            RepositoryHelpers.ThrowIfGetManyFailed(result, ids);
+            return result;
+        }
+
         public T FirstOrDefault<T>(Expression<Func<T, bool>> predicate) where T : class
         {
             throw new NotImplementedException();
@@ -125,6 +137,16 @@ namespace Revo.RavenDB.DataAccess
         public IEnumerable<T> FindAllWithAdded<T>() where T : class
         {
             throw new NotImplementedException();
+        }
+
+        public Task<T[]> FindManyAsync<T, TId>(params TId[] ids) where T : class, IHasId<TId>
+        {
+            return FindManyAsync<T, TId>(default(CancellationToken), ids);
+        }
+
+        public Task<T[]> FindManyAsync<T, TId>(CancellationToken cancellationToken, params TId[] ids) where T : class, IHasId<TId>
+        {
+            return Task.FromResult(Where<T>(x => ids.Contains(x.Id)).ToArray());
         }
 
         public IQueryable<T> Where<T>(Expression<Func<T, bool>> predicate) where T : class

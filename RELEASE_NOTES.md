@@ -1,5 +1,10 @@
 # RELEASE NOTES
 
+## [1.14.1] - 2020-02-04
+
+### Added
+- IReadRepository.GetManyAsync and FindManyAsync
+
 ## [1.14.0] - 2020-02-04
 
 ### Added
