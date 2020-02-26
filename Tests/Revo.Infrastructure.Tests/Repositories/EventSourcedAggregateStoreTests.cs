@@ -188,7 +188,7 @@ namespace Revo.Infrastructure.Tests.Repositories
                     return result;
                 });
 
-            eventStore.PushEventsAsync(Guid.Empty, null, null).ReturnsForAnyArgs(ci =>
+            eventStore.PushEventsAsync(Guid.Empty, null).ReturnsForAnyArgs(ci =>
             {
                 var events = ci.ArgAt<IEnumerable<IUncommittedEventStoreRecord>>(1);
                 return events.Select(x => new FakeEventStoreRecord()
@@ -437,13 +437,13 @@ namespace Revo.Infrastructure.Tests.Repositories
             };
 
             IEnumerable<IUncommittedEventStoreRecord> pushedEvents = null;
-            eventStore.WhenForAnyArgs(x => x.PushEventsAsync(Guid.Empty, null, null))
+            eventStore.WhenForAnyArgs(x => x.PushEventsAsync(Guid.Empty, null))
                 .Do(ci => pushedEvents = ci.ArgAt<IEnumerable<IUncommittedEventStoreRecord>>(1));
 
             await sut.SaveChangesAsync();
 
             eventStore.Received(1).AddStream(entityId);
-            eventStore.Received(1).PushEventsAsync(entityId, Arg.Any<IEnumerable<IUncommittedEventStoreRecord>>(), 0);
+            eventStore.Received(1).PushEventsAsync(entityId, Arg.Any<IEnumerable<IUncommittedEventStoreRecord>>());
             eventStore.Received(1).CommitChangesAsync();
 
             pushedEvents.Should().BeEquivalentTo(eventsRecords);

@@ -36,7 +36,7 @@ namespace Revo.Infrastructure.EventStores
 
         void SetStreamMetadata(Guid streamId, IReadOnlyDictionary<string, string> metadata);
 
-        Task<IReadOnlyCollection<IEventStoreRecord>> PushEventsAsync(Guid streamId, IEnumerable<IUncommittedEventStoreRecord> events, long? expectedVersion);
+        Task<IReadOnlyCollection<IEventStoreRecord>> PushEventsAsync(Guid streamId, IEnumerable<IUncommittedEventStoreRecord> events);
         
         Task CommitChangesAsync();
     }

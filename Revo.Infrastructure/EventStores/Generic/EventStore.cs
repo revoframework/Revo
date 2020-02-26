@@ -98,10 +98,30 @@ namespace Revo.Infrastructure.EventStores.Generic
             streamBuffer.UncommittedMetadata = metadata.ToImmutableDictionary();
         }
 
-        public async Task<IReadOnlyCollection<IEventStoreRecord>> PushEventsAsync(Guid streamId, IEnumerable<IUncommittedEventStoreRecord> events, long? expectedVersion)
+        public async Task<IReadOnlyCollection<IEventStoreRecord>> PushEventsAsync(Guid streamId, IEnumerable<IUncommittedEventStoreRecord> events)
         {
-            return PushEventsAtVersion(streamId, events, expectedVersion,
-                expectedVersion == null ? (long?) await GetStreamVersionAsync(streamId) : null);
+            var streamBuffer = await GetStreamBufferAsync(streamId);
+            long version = streamBuffer.StreamVersion.Value + streamBuffer.UncommitedRows.Count;
+            DateTimeOffset storeDate = Clock.Current.Now;
+
+            var rows = events.Select(x =>
+            {
+                Guid eventId = x.Metadata.GetEventId() ?? Guid.NewGuid();
+                var metadata = CreateRowMetadata(x.Metadata);
+                var metadataJson = eventSerializer.SerializeEventMetadata(metadata);
+
+                string eventJson;
+                VersionedTypeId typeId;
+                (eventJson, typeId) = eventSerializer.SerializeEvent(x.Event);
+
+                return new EventStreamRow(eventId, eventJson, typeId.Name, typeId.Version,
+                    streamId, ++version, storeDate, metadataJson);
+            }).ToList();
+
+            rows.ForEach(x => streamBuffer.UncommitedRows.Add(x.StreamSequenceNumber, x));
+            crudRepository.AddRange(rows);
+
+            return rows.Select(SelectEventRecordFromRow).ToList();
         }
 
         public void AddStream(Guid streamId)
@@ -112,7 +132,7 @@ namespace Revo.Infrastructure.EventStores.Generic
             }
 
             EventStream stream = new EventStream(streamId);
-            streams[streamId] = new StreamBuffer() { EventStream = stream, StreamVersion = 0 };
+            streams[streamId] = new StreamBuffer() { StreamVersion = 0 };
             crudRepository.Add(stream);
         }
 
@@ -214,7 +234,7 @@ namespace Revo.Infrastructure.EventStores.Generic
 
         protected Task DoOnCommitSucceedAsync()
         {
-            ResetChanges();
+            CommitBufferedChanges();
             return Task.CompletedTask;
         }
 
@@ -227,12 +247,8 @@ namespace Revo.Infrastructure.EventStores.Generic
         {
             foreach (var streamBuffer in streams.Where(x => x.Value.UncommittedMetadata != null))
             {
-                if (streamBuffer.Value.EventStream == null)
-                {
-                    streamBuffer.Value.EventStream = await crudRepository.GetAsync<EventStream>(streamBuffer.Key);
-                }
-
-                streamBuffer.Value.EventStream.Metadata = streamBuffer.Value.UncommittedMetadata;
+                var eventStream = await crudRepository.GetAsync<EventStream>(streamBuffer.Key);
+                eventStream.Metadata = streamBuffer.Value.UncommittedMetadata;
                 streamBuffer.Value.UncommittedMetadata = null;
             }
         }
@@ -266,39 +282,7 @@ namespace Revo.Infrastructure.EventStores.Generic
                 CheckStreamVersion(streamPair, streamVersion);
             }
         }
-
-        private IReadOnlyCollection<IEventStoreRecord> PushEventsAtVersion(Guid streamId, IEnumerable<IUncommittedEventStoreRecord> events,
-            long? expectedVersion, long? currentVersion)
-        {
-            if (!streams.TryGetValue(streamId, out StreamBuffer streamBuffer))
-            {
-                streamBuffer = streams[streamId] = new StreamBuffer();
-            }
-
-            Debug.Assert(expectedVersion != null || currentVersion != null);
-            long version = expectedVersion ?? (currentVersion.Value + streamBuffer.UncommitedRows.Count);
-            DateTimeOffset storeDate = Clock.Current.Now;
-
-            var rows = events.Select(x =>
-            {
-                Guid eventId = x.Metadata.GetEventId() ?? Guid.NewGuid();
-                var metadata = CreateRowMetadata(x.Metadata);
-                var metadataJson = eventSerializer.SerializeEventMetadata(metadata);
-
-                string eventJson;
-                VersionedTypeId typeId;
-                (eventJson, typeId) = eventSerializer.SerializeEvent(x.Event);
-
-                return new EventStreamRow(eventId, eventJson, typeId.Name, typeId.Version,
-                    streamId, ++version, storeDate, metadataJson);
-            }).ToList();
-
-            rows.ForEach(x => streamBuffer.UncommitedRows.Add(x.StreamSequenceNumber, x));
-            crudRepository.AddRange(rows);
-
-            return rows.Select(SelectEventRecordFromRow).ToList();
-        }
-
+        
         private IReadOnlyDictionary<string, string> CreateRowMetadata(IReadOnlyDictionary<string, string> metadata)
         {
             Dictionary<string, string> newMetadata = metadata
@@ -309,9 +293,17 @@ namespace Revo.Infrastructure.EventStores.Generic
             return newMetadata;
         }
 
-        private void ResetChanges()
+        private void CommitBufferedChanges()
         {
-            streams.Clear();
+            foreach (var stream in streams)
+            {
+                if (stream.Value.StreamVersion != null)
+                {
+                    stream.Value.StreamVersion = stream.Value.StreamVersion + stream.Value.UncommitedRows.Count;
+                }
+
+                stream.Value.UncommitedRows.Clear();
+            }
         }
 
         private IQueryable<EventStreamRow> QueryStreamRows(bool reverseOrder, params Guid[] streamIds)
@@ -384,73 +376,14 @@ namespace Revo.Infrastructure.EventStores.Generic
                 }
             }
 
-            if (streams.TryGetValue(streamId, out StreamBuffer streamBuffer))
-            {
-                if (streamBuffer.EventStream == null)
-                {
-                    streamBuffer.EventStream = eventStream;
-                }
-            }
-            else
-            {
-                streams[streamId] = new StreamBuffer() { EventStream = eventStream };
-            }
-
             return eventStream;
         }
 
-        private async Task<List<EventStream>> GetEventStreamsAsync(Guid[] streamIds, bool throwOnNotFound)
+        private async Task<EventStream[]> GetEventStreamsAsync(Guid[] streamIds, bool throwOnNotFound)
         {
-            var result = new List<EventStream>();
-
-            StreamBuffer streamBuffer;
-            List<Guid> missingStreamIds = null;
-            foreach (Guid streamId in streamIds)
-            {
-                if (streams.TryGetValue(streamId, out streamBuffer)
-                    && streamBuffer.EventStream != null)
-                {
-                    result.Add(streamBuffer.EventStream);
-                }
-                else
-                {
-                    if (missingStreamIds == null)
-                    {
-                        missingStreamIds = new List<Guid>();
-                    }
-
-                    missingStreamIds.Add(streamId);
-                }
-            }
-
-            if (missingStreamIds?.Count > 0)
-            {
-                EventStream[] loadedEventStreams = await crudRepository.Where<EventStream>(x => missingStreamIds.Contains(x.Id)).ToArrayAsync(crudRepository);
-                if (throwOnNotFound)
-                {
-                    var notFoundIds = missingStreamIds.Where(x => !loadedEventStreams.Any(y => y.Id == x)).ToArray();
-                    if (notFoundIds.Length > 0)
-                    {
-                        throw new EntityNotFoundException($"Event stream(s) with ID(s) {string.Join(", ", notFoundIds)} not found");
-                    }
-                }
-
-                foreach (var eventStream in loadedEventStreams)
-                {
-                    if (streams.TryGetValue(eventStream.Id, out streamBuffer))
-                    {
-                        streamBuffer.EventStream = eventStream;
-                    }
-                    else
-                    {
-                        streams[eventStream.Id] = new StreamBuffer() { EventStream = eventStream };
-                    }
-                }
-
-                result.AddRange(loadedEventStreams);
-            }
-            
-            return result;
+            return throwOnNotFound
+                ? await crudRepository.GetManyAsync<EventStream, Guid>(streamIds)
+                : await crudRepository.FindManyAsync<EventStream, Guid>(streamIds);
         }
 
         private IEventStoreRecord SelectEventRecordFromRow(EventStreamRow row)
@@ -460,30 +393,32 @@ namespace Revo.Infrastructure.EventStores.Generic
 
         private async Task<long> GetStreamVersionAsync(Guid streamId)
         {
-            if (streams.TryGetValue(streamId, out StreamBuffer streamBuffer)
-                && streamBuffer.StreamVersion != null)
+            var streamBuffer = await GetStreamBufferAsync(streamId);
+            return streamBuffer.StreamVersion.Value;
+        }
+
+        private async Task<StreamBuffer> GetStreamBufferAsync(Guid streamId)
+        {
+            if (!streams.TryGetValue(streamId, out StreamBuffer streamBuffer))
             {
-                return streamBuffer.StreamVersion.Value;
+                streamBuffer = new StreamBuffer();
+                streams[streamId] = streamBuffer;
             }
 
-            var lastRow = await QueryStreamRows(true, streamId).FirstOrDefaultAsync(crudRepository);
-            if (lastRow != null)
+            if (streamBuffer.StreamVersion == null)
             {
-                return lastRow.StreamSequenceNumber;
+                var lastRow = await QueryStreamRows(true, streamId).FirstOrDefaultAsync(crudRepository);
+                streamBuffer.StreamVersion = lastRow?.StreamSequenceNumber ?? 0;
             }
-            else
-            {
-                return 0;
-            }
+
+            return streamBuffer;
         }
-        
+
         private class StreamBuffer
         {
-            public EventStream EventStream { get; set; }
             public ImmutableDictionary<string, string> UncommittedMetadata { get; set; }
             public long? StreamVersion { get; set; }
             public SortedList<long, EventStreamRow> UncommitedRows { get; } = new SortedList<long, EventStreamRow>();
         }
     }
 }
-

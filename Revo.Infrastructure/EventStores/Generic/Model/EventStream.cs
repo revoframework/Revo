@@ -11,7 +11,7 @@ namespace Revo.Infrastructure.EventStores.Generic.Model
 {
     [TablePrefix(NamespacePrefix = "RES", ColumnPrefix = "EVS")]
     [DatabaseEntity]
-    public class EventStream : IRowVersioned
+    public class EventStream : IRowVersioned, IHasId<Guid>
     {
         private IReadOnlyDictionary<string, string> metadata;
         private JObject metadataJsonObject;

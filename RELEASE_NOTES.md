@@ -1,9 +1,12 @@
 # RELEASE NOTES
 
-## [1.14.1] - 2020-02-04
+## [1.14.1] - 2020-02-26
 
 ### Added
 - IReadRepository.GetManyAsync and FindManyAsync
+
+### Fixed
+- fixed appending events to event store (wrong expected event number)
 
 ## [1.14.0] - 2020-02-04
 

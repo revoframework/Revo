@@ -128,7 +128,7 @@ namespace Revo.Infrastructure.Repositories
                     List<IEventMessageDraft> eventMessageDrafts = await CreateEventMessagesAsync(aggregate, aggregate.UncommittedEvents);
                     List<UncommitedEventStoreRecord> uncommittedRecords = eventMessageDrafts.Select(x => new UncommitedEventStoreRecord(x.Event, x.Metadata)).ToList();
 
-                    IReadOnlyCollection<IEventStoreRecord> eventRecords = await eventStore.PushEventsAsync(aggregate.Id, uncommittedRecords, aggregate.Version);
+                    IReadOnlyCollection<IEventStoreRecord> eventRecords = await eventStore.PushEventsAsync(aggregate.Id, uncommittedRecords);
                     List<IEventMessage> eventMessages = eventRecords.Select(EventStoreEventMessage.FromRecord).ToList();
 
                     allEventMessages.AddRange(eventMessages);

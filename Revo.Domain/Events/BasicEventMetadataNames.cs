@@ -10,6 +10,7 @@
         //public static readonly string StreamVersion = "StreamVersion";
         public static readonly string EventId = "EventId";
         public static readonly string StreamSequenceNumber = "StreamSequenceNumber";
+        public static readonly string AggregateEventNumber = "AggregateEventNumber";
         public static readonly string RequestUri = "RequestUri";
         public static readonly string AggregateClassId = "AggregateClassId";
         public static readonly string AggregateTenantId = "AggregateTenantId";

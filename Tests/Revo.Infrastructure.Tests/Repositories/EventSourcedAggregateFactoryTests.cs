@@ -57,7 +57,7 @@ namespace Revo.Infrastructure.Tests.Repositories
         }
 
         [Fact]
-        private void ConstructAndLoadEntityFromEvents()
+        public void ConstructAndLoadEntityFromEvents()
         {
             Guid entityId = Guid.Parse("571BCB87-49C7-44AE-A96F-CEBA645A8E6D");
             var eventStoreRecords = new List<IEventStoreRecord>()
@@ -85,7 +85,7 @@ namespace Revo.Infrastructure.Tests.Repositories
         }
         
         [Fact]
-        private void ConstructAndLoadEntityFromEvents_LoadsAggregateVersionFromSequenceNumber()
+        public void ConstructAndLoadEntityFromEvents_LoadsAggregateVersionFromSequenceNumber()
         {
             Guid entityId = Guid.Parse("571BCB87-49C7-44AE-A96F-CEBA645A8E6D");
             var eventStoreRecords = new List<IEventStoreRecord>()
@@ -111,7 +111,7 @@ namespace Revo.Infrastructure.Tests.Repositories
         }
 
         [Fact]
-        private void ConstructAndLoadEntityFromEvents_LoadsAggregateVersionFromAVEventMetadata()
+        public void ConstructAndLoadEntityFromEvents_LoadsAggregateVersionFromAVEventMetadata()
         {
             Guid entityId = Guid.Parse("571BCB87-49C7-44AE-A96F-CEBA645A8E6D");
             var eventStoreRecords = new List<IEventStoreRecord>()
@@ -141,7 +141,7 @@ namespace Revo.Infrastructure.Tests.Repositories
         }
 
         [Fact]
-        private void ConstructAndLoadEntityFromEvents_UpgradesEvents()
+        public void ConstructAndLoadEntityFromEvents_UpgradesEvents()
         {
             Guid entityId = Guid.Parse("571BCB87-49C7-44AE-A96F-CEBA645A8E6D");
             var eventStoreRecords = new List<IEventStoreRecord>()

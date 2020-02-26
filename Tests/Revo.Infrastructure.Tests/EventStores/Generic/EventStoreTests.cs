@@ -178,7 +178,7 @@ namespace Revo.Infrastructure.Tests.EventStores.Generic
             await sut.PushEventsAsync(eventStreams[0].Id, new[]
             {
                 new UncommitedEventStoreRecord(new Event1(5), new Dictionary<string, string>() { {"doh", "42"}}), 
-            }, null);
+            });
 
             var newRows = inMemoryCrudRepository.GetEntities<EventStreamRow>(EntityState.Added).ToList();
             newRows.Should().HaveCount(1);
@@ -204,7 +204,7 @@ namespace Revo.Infrastructure.Tests.EventStores.Generic
                 new UncommitedEventStoreRecord(new Event1(5), new Dictionary<string, string>() {{"doh", "42"}}),
             };
 
-            var records = await sut.PushEventsAsync(eventStreams[0].Id, uncommittedRecords, null);
+            var records = await sut.PushEventsAsync(eventStreams[0].Id, uncommittedRecords);
 
             records.Should().HaveCount(1);
             records.ElementAt(0).AdditionalMetadata.Should().Contain(uncommittedRecords[0].Metadata);
@@ -220,7 +220,7 @@ namespace Revo.Infrastructure.Tests.EventStores.Generic
             await sut.PushEventsAsync(eventStreams[0].Id, new[]
             {
                 new UncommitedEventStoreRecord(new Event1(1), new Dictionary<string, string>() { {"doh", "42"}})
-            }, 10);
+            });
 
             var newRows = inMemoryCrudRepository.GetEntities<EventStreamRow>(EntityState.Added).ToList();
             newRows.Should().HaveCount(1);
@@ -237,12 +237,12 @@ namespace Revo.Infrastructure.Tests.EventStores.Generic
             {
                 new UncommitedEventStoreRecord(new Event1(1), new Dictionary<string, string>() { {"doh", "42"}}), 
                 new UncommitedEventStoreRecord(new Event1(2), new Dictionary<string, string>() { {"doh", "42"}}),
-            }, null);
+            });
 
             await sut.PushEventsAsync(eventStreams[0].Id, new[]
             {
                 new UncommitedEventStoreRecord(new Event1(3), new Dictionary<string, string>() { {"doh", "42"}})
-            }, null);
+            });
 
             var newRows = inMemoryCrudRepository.GetEntities<EventStreamRow>(EntityState.Added).ToList();
             newRows.Should().HaveCount(3);
@@ -253,17 +253,17 @@ namespace Revo.Infrastructure.Tests.EventStores.Generic
         }
 
         [Fact]
-        public async Task PushEventsAsync_WithExpectedVersionSpecified()
+        public async Task PushEventsAsync_WithExpectedVersion()
         {
             await sut.PushEventsAsync(eventStreams[0].Id, new[]
             {
                 new UncommitedEventStoreRecord(new Event1(1), new Dictionary<string, string>() { {"doh", "42"}})
-            }, 10);
+            });
 
             var newRows = inMemoryCrudRepository.GetEntities<EventStreamRow>(EntityState.Added).ToList();
             newRows.Should().HaveCount(1);
 
-            newRows.Should().Contain(x => x.StreamSequenceNumber == 11);
+            newRows.Should().Contain(x => x.StreamSequenceNumber == 3);
         }
 
         public class Event1 : IEvent
