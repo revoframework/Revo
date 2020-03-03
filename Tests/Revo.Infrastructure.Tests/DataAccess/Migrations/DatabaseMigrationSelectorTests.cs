@@ -461,7 +461,8 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
-                    IsRepeatable = true
+                    IsRepeatable = true,
+                    Checksum = "xyz"
                 }
             });
 
