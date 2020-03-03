@@ -50,6 +50,62 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
         }
 
         [Fact]
+        public void SearchModules_AsteriskWildcard()
+        {
+            sut.AddMigration(new FakeDatabaseMigration()
+            {
+                ModuleName = "app-base",
+                Version = DatabaseVersion.Parse("1.0.0")
+            });
+            sut.AddMigration(new FakeDatabaseMigration()
+            {
+                ModuleName = "app-base",
+                Version = DatabaseVersion.Parse("1.0.1")
+            });
+            sut.AddMigration(new FakeDatabaseMigration()
+            {
+                ModuleName = "app-module1",
+                Version = DatabaseVersion.Parse("1.0.0")
+            });
+            sut.AddMigration(new FakeDatabaseMigration()
+            {
+                ModuleName = "foo-another",
+                Version = DatabaseVersion.Parse("1.0.0")
+            });
+
+            var result = sut.SearchModules("app-*");
+            result.Should().BeEquivalentTo("app-base", "app-module1");
+        }
+
+        [Fact]
+        public void SearchModules_QuestionMarkWildcard()
+        {
+            sut.AddMigration(new FakeDatabaseMigration()
+            {
+                ModuleName = "app-base",
+                Version = DatabaseVersion.Parse("1.0.0")
+            });
+            sut.AddMigration(new FakeDatabaseMigration()
+            {
+                ModuleName = "app-base",
+                Version = DatabaseVersion.Parse("1.0.1")
+            });
+            sut.AddMigration(new FakeDatabaseMigration()
+            {
+                ModuleName = "app-module1",
+                Version = DatabaseVersion.Parse("1.0.0")
+            });
+            sut.AddMigration(new FakeDatabaseMigration()
+            {
+                ModuleName = "foo-another",
+                Version = DatabaseVersion.Parse("1.0.0")
+            });
+
+            var result = sut.SearchModules("ap?-base");
+            result.Should().BeEquivalentTo("app-base");
+        }
+
+        [Fact]
         public void Validate_NotThrows()
         {
             sut.AddMigration(new FakeDatabaseMigration()

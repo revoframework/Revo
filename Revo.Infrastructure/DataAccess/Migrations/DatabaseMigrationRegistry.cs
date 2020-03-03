@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Revo.Infrastructure.DataAccess.Migrations
 {
@@ -12,6 +13,13 @@ namespace Revo.Infrastructure.DataAccess.Migrations
         }
 
         public IReadOnlyCollection<IDatabaseMigration> Migrations => migrations;
+
+        public IEnumerable<string> SearchModules(string moduleNameWildcard)
+        {
+            var moduleNameRegex = new Regex("^" + Regex.Escape(moduleNameWildcard).Replace("\\?", ".").Replace("\\*", ".*") + "$",
+                RegexOptions.IgnoreCase | RegexOptions.Compiled);
+            return GetAvailableModules().Where(x => moduleNameRegex.IsMatch(x));
+        }
 
         public void AddMigration(IDatabaseMigration migration)
         {
@@ -33,6 +41,12 @@ namespace Revo.Infrastructure.DataAccess.Migrations
             {
                 if (module.Any(x => x.IsRepeatable))
                 {
+                    if (module.GroupBy(x => GroupMigrationTags(x.Tags)).Any(x => x.Any(m => !m.IsRepeatable)))
+                    {
+                        throw new DatabaseMigrationException(
+                            $"Failed to validate database migrations for module '{module.Key}': module must either have all non-repeatable, or all repeatable migration(s)");
+                    }
+
                     if (module.GroupBy(x => GroupMigrationTags(x.Tags)).Any(x => x.Count() > 1))
                     {
                         throw new DatabaseMigrationException(

@@ -5,7 +5,7 @@ namespace Revo.Tools.DatabaseMigrator
 {
     public class DatabaseMigrationExecutionOptions : IDatabaseMigrationExecutionOptions
     {
-        public IReadOnlyCollection<DatabaseMigrationSpecifier> MigrateOnlySpecifiedModules { get; set; }
+        public IReadOnlyCollection<DatabaseMigrationSearchSpecifier> MigrateOnlySpecifiedModules { get; set; }
         public string[] EnvironmentTags { get; set; }
     }
 }

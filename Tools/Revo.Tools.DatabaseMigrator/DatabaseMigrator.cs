@@ -91,11 +91,11 @@ namespace Revo.Tools.DatabaseMigrator
                     string[] parts = x.Split('@', 2);
                     if (parts.Length > 1)
                     {
-                        return new DatabaseMigrationSpecifier(parts[0], DatabaseVersion.Parse(parts[1]));
+                        return new DatabaseMigrationSearchSpecifier(parts[0], DatabaseVersion.Parse(parts[1]));
                     }
                     else
                     {
-                        return new DatabaseMigrationSpecifier(x, null);
+                        return new DatabaseMigrationSearchSpecifier(x, null);
                     }
                 }).ToArray()
                 : null;

@@ -7,6 +7,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
         IReadOnlyCollection<IDatabaseMigration> Migrations { get; }
 
         IEnumerable<string> GetAvailableModules();
+        IEnumerable<string> SearchModules(string moduleNameWildcard);
         void AddMigration(IDatabaseMigration migration);
         void ValidateMigrations();
     }

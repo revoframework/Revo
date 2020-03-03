@@ -7,11 +7,11 @@ namespace Revo.Infrastructure.DataAccess.Migrations
     public class DatabaseMigrationExecutionHook : IApplicationConfigurer
     {
         private readonly IDatabaseMigrationExecutor executor;
-        private readonly DatabaseMigrationsConfiguration configuration;
+        private readonly IDatabaseMigrationsConfiguration configuration;
         private readonly IEnvironment environment;
 
         public DatabaseMigrationExecutionHook(IDatabaseMigrationExecutor executor,
-            DatabaseMigrationsConfiguration configuration, IEnvironment environment)
+            IDatabaseMigrationsConfiguration configuration, IEnvironment environment)
         {
             this.executor = executor;
             this.configuration = configuration;

@@ -2,6 +2,9 @@
 
 ## [1.15.0] - 2020-0?-??
 
+### Added
+- IDatabaseMigrationExecutionOptions.MigrateOnlySpecifiedModules can now be specified using wildcards
+
 ## [1.14.1] - 2020-02-26
 
 ### Added

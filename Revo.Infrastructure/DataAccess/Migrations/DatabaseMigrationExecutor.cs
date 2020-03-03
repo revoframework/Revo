@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using NLog;
 
@@ -86,7 +87,8 @@ namespace Revo.Infrastructure.DataAccess.Migrations
             IReadOnlyCollection<PendingModuleMigration> migrations;
             if (options.MigrateOnlySpecifiedModules != null)
             {
-                migrations = await SelectModuleMigrationsAsync(options.MigrateOnlySpecifiedModules.ToArray());
+                var moduleSpecifiers = SearchModules(options.MigrateOnlySpecifiedModules);
+                migrations = await SelectModuleMigrationsAsync(moduleSpecifiers.ToArray());
             }
             else
             {
@@ -96,6 +98,27 @@ namespace Revo.Infrastructure.DataAccess.Migrations
             }
 
             return migrations;
+        }
+
+        private List<DatabaseMigrationSpecifier> SearchModules(IReadOnlyCollection<DatabaseMigrationSearchSpecifier> searchedModules)
+        {
+            var result = new List<DatabaseMigrationSpecifier>();
+            foreach (var searchedModule in searchedModules)
+            {
+                var matchingModules = migrationRegistry.SearchModules(searchedModule.ModuleNameWildcard)
+                    .Select(x => new DatabaseMigrationSpecifier(x, searchedModule.Version))
+                    .ToArray();
+
+                foreach (var matchingModule in matchingModules)
+                {
+                    if (!result.Contains(matchingModule))
+                    {
+                        result.Add(matchingModule);
+                    }
+                }
+            }
+
+            return result;
         }
 
         private async Task<IReadOnlyCollection<PendingModuleMigration>> SelectModuleMigrationsAsync(DatabaseMigrationSpecifier[] migratedModules)
