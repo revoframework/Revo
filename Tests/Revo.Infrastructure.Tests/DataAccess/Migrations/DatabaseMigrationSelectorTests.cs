@@ -454,49 +454,6 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
         }
 
         [Fact]
-        public async Task SelectMigrationsAsync_Repeatables()
-        {
-            migrationProvider.GetMigrationHistoryAsync()
-                .Returns(new[]
-                {
-                    new FakeDatabaseMigrationRecord()
-                    {
-                        ModuleName = "appModule1",
-                        Version = DatabaseVersion.Parse("1.0.0")
-                    }
-                });
-
-            migrationRegistry.Migrations.Returns(new List<IDatabaseMigration>()
-            {
-                new FakeDatabaseMigration()
-                {
-                    ModuleName = "appModule1",
-                    Version = DatabaseVersion.Parse("1.0.0")
-                },
-                new FakeDatabaseMigration()
-                {
-                    ModuleName = "appModule1",
-                    Version = DatabaseVersion.Parse("1.0.1")
-                },
-                new FakeDatabaseMigration()
-                {
-                    ModuleName = "appModule1",
-                    IsRepeatable = true
-                }
-            });
-
-            var migrations = await sut.SelectMigrationsAsync(
-                new[] { new DatabaseMigrationSpecifier("appModule1", null) },
-                new string[0]);
-
-            migrations.Should().HaveCount(1);
-            migrations.First().Specifier.Should().Be(new DatabaseMigrationSpecifier("appModule1", null));
-            migrations.First().Migrations.Should().Equal(
-                migrationRegistry.Migrations.ElementAt(1),
-                migrationRegistry.Migrations.ElementAt(2));
-        }
-
-        [Fact]
         public async Task SelectMigrationsAsync_RepeatablesAppliedFirstTime()
         {
             migrationRegistry.Migrations.Returns(new List<IDatabaseMigration>()
@@ -504,8 +461,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
-                    IsRepeatable = true,
-                    Checksum = "xyz"
+                    IsRepeatable = true
                 }
             });
 

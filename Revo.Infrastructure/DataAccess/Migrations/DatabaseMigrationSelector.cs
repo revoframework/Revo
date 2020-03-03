@@ -68,12 +68,13 @@ namespace Revo.Infrastructure.DataAccess.Migrations
             }
             else if (!moduleMigrations.Any())
             {
+                // TODO maybe return without errors if there are migrations for this module with different tags?
                 throw new DatabaseMigrationException($"Cannot select database migrations for module '{moduleName}': no version for specified module were found");
             }
             
             List<IDatabaseMigration> result = new List<IDatabaseMigration>();
-
-            if (targetVersion == null && moduleMigrations.Last().IsRepeatable)
+            
+            if (moduleMigrations.Last().IsRepeatable) // repeatable-migration module
             {
                 if (!queuedMigrations.Any(x => string.Equals(x.ModuleName, moduleName, StringComparison.InvariantCultureIgnoreCase)))
                 {
@@ -114,24 +115,17 @@ namespace Revo.Infrastructure.DataAccess.Migrations
                     {
                         result.Add(baseline);
                         result.AddRange(moduleMigrations
-                            .Where(x => !x.IsRepeatable && x.Version.CompareTo(baseline.Version) > 0));
+                            .Where(x => x.Version.CompareTo(baseline.Version) > 0));
                     }
                     else
                     {
-                        result.AddRange(moduleMigrations.Where(x => !x.IsRepeatable));
+                        result.AddRange(moduleMigrations);
                     }
-
-                    result.AddRange(moduleMigrations.Where(x => x.IsRepeatable));
                 }
                 else
                 {
                     result.AddRange(moduleMigrations
-                        .Where(x => !x.IsRepeatable && !x.IsBaseline && x.Version.CompareTo(version) > 0));
-
-                    if (result.Count > 0)
-                    {
-                        result.AddRange(moduleMigrations.Where(x => x.IsRepeatable));
-                    }
+                        .Where(x => !x.IsBaseline && x.Version.CompareTo(version) > 0));
                 }
             }
 
