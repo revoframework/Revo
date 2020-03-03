@@ -5,6 +5,10 @@
 ### Added
 - IDatabaseMigrationExecutionOptions.MigrateOnlySpecifiedModules can now be specified using wildcards
 
+### Fixed
+- database migrations: doesn't throw anymore if there is no migration for specified version, but DB is already up-to-date
+- database migrations: now throws when updating to 'latest' version, but no migrations are found
+
 ## [1.14.1] - 2020-02-26
 
 ### Added

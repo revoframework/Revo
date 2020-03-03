@@ -342,7 +342,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 .Should()
                 .ThrowAsync<DatabaseMigrationException>();
         }
-
+        
         [Fact]
         public async Task SelectMigrationsAsync_AreInOrder()
         {
@@ -369,6 +369,60 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             migrations.First().Migrations.Should().Equal(
                 migrationRegistry.Migrations.ElementAt(0),
                 migrationRegistry.Migrations.ElementAt(1));
+        }
+
+        [Fact]
+        public async Task SelectMigrationsAsync_MigrationNeedNotExistIfAlreadyUpToDate()
+        {
+            migrationProvider.GetMigrationHistoryAsync()
+                .Returns(new[]
+                {
+                    new FakeDatabaseMigrationRecord()
+                    {
+                        ModuleName = "appModule1",
+                        Version = DatabaseVersion.Parse("1.0.0")
+                    }
+                });
+
+            migrationRegistry.Migrations.Returns(new List<IDatabaseMigration>()
+            {
+            });
+
+            var migrations = await sut.SelectMigrationsAsync(
+                new[] { new DatabaseMigrationSpecifier("appModule1", DatabaseVersion.Parse("1.0.0")) },
+                new string[0]);
+
+            migrations.Should().BeEmpty();
+        }
+        
+        [Fact]
+        public async Task SelectMigrationsAsync_MigrationNeedNotExistIfAlreadyUpToDate_WithBaseline()
+        {
+            migrationProvider.GetMigrationHistoryAsync()
+                .Returns(new[]
+                {
+                    new FakeDatabaseMigrationRecord()
+                    {
+                        ModuleName = "appModule1",
+                        Version = DatabaseVersion.Parse("1.0.0")
+                    }
+                });
+
+            migrationRegistry.Migrations.Returns(new List<IDatabaseMigration>()
+            {
+                new FakeDatabaseMigration()
+                {
+                    ModuleName = "appModule1",
+                    Version = DatabaseVersion.Parse("1.0.1"),
+                    IsBaseline = true
+                }
+            });
+
+            var migrations = await sut.SelectMigrationsAsync(
+                new[] { new DatabaseMigrationSpecifier("appModule1", DatabaseVersion.Parse("1.0.0")) },
+                new string[0]);
+
+            migrations.Should().BeEmpty();
         }
 
         [Fact]
@@ -428,18 +482,18 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
+                    Version = DatabaseVersion.Parse("1.0.1"),
+                    IsBaseline = true
+                },
+                new FakeDatabaseMigration()
+                {
+                    ModuleName = "appModule1",
                     Version = DatabaseVersion.Parse("1.0.1")
                 },
                 new FakeDatabaseMigration()
                 {
                     ModuleName = "appModule1",
                     Version = DatabaseVersion.Parse("1.0.0")
-                },
-                new FakeDatabaseMigration()
-                {
-                    ModuleName = "appModule1",
-                    Version = DatabaseVersion.Parse("1.0.1"),
-                    IsBaseline = true
                 }
             });
 
@@ -450,7 +504,37 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             migrations.Should().HaveCount(1);
             migrations.First().Specifier.Should().Be(new DatabaseMigrationSpecifier("appModule1", null));
             migrations.First().Migrations.Should().Equal(
-                migrationRegistry.Migrations.ElementAt(0));
+                migrationRegistry.Migrations.ElementAt(1));
+        }
+
+        [Fact]
+        public async Task SelectMigrationsAsync_BaselineThrowsWhenLatestVersionHasOnlyBaselineMigrationPath()
+        {
+            migrationProvider.GetMigrationHistoryAsync()
+                .Returns(new[]
+                {
+                    new FakeDatabaseMigrationRecord()
+                    {
+                        ModuleName = "appModule1",
+                        Version = DatabaseVersion.Parse("1.0.0")
+                    }
+                });
+
+            migrationRegistry.Migrations.Returns(new List<IDatabaseMigration>()
+            {
+                new FakeDatabaseMigration()
+                {
+                    ModuleName = "appModule1",
+                    Version = DatabaseVersion.Parse("1.0.1"),
+                    IsBaseline = true
+                }
+            });
+
+            await sut.Awaiting(async x => await sut.SelectMigrationsAsync(
+                    new[] { new DatabaseMigrationSpecifier("appModule1", null) },
+                    new string[0]))
+                .Should()
+                .ThrowAsync<DatabaseMigrationException>();
         }
 
         [Fact]
@@ -690,6 +774,42 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 migrationRegistry.Migrations.ElementAt(1),
                 migrationRegistry.Migrations.ElementAt(4),
                 migrationRegistry.Migrations.ElementAt(2),
+                migrationRegistry.Migrations.ElementAt(0));
+        }
+
+        [Fact]
+        public async Task SelectMigrationsAsync_MigrationsToCurrentDependencyVersionsNeedNotExist()
+        {
+            migrationProvider.GetMigrationHistoryAsync()
+                .Returns(new[]
+                {
+                    new FakeDatabaseMigrationRecord()
+                    {
+                        ModuleName = "baseModule1",
+                        Version = DatabaseVersion.Parse("1.0.0"),
+                    }
+                });
+
+            migrationRegistry.Migrations.Returns(new List<IDatabaseMigration>()
+            {
+                new FakeDatabaseMigration()
+                {
+                    ModuleName = "appModule1",
+                    Version = DatabaseVersion.Parse("1.0.0"),
+                    Dependencies = new []
+                    {
+                        new DatabaseMigrationSpecifier("baseModule1", DatabaseVersion.Parse("1.0.0")),
+                    }
+                }
+            });
+
+            var migrations = await sut.SelectMigrationsAsync(
+                new[] { new DatabaseMigrationSpecifier("appModule1", null) },
+                new string[0]);
+
+            migrations.Should().HaveCount(1);
+            migrations.First().Specifier.Should().Be(new DatabaseMigrationSpecifier("appModule1", null));
+            migrations.First().Migrations.Should().Equal(
                 migrationRegistry.Migrations.ElementAt(0));
         }
 
