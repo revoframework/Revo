@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Revo.Domain.Entities;
-using Revo.Domain.Entities.EventSourcing;
+﻿using Revo.Domain.Entities;
 using Revo.EFCore.DataAccess.Entities;
 using Revo.Infrastructure.Projections;
 

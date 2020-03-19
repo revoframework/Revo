@@ -1,9 +1,6 @@
-﻿using Ninject;
-using Ninject.Modules;
+﻿using Ninject.Modules;
 using Revo.Core.Core;
-using Revo.Core.Events;
 using Revo.Core.Lifecycle;
-using Revo.Core.Transactions;
 using Revo.Domain.Events;
 using Revo.Infrastructure.Events.Async;
 using Revo.Infrastructure.Repositories;

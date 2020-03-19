@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Revo.Domain.Entities.Attributes;
 using Revo.Domain.Entities.EventSourcing;
 using Revo.Examples.Todos.Domain.Events;

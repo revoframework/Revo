@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Revo.Core.Events;
-using Revo.Domain.Entities;
-using Revo.Domain.Entities.EventSourcing;
 using Revo.Domain.Events;
 
 namespace Revo.Infrastructure.Projections

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Revo.Domain.Events;
+﻿using Revo.Domain.Events;
 
 namespace Revo.Examples.Todos.Domain.Events
 {
