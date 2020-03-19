@@ -47,7 +47,7 @@ Segregating command and query responsibilities with:
 Support for both [synchronous](https://revoframework.gitbook.io/revo/reference-guide/events#synchronous-event-processing) and [asynchronous](https://revoframework.gitbook.io/revo/reference-guide/events#asynchronous-event-processing) event processing, guaranteed _at-least-once_ delivery, event queues with strict sequence ordering \(optionally\), event source catch-ups, optional [pseudo-synchronous event dispatch](https://revoframework.gitbook.io/revo/reference-guide/events#pseudo-synchronous-event-dispatch) for listeners \(projectors, for example\).
 
 [**Data access**](https://revoframework.gitbook.io/revo/reference-guide/data-persistence)  
-Thin abstraction layer for easy data persistence (e.g. querying read models) using _Entity Framework Core_, _Entity Framework 6_, _RavenDB,_ testable _in-memory database_ or other data providers.
+Thin abstraction layer for easy data persistence (e.g. querying read models) using _Entity Framework Core_, _Entity Framework 6_, _RavenDB,_ testable _in-memory database_ or other data providers. Includes support for simple [database migrations](https://revoframework.gitbook.io/revo/reference-guide/database-migrations).
 
 [**Projections**](https://revoframework.gitbook.io/revo/reference-guide/projections)  
 Support for read-model projections with various backends \(e.g. _Entity Framework Core_ (_PostgreSQL_, _MSSQL_, _SQLite_,...), _Entity Framework 6_, _RavenDB_...\), automatic idempotency- and concurrency-handling, etc.
@@ -68,6 +68,8 @@ Basic permission/role-based ACL for commands and queries, fine-grained row filte
 * [**Multi-tenancy**](https://revoframework.gitbook.io/revo/reference-guide/multi-tenancy)  
 * [**Event message metadata**](https://revoframework.gitbook.io/revo/reference-guide/events#event-messages-and-metadata)
 * [**Event versioning**](https://revoframework.gitbook.io/revo/reference-guide/events#event-versioning)
+* [**Event upgrades**](https://revoframework.gitbook.io/revo/reference-guide/events#event-upgrades)
+* [**Database migrations**](https://revoframework.gitbook.io/revo/reference-guide/database-migrations)
 * **History and change-tracking**
 * **User notifications:** event-based, with different output channels (mail, etc.), aggregation, buffering, etc.
 * **.NET Core 3.0+, .NET Standard 2.0+ & .NET 4.7.2+ support (with integration for ASP.NET Core and ASP.NET)**
@@ -292,14 +294,6 @@ Binaries are up for grabs in form of NuGet packages:
   </tr>
   <tr>
     <td>
-      Revo.EFCore.AspNetCoreOData
-    </td>
-    <td>
-      <a href="https://www.nuget.org/packages/Revo.EFCore.AspNetCoreOData/"><img src="https://img.shields.io/nuget/v/Revo.EFCore.AspNetCoreOData.svg" alt="NuGet package version"></a>
-    </td>
-  </tr>
-  <tr>
-    <td>
       Revo.EF6
     </td>
     <td>
@@ -308,26 +302,10 @@ Binaries are up for grabs in form of NuGet packages:
   </tr>
   <tr>
     <td>
-      Revo.EF6.AspNetOData
-    </td>
-    <td>
-      <a href="https://www.nuget.org/packages/Revo.EF6.AspNetOData/"><img src="https://img.shields.io/nuget/v/Revo.EF6.AspNetOData.svg" alt="NuGet package version"></a>
-    </td>
-  </tr>
-  <tr>
-    <td>
       Revo.RavenDB
     </td>
     <td>
       <a href="https://www.nuget.org/packages/Revo.RavenDB/"><img src="https://img.shields.io/nuget/v/Revo.RavenDB.svg" alt="NuGet package version"></a>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      Revo.RavenDB.AspNetOData
-    </td>
-    <td>
-      <a href="https://www.nuget.org/packages/Revo.RavenDB.AspNetOData/"><img src="https://img.shields.io/nuget/v/Revo.RavenDB.AspNetOData.svg" alt="NuGet package version"></a>
     </td>
   </tr>
 </table>
@@ -394,14 +372,6 @@ Binaries are up for grabs in form of NuGet packages:
     <th colspan="2">
       Other extensions
     </th>
-  </tr>
-  <tr>
-    <td>
-      Revo.Extensions.AspNet.Interop
-    </td>
-    <td>
-      <a href="https://www.nuget.org/packages/Revo.Extensions.AspNet.Interop/"><img src="https://img.shields.io/nuget/v/Revo.Extensions.AspNet.Interop.svg" alt="NuGet package version"></a>
-    </td>
   </tr>
   <tr>
     <td>
