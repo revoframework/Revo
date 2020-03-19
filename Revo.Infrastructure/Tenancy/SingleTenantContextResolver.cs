@@ -1,20 +1,15 @@
-﻿using System;
-using System.Web;
-using Revo.Domain.Tenancy;
+﻿using Revo.Domain.Tenancy;
 
 namespace Revo.Infrastructure.Tenancy
 {
     public class SingleTenantContextResolver : ITenantContextResolver
     {
-        private readonly ITenantProvider tenantProvider;
-
-        public SingleTenantContextResolver(ITenantProvider tenantProvider, Guid tenantId)
+        public SingleTenantContextResolver(ITenant tenant)
         {
-            this.tenantProvider = tenantProvider;
-            Tenant = tenantProvider.GetTenant(tenantId);
+            Tenant = tenant;
         }
 
-        public ITenant Tenant { get; private set; }
+        public ITenant Tenant { get; }
 
         public ITenant ResolveTenant()
         {

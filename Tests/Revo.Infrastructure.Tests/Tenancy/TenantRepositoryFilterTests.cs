@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using FluentAssertions;
 using Revo.Domain.ReadModel;
 using Revo.Domain.Tenancy;
 using Revo.Infrastructure.Tenancy;
@@ -46,9 +45,19 @@ namespace Revo.Infrastructure.Tests.Tenancy
         public void FilterResults_NullContextReturnsAll()
         {
             tenantContext.Tenant.Returns((ITenant)null);
+            sut.NullTenantCanAccessOtherTenantsData = true;
 
             var results = sut.FilterResults(entities.AsQueryable());
-            Assert.True(results.SequenceEqual(entities));
+            results.Should().BeEquivalentTo(entities);
+        }
+        
+        [Fact]
+        public void FilterResults_NullContextReturnsNull()
+        {
+            tenantContext.Tenant.Returns((ITenant)null);
+
+            var results = sut.FilterResults(entities.AsQueryable());
+            results.Should().BeEquivalentTo(entities[0]);
         }
 
         [Fact]
@@ -58,8 +67,8 @@ namespace Revo.Infrastructure.Tests.Tenancy
             tenantContext.Tenant.Returns(tenant);
 
             var results = sut.FilterResults(entities.AsQueryable());
-            Assert.True(results.SequenceEqual(
-                entities.Where(x => x.TenantId == tenantId1 || x.TenantId == null)));
+            results.Should().BeEquivalentTo(
+               entities.Where(x => x.TenantId == tenantId1 || x.TenantId == null));
         }
 
         [Fact]
@@ -69,7 +78,7 @@ namespace Revo.Infrastructure.Tests.Tenancy
             tenantContext.Tenant.Returns(tenant);
 
             var results = sut.FilterResults(entitiesUnfiltered.AsQueryable());
-            Assert.True(results.SequenceEqual(entitiesUnfiltered));
+            results.Should().BeEquivalentTo(entitiesUnfiltered);
         }
 
         [Fact]
@@ -79,7 +88,7 @@ namespace Revo.Infrastructure.Tests.Tenancy
             tenantContext.Tenant.Returns(tenant);
 
             var result = sut.FilterResult(entities[1]);
-            Assert.Equal(entities[1], result);
+            result.Should().Be(entities[1]);
         }
 
         [Fact]
@@ -89,7 +98,7 @@ namespace Revo.Infrastructure.Tests.Tenancy
             tenantContext.Tenant.Returns(tenant);
 
             var result = sut.FilterResult(entities[0]);
-            Assert.Equal(entities[0], result);
+            result.Should().Be(entities[0]);
         }
 
         [Fact]
@@ -99,7 +108,7 @@ namespace Revo.Infrastructure.Tests.Tenancy
             tenantContext.Tenant.Returns(tenant);
 
             var result = sut.FilterResult(entitiesUnfiltered[0]);
-            Assert.Equal(entitiesUnfiltered[0], result);
+            result.Should().Be(entitiesUnfiltered[0]);
         }
         
         [Fact]
@@ -109,16 +118,17 @@ namespace Revo.Infrastructure.Tests.Tenancy
             tenantContext.Tenant.Returns(tenant);
 
             var result = sut.FilterResult(entities[2]);
-            Assert.Equal(null, result);
+            result.Should().BeNull();
         }
 
         [Fact]
-        public void FilterResult_NullContextReturnsOwned()
+        public void FilterResult_NullContextReturnsForeign()
         {
             tenantContext.Tenant.Returns((ITenant)null);
+            sut.NullTenantCanAccessOtherTenantsData = true;
 
             var result = sut.FilterResult(entities[1]);
-            Assert.Equal(entities[1], result);
+            result.Should().Be(entities[1]);
         }
 
         [Fact]
@@ -127,7 +137,7 @@ namespace Revo.Infrastructure.Tests.Tenancy
             tenantContext.Tenant.Returns((ITenant)null);
 
             var result = sut.FilterResult(entities[0]);
-            Assert.Equal(entities[0], result);
+            result.Should().Be(entities[0]);
         }
         
         [Fact]
@@ -162,9 +172,27 @@ namespace Revo.Infrastructure.Tests.Tenancy
         }
 
         [Fact]
+        public void FilterAdded_NullContextAllowsNull()
+        {
+            tenantContext.Tenant.Returns((ITenant)null);
+            sut.FilterAdded(entities[0]);
+        }
+
+        [Fact]
+        public void FilterAdded_NullContextThrowsWhenForeign()
+        {
+            tenantContext.Tenant.Returns((ITenant)null);
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                sut.FilterAdded(entities[1]);
+            });
+        }
+
+        [Fact]
         public void FilterAdded_NullContextAllowsAny()
         {
             tenantContext.Tenant.Returns((ITenant)null);
+            sut.NullTenantCanAccessOtherTenantsData = true;
 
             foreach (var entity in entities)
             {
@@ -204,9 +232,17 @@ namespace Revo.Infrastructure.Tests.Tenancy
         }
 
         [Fact]
+        public void FilterModified_NullContextAllowsNull()
+        {
+            tenantContext.Tenant.Returns((ITenant)null);
+            sut.FilterModified(entities[0]);
+        }
+
+        [Fact]
         public void FilterModified_NullContextAllowsAny()
         {
             tenantContext.Tenant.Returns((ITenant)null);
+            sut.NullTenantCanAccessOtherTenantsData = true;
 
             foreach (var entity in entities)
             {

@@ -13,6 +13,8 @@ namespace Revo.Infrastructure.Tenancy
         {
             this.tenantContext = tenantContext;
         }
+        
+        public bool NullTenantCanAccessOtherTenantsData { get; set; } = false;
 
         public IQueryable<T> FilterResults<T>(IQueryable<T> results) where T : class
         {
@@ -30,7 +32,8 @@ namespace Revo.Infrastructure.Tenancy
             if (tenantOwned != null)
             {
                 Guid? tenantId = tenantContext.Tenant?.Id;
-                if (tenantOwned.TenantId != null && tenantId != null
+                if (tenantOwned.TenantId != null
+                    && (!NullTenantCanAccessOtherTenantsData || tenantId != null)
                     && tenantOwned.TenantId != tenantId)
                 {
                     return null;
@@ -46,7 +49,8 @@ namespace Revo.Infrastructure.Tenancy
             if (tenantOwned != null)
             {
                 Guid? tenantId = tenantContext.Tenant?.Id;
-                if (tenantOwned.TenantId != null && tenantId != null
+                if (tenantOwned.TenantId != null
+                    && (!NullTenantCanAccessOtherTenantsData || tenantId != null)
                     && tenantOwned.TenantId != tenantId)
                 {
                     throw new InvalidOperationException(
@@ -61,7 +65,8 @@ namespace Revo.Infrastructure.Tenancy
             if (tenantOwned != null)
             {
                 Guid? tenantId = tenantContext.Tenant?.Id;
-                if (tenantOwned.TenantId != null && tenantId != null
+                if (tenantOwned.TenantId != null
+                    && (!NullTenantCanAccessOtherTenantsData || tenantId != null)
                     && tenantOwned.TenantId != tenantId)
                 {
                     throw new InvalidOperationException(
@@ -76,7 +81,8 @@ namespace Revo.Infrastructure.Tenancy
             if (tenantOwned != null)
             {
                 Guid? tenantId = tenantContext.Tenant?.Id;
-                if (tenantOwned.TenantId != null && tenantId != null
+                if (tenantOwned.TenantId != null
+                    && (!NullTenantCanAccessOtherTenantsData || tenantId != null)
                     && tenantOwned.TenantId != tenantId)
                 {
                     throw new InvalidOperationException(
@@ -88,12 +94,12 @@ namespace Revo.Infrastructure.Tenancy
         private IQueryable<T> DoFilterResults<T>(IQueryable<T> results) where T : class, ITenantOwned
         {
             Guid? tenantId = tenantContext.Tenant?.Id;
-            if (tenantId == null)
+            if (tenantId == null && NullTenantCanAccessOtherTenantsData)
             {
                 return results;
             }
 
-            return results.Where(x => x.TenantId == null || x.TenantId.Value == tenantId.Value);
+            return results.Where(x => x.TenantId == null || x.TenantId == tenantId);
         }
     }
 }

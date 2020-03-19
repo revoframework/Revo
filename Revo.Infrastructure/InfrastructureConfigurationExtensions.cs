@@ -5,6 +5,7 @@ using Revo.Infrastructure.DataAccess.Migrations;
 using Revo.Infrastructure.Events.Async;
 using Revo.Infrastructure.Jobs.InMemory;
 using Revo.Infrastructure.Sagas;
+using Revo.Infrastructure.Tenancy;
 
 namespace Revo.Infrastructure
 {
@@ -33,6 +34,7 @@ namespace Revo.Infrastructure
                 }
 
                 c.LoadModule(new DatabaseMigrationsModule(section.DatabaseMigrations));
+                c.LoadModule(new TenancyModule(section.Tenancy));
 
                 if (section.EnableSagas)
                 {
