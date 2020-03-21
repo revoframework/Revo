@@ -1,5 +1,13 @@
 # RELEASE NOTES
 
+## [1.16.0] - 2020-03-05
+
+### Added
+- improved multi-tenancy configuration
+
+### Changed
+- breaking change: null tenants now cannot access other tenant's data by default (can be changed by configuration)
+
 ## [1.15.0] - 2020-03-05
 
 ### Added
@@ -17,7 +25,7 @@
 ### Fixed
 - fixed appending events to event store (wrong expected event number)
 
-## [1.14.0] - 2020-02-04
+## [1.14.0] - 2020-02-11
 
 ### Added
 - event upgrade support - just implement IEventUpgrade in your code (auto discovery) and Revo upgrades the event streams on-the-fly upon loading the aggregates

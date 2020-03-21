@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using Revo.Core.Commands;
 using Revo.Examples.Todos.Dto;
-using Revo.Examples.Todos.Reads.Model;
 
 namespace Revo.Examples.Todos.Messages.Queries
 {

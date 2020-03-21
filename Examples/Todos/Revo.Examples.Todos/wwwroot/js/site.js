@@ -1,4 +1,8 @@
-﻿function newGuid() {
+﻿/// Simple frontend for Revo.Examples.Todos example app
+/// NOTE This is just a quick and dirty implementation meant only as a simple way to interact
+/// with the APIs exposed by the sample application. Itself doesn't actually showcase any features of Revo.
+
+function newGuid() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);

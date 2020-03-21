@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +6,6 @@ using Revo.AspNetCore.Web;
 using Revo.Examples.Todos.Dto;
 using Revo.Examples.Todos.Messages.Commands;
 using Revo.Examples.Todos.Messages.Queries;
-using Revo.Examples.Todos.Reads.Model;
 
 namespace Revo.Examples.Todos.Api
 {
