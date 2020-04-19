@@ -15,11 +15,15 @@ namespace Revo.Infrastructure.Repositories
         private readonly IUnitOfWork unitOfWork;
         private readonly List<IAggregateStore> aggregateStores = new List<IAggregateStore>();
 
-        public Repository(IAggregateStoreFactory[] aggregateStoreFactories, IUnitOfWork unitOfWork)
+        public Repository(IAggregateStoreFactory[] aggregateStoreFactories, IUnitOfWorkAccessor unitOfWorkAccessor)
         {
             this.aggregateStoreFactories = aggregateStoreFactories;
-            this.unitOfWork = unitOfWork;
-            unitOfWork.AddInnerTransaction(new RepositoryTransaction(this));
+            unitOfWork = unitOfWorkAccessor.UnitOfWork;
+
+            if (unitOfWork != null)
+            {
+                unitOfWork.AddInnerTransaction(new RepositoryTransaction(this));
+            }
         }
 
         public IAggregateStore GetAggregateStore(Type entityType)
@@ -147,6 +151,11 @@ namespace Revo.Infrastructure.Repositories
         
         public async Task SaveChangesAsync()
         {
+            if (unitOfWork == null)
+            {
+                throw new InvalidOperationException("Cannot save repository without an unit of work");
+            }
+
             var modifiedStores = aggregateStores.Where(x => x.NeedsSave).ToArray();
 
             if (modifiedStores.Length > 1)

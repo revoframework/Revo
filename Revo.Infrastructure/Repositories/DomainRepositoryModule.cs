@@ -1,8 +1,6 @@
 ﻿using Ninject.Extensions.ContextPreservation;
 using Ninject.Modules;
 using Revo.Core.Core;
-using Revo.Core.Transactions;
-using Revo.DataAccess.Entities;
 
 namespace Revo.Infrastructure.Repositories
 {

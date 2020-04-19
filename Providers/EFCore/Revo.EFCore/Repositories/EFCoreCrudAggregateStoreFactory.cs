@@ -28,7 +28,7 @@ namespace Revo.EFCore.Repositories
         public override IAggregateStore CreateAggregateStore(IUnitOfWork unitOfWork)
         {
             return new EFCoreCrudAggregateStore(crudRepositoryFunc(), entityTypeManager,
-                unitOfWork.EventBuffer, eventMessageFactory, transactionCoordinator);
+                unitOfWork?.EventBuffer, eventMessageFactory, transactionCoordinator);
         }
     }
 }

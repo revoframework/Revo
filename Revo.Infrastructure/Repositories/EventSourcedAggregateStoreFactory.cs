@@ -21,7 +21,7 @@ namespace Revo.Infrastructure.Repositories
 
         public virtual IAggregateStore CreateAggregateStore(IUnitOfWork unitOfWork)
         {
-            return eventSourcedAggregateStoreFunc(unitOfWork.EventBuffer);
+            return eventSourcedAggregateStoreFunc(unitOfWork?.EventBuffer);
         }
     }
 }

@@ -17,6 +17,7 @@ namespace Revo.Infrastructure.Tests.Repositories
     public class RepositoryTests
     {
         private readonly IPublishEventBuffer publishEventBuffer;
+        private readonly IUnitOfWorkAccessor unitOfWorkAccessor;
         private readonly IUnitOfWork unitOfWork;
         private readonly IAggregateStore aggregateStore1;
         private readonly IAggregateStore aggregateStore2;
@@ -32,6 +33,8 @@ namespace Revo.Infrastructure.Tests.Repositories
             unitOfWork = Substitute.For<IUnitOfWork>();
             unitOfWork.EventBuffer.Returns(publishEventBuffer);
             unitOfWork.When(x => x.AddInnerTransaction(Arg.Any<ITransaction>())).Do(ci => uowInnerTransaction = ci.ArgAt<ITransaction>(0));
+            unitOfWorkAccessor = Substitute.For<IUnitOfWorkAccessor>();
+            unitOfWorkAccessor.UnitOfWork.Returns(unitOfWork);
 
             aggregateStore1 = Substitute.For<IAggregateStore>();
             aggregateStore1.CanHandleAggregateType(typeof(MyEntity1)).Returns(true);
@@ -43,7 +46,7 @@ namespace Revo.Infrastructure.Tests.Repositories
             aggregateStoreFactory2 = Substitute.For<IAggregateStoreFactory>();
             aggregateStoreFactory2.CreateAggregateStore(unitOfWork).Returns(aggregateStore2);
 
-            sut = Substitute.ForPartsOf<Repository>(new[] { aggregateStoreFactory1, aggregateStoreFactory2 }, unitOfWork);
+            sut = Substitute.ForPartsOf<Repository>(new[] { aggregateStoreFactory1, aggregateStoreFactory2 }, unitOfWorkAccessor);
         }
 
         [Fact]

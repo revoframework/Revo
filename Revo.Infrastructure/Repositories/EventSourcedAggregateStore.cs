@@ -135,7 +135,11 @@ namespace Revo.Infrastructure.Repositories
                 }
 
                 await eventStore.CommitChangesAsync();
-                allEventMessages.ForEach(publishEventBuffer.PushEvent);
+
+                if (publishEventBuffer != null)
+                {
+                    allEventMessages.ForEach(publishEventBuffer.PushEvent);
+                }
             }
 
             CommitAggregates();

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using Revo.Core.Events;
-using Revo.Core.Transactions;
+﻿using Revo.Core.Transactions;
 
 namespace Revo.Infrastructure.Repositories
 {
@@ -14,9 +11,9 @@ namespace Revo.Infrastructure.Repositories
             this.aggregateStoreFactories = aggregateStoreFactories;
         }
 
-        public IRepository CreateRepository(IUnitOfWork unitOfWork)
+        public IRepository CreateRepository(IUnitOfWorkAccessor unitOfWorkAccessor)
         {
-            return new Repository(aggregateStoreFactories, unitOfWork);
+            return new Repository(aggregateStoreFactories, unitOfWorkAccessor);
         }
     }
 }

@@ -12,7 +12,6 @@ namespace Revo.EFCore.Repositories
 {
     public class EFCoreCoordinatedTransaction : CoordinatedTransaction, IEFCoreTransactionCoordinator, IUnitOfWorkListener
     {
-        private readonly IEFCoreCrudRepository crudRepository;
         private readonly Lazy<EFCoreExternalEventStoreHook> efCoreExternalEventStoreHookLazy;
         private readonly Lazy<EFCoreSyncProjectionHook> efCoreSyncProjectionHook;
 
@@ -21,7 +20,6 @@ namespace Revo.EFCore.Repositories
             Lazy<EFCoreExternalEventStoreHook> efCoreExternalEventStoreHookLazy,
             Lazy<EFCoreSyncProjectionHook> efCoreSyncProjectionHook) : base(new EFCoreCrudRepositoryTransaction(crudRepository))
         {
-            this.crudRepository = crudRepository;
             this.efCoreExternalEventStoreHookLazy = efCoreExternalEventStoreHookLazy;
             this.efCoreSyncProjectionHook = efCoreSyncProjectionHook;
 

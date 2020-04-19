@@ -29,7 +29,7 @@ namespace Revo.Infrastructure.Repositories
         public virtual IAggregateStore CreateAggregateStore(IUnitOfWork unitOfWork)
         {
             return new CrudAggregateStore(crudRepositoryFunc(), entityTypeManager,
-                unitOfWork.EventBuffer, eventMessageFactory);
+                unitOfWork?.EventBuffer, eventMessageFactory);
         }
     }
 }

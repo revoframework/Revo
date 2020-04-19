@@ -7,6 +7,7 @@
 
 ### Changed
 - breaking change: null tenants now cannot access other tenant's data by default (can be changed by configuration)
+- Repository can now be instantiated even without any active UnitOfWork
 
 ## [1.15.0] - 2020-03-05
 

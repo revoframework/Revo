@@ -3,7 +3,7 @@ using Revo.Core.Transactions;
 
 namespace Revo.Core.Commands
 {
-    public class CommandContextStack : ICommandContext
+    public class CommandContextStack : ICommandContext, IUnitOfWorkAccessor
     {
         private readonly Stack<ICommandContext> contexts = new Stack<ICommandContext>();
 

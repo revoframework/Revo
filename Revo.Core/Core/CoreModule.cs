@@ -46,7 +46,7 @@ namespace Revo.Core.Core
                 .To<EventBus>()
                 .InTaskScope();
 
-            Bind<ICommandContext, CommandContextStack>()
+            Bind<ICommandContext, IUnitOfWorkAccessor, CommandContextStack>()
                 .To<CommandContextStack>()
                 .InTaskScope();
 

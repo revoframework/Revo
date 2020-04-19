@@ -153,11 +153,16 @@ namespace Revo.Infrastructure.Repositories
 
         protected async Task PushAggregateEventsAsync()
         {
+            if (publishEventBuffer == null)
+            {
+                return;
+            }
+
             foreach (var aggregate in GetAttachedAggregates())
             {
                 if (aggregate.IsChanged)
                 {
-                    var eventMessages = await CreateEventMessagesAsync(aggregate, aggregate.UncommittedEvents);
+                    var eventMessages = await CreateEventMessagesAsync(aggregate, aggregate.UncommittedEvents); 
                     eventMessages.ForEach(publishEventBuffer.PushEvent);
                 }
             }
