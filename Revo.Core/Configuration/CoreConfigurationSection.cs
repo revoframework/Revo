@@ -1,4 +1,6 @@
-﻿namespace Revo.Core.Configuration
+﻿using Revo.Core.Commands;
+
+namespace Revo.Core.Configuration
 {
     public class CoreConfigurationSection : IRevoConfigurationSection
     {
@@ -7,8 +9,8 @@
         /// This may affect logging, database migration, etc.
         /// </summary>
         public bool? IsDevelopmentEnvironment { get; set; }
+        public CommandsConfiguration Commands { get; } = new CommandsConfiguration();
 
-        public bool AutoDiscoverCommandHandlers { get; set; } = true;
         public bool AutoDiscoverAutoMapperProfiles { get; set; } = true;
     }
 }

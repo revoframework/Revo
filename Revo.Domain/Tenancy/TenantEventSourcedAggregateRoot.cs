@@ -1,4 +1,5 @@
 ﻿using System;
+using Revo.Core.Tenancy;
 using Revo.Domain.Entities.EventSourcing;
 using Revo.Domain.Tenancy.Events;
 

@@ -7,6 +7,9 @@ namespace Revo.AspNet.Web
     public abstract class CommandApiController : ApiController
     {
         [Inject]
-        public ICommandBus CommandBus { get; set; }
+        public ILocalCommandBus CommandBus { get; set; }
+
+        [Inject]
+        public ICommandGateway CommandGateway { get; set; }
     }
 }

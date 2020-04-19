@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Linq;
-using Ninject;
 using Ninject.Extensions.ContextPreservation;
 using Ninject.Modules;
+using Ninject.Planning.Bindings.Resolvers;
 using Revo.Core.Commands;
 using Revo.Core.Configuration;
 using Revo.Core.Events;
@@ -26,16 +25,11 @@ namespace Revo.Core.Core
 
         public override void Load()
         {
+            Kernel.Components.Add<IBindingResolver, ContravariantBindingResolver>();
+
             Bind<IClock>()
                 .ToMethod(ctx => Clock.Current)
                 .InTransientScope();
-
-            if (coreConfigurationSection.AutoDiscoverCommandHandlers)
-            {
-                Bind<IApplicationConfigurer>()
-                    .To<CommandHandlerDiscovery>()
-                    .InSingletonScope();
-            }
 
             Bind<IEnvironment>()
                 .To<Environment>()
@@ -46,16 +40,13 @@ namespace Revo.Core.Core
                 .To<EventBus>()
                 .InTaskScope();
 
-            Bind<ICommandContext, IUnitOfWorkAccessor, CommandContextStack>()
-                .To<CommandContextStack>()
-                .InTaskScope();
-
             Bind<IUnitOfWorkFactory>()
                 .To<UnitOfWorkFactory>()
                 .InTaskScope();
 
             Bind<IUnitOfWork>()
-                .ToMethod(ctx => ctx.ContextPreservingGet<ICommandContext>().UnitOfWork ?? throw new InvalidOperationException("Trying to resolve IUnitOfWork when there is no instance active in current command context"))
+                .ToMethod(ctx => ctx.ContextPreservingGet<ICommandContext>().UnitOfWork
+                                 ?? throw new InvalidOperationException("Trying to resolve IUnitOfWork when there is not one active in current command context"))
                 .InTransientScope();
 
             Bind<IPublishEventBufferFactory>()
@@ -77,7 +68,7 @@ namespace Revo.Core.Core
             Rebind<IVersionedTypeRegistry>()
                 .To<VersionedTypeRegistry>()
                 .InSingletonScope();
-            
+
             Bind<IPermissionTypeRegistry>()
                 .To<PermissionTypeRegistry>()
                 .InSingletonScope();

@@ -1,12 +1,18 @@
 # RELEASE NOTES
 
-## [1.16.0] - 2020-03-05
+## [1.16.0] - 2020-0?-??
 
 ### Added
 - improved multi-tenancy configuration
+- major refactoring of command bus internals:
+  - support for multiple command buses (local, remote...)
+  - routing commands to buses with command gateway
+  - overhauled command pipeline based on new and more flexible command bus middlewares
+  - CommandExecutionOptions that can change the tenant context to run the command in and other options
 
 ### Changed
 - breaking change: null tenants now cannot access other tenant's data by default (can be changed by configuration)
+- breaking change: ITenant moved from Revo.Domain to Revo.Core
 - Repository can now be instantiated even without any active UnitOfWork
 
 ## [1.15.0] - 2020-03-05

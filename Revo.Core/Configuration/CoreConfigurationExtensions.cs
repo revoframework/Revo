@@ -1,4 +1,5 @@
 ﻿using System;
+using Revo.Core.Commands;
 using Revo.Core.Core;
 
 namespace Revo.Core.Configuration
@@ -15,6 +16,7 @@ namespace Revo.Core.Configuration
             configuration.ConfigureKernel(c =>
             {
                 c.LoadModule(new CoreModule(section));
+                c.LoadModule(new CommandsModule(section.Commands));
             });
 
             return configuration;

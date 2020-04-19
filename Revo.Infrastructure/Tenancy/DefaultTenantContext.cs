@@ -1,4 +1,4 @@
-﻿using System.Web;
+﻿using Revo.Core.Tenancy;
 using Revo.Domain.Tenancy;
 
 namespace Revo.Infrastructure.Tenancy
@@ -7,8 +7,16 @@ namespace Revo.Infrastructure.Tenancy
     {
         public DefaultTenantContext(ITenantContextResolver tenantContextResolver)
         {
-            // resolve immediately to prevent keeping HttpContext alive any longer than needed 
-            Tenant = tenantContextResolver.ResolveTenant();
+            // resolve immediately
+            var tenantOverride = TenantContextOverride.Current;
+            if (tenantOverride != null)
+            {
+                Tenant = tenantOverride.Tenant;
+            }
+            else
+            {
+                Tenant = tenantContextResolver.ResolveTenant();
+            }
         }
 
         public ITenant Tenant { get; }

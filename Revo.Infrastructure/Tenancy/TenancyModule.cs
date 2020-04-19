@@ -1,4 +1,5 @@
 ﻿using Ninject.Modules;
+using Revo.Core.Commands;
 using Revo.Core.Core;
 using Revo.DataAccess.Entities;
 
@@ -41,6 +42,10 @@ namespace Revo.Infrastructure.Tenancy
                     .To<DefaultTenantProvider>()
                     .InTransientScope();
             }
+            
+            Bind<ICommandBusMiddleware<ICommandBase>>()
+                .To<TenantContextCommandBusMiddleware>()
+                .InTransientScope();
         }
     }
 }

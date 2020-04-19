@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Revo.Domain.Tenancy
+namespace Revo.Core.Tenancy
 {
     public interface ITenant
     {

@@ -6,6 +6,7 @@ using Revo.Domain.ReadModel;
 using Revo.Domain.Tenancy;
 using Revo.Infrastructure.Tenancy;
 using NSubstitute;
+using Revo.Core.Tenancy;
 using Xunit;
 
 namespace Revo.Infrastructure.Tests.Tenancy
