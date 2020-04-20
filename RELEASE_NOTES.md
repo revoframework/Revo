@@ -9,6 +9,7 @@
   - routing commands to buses with command gateway
   - overhauled command pipeline based on new and more flexible command bus middlewares
   - CommandExecutionOptions that can change the tenant context to run the command in and other options
+- AsyncEventListenerBindingExtensions for easier async event listener registration
 
 ### Changed
 - breaking change: null tenants now cannot access other tenant's data by default (can be changed by configuration)
