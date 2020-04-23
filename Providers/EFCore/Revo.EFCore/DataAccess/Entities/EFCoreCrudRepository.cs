@@ -113,6 +113,20 @@ namespace Revo.EFCore.DataAccess.Entities
             return result;
         }
 
+        public async Task<T[]> GetManyAsync<T>(params Guid[] ids) where T : class, IHasId<Guid>
+        {
+            var result = await FindManyAsync<T, Guid>(default, ids);
+            RepositoryHelpers.ThrowIfGetManyFailed(result, ids);
+            return result;
+        }
+
+        public async Task<T[]> GetManyAsync<T>(CancellationToken cancellationToken, params Guid[] ids) where T : class, IHasId<Guid>
+        {
+            var result = await FindManyAsync<T, Guid>(cancellationToken, ids);
+            RepositoryHelpers.ThrowIfGetManyFailed(result, ids);
+            return result;
+        }
+
         public T FirstOrDefault<T>(Expression<Func<T, bool>> predicate) where T : class
         {
             return FindAll<T>()
@@ -214,6 +228,16 @@ namespace Revo.EFCore.DataAccess.Entities
 
             var result = await Where<T>(x => missingIds.Contains(x.Id)).ToArrayAsync(cancellationToken);
             return loaded.Concat(result).ToArray();
+        }
+
+        public Task<T[]> FindManyAsync<T>(params Guid[] ids) where T : class, IHasId<Guid>
+        {
+            return FindManyAsync<T, Guid>(default(CancellationToken), ids);
+        }
+
+        public Task<T[]> FindManyAsync<T>(CancellationToken cancellationToken, params Guid[] ids) where T : class, IHasId<Guid>
+        {
+            return FindManyAsync<T, Guid>(cancellationToken, ids);
         }
 
         public Task<bool> AnyAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default(CancellationToken))

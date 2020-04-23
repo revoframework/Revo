@@ -73,6 +73,20 @@ namespace Revo.RavenDB.DataAccess
             return result;
         }
 
+        public async Task<T[]> GetManyAsync<T>(params Guid[] ids) where T : class, IHasId<Guid>
+        {
+            var result = await FindManyAsync<T, Guid>(default, ids);
+            RepositoryHelpers.ThrowIfGetManyFailed(result, ids);
+            return result;
+        }
+
+        public async Task<T[]> GetManyAsync<T>(CancellationToken cancellationToken, params Guid[] ids) where T : class, IHasId<Guid>
+        {
+            var result = await FindManyAsync<T, Guid>(cancellationToken, ids);
+            RepositoryHelpers.ThrowIfGetManyFailed(result, ids);
+            return result;
+        }
+
         public T FirstOrDefault<T>(Expression<Func<T, bool>> predicate) where T : class
         {
             throw new NotImplementedException();
@@ -147,6 +161,16 @@ namespace Revo.RavenDB.DataAccess
         public Task<T[]> FindManyAsync<T, TId>(CancellationToken cancellationToken, params TId[] ids) where T : class, IHasId<TId>
         {
             return Task.FromResult(Where<T>(x => ids.Contains(x.Id)).ToArray());
+        }
+
+        public Task<T[]> FindManyAsync<T>(params Guid[] ids) where T : class, IHasId<Guid>
+        {
+            return FindManyAsync<T, Guid>(default(CancellationToken), ids);
+        }
+
+        public Task<T[]> FindManyAsync<T>(CancellationToken cancellationToken, params Guid[] ids) where T : class, IHasId<Guid>
+        {
+            return FindManyAsync<T, Guid>(cancellationToken, ids);
         }
 
         public IQueryable<T> Where<T>(Expression<Func<T, bool>> predicate) where T : class
