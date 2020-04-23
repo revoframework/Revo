@@ -6,16 +6,16 @@ namespace Revo.Infrastructure.Jobs
 {
     public class ExecuteCommandJobHandler : IJobHandler<IExecuteCommandJob>
     {
-        private readonly ICommandBus commandBus;
+        private readonly ICommandGateway commandGateway;
 
-        public ExecuteCommandJobHandler(ICommandBus commandBus)
+        public ExecuteCommandJobHandler(ICommandGateway commandGateway)
         {
-            this.commandBus = commandBus;
+            this.commandGateway = commandGateway;
         }
 
         public Task HandleAsync(IExecuteCommandJob job, CancellationToken cancellationToken)
         {
-            return commandBus.SendAsync(job.Command, cancellationToken);
+            return commandGateway.SendAsync(job.Command, cancellationToken);
         }
     }
 }
