@@ -80,11 +80,7 @@ namespace Revo.Core.Core
             Bind<IPermissionAuthorizationMatcher>()
                 .To<PermissionAuthorizationMatcher>()
                 .InTaskScope();
-
-            Bind<IPermissionCache>()
-                .To<PermissionCache>()
-                .InSingletonScope();
-
+            
             Bind<IUserPermissionAuthorizer>()
                 .To<UserPermissionAuthorizer>()
                 .InTaskScope();

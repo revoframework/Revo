@@ -9,6 +9,6 @@ namespace Revo.Core.Security
             CatalogName = catalogName;
         }
 
-        public string CatalogName { get; private set; }
+        public string CatalogName { get; }
     }
 }

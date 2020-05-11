@@ -24,7 +24,6 @@ namespace Revo.AspNet
                     var hangfireConfigurationSection = configuration.GetSection<HangfireConfigurationSection>();
                     c.LoadModule(new CorePlatformModule(hangfireConfigurationSection));
                     c.LoadModule(new SecurityModule());
-                    c.LoadModule(new NullAspNetIdentityModule());
                     c.LoadModule(new TemplatesModule());
                 }
             });

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Revo.AspNetCore.Security.Identity;
 using Revo.Core.Security;
+using Revo.Core.Security.ClaimBased;
 using IUser = Revo.Core.Security.IUser;
 
 namespace Revo.AspNetCore.Security
@@ -12,17 +12,17 @@ namespace Revo.AspNetCore.Security
     {
         private readonly IUserPermissionResolver userPermissionResolver;
         private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly IUserManager userManager;
+        private readonly IClaimsPrincipalUserResolver claimsPrincipalUserResolver;
         private readonly Lazy<Guid?> userIdLazy;
         private IReadOnlyCollection<Permission> userPermissions;
         private IUser user;
 
         public AspNetCoreUserContext(IUserPermissionResolver userPermissionResolver,
-            IUserManager userManager,
+            IClaimsPrincipalUserResolver claimsPrincipalUserResolver,
             IHttpContextAccessor httpContextAccessor)
         {
             this.userPermissionResolver = userPermissionResolver;
-            this.userManager = userManager;
+            this.claimsPrincipalUserResolver = claimsPrincipalUserResolver;
             this.httpContextAccessor = httpContextAccessor;
 
             userIdLazy = new Lazy<Guid?>(() =>
@@ -31,8 +31,7 @@ namespace Revo.AspNetCore.Security
                 if (httpContext?.User?.Identity?.IsAuthenticated ?? false)
                 {
                     var claimsPrincipal = httpContext.User;
-                    string userIdString = userManager.GetUserId(claimsPrincipal);
-                    return userIdString != null ? (Guid?) Guid.Parse(userIdString) : null;
+                    return claimsPrincipalUserResolver.TryGetUserId(claimsPrincipal);
                 }
 
                 return null;
@@ -68,7 +67,7 @@ namespace Revo.AspNetCore.Security
                 {
                     var httpContext = httpContextAccessor.HttpContext;
                     var claimsPrincipal = httpContext.User;
-                    user = await userManager.GetUserAsync(claimsPrincipal);
+                    user = await claimsPrincipalUserResolver.GetUserAsync(claimsPrincipal);
                     if (user == null)
                     {
                         throw new InvalidOperationException($"GetUserAsync failed because the authenticated user with ID '{UserId}' could not be found");

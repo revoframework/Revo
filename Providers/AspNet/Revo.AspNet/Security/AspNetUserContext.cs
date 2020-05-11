@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
 using Ninject;
-using Revo.AspNet.Security.Identity;
 using Revo.Core.Security;
+using Revo.Core.Security.ClaimBased;
 using IUser = Revo.Core.Security.IUser;
 
 namespace Revo.AspNet.Security
@@ -14,29 +13,33 @@ namespace Revo.AspNet.Security
     {
         private readonly IAuthenticationManager authenticationManager;
         private readonly IUserPermissionResolver userPermissionResolver;
-        private readonly IUserStore<IIdentityUser, Guid> userStore;
+        private readonly IClaimsPrincipalUserResolver claimsPrincipalUserResolver;
         private readonly Lazy<Guid?> userIdLazy;
-        private IIdentityUser user;
+        private IUser user;
         private IReadOnlyCollection<Permission> userPermissions;
 
         public AspNetUserContext(
             [Optional] IAuthenticationManager authenticationManager,
             IUserPermissionResolver userPermissionResolver,
-            IUserStore<IIdentityUser, Guid> userStore)
+            IClaimsPrincipalUserResolver claimsPrincipalUserResolver)
         {
             this.authenticationManager = authenticationManager;
             this.userPermissionResolver = userPermissionResolver;
-            this.userStore = userStore;
+            this.claimsPrincipalUserResolver = claimsPrincipalUserResolver;
 
             userIdLazy = new Lazy<Guid?>(() =>
             {
-                string userIdString = authenticationManager?.User?.Identity?.GetUserId<string>();
-                return userIdString != null ? ((Guid?) Guid.Parse(userIdString)) : null;
+                if (authenticationManager.User?.Identity?.IsAuthenticated ?? false)
+                {
+                    var claimsPrincipal = authenticationManager.User;
+                    return claimsPrincipalUserResolver.TryGetUserId(claimsPrincipal);
+                }
+
+                return null;
             });
         }
 
-        public bool IsAuthenticated => authenticationManager?.User?.Identity?.IsAuthenticated ?? false;
-
+        public bool IsAuthenticated => UserId != null;
         public Guid? UserId => userIdLazy.Value;
 
         public async Task<IReadOnlyCollection<Permission>> GetPermissionsAsync()
@@ -45,8 +48,8 @@ namespace Revo.AspNet.Security
             {
                 if (IsAuthenticated)
                 {
-                    IIdentityUser user = await GetUserInternalAsync();
-                    userPermissions = await userPermissionResolver.GetUserPermissionsAsync(user.User);
+                    IUser user = await GetUserAsync();
+                    userPermissions = await userPermissionResolver.GetUserPermissionsAsync(user);
                 }
                 else
                 {
@@ -59,19 +62,15 @@ namespace Revo.AspNet.Security
 
         public async Task<IUser> GetUserAsync()
         {
-            return (await GetUserInternalAsync()).User;
-        }
-
-        private async Task<IIdentityUser> GetUserInternalAsync()
-        {
             if (user == null)
             {
                 if (UserId != null)
                 {
-                    user = await userStore.FindByIdAsync(UserId.Value);
+                    var claimsPrincipal = authenticationManager.User;
+                    user = await claimsPrincipalUserResolver.GetUserAsync(claimsPrincipal);
                     if (user == null)
                     {
-                        throw new InvalidOperationException($"GetUserAsync failed because the authenticated user with ID '{UserId.Value}' could not be found");
+                        throw new InvalidOperationException($"GetUserAsync failed because the authenticated user with ID '{UserId}' could not be found");
                     }
                 }
             }

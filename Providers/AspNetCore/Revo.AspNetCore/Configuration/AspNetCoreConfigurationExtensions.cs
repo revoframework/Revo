@@ -1,6 +1,5 @@
 ﻿using System;
 using Revo.AspNetCore.Security;
-using Revo.AspNetCore.Security.Identity;
 using Revo.Core.Configuration;
 using Revo.Hangfire;
 
@@ -23,7 +22,6 @@ namespace Revo.AspNetCore.Configuration
                     var hangfireConfigurationSection = configuration.GetSection<HangfireConfigurationSection>();
                     c.LoadModule(new AspNetCoreModule(hangfireConfigurationSection));
                     c.LoadModule(new AspNetCoreSecurityModule());
-                    c.LoadModule(new NullAspNetCoreIdentityModule());
                 }
             });
 

@@ -1,4 +1,5 @@
 ﻿using Revo.Core.Commands;
+using Revo.Core.Security;
 
 namespace Revo.Core.Configuration
 {
@@ -10,6 +11,7 @@ namespace Revo.Core.Configuration
         /// </summary>
         public bool? IsDevelopmentEnvironment { get; set; }
         public CommandsConfiguration Commands { get; } = new CommandsConfiguration();
+        public SecurityConfiguration Security { get; } = new SecurityConfiguration();
 
         public bool AutoDiscoverAutoMapperProfiles { get; set; } = true;
     }

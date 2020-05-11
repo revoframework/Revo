@@ -3,20 +3,14 @@ using System.Collections.Generic;
 using System.Web;
 using Microsoft.Owin;
 
-namespace Revo.AspNet.Security.Identity
+namespace Revo.AspNet.Web
 {
     /// <summary>
     /// Provides extension methods for <see cref="HttpContext"/>.
-    /// 
-    /// GTRevo: Ported and extended from katana-clone/src/Microsoft.Owin.Host.SystemWeb/HttpContextExtensions.cs.
     /// </summary>
-    public static partial class HttpContextExtensions
+    /// <remarks>Ported and extended from katana-clone/src/Microsoft.Owin.Host.SystemWeb/HttpContextExtensions.cs.</remarks>
+    internal static class HttpContextExtensions
     {
-        private static IDictionary<string, object> GetOwinEnvironment(this HttpContext context)
-        {
-            return (IDictionary<string, object>)context.Items[HttpContextItemKeys.OwinEnvironmentKey];
-        }
-
         /// <summary>
         /// Gets the <see cref="IOwinContext"/> for the current request.
         /// </summary>
@@ -63,6 +57,10 @@ namespace Revo.AspNet.Security.Identity
                 throw new ArgumentNullException("request");
             }
             return request.RequestContext.HttpContext.GetOwinContext();
+        }
+        private static IDictionary<string, object> GetOwinEnvironment(this HttpContext context)
+        {
+            return (IDictionary<string, object>)context.Items[HttpContextItemKeys.OwinEnvironmentKey];
         }
 
         internal static class HttpContextItemKeys

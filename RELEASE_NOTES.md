@@ -15,7 +15,12 @@
 ### Changed
 - breaking change: null tenants now cannot access other tenant's data by default (can be changed by configuration)
 - breaking change: ITenant moved from Revo.Domain to Revo.Core
+- simplified security (IUserManager replaced with Revo.Core.Security.IClaimsPrincipalResolver, disabling null implementations can now be done with CoreConfigurationSection.Security.UseNullSecurityModule)
 - Repository can now be instantiated even without any active UnitOfWork
+
+### Removed
+- Revo.AspNetCore.Security.ISignInManager removed, use IUserContext instead
+- AuthorizePermissionsAttribute for old ASP.NET 4 removed (inconsistent with the rest of the framework)
 
 ## [1.15.0] - 2020-03-05
 

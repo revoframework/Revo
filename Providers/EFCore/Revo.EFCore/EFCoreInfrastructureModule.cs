@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Ninject.Extensions.ContextPreservation;
 using Ninject.Modules;
 using Revo.Core.Commands;

@@ -1,6 +1,7 @@
 ﻿using System;
 using Revo.Core.Commands;
 using Revo.Core.Core;
+using Revo.Core.Security;
 
 namespace Revo.Core.Configuration
 {
@@ -17,6 +18,11 @@ namespace Revo.Core.Configuration
             {
                 c.LoadModule(new CoreModule(section));
                 c.LoadModule(new CommandsModule(section.Commands));
+
+                if (section.Security.UseNullSecurityModule)
+                {
+                    c.LoadModule(new NullCoreSecurityModule());
+                }
             });
 
             return configuration;
