@@ -8,5 +8,8 @@ namespace Revo.AspNetCore.Web
     {
         [Inject]
         public ICommandBus CommandBus { get; set; }
+
+        [Inject]
+        public ICommandGateway CommandGateway { get; set; }
     }
 }
