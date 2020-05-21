@@ -56,10 +56,9 @@ namespace Revo.AspNetCore
                     revoConfiguration.OverrideModuleLoading(ninjectExtModule, true);
                 }
             }
-            
+
             services
-                .AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+                .AddMvcCore();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton(sp => Kernel);

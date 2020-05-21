@@ -23,6 +23,9 @@ namespace Revo.Examples.Todos
         public override void ConfigureServices(IServiceCollection services)
         {
             base.ConfigureServices(services);
+
+            services.AddControllers();
+            services.AddRazorPages();
         }
 
         public override void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
