@@ -10,7 +10,7 @@ Framework infrastruture package - event stores, projections, jobs, etc.</Descrip
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="LinqKit.Core" Version="1.1.15" />
+    <PackageReference Include="LinqKit.Core" Version="1.1.17" />
     <PackageReference Include="morelinq" Version="3.3.2" />
     <PackageReference Include="Nito.AsyncEx" Version="5.0.0" />
   </ItemGroup>
@@ -23,6 +23,10 @@ Framework infrastruture package - event stores, projections, jobs, etc.</Descrip
     <EmbeddedResource Include="Sql\rev_baseline_1_mssql.sql" />
     <EmbeddedResource Include="Sql\rev_baseline_1_pgsql.sql" />
     <EmbeddedResource Include="Sql\rev_baseline_1_sqlite.sql" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.0.0" />
   </ItemGroup>
   
 </Project>

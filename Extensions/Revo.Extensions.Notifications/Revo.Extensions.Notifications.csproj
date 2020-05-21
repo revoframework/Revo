@@ -16,11 +16,11 @@ Configurable user notifications extension package.</Description>
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="PushSharp.Core" Version="1.0.0" />
+    <ProjectReference Include="..\..\Revo.Infrastructure\Revo.Infrastructure.csproj" />
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\..\Revo.Infrastructure\Revo.Infrastructure.csproj" />
+    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.0.0" />
   </ItemGroup>
   
 </Project>

@@ -140,7 +140,7 @@ namespace Revo.Core.Tests.Commands
             var command = new Command1();
             CommandBusMiddlewareDelegate next = async paramCommand => { throw new Exception(); };
 
-            await sut.Awaiting(async x => await x.HandleAsync(command, CommandExecutionOptions.Default,
+            await sut.Awaiting(x => x.HandleAsync(command, CommandExecutionOptions.Default,
                 next, CancellationToken.None)).Should().ThrowExactlyAsync<Exception>();
 
             commandContextStack.PeekOrDefault.Should().BeNull();

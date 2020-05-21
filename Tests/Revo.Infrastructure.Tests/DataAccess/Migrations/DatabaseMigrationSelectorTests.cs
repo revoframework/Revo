@@ -336,7 +336,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 }
             });
 
-            await sut.Awaiting(async x => await sut.SelectMigrationsAsync(
+            await sut.Awaiting(x => sut.SelectMigrationsAsync(
                     new[] { new DatabaseMigrationSpecifier("appModule1", DatabaseVersion.Parse("1.0.1")) },
                     new string[0]))
                 .Should()
@@ -530,7 +530,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                 }
             });
 
-            await sut.Awaiting(async x => await sut.SelectMigrationsAsync(
+            await sut.Awaiting(x => sut.SelectMigrationsAsync(
                     new[] { new DatabaseMigrationSpecifier("appModule1", null) },
                     new string[0]))
                 .Should()

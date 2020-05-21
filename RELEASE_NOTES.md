@@ -18,6 +18,7 @@
 - breaking change: ITenant moved from Revo.Domain to Revo.Core
 - simplified security (IUserManager replaced with Revo.Core.Security.IClaimsPrincipalResolver, disabling null implementations can now be done with CoreConfigurationSection.Security.UseNullSecurityModule)
 - Repository can now be instantiated even without any active UnitOfWork
+- updated to (ASP).NET Core 3.1
 
 ### Removed
 - Revo.AspNetCore.Security.ISignInManager removed, use IUserContext instead

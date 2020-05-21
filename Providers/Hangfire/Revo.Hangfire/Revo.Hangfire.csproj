@@ -10,8 +10,8 @@ Hangfire background job support.</Description>
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Hangfire" Version="1.7.7" />
-    <PackageReference Include="Hangfire.MemoryStorage" Version="1.6.3" />
+    <PackageReference Include="Hangfire" Version="1.7.11" />
+    <PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />
   </ItemGroup>
   
   <ItemGroup>
@@ -20,6 +20,10 @@ Hangfire background job support.</Description>
   
   <ItemGroup>
     <ProjectReference Include="..\..\..\Revo.Infrastructure\Revo.Infrastructure.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.0.0" />
   </ItemGroup>
   
 </Project>

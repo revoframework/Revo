@@ -10,12 +10,16 @@ Base domain model package.</Description>
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="System.ComponentModel.Annotations" Version="4.4.1" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
   </ItemGroup>
   
   <ItemGroup>
     <ProjectReference Include="..\Revo.Core\Revo.Core.csproj" />
     <ProjectReference Include="..\Revo.DataAccess\Revo.DataAccess.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.0.0" />
   </ItemGroup>
   
 </Project>

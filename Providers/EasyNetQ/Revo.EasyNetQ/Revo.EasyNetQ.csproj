@@ -16,5 +16,9 @@ Framework infrastruture package - event stores, projections, jobs, etc.</Descrip
   <ItemGroup>
     <ProjectReference Include="..\..\..\Revo.Infrastructure\Revo.Infrastructure.csproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.0.0" />
+  </ItemGroup>
 
 </Project>

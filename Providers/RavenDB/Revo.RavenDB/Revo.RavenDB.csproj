@@ -17,4 +17,8 @@ RavenDB data access and infrastructure services.</Description>
     <ProjectReference Include="..\..\..\Revo.Infrastructure\Revo.Infrastructure.csproj" />
   </ItemGroup>
   
+  <ItemGroup>
+    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.0.0" />
+  </ItemGroup>
+  
 </Project>
