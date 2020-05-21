@@ -9,17 +9,14 @@ namespace Revo.Core.Security
         private readonly IUserContext userContext;
         private readonly IPermissionAuthorizationMatcher permissionAuthorizationMatcher;
         private readonly IUserPermissionResolver userPermissionResolver;
-        private readonly IPermissionTypeRegistry permissionTypeRegistry;
 
         public UserPermissionAuthorizer(IUserContext userContext,
             IPermissionAuthorizationMatcher permissionAuthorizationMatcher,
-            IUserPermissionResolver userPermissionResolver,
-            IPermissionTypeRegistry permissionTypeRegistry)
+            IUserPermissionResolver userPermissionResolver)
         {
             this.userContext = userContext;
             this.permissionAuthorizationMatcher = permissionAuthorizationMatcher;
             this.userPermissionResolver = userPermissionResolver;
-            this.permissionTypeRegistry = permissionTypeRegistry;
         }
 
         public async Task<bool> CheckAuthorizationAsync(IUser user, Guid permissionId, string resourceId = null, string contextId = null)
@@ -52,10 +49,7 @@ namespace Revo.Core.Security
 
         private Permission GetPermission(Guid permissionId, string resourceId, string contextId)
         {
-            return new Permission(
-                permissionTypeRegistry.GetPermissionTypeById(permissionId),
-                resourceId,
-                contextId);
+            return new Permission(permissionId, resourceId, contextId);
         }
     }
 }

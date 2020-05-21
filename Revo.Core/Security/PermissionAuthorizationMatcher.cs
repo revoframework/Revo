@@ -22,7 +22,7 @@ namespace Revo.Core.Security
         private bool AuthorizePermission(IReadOnlyCollection<Permission> availablePermissions, Permission requiredPermission)
         {
             var matchingPermissions = availablePermissions
-                .Where(x => x.PermissionType.Id == requiredPermission.PermissionType.Id);
+                .Where(x => x.PermissionTypeId == requiredPermission.PermissionTypeId);
 
             if (requiredPermission.ContextId != null)
             {

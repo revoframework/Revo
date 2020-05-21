@@ -17,6 +17,7 @@
 - breaking change: null tenants now cannot access other tenant's data by default (can be changed by configuration)
 - breaking change: ITenant moved from Revo.Domain to Revo.Core
 - simplified security (IUserManager replaced with Revo.Core.Security.IClaimsPrincipalResolver, disabling null implementations can now be done with CoreConfigurationSection.Security.UseNullSecurityModule)
+- Permission now contains only PermissionTypeId instead of PermissionType
 - Repository can now be instantiated even without any active UnitOfWork
 - updated to (ASP).NET Core 3.1
 - ASP.NET Core provider's RevoStartup class now only calls AddMvcCore() instead of AddMvc(), you have to add other parts yourself in ConfigureServices(...) if you want them
