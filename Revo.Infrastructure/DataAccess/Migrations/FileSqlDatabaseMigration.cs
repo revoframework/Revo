@@ -67,7 +67,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
 
                     if (version == null)
                     {
-                        throw new FormatException($"Invalid FileSqlDatabaseMigration: {this} is missing version");
+                        throw new FormatException($"Invalid FileSqlDatabaseMigration: {FileName} is missing version");
                     }
                 }
 
