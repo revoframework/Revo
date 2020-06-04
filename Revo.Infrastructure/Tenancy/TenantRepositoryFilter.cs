@@ -54,7 +54,7 @@ namespace Revo.Infrastructure.Tenancy
                     && tenantOwned.TenantId != tenantId)
                 {
                     throw new InvalidOperationException(
-                        $"Forbidden to add {typeof(T).FullName} entity for tenant ID {tenantOwned.TenantId.Value} from context of tenant ID {tenantId}");
+                        $"Forbidden to add {added} entity for tenant ID {tenantOwned.TenantId.Value} from context of tenant ID {tenantId}");
                 }
             }
         }
@@ -70,7 +70,7 @@ namespace Revo.Infrastructure.Tenancy
                     && tenantOwned.TenantId != tenantId)
                 {
                     throw new InvalidOperationException(
-                        $"Forbidden to delete {typeof(T).FullName} entity for tenant ID {tenantOwned.TenantId.Value} from context of tenant ID {tenantId}");
+                        $"Forbidden to delete {deleted} entity for tenant ID {tenantOwned.TenantId.Value} from context of tenant ID {tenantId}");
                 }
             }
         }
@@ -86,7 +86,7 @@ namespace Revo.Infrastructure.Tenancy
                     && tenantOwned.TenantId != tenantId)
                 {
                     throw new InvalidOperationException(
-                        $"Forbidden to modify {typeof(T).FullName} entity for tenant ID {tenantOwned.TenantId.Value} from context of tenant ID {tenantId}");
+                        $"Forbidden to modify {modified} entity for tenant ID {tenantOwned.TenantId.Value} from context of tenant ID {tenantId}");
                 }
             }
         }
