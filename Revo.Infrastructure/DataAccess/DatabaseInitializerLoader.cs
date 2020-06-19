@@ -9,13 +9,14 @@ using Revo.Infrastructure.Repositories;
 
 namespace Revo.Infrastructure.DataAccess
 {
-    public class DatabaseInitializerLoader : IApplicationStartListener
+    public class DatabaseInitializerLoader : IDatabaseInitializerLoader, IApplicationStartListener
     {
         private readonly IDatabaseInitializerDiscovery databaseInitializerDiscovery;
         private readonly IDatabaseInitializerComparer comparer;
         private readonly Func<IRepository> repositoryFunc; // using func factories for late resolving in the scope of different tasks
         private readonly Func<IUnitOfWorkFactory> unitOfWorkFactoryFunc;
         private readonly Func<CommandContextStack> commandContextStackFunc;
+        private bool isInitialized = false;
 
         public DatabaseInitializerLoader(IDatabaseInitializerDiscovery databaseInitializerDiscovery,
             IDatabaseInitializerComparer comparer, Func<IRepository> repositoryFunc,
@@ -30,30 +31,40 @@ namespace Revo.Infrastructure.DataAccess
 
         public void OnApplicationStarted()
         {
-            var initializers = databaseInitializerDiscovery.DiscoverDatabaseInitializers();
-            var sortedInitializers = initializers.ToList();
-            sortedInitializers.Sort(comparer);
+            EnsureDatabaseInitialized();
+        }
 
-            foreach (var initializer in sortedInitializers)
+        public void EnsureDatabaseInitialized()
+        {
+            if (!isInitialized)
             {
-                Task.Factory.StartNewWithContext(async () =>
+                isInitialized = true;
+
+                var initializers = databaseInitializerDiscovery.DiscoverDatabaseInitializers();
+                var sortedInitializers = initializers.ToList();
+                sortedInitializers.Sort(comparer);
+
+                foreach (var initializer in sortedInitializers)
                 {
-                    using (IUnitOfWork uow = unitOfWorkFactoryFunc().CreateUnitOfWork())
+                    Task.Factory.StartNewWithContext(async () =>
                     {
-                        var commandContextStack = commandContextStackFunc();
-                        commandContextStack.Push(new CommandContext(null, uow));
-                        try
+                        using (IUnitOfWork uow = unitOfWorkFactoryFunc().CreateUnitOfWork())
                         {
-                            uow.Begin();
-                            await initializer.InitializeAsync(repositoryFunc());
-                            await uow.CommitAsync();
+                            var commandContextStack = commandContextStackFunc();
+                            commandContextStack.Push(new CommandContext(null, uow));
+                            try
+                            {
+                                uow.Begin();
+                                await initializer.InitializeAsync(repositoryFunc());
+                                await uow.CommitAsync();
+                            }
+                            finally
+                            {
+                                commandContextStack.Pop();
+                            }
                         }
-                        finally
-                        {
-                            commandContextStack.Pop();
-                        }
-                    }
-                }).GetAwaiter().GetResult();
+                    }).GetAwaiter().GetResult();
+                }
             }
         }
     }

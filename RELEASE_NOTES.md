@@ -12,6 +12,7 @@
 - AsyncEventListenerBindingExtensions for easier async event listener registration
 - convenience methods IReadRepository.GetManyAsync<T> and IReadRepository.FindManyAsync<T> using Guid IDs
 - added PerAggregateAsyncEventSequencer and PerTenantAsyncEventSequencer for common sequencer scenarios
+- added IDatabaseInitializerLoader.EnsureDatabaseInitialized
 
 ### Changed
 - breaking change: null tenants now cannot access other tenant's data by default (can be changed by configuration)
