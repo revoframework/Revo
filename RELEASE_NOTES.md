@@ -1,6 +1,6 @@
 # RELEASE NOTES
 
-## [1.16.0] - 2020-0?-??
+## [1.16.0] - 2020-06-23
 
 ### Added
 - improved multi-tenancy configuration
