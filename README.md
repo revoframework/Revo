@@ -4,6 +4,7 @@
 </p>
 <p align="center">
 <a href="https://ci.appveyor.com/project/revoframework/revo/"><img src="https://ci.appveyor.com/api/projects/status/uil4j7y3nlqkdmy1/branch/develop?svg=true" alt="Build status"></a>
+<a href="https://github.com/revoframework/Revo/releases"><img src="https://img.shields.io/github/release-date/revoframework/Revo?label=latest%20release" alt="Latest release date"></a>
 <a href="https://www.nuget.org/packages?q=revo"><img src="https://img.shields.io/nuget/v/Revo.Core.svg" alt="NuGet package version"></a>
 <a href="https://revoframework.gitbook.io/revo/"><img src="https://img.shields.io/badge/docs-GITBOOK-blue.svg" alt="Docs"></a>
 <a href="https://github.com/revoframework/Revo/issues"><img src="https://img.shields.io/github/issues/revoframework/Revo.svg" alt="GitHub issues"></a>
