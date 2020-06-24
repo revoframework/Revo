@@ -10,9 +10,8 @@ namespace Revo.Core.Configuration
         /// This may affect logging, database migration, etc.
         /// </summary>
         public bool? IsDevelopmentEnvironment { get; set; }
+
         public CommandsConfiguration Commands { get; } = new CommandsConfiguration();
         public SecurityConfiguration Security { get; } = new SecurityConfiguration();
-
-        public bool AutoDiscoverAutoMapperProfiles { get; set; } = true;
     }
 }

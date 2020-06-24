@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Revo.Core.Commands;
@@ -15,18 +16,19 @@ namespace Revo.Examples.Todos.Reads.Handlers
         IQueryHandler<GetTodoListsQuery, IQueryable<TodoListDto>>
     {
         private readonly IReadRepository readRepository;
+        private readonly IMapper mapper;
 
-        public TaskListQueryHandler(IReadRepository readRepository)
+        public TaskListQueryHandler(IReadRepository readRepository, IMapper mapper)
         {
             this.readRepository = readRepository;
+            this.mapper = mapper;
         }
 
         public Task<IQueryable<TodoListDto>> HandleAsync(GetTodoListsQuery query, CancellationToken cancellationToken)
         {
-            IQueryable<TodoListDto> taskLists = readRepository
-                .FindAll<TodoListReadModel>()
-                .Include(x => x.Todos)
-                .ProjectTo<TodoListDto>();
+            var taskLists = mapper.ProjectTo<TodoListDto>(
+                readRepository
+                    .FindAll<TodoListReadModel>());
             return Task.FromResult(taskLists);
         }
     }

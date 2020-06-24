@@ -5,7 +5,7 @@ using AutoMapper;
 using Ninject;
 using Revo.Core.Types;
 
-namespace Revo.Core.IO
+namespace Revo.Extensions.AutoMapper
 {
     public class AutoMapperProfileDiscovery : IAutoMapperProfileDiscovery
     {

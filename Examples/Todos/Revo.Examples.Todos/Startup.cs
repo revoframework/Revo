@@ -11,6 +11,7 @@ using Revo.Core.Configuration;
 using Revo.EFCore.Configuration;
 using Revo.EFCore.DataAccess.Configuration;
 using Revo.EFCore.DataAccess.Conventions;
+using Revo.Extensions.AutoMapper.Configuration;
 
 namespace Revo.Examples.Todos
 {
@@ -72,7 +73,8 @@ namespace Revo.Examples.Todos
                             .AddConvention<SnakeCaseColumnNamesConvention>(1)
                             .AddConvention<LowerCaseConvention>(2);
                     })
-                .UseAllEFCoreInfrastructure();
+                .UseAllEFCoreInfrastructure()
+                .AddAutoMapperExtension();
         }
     }
 }

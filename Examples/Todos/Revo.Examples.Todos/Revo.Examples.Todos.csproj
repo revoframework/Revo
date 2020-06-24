@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Extensions\Revo.Extensions.AutoMapper\Revo.Extensions.AutoMapper.csproj" />
     <ProjectReference Include="..\..\..\Providers\AspNetCore\Revo.AspNetCore\Revo.AspNetCore.csproj" />
     <ProjectReference Include="..\..\..\Providers\EFCore\Revo.EFCore\Revo.EFCore.csproj" />
     <ProjectReference Include="..\..\..\Providers\Hangfire\Revo.Hangfire\Revo.Hangfire.csproj" />

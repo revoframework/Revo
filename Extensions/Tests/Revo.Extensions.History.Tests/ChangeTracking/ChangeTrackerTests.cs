@@ -25,6 +25,7 @@ namespace Revo.Extensions.History.Tests.ChangeTracking
         private readonly Guid aggregateClassId = Guid.NewGuid();
         private readonly Guid entityId = Guid.NewGuid();
         private readonly Guid entityClassId = Guid.NewGuid();
+        private readonly IMapper mapper;
 
         public ChangeTrackerTests()
         {
@@ -36,10 +37,14 @@ namespace Revo.Extensions.History.Tests.ChangeTracking
             FakeClock.Now = DateTime.Today;
             trackedChangeRecordConverter = Substitute.For<ITrackedChangeRecordConverter>();
 
-            Mapper.Reset(); // TODO will break if other parallel tests call this too
-            Mapper.Initialize(cfg => cfg.AddProfile(new HistoryAutoMapperProfile(trackedChangeRecordConverter)));
+            var mapperConfig = new MapperConfiguration(configurationExpression =>
+            {
+                configurationExpression.AddProfile(new HistoryAutoMapperProfile(trackedChangeRecordConverter));
+            });
+            mapper = mapperConfig.CreateMapper();
 
-            sut = new ChangeTracker(crudRepository, actorContext, trackedChangeRecordConverter, eventBus);
+            sut = new ChangeTracker(crudRepository, actorContext,
+                trackedChangeRecordConverter, eventBus, mapper);
         }
 
         [Fact]

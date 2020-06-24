@@ -84,15 +84,6 @@ namespace Revo.Core.Core
             Bind<IUserPermissionAuthorizer>()
                 .To<UserPermissionAuthorizer>()
                 .InTaskScope();
-
-            Bind<IAutoMapperProfileDiscovery>()
-                .To<AutoMapperProfileDiscovery>()
-                .InSingletonScope();
-
-            Bind<IApplicationConfigurer>()
-                .To<AutoMapperInitializer>()
-                .InSingletonScope()
-                .WithPropertyValue(nameof(AutoMapperInitializer.AutoDiscoverAutoMapperProfiles), coreConfigurationSection.AutoDiscoverAutoMapperProfiles);
         }
     }
 }

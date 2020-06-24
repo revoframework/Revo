@@ -112,6 +112,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4_Tools", "4_Tools", "{80BD
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.Tools.DatabaseMigrator", "Tools\Revo.Tools.DatabaseMigrator\Revo.Tools.DatabaseMigrator.csproj", "{DD6B984E-3F40-4735-A030-1331F56EBACC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.Extensions.AutoMapper", "Extensions\Revo.Extensions.AutoMapper\Revo.Extensions.AutoMapper.csproj", "{E3A99A37-EF26-4EE9-BE72-F869AC8EC3CD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -234,6 +236,10 @@ Global
 		{DD6B984E-3F40-4735-A030-1331F56EBACC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DD6B984E-3F40-4735-A030-1331F56EBACC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DD6B984E-3F40-4735-A030-1331F56EBACC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3A99A37-EF26-4EE9-BE72-F869AC8EC3CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3A99A37-EF26-4EE9-BE72-F869AC8EC3CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3A99A37-EF26-4EE9-BE72-F869AC8EC3CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3A99A37-EF26-4EE9-BE72-F869AC8EC3CD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -286,6 +292,7 @@ Global
 		{EFDAE739-E880-4449-BBBA-4346D3443E7B} = {3C46ACB0-08B6-40E0-8C66-5333C50A95F1}
 		{EC0E18C4-B6EA-47AE-AB6E-7FCC654C1FE9} = {5A3C5A38-4A06-43D0-BFDC-243A2CBB36EE}
 		{DD6B984E-3F40-4735-A030-1331F56EBACC} = {80BDC064-0388-4205-BA2A-ADB72ED29B38}
+		{E3A99A37-EF26-4EE9-BE72-F869AC8EC3CD} = {72197100-932A-45EF-B394-31F2C86CEC0E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C98B2018-4C0A-4011-94CB-77D70109215F}

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), Common.props))\Common.props" />
   
@@ -6,18 +6,8 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Configurations>Debug;Release</Configurations>
     <Description>Event Sourcing, CQRS and DDD framework for modern C#/.NET applications.
-History-tracking extension package.</Description>
+Extension for automatic discovery and registration of AutoMapper profiles.</Description>
   </PropertyGroup>
-  
-  <ItemGroup>
-    <Folder Include="Audits\" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <EmbeddedResource Include="Sql\rhi_baseline_1_mssql.sql" />
-    <EmbeddedResource Include="Sql\rhi_baseline_1_pgsql.sql" />
-    <EmbeddedResource Include="Sql\rhi_baseline_1_sqlite.sql" />
-  </ItemGroup>
   
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="9.0.0" />
@@ -25,11 +15,11 @@ History-tracking extension package.</Description>
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\..\Revo.Infrastructure\Revo.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Revo.Core\Revo.Core.csproj" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.0.0" />
   </ItemGroup>
-  
+
 </Project>

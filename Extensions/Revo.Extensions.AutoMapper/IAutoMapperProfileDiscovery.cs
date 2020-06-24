@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using AutoMapper;
 
-namespace Revo.Core.IO
+namespace Revo.Extensions.AutoMapper
 {
     public interface IAutoMapperProfileDiscovery
     {

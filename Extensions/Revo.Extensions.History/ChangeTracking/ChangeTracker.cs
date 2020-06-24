@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.Extensions.ExpressionMapping;
-using AutoMapper.QueryableExtensions;
 using Revo.Core.Core;
 using Revo.Core.Events;
 using Revo.DataAccess.Entities;
@@ -19,16 +18,20 @@ namespace Revo.Extensions.History.ChangeTracking
         private readonly ITrackedChangeRecordConverter trackedChangeRecordConverter;
         private readonly IEventBus eventBus;
         private readonly List<TrackedChangeRecord> unsavedChangeRecords = new List<TrackedChangeRecord>();
+        private readonly IMapper mapper;
 
-        public ChangeTracker(ICrudRepository crudRepository,
+        public ChangeTracker(
+            ICrudRepository crudRepository,
             IActorContext actorContext,
             ITrackedChangeRecordConverter trackedChangeRecordConverter,
-            IEventBus eventBus)
+            IEventBus eventBus,
+            IMapper mapper)
         {
             this.crudRepository = crudRepository;
             this.actorContext = actorContext;
             this.trackedChangeRecordConverter = trackedChangeRecordConverter;
             this.eventBus = eventBus;
+            this.mapper = mapper;
         }
 
         public TrackedChange AddChange<T>(T changeData, Guid? aggregateId = null, Guid? aggregateClassId = null,
@@ -51,14 +54,14 @@ namespace Revo.Extensions.History.ChangeTracking
         {
             return crudRepository
                 .FindAll<TrackedChangeRecord>()
-                .UseAsDataSource()
+                .UseAsDataSource(mapper)
                 .For<TrackedChange>();
         }
 
         public async Task<TrackedChange> GetChangeAsync(Guid trackedChangeId)
         {
             TrackedChangeRecord record = await crudRepository.GetAsync<TrackedChangeRecord>(trackedChangeId);
-            return Mapper.Map<TrackedChange>(record);
+            return mapper.Map<TrackedChange>(record);
         }
 
         public async Task SaveChangesAsync()
