@@ -100,6 +100,7 @@ namespace Revo.Infrastructure.Projections
                 .GetMethods(BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.Public |
                             BindingFlags.NonPublic)
                 .Where(x => x.Name == "Apply"
+                            && x.DeclaringType == projectorType
                             && x.GetBaseDefinition() == x //exclude overrides
                             && x.GetParameters().Length == 1
                             && typeof(IEventMessage<DomainAggregateEvent>).IsAssignableFrom(x.GetParameters()[0]
@@ -124,6 +125,7 @@ namespace Revo.Infrastructure.Projections
                     .GetMethods(BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.Public |
                                 BindingFlags.NonPublic)
                     .Where(x => x.Name == "Apply"
+                                && x.DeclaringType == projectorType
                                 && x.GetBaseDefinition() == x //exclude overrides
                                 && x.GetParameters().Length == 2
                                 && typeof(IEventMessage<DomainAggregateEvent>).IsAssignableFrom(x.GetParameters()[0]

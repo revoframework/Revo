@@ -3,10 +3,12 @@
 ## [1.17.0] - 2020-0?-??
 
 ### Changed
-
 - removed core dependency on AutoMapper
   - the functionality of automatic registration of profiles got separated into new Revo.Extensions.AutoMapper package
   - updated to AutoMapper 9.0
+
+### Fixed
+- Apply methods inherited in EntityEventProjector no longer get called multiple times
 
 ## [1.16.0] - 2020-06-23
 
