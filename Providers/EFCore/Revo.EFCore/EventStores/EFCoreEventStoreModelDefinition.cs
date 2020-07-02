@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.EntityFrameworkCore;
-using Revo.EFCore.DataAccess.Conventions;
+﻿using Microsoft.EntityFrameworkCore;
 using Revo.EFCore.DataAccess.Model;
 using Revo.Infrastructure.EventStores.Generic.Model;
 

@@ -1,20 +1,20 @@
 ﻿using System.Collections.Generic;
-using Ninject;
+using Revo.Core.Core;
 
 namespace Revo.Infrastructure.Security.Commands
 {
     public class EntityQueryFilterFactory : IEntityQueryFilterFactory
     {
-        private readonly StandardKernel kernel;
+        private readonly IServiceLocator serviceLocator;
 
-        public EntityQueryFilterFactory(StandardKernel kernel)
+        public EntityQueryFilterFactory(IServiceLocator serviceLocator)
         {
-            this.kernel = kernel;
+            this.serviceLocator = serviceLocator;
         }
 
         public IEnumerable<IEntityQueryFilter<T>> GetEntityQueryFilters<T>()
         {
-            return kernel.GetAll<IEntityQueryFilter<T>>();
+            return serviceLocator.GetAll<IEntityQueryFilter<T>>();
         }
     }
 }
