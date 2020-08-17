@@ -16,6 +16,8 @@
 
 Revo is an application framework for modern server C\#/.NET applications built with _event sourcing_, _CQRS_ and _DDD_.
 
+_Development of this framework is supported by company <a href="https://olify.io">Olify IO s.r.o.</a>_
+
 ## Table of contents
 
 * [Home](#revo-framework)
