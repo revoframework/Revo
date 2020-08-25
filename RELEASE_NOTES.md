@@ -9,6 +9,7 @@
 
 ### Fixed
 - Apply methods inherited in EntityEventProjector no longer get called multiple times
+- catching ReflectionTypeLoadException exceptions in TypeExplorer
 
 ## [1.16.0] - 2020-06-23
 

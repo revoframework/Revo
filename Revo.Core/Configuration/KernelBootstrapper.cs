@@ -48,7 +48,7 @@ namespace Revo.Core.Configuration
                 var modules = GetNinjectModules(assembly).Where(x => !kernel.HasModule(x.Name)).ToArray();
                 if (modules.Length > 0)
                 {
-                    Logger.Trace($"Loading {modules.Length} dependency modules from assembly {assembly.FullName}: {string.Join(",", modules.Select(x => x.Name))}");
+                    Logger.Info($"Loading {modules.Length} dependency modules from assembly {assembly.FullName}: {string.Join(",", modules.Select(x => x.Name))}");
                     kernel.Load(modules);
                 }
 
