@@ -1,7 +1,6 @@
 # RELEASE NOTES
 
-## [1.17.0] - 2020-0?-??
-
+## [1.17.0] - 2020-08-25
 ### Changed
 - removed core dependency on AutoMapper
   - the functionality of automatic registration of profiles got separated into new Revo.Extensions.AutoMapper package
