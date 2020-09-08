@@ -1,5 +1,7 @@
 # RELEASE NOTES
 
+## [1.18.0] - 2020-??-??
+
 ## [1.17.0] - 2020-08-25
 ### Changed
 - removed core dependency on AutoMapper
