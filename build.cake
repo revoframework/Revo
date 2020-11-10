@@ -73,20 +73,14 @@ Task("Clean")
   {
     if (IsCleanEnabled)
     {
-      CleanDirectories(new []{ PackagesDir, ReportsDir });
-
-      var msbuildSettings = new MSBuildSettings
+      DotNetCoreClean(
+        SolutionFile,
+        new DotNetCoreCleanSettings
         {
-          Verbosity = Verbosity.Minimal,
-          ToolVersion = MSBuildToolVersion.VS2019,
-          Configuration = Configuration,
-          PlatformTarget = PlatformTarget.MSIL,
-          ArgumentCustomization = args => args
-        };
-
-      msbuildSettings.Targets.Add("Clean");
-
-      MSBuild(SolutionFile, msbuildSettings);
+          Verbosity = DotNetCoreVerbosity.Normal
+        });
+    
+      CleanDirectories(new []{ PackagesDir, ReportsDir });
     }
   });
 
@@ -96,11 +90,11 @@ Task("Restore")
   {
     if (IsRestoreEnabled)
     {
-      NuGetRestore(
+      DotNetCoreRestore(
         SolutionFile,
-        new NuGetRestoreSettings ()
+        new DotNetCoreRestoreSettings
         {
-          Verbosity = NuGetVerbosity.Normal
+          Verbosity = DotNetCoreVerbosity.Normal
         });
     }
   });
@@ -111,19 +105,18 @@ Task("Build")
   {
     if (IsBuildEnabled)
     {
-      MSBuild(SolutionFile,
-        new MSBuildSettings
+      DotNetCoreBuild(SolutionFile,
+        new DotNetCoreBuildSettings
         {
-          Verbosity = Verbosity.Minimal,
-          ToolVersion = MSBuildToolVersion.VS2019,
-          Configuration = Configuration,
-          PlatformTarget = PlatformTarget.MSIL,
           ArgumentCustomization = args => args
             .Append($"/p:VersionSuffix={VersionSuffix}")
             .Append("/p:ci=true")
             .AppendSwitch("/p:DebugType", "=", Configuration == "Release" ? "portable" : "full")
             .AppendSwitch("/p:ContinuousIntegrationBuild", "=", IsCiBuild ? "true" : "false")
-            .AppendSwitch("/p:DeterministicSourcePaths", "=", "false") // Temporary workaround for https://github.com/dotnet/sourcelink/issues/91
+            .AppendSwitch("/p:DeterministicSourcePaths", "=", "false"), // Temporary workaround for https://github.com/dotnet/sourcelink/issues/91
+          Configuration = Configuration,
+          NoRestore = true,
+          Verbosity = DotNetCoreVerbosity.Minimal
         });
     }
   });

@@ -8,6 +8,9 @@
 ### Changed
 - updated minor version for EF Core 3.1.x
 
+### Removed
+- dropping support for legacy ASP.NET platform (.NET 4.7)
+
 ## [1.17.0] - 2020-08-25
 
 ### Changed
