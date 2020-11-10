@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Revo.EF6.DataAccess.InMemory;
+using Revo.DataAccess.InMemory;
 using Revo.Extensions.Notifications.Channels.Buffering;
 using Revo.Extensions.Notifications.Model;
 using Revo.Testing.Core;
@@ -14,12 +14,12 @@ namespace Revo.Extensions.Notifications.Tests.Channels.Bufferring
     {
         private readonly AggregatingBufferGovernor sut;
         private readonly Guid governorId = Guid.NewGuid();
-        private readonly EF6InMemoryCrudRepository inMemoryCrudRepository;
+        private readonly InMemoryCrudRepository inMemoryCrudRepository;
 
         public AggregatingBufferGovernorTests()
         {
             sut = new AggregatingBufferGovernor(governorId, TimeSpan.FromMinutes(5));
-            inMemoryCrudRepository = new EF6InMemoryCrudRepository();
+            inMemoryCrudRepository = new InMemoryCrudRepository();
         }
 
         [Fact]

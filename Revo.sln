@@ -112,7 +112,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4_Tools", "4_Tools", "{80BD
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.Tools.DatabaseMigrator", "Tools\Revo.Tools.DatabaseMigrator\Revo.Tools.DatabaseMigrator.csproj", "{DD6B984E-3F40-4735-A030-1331F56EBACC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.Extensions.AutoMapper", "Extensions\Revo.Extensions.AutoMapper\Revo.Extensions.AutoMapper.csproj", "{E3A99A37-EF26-4EE9-BE72-F869AC8EC3CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.Extensions.AutoMapper", "Extensions\Revo.Extensions.AutoMapper\Revo.Extensions.AutoMapper.csproj", "{E3A99A37-EF26-4EE9-BE72-F869AC8EC3CD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

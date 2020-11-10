@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>
     <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 
@@ -14,11 +14,6 @@
     <ProjectReference Include="..\..\..\Revo.Testing\Revo.Testing.csproj" />
     <ProjectReference Include="..\Revo.Examples.Todos\Revo.Examples.Todos.csproj" />
   </ItemGroup>
-  
-  <Target Name="WorkaroundNetStandard" AfterTargets="ResolvePackageAssets">
-    <ItemGroup>
-      <TransitiveFrameworkReference Remove="NETStandard.Library" />
-    </ItemGroup>
-  </Target>
+
 
 </Project>

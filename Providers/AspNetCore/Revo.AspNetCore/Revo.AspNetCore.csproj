@@ -3,7 +3,7 @@
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), Common.props))\Common.props" />
   
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>
     <Configurations>Debug;Release</Configurations>
     <Description>Event Sourcing, CQRS and DDD framework for modern C#/.NET applications.
 Entity Framework (EF) Core data-access layer implementation.</Description>
@@ -22,11 +22,5 @@ Entity Framework (EF) Core data-access layer implementation.</Description>
     <ProjectReference Include="..\..\..\Revo.Infrastructure\Revo.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Hangfire\Revo.Hangfire\Revo.Hangfire.csproj" />
   </ItemGroup>
-  
-  <Target Name="WorkaroundNetStandard" AfterTargets="ResolvePackageAssets">
-    <ItemGroup>
-      <TransitiveFrameworkReference Remove="NETStandard.Library" />
-    </ItemGroup>
-  </Target>
   
 </Project>

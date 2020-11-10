@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Configurations>Debug;Release</Configurations>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -16,10 +16,5 @@
     <ProjectReference Include="..\..\Revo.AspNetCore\Revo.AspNetCore.csproj" />
   </ItemGroup>
 
-  <Target Name="WorkaroundNetStandard" AfterTargets="ResolvePackageAssets">
-    <ItemGroup>
-      <TransitiveFrameworkReference Remove="NETStandard.Library" />
-    </ItemGroup>
-  </Target>
   
 </Project>

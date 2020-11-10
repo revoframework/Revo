@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>
     <Authors>Revo Framework</Authors>
   </PropertyGroup>
   
@@ -11,7 +11,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Providers\EF6\Revo.EF6\Revo.EF6.csproj" />
     <ProjectReference Include="..\..\..\Revo.Testing\Revo.Testing.csproj" />
     <ProjectReference Include="..\..\Revo.Extensions.Notifications\Revo.Extensions.Notifications.csproj" />
   </ItemGroup>

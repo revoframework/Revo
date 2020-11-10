@@ -1,8 +1,15 @@
 # RELEASE NOTES
 
-## [1.18.0] - 2020-??-??
+## [1.18.0] - 2020-11-10
+
+### Added
+- support for .NET 5.0, ASP.NET Core 5.0 and EF Core 5.0 (supporting both 3.1 and 5.0 versions now)
+
+### Changed
+- updated minor version for EF Core 3.1.x
 
 ## [1.17.0] - 2020-08-25
+
 ### Changed
 - removed core dependency on AutoMapper
   - the functionality of automatic registration of profiles got separated into new Revo.Extensions.AutoMapper package
