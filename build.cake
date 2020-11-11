@@ -208,8 +208,7 @@ Task("Push")
       {
         ApiKey = NuGetApiKey,
         Interactive = !IsCiBuild,
-        Source = ProductionNuGetSourceUrl,
-        Verbosity = DotNetCoreVerbosity.Minimal
+        Source = ProductionNuGetSourceUrl
       };
     }
     else
@@ -218,8 +217,7 @@ Task("Push")
       {
         ApiKey = "az",
         Interactive = !IsCiBuild,
-        Source = DevelopNuGetSourceUrl,
-        Verbosity = DotNetCoreVerbosity.Minimal
+        Source = DevelopNuGetSourceUrl
       };
     }
 
