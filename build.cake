@@ -11,10 +11,15 @@ bool IsRestoreEnabled = Argument<bool>("DoRestore", true);
 bool IsBuildEnabled = Argument<bool>("DoBuild", true);
 bool IsTestEnabled = Argument<bool>("DoTest", true);
 bool IsPackEnabled = Argument<bool>("DoPack", true);
+bool IsPushEnabled = Argument<bool>("DoPush", true);
 
 string Configuration = HasArgument("Configuration")
     ? Argument<string>("Configuration")
     : EnvironmentVariable("Configuration") ?? "Release";
+
+string NuGetApiKey = HasArgument("NuGetApiKey")
+    ? Argument<string>("NuGetApiKey")
+    : EnvironmentVariable("NUGET_API_KEY");
 
 var SolutionDir = Context.Environment.WorkingDirectory.FullPath;
 string SolutionFile => System.IO.Path.Combine(SolutionDir, SolutionName + ".sln");
@@ -48,15 +53,27 @@ if (Version == null)
     if (AzurePipelines.Environment.PullRequest.IsPullRequest)
     {
       versionSuffix += $"-pr{AzurePipelines.Environment.PullRequest.Id}";
+      IsPushEnabled = false;
     }
-    else if (branchName != "develop" && branchName != "master")
+    else if (branchName != "master")
     {
       versionSuffix += $"-{branchName.Replace('_', '-').ToLowerInvariant()}";
-    }
 
-    if (branchName != "master" && BuildNumber != null)
-    {
-      versionSuffix += $"-build{BuildNumber.Value:00000}";
+      if (branchName == "develop")
+      {
+        if (BuildNumber != null)
+        {
+          versionSuffix += $"{BuildNumber.Value:00000}";
+        }
+      }
+      else
+      {
+        IsPushEnabled = false;
+
+        var shortCommitHash = AzurePipelines.Environment.Repository.SourceVersion;
+        shortCommitHash = shortCommitHash.Substring(0, 7);
+        versionSuffix += $"-{shortCommitHash}";
+      }
     }
   }
   else
@@ -65,11 +82,6 @@ if (Version == null)
   }
 
   Version = $"{versionPrefix}{versionSuffix}";
-}
-
-string GetXunitXmlReportFilePath(FilePath projectFile)
-{
-  return new DirectoryPath(ReportsDir).CombineWithFilePath(projectFile.GetFilenameWithoutExtension()).FullPath + ".xml";
 }
 
 Information($"{SolutionName} cake build script start");
@@ -84,7 +96,7 @@ Task("Default")
     .IsDependentOn("Pack");
 
 Task("CI")
-    .IsDependentOn("Pack");
+    .IsDependentOn("Push");
 
 Task("Clean")
   .WithCriteria(IsCleanEnabled)
@@ -93,7 +105,7 @@ Task("Clean")
     CleanDirectories(new [] { PackagesDir, ReportsDir });
 
     DotNetCoreClean(SolutionFile,
-      new DotNetCoreCleanSettings()
+      new DotNetCoreCleanSettings
       {
         Verbosity = DotNetCoreVerbosity.Minimal,
         Configuration = Configuration
@@ -108,7 +120,7 @@ Task("Restore")
     DotNetCoreRestore(SolutionFile,
       new DotNetCoreRestoreSettings
       {
-        Verbosity = DotNetCoreVerbosity.Normal,
+        Verbosity = DotNetCoreVerbosity.Minimal,
         Interactive = !IsCiBuild
       });
   });
@@ -158,28 +170,38 @@ Task("Pack")
   .IsDependentOn("Test")
   .Does(() =>
   {
-    foreach (var projectFile in GetFiles("./**/Revo.*.csproj")) // without the "Revo.*" prefix, it also matches stuff from ./tools
-    {
-      if (!projectFile.GetFilename().FullPath.StartsWith("Revo.")
-      || projectFile.GetFilename().FullPath.EndsWith(".Tests.csproj")
-      || projectFile.GetFilename().FullPath.StartsWith("Revo.Examples."))
+    DotNetCorePack(SolutionFile,
+      new DotNetCorePackSettings
       {
-        continue;
-      }
-
-      DotNetCorePack(
-        projectFile.FullPath,
-        new DotNetCorePackSettings
-        {
         ArgumentCustomization = args => args.Append($"/p:Version={Version}"),
-          Configuration = Configuration,
-          OutputDirectory = PackagesDir,
-          NoBuild = true,
-          NoRestore = true,
-          IncludeSymbols = true,
-          Verbosity = DotNetCoreVerbosity.Minimal
-        });
+        Configuration = Configuration,
+        OutputDirectory = PackagesDir,
+        NoBuild = true,
+        NoRestore = true,
+        IncludeSource = true,
+        IncludeSymbols = true,
+        Verbosity = DotNetCoreVerbosity.Minimal
+      });
+  });
+
+Task("Push")
+  .WithCriteria(IsPushEnabled)
+  .IsDependentOn("Pack")
+  .Does(() =>
+  {
+    if (string.IsNullOrWhiteSpace(NuGetApiKey))
+    {
+      throw new Exception("Error: NuGetApiKey is required to push NuGet packages");
     }
+
+    DotNetCoreNuGetPush(System.IO.Path.Combine(PackagesDir, "*.nupkg"),
+      new DotNetCoreNuGetPushSettings
+      {
+        ApiKey = NuGetApiKey,
+        Interactive = !IsCiBuild,
+        Source = "https://api.nuget.org/v3/index.json",
+        Verbosity = DotNetCoreVerbosity.Minimal
+      });
   });
 
 RunTarget(Target);
