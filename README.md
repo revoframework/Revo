@@ -3,13 +3,14 @@
 <img src="https://github.com/revoframework/Revo/blob/develop/res/revo-framework.png" alt="Revo framework">
 </p>
 <p align="center">
-<a href="https://ci.appveyor.com/project/revoframework/revo/"><img src="https://ci.appveyor.com/api/projects/status/uil4j7y3nlqkdmy1/branch/develop?svg=true" alt="Build status"></a>
-<a href="https://github.com/revoframework/Revo/releases"><img src="https://img.shields.io/github/release-date/revoframework/Revo?label=latest%20release" alt="Latest release date"></a>
-<a href="https://www.nuget.org/packages?q=revo"><img src="https://img.shields.io/nuget/v/Revo.Core.svg" alt="NuGet package version"></a>
-<a href="https://revoframework.gitbook.io/revo/"><img src="https://img.shields.io/badge/docs-GITBOOK-blue.svg" alt="Docs"></a>
-<a href="https://github.com/revoframework/Revo/issues"><img src="https://img.shields.io/github/issues/revoframework/Revo.svg" alt="GitHub issues"></a>
-<a href="https://github.com/revoframework/Revo/pulls"><img src="https://img.shields.io/badge/contributions-welcome-orange.svg" alt="Contributions"></a>
-<a href="https://github.com/revoframework/Revo/blob/develop/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
+<a href="https://dev.azure.com/revoframework/Revo/_build?definitionId=1&view=runs"><img src="https://img.shields.io/azure-devops/build/revoframework/7ff8258b-dd3c-4007-9d06-7609742e93cf/1/develop?style=flat-square" alt="Build status"></a>
+<a href="https://github.com/revoframework/Revo/releases"><img src="https://img.shields.io/github/release-date/revoframework/Revo?label=latest%20release&style=flat-square" alt="Latest release date"></a>
+<a href="https://www.nuget.org/packages?q=revo"><img src="https://img.shields.io/nuget/v/Revo.Core.svg?style=flat-square" alt="NuGet package version"></a>
+<a href="https://www.myget.org/gallery/revoframework"><img src="https://img.shields.io/myget/revoframework/vpre/Revo.Core?style=flat-square" alt="NuGet package version"></a>
+<a href="https://revoframework.gitbook.io/revo/"><img src="https://img.shields.io/badge/docs-GITBOOK-blue.svg?style=flat-square" alt="Docs"></a>
+<a href="https://github.com/revoframework/Revo/issues"><img src="https://img.shields.io/github/issues/revoframework/Revo.svg?style=flat-square" alt="GitHub issues"></a>
+<a href="https://github.com/revoframework/Revo/pulls"><img src="https://img.shields.io/badge/PRs-welcome-green?style=flat-square" alt="PRs welcome"></a>
+<a href="https://github.com/revoframework/Revo/blob/develop/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="License"></a>
 </p>
 
 # Revo Framework
