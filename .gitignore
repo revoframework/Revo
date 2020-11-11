@@ -1,6 +1,6 @@
 bin/
 obj/
 .vs/
-cake-tools/
+.cake-tools/
 build/
 *.user
