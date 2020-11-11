@@ -10,7 +10,7 @@ Entity Framework 6 (EF6) data access and infrastructure services.</Description>
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="EntityFramework" Version="6.4.0" />
+    <PackageReference Include="EntityFramework" Version="6.4.4" />
   </ItemGroup>
   
   <ItemGroup>
