@@ -22,7 +22,6 @@ Rebus (service bus) messaging integration package.</Description>
     <PackageReference Include="Rebus.NLog" Version="5.0.0" />
     <PackageReference Include="Rebus.RabbitMq" Version="7.3.0" />
     <PackageReference Include="Rebus.UnitOfWork" Version="6.0.0" />
-    <PackageReference Include="Rebus.XmlConfig" Version="4.0.0" />
     <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.0.0" />
   </ItemGroup>
   
