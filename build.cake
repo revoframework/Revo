@@ -4,6 +4,9 @@ using System.Xml;
 
 const string SolutionName = "Revo";
 
+const string ProductionNuGetSourceUrl = "https://api.nuget.org/v3/index.json";
+const string DevelopNuGetSourceUrl = "https://pkgs.dev.azure.com/revoframework/_packaging/revoframework/nuget/v3/index.json";
+
 string Target = Argument<string>("Target", "Default");
 
 bool IsCleanEnabled = Argument<bool>("DoClean", true);
@@ -38,6 +41,8 @@ int? BuildNumber =
   IsCiBuild ? AzurePipelines.Environment.Build.Id :
   EnvironmentVariable("BuildNumber") != null ? (int?) int.Parse(EnvironmentVariable("BuildNumber")) : null;
 
+bool IsReleaseBuild = false;
+
 if (Version == null)
 {
   var xmlDocument = new XmlDocument();
@@ -50,29 +55,30 @@ if (Version == null)
   {
     var branchName = AzurePipelines.Environment.Repository.SourceBranchName;
 
+    var shortCommitHash = AzurePipelines.Environment.Repository.SourceVersion;
+    shortCommitHash = shortCommitHash.Substring(0, 7);
+
     if (AzurePipelines.Environment.PullRequest.IsPullRequest)
     {
-      versionSuffix += $"-pr{AzurePipelines.Environment.PullRequest.Id}";
+      versionSuffix += $"-pr{AzurePipelines.Environment.PullRequest.Id}-{shortCommitHash}";
       IsPushEnabled = false;
     }
-    else if (branchName != "master")
+    else if (branchName == "master")
+    {
+      IsReleaseBuild = true;
+    }
+    else
     {
       versionSuffix += $"-{branchName.Replace('_', '-').ToLowerInvariant()}";
 
-      if (branchName == "develop")
+      if (branchName != "develop")
       {
-        if (BuildNumber != null)
-        {
-          versionSuffix += $"{BuildNumber.Value:00000}";
-        }
-      }
-      else
-      {
-        IsPushEnabled = false;
-
-        var shortCommitHash = AzurePipelines.Environment.Repository.SourceVersion;
-        shortCommitHash = shortCommitHash.Substring(0, 7);
         versionSuffix += $"-{shortCommitHash}";
+        IsPushEnabled = false;
+      }
+      else if (BuildNumber != null)
+      {
+        versionSuffix += $"{BuildNumber.Value:00000}";
       }
     }
   }
@@ -85,7 +91,7 @@ if (Version == null)
 }
 
 Information($"{SolutionName} cake build script start");
-Information($"Build target: {Target}, version: {Version}, is CI build: {IsCiBuild}");
+Information($"Build target: {Target}, version: {Version}, is CI build: {IsCiBuild}, NuGet API key: {(string.IsNullOrWhiteSpace(NuGetApiKey) ? "null" : "****")}");
 
 if (IsCiBuild)
 {
@@ -189,19 +195,36 @@ Task("Push")
   .IsDependentOn("Pack")
   .Does(() =>
   {
-    if (string.IsNullOrWhiteSpace(NuGetApiKey))
-    {
-      throw new Exception("Error: NuGetApiKey is required to push NuGet packages");
-    }
+    DotNetCoreNuGetPushSettings pushSettings;
 
-    DotNetCoreNuGetPush(System.IO.Path.Combine(PackagesDir, "*.nupkg"),
-      new DotNetCoreNuGetPushSettings
+    if (IsReleaseBuild)
+    {
+      if (string.IsNullOrWhiteSpace(NuGetApiKey))
+      {
+        throw new Exception("Error: NuGetApiKey is required to push NuGet packages");
+      }
+
+      pushSettings = new DotNetCoreNuGetPushSettings
       {
         ApiKey = NuGetApiKey,
         Interactive = !IsCiBuild,
-        Source = "https://api.nuget.org/v3/index.json",
+        Source = ProductionNuGetSourceUrl,
         Verbosity = DotNetCoreVerbosity.Minimal
-      });
+      };
+    }
+    else
+    {
+      pushSettings = new DotNetCoreNuGetPushSettings
+      {
+        ApiKey = "az",
+        Interactive = !IsCiBuild,
+        Source = DevelopNuGetSourceUrl,
+        Verbosity = DotNetCoreVerbosity.Minimal
+      };
+    }
+
+    DotNetCoreNuGetPush(System.IO.Path.Combine(PackagesDir, "*.nupkg"),
+      pushSettings);
   });
 
 RunTarget(Target);
