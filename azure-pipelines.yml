@@ -4,11 +4,15 @@
 # https://aka.ms/yaml
 
 trigger:
+- master
 - develop
 
 pool:
   vmImage: 'ubuntu-latest'
 
+variables:
+- group: ci-nuget-vars
+  
 steps:
 - task: UseDotNet@2
   inputs:
