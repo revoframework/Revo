@@ -6,7 +6,6 @@ namespace Revo.Rebus
     {
         public bool IsActive { get; set; }
 
-        public RebusConnectionConfiguration Connection { get; set; } =
-            RebusConnectionConfiguration.FromConnectionName("RabbitMQ");
+        public RebusConnectionConfiguration Connection { get; set; } = null;
     }
 }
