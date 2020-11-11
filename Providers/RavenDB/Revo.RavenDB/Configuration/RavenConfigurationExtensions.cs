@@ -7,8 +7,8 @@ namespace Revo.RavenDB.Configuration
     public static class RavenConfigurationExtensions
     {
         public static IRevoConfiguration UseRavenDataAccess(this IRevoConfiguration configuration,
+            RavenConnectionConfiguration connection,
             bool? useAsPrimaryRepository = true,
-            RavenConnectionConfiguration connection = null,
             Action<RavenConfigurationSection> advancedAction = null)
         {
             var section = configuration.GetSection<RavenConfigurationSection>();

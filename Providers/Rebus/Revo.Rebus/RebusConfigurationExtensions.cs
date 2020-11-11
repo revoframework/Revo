@@ -1,17 +1,24 @@
 ﻿using System;
+using Rebus.Config;
 using Revo.Core.Configuration;
 
 namespace Revo.Rebus
 {
     public static class RebusConfigurationExtensions
     {
+        /// <summary>
+        /// Uses Rebus service bus integration.
+        /// </summary>
+        /// <param name="configureFunc">Function to configure Rebus. You have to configure your connection, routing, etc. here.</param>
+        /// <param name="advancedAction">Advanced extension configuration action (optional).</param>
+        /// <returns></returns>
         public static IRevoConfiguration UseRebus(this IRevoConfiguration configuration,
-            RebusConnectionConfiguration connection = null,
+            Func<RebusConfigurer, RebusConfigurer> configureFunc,
             Action<RebusConfigurationSection> advancedAction = null)
         {
             var section = configuration.GetSection<RebusConfigurationSection>();
             section.IsActive = true;
-            section.Connection = connection ?? section.Connection;
+            section.ConfigureFunc = section.ConfigureFunc;
 
             advancedAction?.Invoke(section);
 
@@ -19,7 +26,7 @@ namespace Revo.Rebus
             {
                 if (section.IsActive)
                 {
-                    c.LoadModule(new RebusModule(section.Connection));
+                    c.LoadModule(new RebusModule(section.ConfigureFunc));
                 }
             });
 

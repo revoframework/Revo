@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using Ninject;
 using Ninject.Modules;
 using Rebus.Activation;
@@ -16,19 +15,15 @@ namespace Revo.Rebus
 {
     public class RebusModule : NinjectModule
     {
-        private readonly RebusConnectionConfiguration connectionConfiguration;
+        private readonly Func<RebusConfigurer, RebusConfigurer> configureFunc;
 
-        public RebusModule(RebusConnectionConfiguration connectionConfiguration)
+        public RebusModule(Func<RebusConfigurer, RebusConfigurer> configureFunc)
         {
-            this.connectionConfiguration = connectionConfiguration;
+            this.configureFunc = configureFunc;
         }
 
         public override void Load()
         {
-            Dictionary<string, string> connectionParams = connectionConfiguration?.ConnectionString?.Split(';')
-                .Select(value => value.Split('='))
-                .ToDictionary(pair => pair[0].Trim(), pair => pair.Length > 0 ? pair[1].Trim() : null);
-
             Bind<IAsyncEventListener<IEvent>>()
                 .To<RebusEventListener>()
                 .InTaskScope();
@@ -51,11 +46,6 @@ namespace Revo.Rebus
 
             var bus = Configure.With(Kernel.Get<IContainerAdapter>())
                 .Logging(l => l.NLog())
-                .Transport(t =>
-                    t.UseRabbitMq(
-                        connectionParams != null && connectionParams.TryGetValue("Url", out string url) ? url : "amqp://localhost",
-                        connectionParams != null && connectionParams.TryGetValue("InputQueue", out string database) ? database : "Revo"))
-                .Routing(r => r.TypeBasedRoutingFromAppConfig())
                 .Options(c => c.EnableUnitOfWork(
                     mc =>
                     {
@@ -63,8 +53,14 @@ namespace Revo.Rebus
                         mc.TransactionContext.Items["uow"] = uow;
                         return uow;
                     },
-                    async (mc, uow) => await uow.RunAsync()))
-                .Start();
+                    async (mc, uow) => await uow.RunAsync()));
+
+            if (configureFunc != null)
+            {
+                bus = configureFunc(bus);
+            }
+
+            bus.Start();
         }
     }
 }
