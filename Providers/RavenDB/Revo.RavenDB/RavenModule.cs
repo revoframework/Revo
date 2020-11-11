@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using Ninject;
 using Ninject.Modules;
@@ -30,11 +29,7 @@ namespace Revo.RavenDB
             Bind<IDocumentStore>()
                 .ToMethod(ctx =>
                 {
-                    var connectionString = connectionConfiguration.ConnectionString
-                                           ?? (connectionConfiguration.ConnectionName != null
-                                               ? ConfigurationManager.ConnectionStrings[connectionConfiguration.ConnectionName]?.ConnectionString
-                                               : null);
-                    Dictionary<string, string> connectionParams = connectionString?.Split(';')
+                    Dictionary<string, string> connectionParams = connectionConfiguration?.ConnectionString?.Split(';')
                         .Select(value => value.Split('='))
                         .ToDictionary(pair => pair[0].Trim(), pair => pair.Length > 0 ? pair[1].Trim() : null);
 

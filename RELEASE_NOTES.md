@@ -7,6 +7,7 @@
 
 ### Changed
 - updated minor version for EF Core 3.1.x
+- updated RavenDB.Client to 5.0.4, Revo.RavenDB now only requires netstandard2.0
 
 ### Removed
 - dropping support for legacy ASP.NET platform (.NET 4.7)

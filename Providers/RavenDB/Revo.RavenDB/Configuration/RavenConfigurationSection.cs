@@ -9,7 +9,6 @@ namespace Revo.RavenDB.Configuration
         public bool UseAsPrimaryRepository { get; set; }
         public bool UseProjections { get; set; }
 
-        public RavenConnectionConfiguration Connection { get; set; } =
-            RavenConnectionConfiguration.FromConnectionName("RavenDB");
+        public RavenConnectionConfiguration Connection { get; set; } = null;
     }
 }

@@ -2,23 +2,16 @@
 {
     public class RavenConnectionConfiguration
     {
-        public static RavenConnectionConfiguration FromConnectionName(string connectionName)
-        {
-            return new RavenConnectionConfiguration(connectionName, null);
-        }
-
         public static RavenConnectionConfiguration FromConnectionString(string connectionString)
         {
-            return new RavenConnectionConfiguration(null, connectionString);
+            return new RavenConnectionConfiguration(connectionString);
         }
 
-        private RavenConnectionConfiguration(string connectionName, string connectionString)
+        private RavenConnectionConfiguration(string connectionString)
         {
-            ConnectionName = connectionName;
             ConnectionString = connectionString;
         }
 
-        public string ConnectionName { get; }
         public string ConnectionString { get; }
     }
 }
