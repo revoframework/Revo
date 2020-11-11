@@ -1,13 +1,8 @@
-#r "System.IO.Compression.FileSystem"
 #r "System.Xml"
 
-//#tool "nuget:?package=xunit.runner.console"
-//#tool "nuget:?package=OpenCover"
-#addin "Cake.Incubator"
-
-using System.IO.Compression;
-using System.Net;
 using System.Xml;
+
+const string SolutionName = "Revo";
 
 string Target = Argument<string>("Target", "Default");
 
@@ -17,47 +12,59 @@ bool IsBuildEnabled = Argument<bool>("DoBuild", true);
 bool IsTestEnabled = Argument<bool>("DoTest", true);
 bool IsPackEnabled = Argument<bool>("DoPack", true);
 
-string Configuration = HasArgument("Configuration") 
-    ? Argument<string>("Configuration") 
+string Configuration = HasArgument("Configuration")
+    ? Argument<string>("Configuration")
     : EnvironmentVariable("Configuration") ?? "Release";
 
 var SolutionDir = Context.Environment.WorkingDirectory.FullPath;
-var SolutionFile = System.IO.Path.Combine(SolutionDir, "Revo.sln");
+string SolutionFile => System.IO.Path.Combine(SolutionDir, SolutionName + ".sln");
 
 var PackagesDir = System.IO.Path.Combine(SolutionDir, "build", "packages");
 var ReportsDir = System.IO.Path.Combine(SolutionDir, "build", "reports");
 
-bool IsCiBuild = AppVeyor.IsRunningOnAppVeyor;
+bool IsCiBuild = AzurePipelines.IsRunningOnAzurePipelines || AzurePipelines.IsRunningOnAzurePipelinesHosted;
+
+string Version = HasArgument("BuildVersion") ?
+  Argument<string>("BuildVersion", null) :
+  EnvironmentVariable("BUILD_VERSION");
 
 int? BuildNumber =
-    HasArgument("BuildNumber") ? (int?)Argument<int>("BuildNumber") :
-    AppVeyor.IsRunningOnAppVeyor ? (int?)AppVeyor.Environment.Build.Number :
-    EnvironmentVariable("BuildNumber") != null ? (int?)int.Parse(EnvironmentVariable("BuildNumber")) : null;
+  HasArgument("BuildNumber") ? (int?) Argument<int>("BuildNumber") :
+  IsCiBuild ? AzurePipelines.Environment.Build.Id :
+  EnvironmentVariable("BuildNumber") != null ? (int?) int.Parse(EnvironmentVariable("BuildNumber")) : null;
 
-string VersionSuffix = HasArgument("VersionSuffix") ? Argument<string>("VersionSuffix") : null;
-
-// load VersionSuffix (if explicitly specified in Common.props)
-if (VersionSuffix == null)
+if (Version == null)
 {
   var xmlDocument = new XmlDocument();
   xmlDocument.Load(System.IO.Path.Combine(SolutionDir, "Common.props"));
 
-  var node = xmlDocument.SelectSingleNode("Project/PropertyGroup/VersionSuffix") as XmlElement;
-  if (node != null)
+  string versionPrefix = ((XmlElement) xmlDocument.SelectSingleNode("Project/PropertyGroup/VersionPrefix")).InnerText;
+  string versionSuffix = "";
+
+  if (IsCiBuild)
   {
-    VersionSuffix = node.InnerText;
+    var branchName = AzurePipelines.Environment.Repository.SourceBranchName;
+
+    if (AzurePipelines.Environment.PullRequest.IsPullRequest)
+    {
+      versionSuffix += $"-pr{AzurePipelines.Environment.PullRequest.Id}";
+    }
+    else if (branchName != "develop" && branchName != "master")
+    {
+      versionSuffix += $"-{branchName.Replace('_', '-').ToLowerInvariant()}";
+    }
+
+    if (branchName != "master" && BuildNumber != null)
+    {
+      versionSuffix += $"-build{BuildNumber.Value:00000}";
+    }
   }
-}
+  else
+  {
+    versionSuffix += $"-local{DateTime.Now.ToString("yyMMdd")}";
+  }
 
-// append the VersionSuffix for non-release CI builds
-string ciTag = AppVeyor.Environment.Repository.Tag.IsTag ? AppVeyor.Environment.Repository.Tag.Name : null;
-string ciBranch = AppVeyor.IsRunningOnAppVeyor ? AppVeyor.Environment.Repository.Branch : null;
-
-if (BuildNumber.HasValue && ciTag == null && (string.IsNullOrWhiteSpace(ciBranch) || ciBranch != "master"))
-{
-  VersionSuffix = VersionSuffix != null
-    ? $"{VersionSuffix}-build{BuildNumber:00000}"
-    : $"build{BuildNumber:00000}";
+  Version = $"{versionPrefix}{versionSuffix}";
 }
 
 string GetXunitXmlReportFilePath(FilePath projectFile)
@@ -65,107 +72,113 @@ string GetXunitXmlReportFilePath(FilePath projectFile)
   return new DirectoryPath(ReportsDir).CombineWithFilePath(projectFile.GetFilenameWithoutExtension()).FullPath + ".xml";
 }
 
+Information($"{SolutionName} cake build script start");
+Information($"Build target: {Target}, version: {Version}, is CI build: {IsCiBuild}");
+
+if (IsCiBuild)
+{
+  AzurePipelines.Commands.UpdateBuildNumber(Version);
+}
+
 Task("Default")
     .IsDependentOn("Pack");
 
+Task("CI")
+    .IsDependentOn("Pack");
+
 Task("Clean")
+  .WithCriteria(IsCleanEnabled)
   .Does(() =>
   {
-    if (IsCleanEnabled)
-    {
-      DotNetCoreClean(
-        SolutionFile,
-        new DotNetCoreCleanSettings
-        {
-          Verbosity = DotNetCoreVerbosity.Normal
-        });
-    
-      CleanDirectories(new []{ PackagesDir, ReportsDir });
-    }
+    CleanDirectories(new [] { PackagesDir, ReportsDir });
+
+    DotNetCoreClean(SolutionFile,
+      new DotNetCoreCleanSettings()
+      {
+        Verbosity = DotNetCoreVerbosity.Minimal,
+        Configuration = Configuration
+      });
   });
 
 Task("Restore")
+  .WithCriteria(IsRestoreEnabled)
   .IsDependentOn("Clean")
   .Does(() =>
   {
-    if (IsRestoreEnabled)
-    {
-      DotNetCoreRestore(
-        SolutionFile,
-        new DotNetCoreRestoreSettings
-        {
-          Verbosity = DotNetCoreVerbosity.Normal
-        });
-    }
+    DotNetCoreRestore(SolutionFile,
+      new DotNetCoreRestoreSettings
+      {
+        Verbosity = DotNetCoreVerbosity.Normal,
+        Interactive = !IsCiBuild
+      });
   });
 
 Task("Build")
+  .WithCriteria(IsBuildEnabled)
   .IsDependentOn("Restore")
   .Does(() =>
   {
-    if (IsBuildEnabled)
-    {
-      DotNetCoreBuild(SolutionFile,
-        new DotNetCoreBuildSettings
-        {
-          ArgumentCustomization = args => args
-            .Append($"/p:VersionSuffix={VersionSuffix}")
-            .Append("/p:ci=true")
-            .AppendSwitch("/p:DebugType", "=", Configuration == "Release" ? "portable" : "full")
-            .AppendSwitch("/p:ContinuousIntegrationBuild", "=", IsCiBuild ? "true" : "false")
-            .AppendSwitch("/p:DeterministicSourcePaths", "=", "false"), // Temporary workaround for https://github.com/dotnet/sourcelink/issues/91
-          Configuration = Configuration,
-          NoRestore = true,
-          Verbosity = DotNetCoreVerbosity.Minimal
-        });
-    }
+    DotNetCoreBuild(SolutionFile,
+      new DotNetCoreBuildSettings
+      {
+        ArgumentCustomization = args => args
+          .Append($"/p:Version={Version}")
+          .Append("/p:ci=true")
+          .AppendSwitch("/p:DebugType", "=", Configuration == "Release" ? "portable" : "full")
+          .AppendSwitch("/p:ContinuousIntegrationBuild", "=", IsCiBuild ? "true" : "false")
+          .AppendSwitch("/p:DeterministicSourcePaths", "=", "false"), // Temporary workaround for https://github.com/dotnet/sourcelink/issues/91,
+        Configuration = Configuration,
+        NoRestore = true,
+        Verbosity = DotNetCoreVerbosity.Minimal
+      });
   });
 
 Task("Test")
+  .WithCriteria(IsTestEnabled)
   .IsDependentOn("Build")
   .Does(() =>
   {
-    if (IsTestEnabled)
-    {
-      DotNetCoreTest(SolutionFile,
-        new DotNetCoreTestSettings
-        {
-          Configuration = Configuration,
-          NoBuild = true,
-          NoRestore = true,
-          Verbosity = DotNetCoreVerbosity.Minimal
-        });
-     }
+    DotNetCoreTest(SolutionFile,
+      new DotNetCoreTestSettings
+      {
+        ArgumentCustomization = args => args
+          .Append("--collect:\"XPlat Code Coverage\"")
+          .Append("--settings coverlet.runsettings"),
+        Configuration = Configuration,
+        Logger = "trx",
+        NoBuild = true,
+        NoRestore = true,
+        Verbosity = DotNetCoreVerbosity.Minimal,
+        ResultsDirectory = ReportsDir
+      });
   });
 
 Task("Pack")
+  .WithCriteria(IsPackEnabled)
   .IsDependentOn("Test")
   .Does(() =>
   {
-    if (IsPackEnabled)
+    foreach (var projectFile in GetFiles("./**/Revo.*.csproj")) // without the "Revo.*" prefix, it also matches stuff from ./tools
     {
-      foreach (var projectFile in GetFiles("./**/Revo.*.csproj")) // without the "Revo.*" prefix, it also matches stuff from ./tools
+      if (!projectFile.GetFilename().FullPath.StartsWith("Revo.")
+      || projectFile.GetFilename().FullPath.EndsWith(".Tests.csproj")
+      || projectFile.GetFilename().FullPath.StartsWith("Revo.Examples."))
       {
-        if (!projectFile.GetFilename().FullPath.StartsWith("Revo.")
-        || projectFile.GetFilename().FullPath.EndsWith(".Tests.csproj")
-        || projectFile.GetFilename().FullPath.StartsWith("Revo.Examples."))
-        {
-          continue;
-        }
-
-        DotNetCorePack(
-          projectFile.FullPath,
-          new DotNetCorePackSettings
-          {
-            Configuration = Configuration,
-            OutputDirectory = PackagesDir,
-            NoBuild = true,
-            NoRestore = true,
-            IncludeSymbols = true,
-            Verbosity = DotNetCoreVerbosity.Minimal,
-            VersionSuffix = VersionSuffix
-          });
+        continue;
       }
+
+      DotNetCorePack(
+        projectFile.FullPath,
+        new DotNetCorePackSettings
+        {
+        ArgumentCustomization = args => args.Append($"/p:Version={Version}"),
+          Configuration = Configuration,
+          OutputDirectory = PackagesDir,
+          NoBuild = true,
+          NoRestore = true,
+          IncludeSymbols = true,
+          Verbosity = DotNetCoreVerbosity.Minimal
+        });
     }
   });
 
