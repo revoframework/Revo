@@ -6,6 +6,7 @@
 - support for .NET 5.0, ASP.NET Core 5.0 and EF Core 5.0 (supporting both 3.1 and 5.0 versions now)
 
 ### Changed
+- Permission.ContextId and ResourceId can now be any objects
 - updated minor version for EF Core 3.1.x
 - updated RavenDB.Client to 5.0.4, Revo.RavenDB now only requires netstandard2.0
 - updated Rebus dependency to 5.0.4, Revo.Rebus now only requires netstandard2.0
