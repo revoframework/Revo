@@ -21,8 +21,8 @@ namespace Revo.Core.Security
         }
 
         public Guid PermissionTypeId { get; }
-        public string ContextId { get; }
-        public string ResourceId { get; }
+        public object ContextId { get; }
+        public object ResourceId { get; }
 
         protected override IEnumerable<(string Name, object Value)> GetValueComponents()
         {
