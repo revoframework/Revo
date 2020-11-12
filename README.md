@@ -3,12 +3,12 @@
 <img src="https://github.com/revoframework/Revo/blob/develop/res/revo-framework.png" alt="Revo framework">
 </p>
 <p align="center">
-<a href="https://dev.azure.com/revoframework/Revo/_build?definitionId=1&view=runs"><img src="https://img.shields.io/azure-devops/build/revoframework/7ff8258b-dd3c-4007-9d06-7609742e93cf/1/develop?style=flat-square" alt="Build status"></a>
+<a href="https://dev.azure.com/revoframework/Revo/_build?definitionId=1&view=runs"><img src="https://img.shields.io/azure-devops/build/revoframework/7ff8258b-dd3c-4007-9d06-7609742e93cf/1/develop?style=flat-square&logo=azure-pipelines" alt="Build status"></a>
 <a href="https://github.com/revoframework/Revo/releases"><img src="https://img.shields.io/github/release-date/revoframework/Revo?label=latest%20release&style=flat-square" alt="Latest release date"></a>
-<a href="https://www.nuget.org/packages?q=revo"><img src="https://img.shields.io/nuget/v/Revo.Core.svg?style=flat-square" alt="NuGet package version"></a>
-<a href="https://www.myget.org/gallery/revoframework"><img src="https://img.shields.io/myget/revoframework/vpre/Revo.Core?style=flat-square" alt="NuGet package version"></a>
+<a href="https://www.nuget.org/packages?q=revo"><img src="https://img.shields.io/nuget/v/Revo.Core?logo=NuGet&style=flat-square" alt="NuGet packages"></a>
+<a href="https://www.myget.org/gallery/revoframework"><img src="https://img.shields.io/myget/revoframework/vpre/Revo.Core?label=nuget%20CI&logo=NuGet&style=flat-square" alt="CI NuGet packages at MyGet"></a>
 <a href="https://revoframework.gitbook.io/revo/"><img src="https://img.shields.io/badge/docs-GITBOOK-blue.svg?style=flat-square" alt="Docs"></a>
-<a href="https://github.com/revoframework/Revo/issues"><img src="https://img.shields.io/github/issues/revoframework/Revo.svg?style=flat-square" alt="GitHub issues"></a>
+<a href="https://gitter.im/revoframework/Revo?utm_source=share-link&utm_medium=link&utm_campaign=share-link"><img src="https://img.shields.io/gitter/room/revoframework/Revo?color=4BB595&logo=gitter&&style=flat-square" alt="Gitter chat"></a>
 <a href="https://github.com/revoframework/Revo/pulls"><img src="https://img.shields.io/badge/PRs-welcome-green?style=flat-square" alt="PRs welcome"></a>
 <a href="https://github.com/revoframework/Revo/blob/develop/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="License"></a>
 </p>
@@ -19,17 +19,17 @@ Revo is an application framework for modern server C\#/.NET applications built w
 
 _Development of this framework is supported by company <a href="https://olify.io">Olify IO s.r.o.</a>_
 
-## Table of contents
+## Contents
 
-* [Home](#revo-framework)
-* [Features](#features)
-* [Super-short example](#show-me-how-it-looks)
-* [Getting started](#getting-started)
-* [Binaries](#binaries)
-* [Requirements](#requirements)
-* [License](#license)
+* 🏠 [Home](#revo-framework)
+* ⚡️ [Features](#features)
+* 👓 [Super-short example](#show-me-how-it-looks)
+* 🚀 [Getting started](#getting-started)
+* 📘 [Full documentation](https://docs.revoframework.net/)
+* 📦 [Packages](#packages)
+* 📑 [License](#license)
 
-## Features
+## ⚡️ Features
 
 The framework combines the concepts of event sourcing, CQRS and DDD to provide support for building applications that are scalable, maintainable, can work in distributed environments and are easy to integrate with outside world. As such, it takes some rather opinionated approaches on the design of certain parts of its architecture. Revo also offers other common features and infrastructure that is often necessary for building complete applications – for example, authorizations, validations, messaging, integrations, multi-tenancy or testing.
 Furthermore, its extensions implement other useful features like entity history change-tracking, auditing or user notifications.
@@ -78,7 +78,7 @@ Basic permission/role-based ACL for commands and queries, fine-grained row filte
 * **User notifications:** event-based, with different output channels (mail, etc.), aggregation, buffering, etc.
 * **.NET Core 3.0+, .NET Standard 2.0+ support (with integration for ASP.NET Core)**
 
-## Show me how it looks!
+## 👓 Show me how it looks!
 
 Super-short example of a simple application that can save tasks using event-sourced aggregates and then query them back from a RDBMS.
 
@@ -221,17 +221,18 @@ public class TaskQueryHandler : IQueryHandler<GetTodoQuery, IQueryable<TodoReadM
 }
 ```
 
-## Getting started
+## 🚀 Getting started
 
 If you are new to the framework, you can
  * begin with reading the quick walkthrough for the [**Simple TO-DOs example**](https://docs.revoframework.net/general/example-simple-to-dos-task-list-app) (a task list app)
  * or try exploring [~~**the other examples**~~](https://github.com/revoframework/Revo/tree/develop/Examples) (TODO!) and framework sources on Github.
  
-You can also start by reading the [**reference guide**](https://docs.revoframework.net/general/getting-started).
+You can also start by reading the 📘 [**reference guide**](https://docs.revoframework.net/general/getting-started).
 
-## Binaries
+## 📦 Packages
 
-Binaries are up for grabs in form of NuGet packages:
+Released version are available in form of NuGet packages.  
+There is also a separate channel for [**pre-release CI packages at MyGet**](https://www.myget.org/gallery/revoframework).
 
 <div style="width:100%";>
 <table border="0" cellpadding="0" cellspacing="0" style="float:left;">
@@ -331,14 +332,6 @@ Binaries are up for grabs in form of NuGet packages:
   </tr>
   <tr>
     <td>
-      Revo.AspNet
-    </td>
-    <td>
-      <a href="https://www.nuget.org/packages/Revo.AspNet/"><img src="https://img.shields.io/nuget/v/Revo.AspNet.svg" alt="NuGet package version"></a>
-    </td>
-  </tr>
-  <tr>
-    <td>
       Revo.Hangfire
     </td>
     <td>
@@ -398,16 +391,12 @@ Binaries are up for grabs in form of NuGet packages:
 
 Most applications will require at least **Revo.Core**, **Revo.DataAccess**, **Revo.Domain**, **Revo.Infrastructure** packages to get started with and then typically a platform package like **Revo.Platforms.AspNetCore** (ASP.NET Core platform implementation) and a data-access package like **Revo.EFCore** (for Entity Framework Core support).
 
-## Requirements
-
-The framework is written in C\# 7.1 and targets the .NET Standard 2.0 specification; some of its modules currently also use .NET Core 2.1 (ASP.NET Core) or .NET Framework 4.7.1 where needed \(e.g. Entity Framework 6 support\). Revo also makes a heavy use of the C\# async/await pattern and uses the TAP \(Task Asynchronous Pattern\) throughout its entire codebase \(i.e. _async all the way_\).
-
-## License
+## 📑 License
 
 > MIT License
 > 
-> Copyright (c) 2017-2018 Martin Zima<br>
-> Copyright (c) 2017-2018 ASP a.s.
+> Copyright (c) 2017-2020 Martin Zima<br>
+> Copyright (c) 2017-2020 Olify IO s.r.o.
 > 
 > Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 > 
