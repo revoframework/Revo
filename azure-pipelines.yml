@@ -31,4 +31,4 @@ steps:
 - task: Bash@3
   inputs:
     targetType: 'inline'
-    script: 'dotnet-cake --Target="CI" --Configuration="Release" --ProductionNuGetApiKey="$(NUGET_ORG_API_KEY)" --DevelopmentNuGetApiKey="$(MYGET_API_KEY)"'
+    script: 'dotnet-cake --Target="CI" --Configuration="Release" --ReleaseNuGetApiKey="$(NUGET_ORG_API_KEY)" --PreReleaseNuGetApiKey="$(MYGET_API_KEY)"'
