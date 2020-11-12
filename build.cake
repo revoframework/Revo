@@ -1,4 +1,6 @@
 #r "System.Xml"
+#tool nuget:?package=Codecov&version=1.12.3
+#addin nuget:?package=Cake.Codecov&version=0.9.1
 
 using System.Xml;
 
@@ -6,6 +8,16 @@ const string SolutionName = "Revo";
 
 const string ProductionNuGetSourceUrl = "https://api.nuget.org/v3/index.json";
 const string DevelopNuGetSourceUrl = "https://www.myget.org/F/revoframework/api/v2/package";
+
+readonly string SolutionDir = Context.Environment.WorkingDirectory.FullPath;
+readonly string SolutionFile = System.IO.Path.Combine(SolutionDir, SolutionName + ".sln");
+
+readonly string PackagesDir = System.IO.Path.Combine(SolutionDir, "build", "packages");
+readonly string ReportsDir = System.IO.Path.Combine(SolutionDir, "build", "reports");
+readonly string CoverageHtmlReportDir = System.IO.Path.Combine(ReportsDir, "coverage_html");
+
+readonly bool IsAzurePipelines = AzurePipelines.IsRunningOnAzurePipelines || AzurePipelines.IsRunningOnAzurePipelinesHosted;
+readonly bool IsCiBuild = IsAzurePipelines;
 
 string Target = Argument<string>("Target", "Default");
 
@@ -28,21 +40,13 @@ string PreReleaseNuGetApiKey = HasArgument("PreReleaseNuGetApiKey")
     ? Argument<string>("PreReleaseNuGetApiKey")
     : EnvironmentVariable("PRE_RELEASE_NUGET_API_KEY");
 
-var SolutionDir = Context.Environment.WorkingDirectory.FullPath;
-string SolutionFile => System.IO.Path.Combine(SolutionDir, SolutionName + ".sln");
-
-var PackagesDir = System.IO.Path.Combine(SolutionDir, "build", "packages");
-var ReportsDir = System.IO.Path.Combine(SolutionDir, "build", "reports");
-
-bool IsCiBuild = AzurePipelines.IsRunningOnAzurePipelines || AzurePipelines.IsRunningOnAzurePipelinesHosted;
-
 string Version = HasArgument("BuildVersion") ?
   Argument<string>("BuildVersion", null) :
   EnvironmentVariable("BUILD_VERSION");
 
 int? BuildNumber =
   HasArgument("BuildNumber") ? (int?) Argument<int>("BuildNumber") :
-  IsCiBuild ? AzurePipelines.Environment.Build.Id :
+  IsAzurePipelines ? AzurePipelines.Environment.Build.Id :
   EnvironmentVariable("BuildNumber") != null ? (int?) int.Parse(EnvironmentVariable("BuildNumber")) : null;
 
 bool IsReleaseBuild = false;
@@ -96,8 +100,8 @@ if (Version == null)
 
 Information($"{SolutionName} cake build script start");
 Information($"Build target: {Target}, version: {Version}, is CI build: {IsCiBuild}, "
-+ $"prod NuGet API key: {(string.IsNullOrWhiteSpace(ReleaseNuGetApiKey) ? "null" : "****")}, "
-+ $"dev NuGet API key: {(string.IsNullOrWhiteSpace(PreReleaseNuGetApiKey) ? "null" : "****")}");
++ $"release NuGet API key: {(string.IsNullOrWhiteSpace(ReleaseNuGetApiKey) ? "null" : "****")}, "
++ $"pre-release NuGet API key: {(string.IsNullOrWhiteSpace(PreReleaseNuGetApiKey) ? "null" : "****")}");
 
 if (IsCiBuild)
 {
@@ -108,7 +112,9 @@ Task("Default")
     .IsDependentOn("Pack");
 
 Task("CI")
-    .IsDependentOn("Push");
+    .IsDependentOn("PublishTestResults")
+    .IsDependentOn("PublishCodeCoverage")
+    .IsDependentOn("PushNuGet");
 
 Task("Clean")
   .WithCriteria(IsCleanEnabled)
@@ -177,6 +183,54 @@ Task("Test")
       });
   });
 
+Task("PublishTestResults")
+  .WithCriteria(IsAzurePipelines)
+  .IsDependentOn("Test")
+  .Does(() =>
+  {
+    var testResultFiles = GetFiles(System.IO.Path.Combine(ReportsDir, "**/*.trx")).ToArray();
+    if (testResultFiles.Length > 0)
+    {
+      // there is a bug when publishing test result files that have brackets in their filename
+      foreach (var testResultFile in testResultFiles)
+      {
+        if (testResultFile.GetFilename().ToString().Contains("[")
+          || testResultFile.GetFilename().ToString().Contains("]"))
+        {
+          var fileName = testResultFile.GetFilename().ToString()
+            .Replace("[", "_lb_")
+            .Replace("]", "_rb_");
+          var newPath = testResultFile.GetDirectory().CombineWithFilePath(fileName);
+          MoveFile(testResultFile, newPath);
+        }
+      }
+
+      testResultFiles = GetFiles(System.IO.Path.Combine(ReportsDir, "**/*.trx")).ToArray();
+      AzurePipelines.Commands.PublishTestResults(
+        new AzurePipelinesPublishTestResultsData()
+        {
+          Configuration = Configuration,
+          TestResultsFiles = testResultFiles,
+          TestRunner = AzurePipelinesTestRunnerType.VSTest
+        });
+    }
+  });
+
+Task("PublishCodeCoverage")
+  .WithCriteria(IsAzurePipelines)
+  .IsDependentOn("Test")
+  .Does(() =>
+  {
+    var coverageFiles = GetFiles(System.IO.Path.Combine(ReportsDir, "*/coverage.cobertura.xml"));
+
+    Codecov(
+      new CodecovSettings
+      {
+        Files = coverageFiles.Select(x => x.ToString()),
+        Build = Version
+      });
+  });
+
 Task("Pack")
   .WithCriteria(IsPackEnabled)
   .IsDependentOn("Test")
@@ -196,7 +250,7 @@ Task("Pack")
       });
   });
 
-Task("Push")
+Task("PushNuGet")
   .WithCriteria(IsPushEnabled)
   .IsDependentOn("Pack")
   .Does(() =>
@@ -227,7 +281,7 @@ Task("Push")
           ApiKey = ProductionNuGetSourceUrl,
           Interactive = !IsCiBuild,
           Source = ProductionNuGetSourceUrl
-        };);
+        });
     }
   });
 
