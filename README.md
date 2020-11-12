@@ -4,9 +4,10 @@
 </p>
 <p align="center">
 <a href="https://dev.azure.com/revoframework/Revo/_build?definitionId=1&view=runs"><img src="https://img.shields.io/azure-devops/build/revoframework/7ff8258b-dd3c-4007-9d06-7609742e93cf/1/develop?style=flat-square&logo=azure-pipelines" alt="Build status"></a>
+<a href="https://codecov.io/gh/revoframework/Revo"><img src="https://img.shields.io/codecov/c/github/revoframework/Revo?logo=codecov&style=flat-square" alt="Code coverage"></a>
 <a href="https://github.com/revoframework/Revo/releases"><img src="https://img.shields.io/github/release-date/revoframework/Revo?label=latest%20release&style=flat-square" alt="Latest release date"></a>
 <a href="https://www.nuget.org/packages?q=revo"><img src="https://img.shields.io/nuget/v/Revo.Core?logo=NuGet&style=flat-square" alt="NuGet packages"></a>
-<a href="https://www.myget.org/gallery/revoframework"><img src="https://img.shields.io/myget/revoframework/vpre/Revo.Core?label=nuget%20CI&logo=NuGet&style=flat-square" alt="CI NuGet packages at MyGet"></a>
+<a href="https://www.myget.org/gallery/revoframework"><img src="https://img.shields.io/myget/revoframework/vpre/Revo.Core?label=nuget%20CI&logo=NuGet&style=flat-square" alt="CI NuGet packages at MyGet"></a><br>
 <a href="https://revoframework.gitbook.io/revo/"><img src="https://img.shields.io/badge/docs-GITBOOK-blue.svg?style=flat-square" alt="Docs"></a>
 <a href="https://gitter.im/revoframework/Revo?utm_source=share-link&utm_medium=link&utm_campaign=share-link"><img src="https://img.shields.io/gitter/room/revoframework/Revo?color=4BB595&logo=gitter&&style=flat-square" alt="Gitter chat"></a>
 <a href="https://github.com/revoframework/Revo/pulls"><img src="https://img.shields.io/badge/PRs-welcome-green?style=flat-square" alt="PRs welcome"></a>

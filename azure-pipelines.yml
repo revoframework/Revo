@@ -23,11 +23,6 @@ steps:
     command: 'custom'
     custom: 'tool'
     arguments: 'update -g Cake.Tool --version 0.38.5'
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'custom'
-    custom: 'tool'
-    arguments: 'update -g dotnet-reportgenerator-globaltool --version 4.7.1'
 - task: Bash@3
   inputs:
     targetType: 'inline'
