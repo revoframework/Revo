@@ -20,13 +20,13 @@ string Configuration = HasArgument("Configuration")
     ? Argument<string>("Configuration")
     : EnvironmentVariable("Configuration") ?? "Release";
 
-string ProductionNuGetApiKey = HasArgument("ProductionNuGetApiKey")
-    ? Argument<string>("ProductionNuGetApiKey")
-    : EnvironmentVariable("PRODUCTION_NUGET_API_KEY");
+string ReleaseNuGetApiKey = HasArgument("ReleaseNuGetApiKey")
+    ? Argument<string>("ReleaseNuGetApiKey")
+    : EnvironmentVariable("RELEASE_NUGET_API_KEY");
 
-string DevelopmentNuGetApiKey = HasArgument("DevelopmentNuGetApiKey")
-    ? Argument<string>("DevelopmentNuGetApiKey")
-    : EnvironmentVariable("DEVELOPMENT_NUGET_API_KEY");
+string PreReleaseNuGetApiKey = HasArgument("PreReleaseNuGetApiKey")
+    ? Argument<string>("PreReleaseNuGetApiKey")
+    : EnvironmentVariable("PRE_RELEASE_NUGET_API_KEY");
 
 var SolutionDir = Context.Environment.WorkingDirectory.FullPath;
 string SolutionFile => System.IO.Path.Combine(SolutionDir, SolutionName + ".sln");
@@ -96,8 +96,8 @@ if (Version == null)
 
 Information($"{SolutionName} cake build script start");
 Information($"Build target: {Target}, version: {Version}, is CI build: {IsCiBuild}, "
-+ $"prod NuGet API key: {(string.IsNullOrWhiteSpace(ProductionNuGetApiKey) ? "null" : "****")}, "
-+ $"dev NuGet API key: {(string.IsNullOrWhiteSpace(DevelopmentNuGetApiKey) ? "null" : "****")}");
++ $"prod NuGet API key: {(string.IsNullOrWhiteSpace(ReleaseNuGetApiKey) ? "null" : "****")}, "
++ $"dev NuGet API key: {(string.IsNullOrWhiteSpace(PreReleaseNuGetApiKey) ? "null" : "****")}");
 
 if (IsCiBuild)
 {
@@ -201,39 +201,34 @@ Task("Push")
   .IsDependentOn("Pack")
   .Does(() =>
   {
-    DotNetCoreNuGetPushSettings pushSettings;
+    if (string.IsNullOrWhiteSpace(PreReleaseNuGetApiKey))
+    {
+      throw new Exception("Error: PreReleaseNuGetApiKey is required to push pre-release NuGet packages");
+    }
+
+    DotNetCoreNuGetPush(System.IO.Path.Combine(PackagesDir, "*.nupkg"),
+      new DotNetCoreNuGetPushSettings
+      {
+        ApiKey = PreReleaseNuGetApiKey,
+        Interactive = !IsCiBuild,
+        Source = DevelopNuGetSourceUrl
+      });
 
     if (IsReleaseBuild)
     {
       if (string.IsNullOrWhiteSpace(ProductionNuGetSourceUrl))
       {
-        throw new Exception("Error: ProductionNuGetSourceUrl is required to push NuGet packages");
+        throw new Exception("Error: ProductionNuGetSourceUrl is required to push release NuGet packages");
       }
 
-      pushSettings = new DotNetCoreNuGetPushSettings
-      {
-        ApiKey = ProductionNuGetSourceUrl,
-        Interactive = !IsCiBuild,
-        Source = ProductionNuGetSourceUrl
-      };
+      DotNetCoreNuGetPush(System.IO.Path.Combine(PackagesDir, "*.nupkg"),
+        new DotNetCoreNuGetPushSettings
+        {
+          ApiKey = ProductionNuGetSourceUrl,
+          Interactive = !IsCiBuild,
+          Source = ProductionNuGetSourceUrl
+        };);
     }
-    else
-    {
-      if (string.IsNullOrWhiteSpace(DevelopmentNuGetApiKey))
-      {
-        throw new Exception("Error: DevelopmentNuGetApiKey is required to push NuGet packages");
-      }
-
-      pushSettings = new DotNetCoreNuGetPushSettings
-      {
-        ApiKey = DevelopmentNuGetApiKey,
-        Interactive = !IsCiBuild,
-        Source = DevelopNuGetSourceUrl
-      };
-    }
-
-    DotNetCoreNuGetPush(System.IO.Path.Combine(PackagesDir, "*.nupkg"),
-      pushSettings);
   });
 
 RunTarget(Target);
