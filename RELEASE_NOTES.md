@@ -1,5 +1,10 @@
 # RELEASE NOTES
 
+## [1.18.1] - 2020-11-15
+
+### Fixed
+- fixed publishing of NuGet package symbols: now using separate snupkg for symbols
+
 ## [1.18.0] - 2020-11-16
 
 ### Added

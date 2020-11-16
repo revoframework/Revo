@@ -239,13 +239,12 @@ Task("Pack")
     DotNetCorePack(SolutionFile,
       new DotNetCorePackSettings
       {
-        ArgumentCustomization = args => args.Append($"/p:Version={Version}"),
+        ArgumentCustomization = args => args
+          .Append($"/p:Version={Version}"),
         Configuration = Configuration,
         OutputDirectory = PackagesDir,
         NoBuild = true,
         NoRestore = true,
-        IncludeSource = true,
-        IncludeSymbols = true,
         Verbosity = DotNetCoreVerbosity.Minimal
       });
   });
