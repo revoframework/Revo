@@ -1,6 +1,6 @@
 # RELEASE NOTES
 
-## [1.18.0] - 2020-11-10
+## [1.18.0] - 2020-11-16
 
 ### Added
 - support for .NET 5.0, ASP.NET Core 5.0 and EF Core 5.0 (supporting both 3.1 and 5.0 versions now)
