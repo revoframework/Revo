@@ -7,7 +7,7 @@ using System.Xml;
 const string SolutionName = "Revo";
 
 const string RelaseNuGetSourceUrl = "https://api.nuget.org/v3/index.json";
-const string PreRelaseNuGetSourceUrl = "https://www.myget.org/F/revoframework/api/v2/package";
+const string PreRelaseNuGetSourceUrl = "https://www.myget.org/F/revoframework/api/v3/index.json";
 
 readonly string SolutionDir = Context.Environment.WorkingDirectory.FullPath;
 readonly string SolutionFile = System.IO.Path.Combine(SolutionDir, SolutionName + ".sln");
