@@ -6,8 +6,8 @@ using System.Xml;
 
 const string SolutionName = "Revo";
 
-const string ProductionNuGetSourceUrl = "https://api.nuget.org/v3/index.json";
-const string DevelopNuGetSourceUrl = "https://www.myget.org/F/revoframework/api/v2/package";
+const string RelaseNuGetSourceUrl = "https://api.nuget.org/v3/index.json";
+const string PreRelaseNuGetSourceUrl = "https://www.myget.org/F/revoframework/api/v2/package";
 
 readonly string SolutionDir = Context.Environment.WorkingDirectory.FullPath;
 readonly string SolutionFile = System.IO.Path.Combine(SolutionDir, SolutionName + ".sln");
@@ -265,22 +265,22 @@ Task("PushNuGet")
       {
         ApiKey = PreReleaseNuGetApiKey,
         Interactive = !IsCiBuild,
-        Source = DevelopNuGetSourceUrl
+        Source = PreRelaseNuGetSourceUrl
       });
 
     if (IsReleaseBuild)
     {
-      if (string.IsNullOrWhiteSpace(ProductionNuGetSourceUrl))
+      if (string.IsNullOrWhiteSpace(RelaseNuGetSourceUrl))
       {
-        throw new Exception("Error: ProductionNuGetSourceUrl is required to push release NuGet packages");
+        throw new Exception("Error: RelaseNuGetSourceUrl is required to push release NuGet packages");
       }
 
       DotNetCoreNuGetPush(System.IO.Path.Combine(PackagesDir, "*.nupkg"),
         new DotNetCoreNuGetPushSettings
         {
-          ApiKey = ProductionNuGetSourceUrl,
+          ApiKey = ReleaseNuGetApiKey,
           Interactive = !IsCiBuild,
-          Source = ProductionNuGetSourceUrl
+          Source = RelaseNuGetSourceUrl
         });
     }
   });
