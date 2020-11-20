@@ -92,7 +92,7 @@ if (Version == null)
   }
   else
   {
-    versionSuffix += $"-local{DateTime.Now.ToString("yyMMdd")}";
+    versionSuffix += $"-local{DateTime.Now.ToString("yyMMdd-HHmmss")}";
   }
 
   Version = $"{versionPrefix}{versionSuffix}";

@@ -4,3 +4,4 @@ obj/
 .cake-tools/
 build/
 *.user
+build-local.ps1
