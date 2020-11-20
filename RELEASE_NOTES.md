@@ -1,6 +1,11 @@
 # RELEASE NOTES
 
-## [1.18.1] - 2020-11-15
+## [1.18.2] - 2020-11-20
+
+### Fixed
+- Permission constructor now correctly accepts objects as contextId and resourceId  (in accordance with change from 1.18.0)
+
+## [1.18.1] - 2020-11-16
 
 ### Fixed
 - fixed publishing of NuGet package symbols: now using separate snupkg for symbols

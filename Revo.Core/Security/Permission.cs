@@ -6,14 +6,14 @@ namespace Revo.Core.Security
 {
     public class Permission : ValueObject<Permission>
     {
-        public Permission(PermissionType permissionType, string resourceId, string contextId)
+        public Permission(PermissionType permissionType, object resourceId, object contextId)
         {
             PermissionTypeId = permissionType.Id;
             ResourceId = resourceId;
             ContextId = contextId;
         }
 
-        public Permission(Guid permissionTypeId, string resourceId, string contextId)
+        public Permission(Guid permissionTypeId, object resourceId, object contextId)
         {
             PermissionTypeId = permissionTypeId;
             ResourceId = resourceId;
