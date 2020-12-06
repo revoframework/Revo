@@ -7,9 +7,9 @@ namespace Revo.Infrastructure.Tenancy
 {
     public class TenantRepositoryFilter : IRepositoryFilter
     {
-        private readonly ITenantContext tenantContext;
+        private readonly Lazy<ITenantContext> tenantContext;
 
-        public TenantRepositoryFilter(ITenantContext tenantContext)
+        public TenantRepositoryFilter(Lazy<ITenantContext> tenantContext)
         {
             this.tenantContext = tenantContext;
         }
@@ -31,7 +31,7 @@ namespace Revo.Infrastructure.Tenancy
             ITenantOwned tenantOwned = result as ITenantOwned;
             if (tenantOwned != null)
             {
-                Guid? tenantId = tenantContext.Tenant?.Id;
+                Guid? tenantId = tenantContext.Value.Tenant?.Id;
                 if (tenantOwned.TenantId != null
                     && (!NullTenantCanAccessOtherTenantsData || tenantId != null)
                     && tenantOwned.TenantId != tenantId)
@@ -48,7 +48,7 @@ namespace Revo.Infrastructure.Tenancy
             ITenantOwned tenantOwned = added as ITenantOwned;
             if (tenantOwned != null)
             {
-                Guid? tenantId = tenantContext.Tenant?.Id;
+                Guid? tenantId = tenantContext.Value.Tenant?.Id;
                 if (tenantOwned.TenantId != null
                     && (!NullTenantCanAccessOtherTenantsData || tenantId != null)
                     && tenantOwned.TenantId != tenantId)
@@ -64,7 +64,7 @@ namespace Revo.Infrastructure.Tenancy
             ITenantOwned tenantOwned = deleted as ITenantOwned;
             if (tenantOwned != null)
             {
-                Guid? tenantId = tenantContext.Tenant?.Id;
+                Guid? tenantId = tenantContext.Value.Tenant?.Id;
                 if (tenantOwned.TenantId != null
                     && (!NullTenantCanAccessOtherTenantsData || tenantId != null)
                     && tenantOwned.TenantId != tenantId)
@@ -80,7 +80,7 @@ namespace Revo.Infrastructure.Tenancy
             ITenantOwned tenantOwned = modified as ITenantOwned;
             if (tenantOwned != null)
             {
-                Guid? tenantId = tenantContext.Tenant?.Id;
+                Guid? tenantId = tenantContext.Value.Tenant?.Id;
                 if (tenantOwned.TenantId != null
                     && (!NullTenantCanAccessOtherTenantsData || tenantId != null)
                     && tenantOwned.TenantId != tenantId)
@@ -93,7 +93,7 @@ namespace Revo.Infrastructure.Tenancy
 
         private IQueryable<T> DoFilterResults<T>(IQueryable<T> results) where T : class, ITenantOwned
         {
-            Guid? tenantId = tenantContext.Tenant?.Id;
+            Guid? tenantId = tenantContext.Value.Tenant?.Id;
             if (tenantId == null && NullTenantCanAccessOtherTenantsData)
             {
                 return results;

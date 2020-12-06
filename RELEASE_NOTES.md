@@ -1,5 +1,10 @@
 # RELEASE NOTES
 
+## [1.19.0] - 2020-12-06
+
+### Change
+- breaking change: TenantRepositoryFilter gets injected always, but uses now only Lazy<ITenantContext> - fixes issue when first request didn't have the filter applied (hint: use ExcludeFilters method when implementing a custom ITenantProvider)
+
 ## [1.18.2] - 2020-11-20
 
 ### Fixed
