@@ -1,4 +1,5 @@
-﻿using Revo.Core.Tenancy;
+﻿using Revo.Core.Core;
+using Revo.Core.Tenancy;
 using Revo.Domain.Tenancy;
 
 namespace Revo.Infrastructure.Tenancy

@@ -24,7 +24,6 @@ namespace Revo.Infrastructure.Tenancy
             {
                 Bind<IRepositoryFilter>()
                     .To<TenantRepositoryFilter>()
-                    .WhenNoAncestorMatches(ctx => typeof(ITenantProvider).IsAssignableFrom(ctx.Request.Service))
                     .InTransientScope()
                     .WithPropertyValue(nameof(TenantRepositoryFilter.NullTenantCanAccessOtherTenantsData), configuration.NullTenantCanAccessOtherTenantsData);
             }

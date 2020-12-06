@@ -39,7 +39,7 @@ namespace Revo.Infrastructure.Tests.Tenancy
 
             tenant = Substitute.For<ITenant>();
 
-            sut = new TenantRepositoryFilter(tenantContext);
+            sut = new TenantRepositoryFilter(new Lazy<ITenantContext>(() => tenantContext));
         }
 
         [Fact]
