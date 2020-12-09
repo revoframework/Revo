@@ -10,10 +10,18 @@ namespace Revo.Infrastructure.Security.Commands
     public class EntityQueryAuthorizer : IEntityQueryAuthorizer
     {
         private readonly IEntityQueryFilterFactory entityQueryFilterFactory;
+        private readonly ICommandContext commandContext;
 
-        public EntityQueryAuthorizer(IEntityQueryFilterFactory entityQueryFilterFactory)
+        public EntityQueryAuthorizer(IEntityQueryFilterFactory entityQueryFilterFactory, ICommandContext commandContext)
         {
             this.entityQueryFilterFactory = entityQueryFilterFactory;
+            this.commandContext = commandContext;
+        }
+
+        public Task<IQueryable<T>> AuthorizeQueryAsync<T, TResult>(IQueryable<T> results, Expression<Func<T, TResult>> authorizedEntity)
+        {
+            var command = commandContext.CurrentCommand;
+            return AuthorizeQueryAsync(results, authorizedEntity, command);
         }
 
         public async Task<IQueryable<T>> AuthorizeQueryAsync<T, TResult>(IQueryable<T> results,
@@ -23,7 +31,12 @@ namespace Revo.Infrastructure.Security.Commands
 
             foreach (var filter in entityQueryFilterFactory.GetEntityQueryFilters<TResult>())
             {
-                var filterExpression = await filter.FilterAsync(command);
+                var filterExpression = await filter.FilterAsync<TResult>(command);
+
+                if (filterExpression == null)
+                { 
+                    continue;
+                }
 
                 var tParam = Expression.Parameter(typeof(T), "__x");
                 var tResult = Expression.Invoke(authorizedEntity, tParam);

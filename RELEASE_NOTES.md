@@ -2,6 +2,12 @@
 
 ## [1.20.0] - 2020-??-??
 
+### Added
+- IEntityQueryFilter<TBase>.FilterAsync<T> overload without command (just takes the current one)
+
+### Change
+- IEntityQueryFilter<TBase>.FilterAsync<T> filter is now generic to enable easier filtering for derived entity types
+
 ## [1.19.0] - 2020-12-06
 
 ### Change
