@@ -24,6 +24,7 @@ namespace Revo.EFCore.DataAccess.Entities
         }
 
         public IEFCoreDatabaseAccess DatabaseAccess { get; }
+
         public IEnumerable<IRepositoryFilter> DefaultFilters => repositoryFilters;
 
         public void Attach<T>(T entity) where T : class
@@ -238,6 +239,18 @@ namespace Revo.EFCore.DataAccess.Entities
         public Task<T[]> FindManyAsync<T>(CancellationToken cancellationToken, params Guid[] ids) where T : class, IHasId<Guid>
         {
             return FindManyAsync<T, Guid>(cancellationToken, ids);
+        }
+
+        public IQueryable<T> FromSqlInterpolated<T>(FormattableString sql) where T : class
+        {
+            var results = DatabaseAccess.FromSqlInterpolated<T>(sql);
+            return FilterResults(results);
+        }
+
+        public IQueryable<T> FromSqlRaw<T>(string sql, params object[] parameters) where T : class
+        {
+            var results = DatabaseAccess.FromSqlRaw<T>(sql, parameters);
+            return FilterResults(results);
         }
 
         public Task<bool> AnyAsync<T>(IQueryable<T> queryable, CancellationToken cancellationToken = default(CancellationToken))
