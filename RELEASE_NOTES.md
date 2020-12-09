@@ -3,6 +3,7 @@
 ## [1.20.0] - 2020-??-??
 
 ### Added
+- automatic queryable injection + helpers in EF Core provider for easier entity authorization (default enabled)
 - IEntityQueryFilter<TBase>.FilterAsync<T> overload without command (just takes the current one)
 
 ### Change

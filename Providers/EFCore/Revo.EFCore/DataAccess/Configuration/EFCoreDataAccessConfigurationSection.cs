@@ -25,6 +25,13 @@ namespace Revo.EFCore.DataAccess.Configuration
         public bool IsActive { get; set; }
         public bool UseAsPrimaryRepository { get; set; }
         public bool EnableMigrationProvider { get; set; } = true;
+
+        /// <summary>
+        /// This registers a custom EntityQueryProvider which enables certain Revo features.
+        /// This is required to use e.g. <see cref="Security.AuthorizationQueryableExtensions"/>.
+        /// </summary>
+        public bool EnableCustomQueryProvider { get; set; } = true;
+
         public IReadOnlyCollection<Func<IContext, IEFCoreConvention>> Conventions => conventions;
         public Action<DbContextOptionsBuilder> Configurer { get; set; }
 
