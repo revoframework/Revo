@@ -8,6 +8,7 @@ using Revo.EFCore.DataAccess.Configuration;
 using Revo.EFCore.DataAccess.Conventions;
 using Revo.EFCore.DataAccess.Entities;
 using Revo.EFCore.DataAccess.Model;
+using Revo.EFCore.DataAccess.Query;
 
 namespace Revo.EFCore.DataAccess
 {
@@ -65,6 +66,11 @@ namespace Revo.EFCore.DataAccess
                 .InSingletonScope();
             
             Bind<EFCoreDataAccessConfigurationSection>().ToConstant(configurationSection);
+            
+            if (configurationSection.EnableCustomQueryProvider)
+            {
+                Bind<IEFCoreConfigurer>().To<CustomQueryProviderConfigurer>();
+            }
 
             foreach (var conventionFunc in configurationSection.Conventions)
             {

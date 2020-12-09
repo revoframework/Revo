@@ -10,12 +10,17 @@ Entity Framework 6 (EF6) data access and infrastructure services.</Description>
   </PropertyGroup>
   
   <ItemGroup>
+    <Compile Remove="Properties\**" />
+    <EmbeddedResource Remove="Properties\**" />
+    <None Remove="Properties\**" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <PackageReference Include="EntityFramework" Version="6.4.4" />
   </ItemGroup>
   
   <ItemGroup>
     <Folder Include="Configuration\" />
-    <Folder Include="Properties\" />
   </ItemGroup>
   
   <ItemGroup>

@@ -1,10 +1,11 @@
 ﻿using Ninject.Modules;
 using Revo.Core.Core;
+using Revo.DataAccess.Entities;
 using Revo.EFCore.Configuration;
-using Revo.EFCore.Repositories;
+using Revo.EFCore.Security;
 using Revo.Infrastructure.Repositories;
 
-namespace Revo.EFCore
+namespace Revo.EFCore.Repositories
 {
     [AutoLoadModule(false)]
     public class EFCoreRepositoriesModule : NinjectModule

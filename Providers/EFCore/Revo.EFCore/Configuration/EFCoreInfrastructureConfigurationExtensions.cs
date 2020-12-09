@@ -4,6 +4,7 @@ using Revo.EFCore.DataAccess.Configuration;
 using Revo.EFCore.Events;
 using Revo.EFCore.EventStores;
 using Revo.EFCore.Projections;
+using Revo.EFCore.Repositories;
 using Revo.EFCore.Sagas;
 using Revo.Infrastructure;
 

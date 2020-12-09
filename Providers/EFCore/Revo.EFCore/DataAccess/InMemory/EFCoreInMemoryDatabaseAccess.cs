@@ -12,27 +12,28 @@ namespace Revo.EFCore.DataAccess.InMemory
         {
         }
 
-        public IReadOnlyDictionary<string, DbContext> DbContexts { get; }
+        public virtual IReadOnlyDictionary<string, DbContext> DbContexts { get; }
+
         public void ClearDbContexts()
         {
         }
 
-        public IQueryable<T> FromSqlInterpolated<T>(FormattableString sql) where T : class
+        public virtual IQueryable<T> FromSqlInterpolated<T>(FormattableString sql) where T : class
         {
             throw new NotImplementedException();
         }
 
-        public IQueryable<T> FromSqlRaw<T>(string sql, params object[] parameters) where T : class
+        public virtual IQueryable<T> FromSqlRaw<T>(string sql, params object[] parameters) where T : class
         {
             throw new NotImplementedException();
         }
 
-        public DbContext GetDbContext(string schemaSpace)
+        public virtual DbContext GetDbContext(string schemaSpace)
         {
             throw new NotImplementedException();
         }
 
-        public DbContext GetDbContext(Type entityType)
+        public virtual DbContext GetDbContext(Type entityType)
         {
             throw new NotImplementedException();
         }
