@@ -9,8 +9,8 @@ namespace Revo.Infrastructure.Security.Commands
     {
     }
 
-    public interface IEntityQueryFilter<T> : IEntityQueryFilter
+    public interface IEntityQueryFilter<in TBase> : IEntityQueryFilter
     {
-        Task<Expression<Func<T, bool>>> FilterAsync(ICommandBase query);
+        Task<Expression<Func<T, bool>>> FilterAsync<T>(ICommandBase query) where T : TBase;
     }
 }
