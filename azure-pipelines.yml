@@ -27,3 +27,9 @@ steps:
   inputs:
     targetType: 'inline'
     script: 'dotnet-cake --Target="CI" --Configuration="Release" --ReleaseNuGetApiKey="$(NUGET_ORG_API_KEY)" --PreReleaseNuGetApiKey="$(GITHUB_API_KEY)"'
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'push'
+    packagesToPush: './build/packages/*.nupkg'
+    nuGetFeedType: 'internal'
+    publishVstsFeed: '7ff8258b-dd3c-4007-9d06-7609742e93cf/f4e837d9-074e-4374-afa0-7366d34fe578'

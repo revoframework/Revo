@@ -7,7 +7,7 @@
 <a href="https://codecov.io/gh/revoframework/Revo"><img src="https://img.shields.io/codecov/c/github/revoframework/Revo?logo=codecov&style=flat-square" alt="Code coverage"></a>
 <a href="https://github.com/revoframework/Revo/releases"><img src="https://img.shields.io/github/release-date/revoframework/Revo?label=latest%20release&style=flat-square" alt="Latest release date"></a>
 <a href="https://www.nuget.org/packages?q=revo"><img src="https://img.shields.io/nuget/v/Revo.Core?logo=NuGet&style=flat-square" alt="NuGet packages"></a>
-<a href="https://github.com/orgs/revoframework/packages?repo_name=Revo"><img src="https://img.shields.io/badge/nuget%20CI-source-blue?logo=NuGet&style=flat-square" alt="CI NuGet packages at GitHub"></a><br>
+<a href="https://pkgs.dev.azure.com/revoframework/_packaging/revoframework/nuget/v3/index.json"><img src="https://img.shields.io/badge/nuget%20CI-source-blue?logo=NuGet&style=flat-square" alt="CI NuGet feed at Azure"></a><br>
 <a href="https://revoframework.gitbook.io/revo/"><img src="https://img.shields.io/badge/docs-GITBOOK-blue.svg?style=flat-square" alt="Docs"></a>
 <a href="https://gitter.im/revoframework/Revo?utm_source=share-link&utm_medium=link&utm_campaign=share-link"><img src="https://img.shields.io/gitter/room/revoframework/Revo?color=4BB595&logo=gitter&&style=flat-square" alt="Gitter chat"></a>
 <a href="https://github.com/revoframework/Revo/pulls"><img src="https://img.shields.io/badge/PRs-welcome-green?style=flat-square" alt="PRs welcome"></a>
@@ -233,7 +233,7 @@ You can also start by reading the 📘 [**reference guide**](https://docs.revofr
 ## 📦 Packages
 
 Released version are available in form of NuGet packages.  
-There is also a separate channel for [**pre-release CI packages at GitHub packages**](https://github.com/orgs/revoframework/packages?repo_name=Revo).
+There is also a separate [**pre-release CI package feed at Azure**](https://pkgs.dev.azure.com/revoframework/_packaging/revoframework/nuget/v3/index.json).
 
 <div style="width:100%";>
 <table border="0" cellpadding="0" cellspacing="0" style="float:left;">
