@@ -3,10 +3,12 @@
 ## [1.20.0] - 2020-??-??
 
 ### Added
-- automatic queryable injection + helpers in EF Core provider for easier entity authorization (default enabled)
+- custom query provider + helpers in EF Core provider for easier query authorization (default enabled by EnableCustomQueryProvider) with AuthorizationQueryableExtensions
+- support for custom EF Core query translation plugins (IQueryTranslationPlugin)
+- IEFCoreReadRepository.FromSqlInterpolated<T> and FromSqlRaw<T> (which apply repository filters, unlike existing IEFCoreDatabaseAccess methods)
 - IEntityQueryFilter<TBase>.FilterAsync<T> overload without command (just takes the current one)
 
-### Change
+### Changed
 - IEntityQueryFilter<TBase>.FilterAsync<T> filter is now generic to enable easier filtering for derived entity types
 
 ## [1.19.0] - 2020-12-06
