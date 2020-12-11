@@ -6,7 +6,7 @@
  
   <PropertyGroup>
     <Authors>Revo Framework</Authors>
-    <Copyright>Copyright (c) 2017-2018 Martin Zima &amp; ASP a.s.</Copyright>
+    <Copyright>Copyright (c) 2017-2020 Martin Zima</Copyright>
     <PackageIconUrl>https://raw.githubusercontent.com/revoframework/Revo/develop/res/revo-nuget-64.png</PackageIconUrl>
     <PackageLicenseUrl>https://raw.githubusercontent.com/revoframework/Revo/develop/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/revoframework/Revo</PackageProjectUrl>
