@@ -32,6 +32,12 @@ namespace Revo.EFCore.DataAccess.Configuration
         /// </summary>
         public bool EnableCustomQueryProvider { get; set; } = true;
 
+        /// <summary>
+        /// This registers a custom IQueryTranslationPreprocessor implementation which makes it possible
+        /// to register own <see cref="Query.IQueryTranslationPlugin"/>.
+        /// </summary>
+        public bool EnableCustomQueryTranslationPreprocessor { get; set; } = true;
+
         public IReadOnlyCollection<Func<IContext, IEFCoreConvention>> Conventions => conventions;
         public Action<DbContextOptionsBuilder> Configurer { get; set; }
 

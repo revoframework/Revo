@@ -72,6 +72,11 @@ namespace Revo.EFCore.DataAccess
                 Bind<IEFCoreConfigurer>().To<CustomQueryProviderConfigurer>();
             }
 
+            if (configurationSection.EnableCustomQueryTranslationPreprocessor)
+            {
+                Bind<IEFCoreConfigurer>().To<CustomQueryTranslationConfigurer>();
+            }
+
             foreach (var conventionFunc in configurationSection.Conventions)
             {
                 Bind<IEFCoreConvention>().ToMethod(conventionFunc);
