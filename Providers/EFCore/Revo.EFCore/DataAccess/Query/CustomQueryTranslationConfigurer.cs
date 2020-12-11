@@ -8,8 +8,8 @@ namespace Revo.EFCore.DataAccess.Query
     {
         public void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-           // optionsBuilder
-           //     .ReplaceService<IQueryTranslationPreprocessorFactory, CustomQueryTranslationPreprocessorFactory>();
+            optionsBuilder
+                .ReplaceService<IQueryTranslationPreprocessorFactory, CustomQueryTranslationPreprocessorFactory>();
         }
     }
 }
