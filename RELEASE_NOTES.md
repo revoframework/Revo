@@ -1,6 +1,6 @@
 # RELEASE NOTES
 
-## [1.20.0] - 2020-??-??
+## [1.20.0] - 2020-12-19
 
 ### Added
 - custom query provider + helpers in EF Core provider for easier query authorization (default enabled by EnableCustomQueryProvider) with AuthorizationQueryableExtensions
