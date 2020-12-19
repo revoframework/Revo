@@ -1,17 +1,19 @@
-﻿using Microsoft.EntityFrameworkCore.Query;
+﻿using System.Linq;
+using Microsoft.EntityFrameworkCore.Query;
+using Revo.Core.Core;
 
 namespace Revo.EFCore.DataAccess.Query
 {
     public class CustomQueryTranslationPreprocessorFactory : IQueryTranslationPreprocessorFactory
     {
-        private readonly IQueryTranslationPlugin[] translationPlugins;
+        private readonly IServiceLocator serviceLocator;
 
         public CustomQueryTranslationPreprocessorFactory(QueryTranslationPreprocessorDependencies dependencies,
-            RelationalQueryTranslationPreprocessorDependencies relationalDependencies, IQueryTranslationPlugin[] translationPlugins)
+            RelationalQueryTranslationPreprocessorDependencies relationalDependencies, IServiceLocator serviceLocator)
         {
             Dependencies = dependencies;
             RelationalDependencies = relationalDependencies;
-            this.translationPlugins = translationPlugins;
+            this.serviceLocator = serviceLocator;
         }
 
         protected QueryTranslationPreprocessorDependencies Dependencies { get; }
@@ -19,6 +21,10 @@ namespace Revo.EFCore.DataAccess.Query
         protected RelationalQueryTranslationPreprocessorDependencies RelationalDependencies;
 
         public QueryTranslationPreprocessor Create(QueryCompilationContext queryCompilationContext)
-            => new CustomQueryTranslationPreprocessor(Dependencies, RelationalDependencies, queryCompilationContext, translationPlugins);
+        {
+            var translationPlugins = serviceLocator.GetAll<IQueryTranslationPlugin>();
+            return new CustomQueryTranslationPreprocessor(Dependencies, RelationalDependencies,
+                queryCompilationContext,  translationPlugins.ToArray());
+        }
     }
 }
