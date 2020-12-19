@@ -1,5 +1,10 @@
 # RELEASE NOTES
 
+## [1.20.1] - 2020-12-19
+
+### Fixed
+- missing IQueryTranslationPlugin in EF Core's internal DI container
+
 ## [1.20.0] - 2020-12-19
 
 ### Added
