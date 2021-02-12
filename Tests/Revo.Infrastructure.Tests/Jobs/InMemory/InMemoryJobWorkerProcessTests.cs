@@ -35,7 +35,7 @@ namespace Revo.Infrastructure.Tests.Jobs.InMemory
             sut.EnqueueJob(job, (j, e) => { });
             sut.OnApplicationStopping();
 
-            jobRunner.Received(1).RunJobAsync(job);
+            jobRunner.Received(1).RunJobAsync(job, CancellationToken.None);
         }
 
         [Fact]
@@ -77,9 +77,9 @@ namespace Revo.Infrastructure.Tests.Jobs.InMemory
 
             Lazy<Task> job3Task = new Lazy<Task>(Job3);
 
-            jobRunner.RunJobAsync(job1).Returns(ci => job1Task.Value);
-            jobRunner.RunJobAsync(job2).Returns(ci => job2Task.Value);
-            jobRunner.RunJobAsync(job3).Returns(ci => job3Task.Value);
+            jobRunner.RunJobAsync(job1, CancellationToken.None).Returns(ci => job1Task.Value);
+            jobRunner.RunJobAsync(job2, CancellationToken.None).Returns(ci => job2Task.Value);
+            jobRunner.RunJobAsync(job3, CancellationToken.None).Returns(ci => job3Task.Value);
 
             sut.OnApplicationStarted();
             sut.EnqueueJob(job1, (j, e) => { });
@@ -109,7 +109,7 @@ namespace Revo.Infrastructure.Tests.Jobs.InMemory
             var job = new Job1();
 
             var exception = new Exception("Test exception");
-            jobRunner.RunJobAsync(job).Throws(exception);
+            jobRunner.RunJobAsync(job, CancellationToken.None).Throws(exception);
 
             var errorHandler = Substitute.For<Action<IJob, Exception>>();
 
