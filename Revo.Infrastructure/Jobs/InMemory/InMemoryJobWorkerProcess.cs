@@ -71,7 +71,7 @@ namespace Revo.Infrastructure.Jobs.InMemory
                     {
                         try
                         {
-                            await jobRunner.RunJobAsync(enqueuedJob.Job);
+                            await jobRunner.RunJobAsync(enqueuedJob.Job, CancellationToken.None);
                             runningTasks.TryRemove(task, out _);
                         }
                         catch (Exception e)

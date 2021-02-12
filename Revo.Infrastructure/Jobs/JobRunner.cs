@@ -14,12 +14,11 @@ namespace Revo.Infrastructure.Jobs
             this.serviceLocator = serviceLocator;
         }
 
-        public Task RunJobAsync(IJob job)
+        public Task RunJobAsync(IJob job, CancellationToken cancellationToken)
         {
             Type jobHandlerType = typeof(IJobHandler<>).MakeGenericType(job.GetType());
             object jobHandler = serviceLocator.Get(jobHandlerType);
-            var handleAsyncMethod = jobHandler.GetType().GetMethod(nameof(IJobHandler<IJob>.HandleAsync));
-            var cancellationToken = new CancellationToken();
+            var handleAsyncMethod = jobHandlerType.GetMethod(nameof(IJobHandler<IJob>.HandleAsync));
             return (Task)handleAsyncMethod.Invoke(jobHandler, new object[] {job, cancellationToken});
         }
     }
