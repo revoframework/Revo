@@ -1,5 +1,10 @@
 # RELEASE NOTES
 
+## [1.20.2] - 2020-02-12
+
+### Fixed
+- JobRunner was causing AmbiguousMatchException when a job handler class implemented more IJobHandler interfaces
+
 ## [1.20.1] - 2020-12-19
 
 ### Fixed
