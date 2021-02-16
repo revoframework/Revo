@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using McMaster.NETCore.Plugins;
+﻿using McMaster.NETCore.Plugins;
 using Microsoft.Data.Sqlite;
 using Ninject;
 using Ninject.Modules;
@@ -14,6 +6,14 @@ using NLog;
 using Npgsql;
 using Revo.Infrastructure.DataAccess.Migrations;
 using Revo.Infrastructure.DataAccess.Migrations.Providers;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Reflection;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Revo.Tools.DatabaseMigrator
 {
@@ -100,7 +100,8 @@ namespace Revo.Tools.DatabaseMigrator
                 }).ToArray()
                 : null;
 
-            migrationSelector = new DatabaseMigrationSelector(migrationRegistry, migrationProvider);
+            migrationSelector = new DatabaseMigrationSelector(migrationRegistry, migrationProvider,
+                executionOptions.MigrationSelectorOptions);
 
             Regex fileNameRegex = Options.FileNameRegex != null
                 ? new Regex(Options.FileNameRegex, RegexOptions.Compiled | RegexOptions.IgnoreCase)

@@ -9,6 +9,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
         public bool? ApplyMigrationsUponStartup { get; set; }
         public string[] EnvironmentTags { get; set; } = new string[0];
         public IDatabaseMigrationScripter OverrideDatabaseMigrationScripter { get; set; }
+        public DatabaseMigrationSelectorOptions MigrationSelectorOptions { get; set; }
 
         IReadOnlyCollection<DatabaseMigrationSearchSpecifier> IDatabaseMigrationExecutionOptions.
             MigrateOnlySpecifiedModules => MigrateOnlySpecifiedModules;

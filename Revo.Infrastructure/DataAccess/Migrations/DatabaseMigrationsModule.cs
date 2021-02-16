@@ -25,6 +25,10 @@ namespace Revo.Infrastructure.DataAccess.Migrations
                 .To<DatabaseMigrationSelector>()
                 .InSingletonScope();
 
+            Bind<IDatabaseMigrationSelectorOptions>()
+                .ToConstant(configuration.MigrationSelectorOptions)
+                .InSingletonScope();
+
             Bind<IDatabaseMigrationExecutor>()
                 .To<DatabaseMigrationExecutor>()
                 .InSingletonScope();
