@@ -1,5 +1,10 @@
 # RELEASE NOTES
 
+## [1.21.0] - 2020-02-16
+
+### Added
+- added option to rerun repeatable database migrations when their dependencies get updated (RerunRepeatableMigrationsOnDependencyUpdate - default to true)
+
 ## [1.20.2] - 2020-02-12
 
 ### Fixed

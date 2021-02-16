@@ -19,5 +19,10 @@ namespace Revo.Infrastructure.DataAccess.Migrations
             yield return (nameof(ModuleName), ModuleName);
             yield return (nameof(Version), Version);
         }
+
+        public override string ToString()
+        {
+            return $"{ModuleName}@{Version?.ToString() ?? "latest"}";
+        }
     }
 }

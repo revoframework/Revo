@@ -6,5 +6,6 @@ namespace Revo.Infrastructure.DataAccess.Migrations
     {
         bool? ApplyMigrationsUponStartup { get; }
         IDatabaseMigrationScripter OverrideDatabaseMigrationScripter { get; }
+        DatabaseMigrationSelectorOptions MigrationSelectorOptions { get; }
     }
 }
