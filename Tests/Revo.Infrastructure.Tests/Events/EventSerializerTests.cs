@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using FluentAssertions;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using NSubstitute;
 using Revo.Core.Events;
 using Revo.Core.Types;
@@ -28,16 +30,16 @@ namespace Revo.Infrastructure.Tests.Events
             versionedTypeRegistry.GetTypeInfo<IEvent>(new VersionedTypeId("Event2", 1))
                 .Returns(new VersionedType(new VersionedTypeId("Event2", 1), typeof(Event2)));
 
-            sut = new EventSerializer(versionedTypeRegistry);
+            sut = new EventSerializer(versionedTypeRegistry, x => x);
         }
 
         [Fact]
         public void DeserializeEvent()
         {
-            var result = sut.DeserializeEvent("{\"foo\":123}", new VersionedTypeId("Event1", 1));
+            var result = sut.DeserializeEvent("{\"fooBar\":123}", new VersionedTypeId("Event1", 1));
 
             result.Should().BeOfType<Event1>();
-            ((Event1)result).Foo.Should().Be(123);
+            ((Event1)result).FooBar.Should().Be(123);
         }
 
         [Fact]
@@ -55,7 +57,7 @@ namespace Revo.Infrastructure.Tests.Events
 
             JObject json = JObject.Parse(result.EventJson);
             json.Should().HaveCount(1);
-            json.Should().Contain("foo", 123);
+            json.Should().Contain("fooBar", 123);
             result.TypeId.Should().Be(new VersionedTypeId("Event1", 1));
         }
 
@@ -83,15 +85,56 @@ namespace Revo.Infrastructure.Tests.Events
             json["pairs"].Children<JProperty>().Should().Contain(x => x.Name == "Key" && x.Value.ToString() == "Value");
             json["pairs"].Children<JProperty>().Should().Contain(x => x.Name == "key" && x.Value.ToString() == "value");
         }
+
+        [Fact]
+        public void SerializeEvent_CustomizeEventJsonSerializer()
+        {
+            sut = new EventSerializer(versionedTypeRegistry,
+                x =>
+                    new JsonSerializerSettings
+                    {
+                        ContractResolver = new DefaultContractResolver
+                        {
+                            NamingStrategy = new SnakeCaseNamingStrategy()
+                        },
+                        Formatting = Formatting.None
+                    });
+
+            var result = sut.SerializeEvent(new Event1(123));
+
+            JObject json = JObject.Parse(result.EventJson);
+            json.Should().HaveCount(1);
+            json.Should().Contain("foo_bar", 123);
+        }
+        
+        [Fact]
+        public void DeserializeEvent_CustomizeEventJsonSerializer()
+        {
+            sut = new EventSerializer(versionedTypeRegistry,
+                x =>
+                    new JsonSerializerSettings
+                    {
+                        ContractResolver = new DefaultContractResolver
+                        {
+                            NamingStrategy = new SnakeCaseNamingStrategy()
+                        },
+                        Formatting = Formatting.None
+                    });
+
+            var result = sut.DeserializeEvent("{\"foo_bar\":123}", new VersionedTypeId("Event1", 1));
+
+            result.Should().BeOfType<Event1>();
+            ((Event1)result).FooBar.Should().Be(123);
+        }
         
         public class Event1 : IEvent
         {
-            public Event1(int foo)
+            public Event1(int fooBar)
             {
-                Foo = foo;
+                FooBar = fooBar;
             }
 
-            public int Foo { get; }
+            public int FooBar { get; }
         }
 
         public class Event2 : IEvent
