@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using Revo.Core.Core;
 using Revo.Core.Events;
-using Revo.Domain.Events;
 
 namespace Revo.Infrastructure.EventStores
 {

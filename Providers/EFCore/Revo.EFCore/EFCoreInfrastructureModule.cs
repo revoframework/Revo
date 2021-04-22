@@ -17,7 +17,6 @@ namespace Revo.EFCore
             Bind<IEFCoreTransactionCoordinator, IUnitOfWorkListener>()
                 .ToMethod(ctx => new EFCoreCoordinatedTransaction(ctx.ContextPreservingGet<IEFCoreCrudRepository>(),
                     ctx.ContextPreservingGet<ICommandContext>(),
-                    ctx.ContextPreservingGet<Lazy<EFCoreExternalEventStoreHook>>(),
                     ctx.ContextPreservingGet<Lazy<EFCoreSyncProjectionHook>>()))
                 .InTaskScope();
         }

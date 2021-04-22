@@ -8,7 +8,7 @@ namespace Revo.Infrastructure.Events
     {
         IEvent DeserializeEvent(string eventJson, VersionedTypeId typeId);
         (string EventJson, VersionedTypeId TypeId) SerializeEvent(IEvent @event);
-        string SerializeEventMetadata(IReadOnlyDictionary<string, string> message);
-        JsonMetadata DeserializeEventMetadata(string metadataJson);
+        string SerializeEventMetadata(IReadOnlyDictionary<string, string> metadata);
+        IReadOnlyDictionary<string, string> DeserializeEventMetadata(string metadataJson);
     }
 }

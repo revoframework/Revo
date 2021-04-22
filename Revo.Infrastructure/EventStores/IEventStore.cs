@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Revo.Core.Collections;
 
 namespace Revo.Infrastructure.EventStores
 {
+    /// <summary>
+    /// Stores event streams and their events.
+    /// </summary>
     public interface IEventStore
     {
         /// <summary>

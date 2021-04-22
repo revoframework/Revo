@@ -24,6 +24,10 @@ namespace Revo.EF6.Events
                 .WhenInjectedInto<AsyncEventQueueManager>()
                 .InTransientScope();
 
+            Bind<IQueuedAsyncEventMessageFactory>()
+                .To<QueuedAsyncEventMessageFactory>()
+                .InSingletonScope();
+
             Bind<IEventSerializer>()
                 .To<EventSerializer>()
                 .InSingletonScope();

@@ -12,15 +12,12 @@ namespace Revo.EFCore.Repositories
 {
     public class EFCoreCoordinatedTransaction : CoordinatedTransaction, IEFCoreTransactionCoordinator, IUnitOfWorkListener
     {
-        private readonly Lazy<EFCoreExternalEventStoreHook> efCoreExternalEventStoreHookLazy;
         private readonly Lazy<EFCoreSyncProjectionHook> efCoreSyncProjectionHook;
 
         public EFCoreCoordinatedTransaction(IEFCoreCrudRepository crudRepository,
             ICommandContext commandContext,
-            Lazy<EFCoreExternalEventStoreHook> efCoreExternalEventStoreHookLazy,
             Lazy<EFCoreSyncProjectionHook> efCoreSyncProjectionHook) : base(new EFCoreCrudRepositoryTransaction(crudRepository))
         {
-            this.efCoreExternalEventStoreHookLazy = efCoreExternalEventStoreHookLazy;
             this.efCoreSyncProjectionHook = efCoreSyncProjectionHook;
 
             if (commandContext.UnitOfWork?.IsWorkBegun == true)
@@ -31,11 +28,6 @@ namespace Revo.EFCore.Repositories
 
         protected override async Task DoCommitAsync()
         {
-            if (!Participants.Any(x => x is EFCoreExternalEventStoreHook))
-            {
-                Participants.Add(efCoreExternalEventStoreHookLazy.Value);
-            }
-
             if (!Participants.Any(x => x is EFCoreSyncProjectionHook))
             {
                 Participants.Add(efCoreSyncProjectionHook.Value);
@@ -56,9 +48,6 @@ namespace Revo.EFCore.Repositories
 
                     case EFCoreProjectionSubSystem _:
                         return 103;
-                        
-                    case EFCoreExternalEventStoreHook _:
-                        return 104;
 
                     case EFCoreEventStore _:
                         return 105;

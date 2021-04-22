@@ -1,5 +1,14 @@
 # RELEASE NOTES
 
+## [1.22.0] - 2020-0?-?
+
+### Fixed
+- external events and events published by non-event sourced aggregates are not stored to DB if not dispatched to any async event queues (no need to store them then)
+
+### Changed
+- breaking change: BasicEventMetadataNames moved to Revo.Core.Events
+- manually published events no longer require explicitly set event message ID
+
 ## [1.21.0] - 2020-02-16
 
 ### Added
