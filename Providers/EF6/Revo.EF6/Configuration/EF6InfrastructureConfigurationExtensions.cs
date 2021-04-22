@@ -124,7 +124,7 @@ namespace Revo.EF6.Configuration
             {
                 if (section.UseAsyncEvents)
                 {
-                    c.LoadModule<EF6AsyncEventsModule>();
+                    c.LoadModule(new EF6AsyncEventsModule(section.CustomizeEventJsonSerializer));
                 }
             });
 

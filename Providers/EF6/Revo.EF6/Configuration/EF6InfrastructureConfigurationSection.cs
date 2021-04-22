@@ -1,4 +1,6 @@
-﻿using Revo.Core.Configuration;
+﻿using System;
+using Newtonsoft.Json;
+using Revo.Core.Configuration;
 
 namespace Revo.EF6.Configuration
 {
@@ -11,5 +13,7 @@ namespace Revo.EF6.Configuration
         public bool UseProjections { get; set; }
         public bool UseEventSourcedAggregateStore { get; set; }
         public bool UseCrudAggregateStore { get; set; }
+
+        public Func<JsonSerializerSettings, JsonSerializerSettings> CustomizeEventJsonSerializer { get; set; } = settings => settings;
     }
 }

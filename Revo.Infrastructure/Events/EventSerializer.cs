@@ -12,7 +12,7 @@ namespace Revo.Infrastructure.Events
 {
     public class EventSerializer : IEventSerializer
     {
-        private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings
+        private readonly JsonSerializerSettings jsonSerializerSettings = new JsonSerializerSettings
         {
             ContractResolver = new DefaultContractResolver
             {
@@ -23,17 +23,16 @@ namespace Revo.Infrastructure.Events
             },
             Formatting = Formatting.None
         };
-
-        static EventSerializer()
-        {
-            JsonSerializerSettings.Converters.Add(new StringEnumConverter());
-        }
-
+        
         private readonly IVersionedTypeRegistry versionedTypeRegistry;
 
-        public EventSerializer(IVersionedTypeRegistry versionedTypeRegistry)
+        public EventSerializer(IVersionedTypeRegistry versionedTypeRegistry,
+            Func<JsonSerializerSettings, JsonSerializerSettings> customizeEventJsonSerializer)
         {
             this.versionedTypeRegistry = versionedTypeRegistry;
+
+            jsonSerializerSettings.Converters.Add(new StringEnumConverter());
+            jsonSerializerSettings = customizeEventJsonSerializer(jsonSerializerSettings);
         }
 
         public IEvent DeserializeEvent(string eventJson, VersionedTypeId typeId)
@@ -47,7 +46,7 @@ namespace Revo.Infrastructure.Events
                 }
 
                 Type clrType = versionedType.ClrType;
-                return (IEvent)JsonConvert.DeserializeObject(eventJson, clrType, JsonSerializerSettings);
+                return (IEvent)JsonConvert.DeserializeObject(eventJson, clrType, jsonSerializerSettings);
             }
             catch (JsonException e)
             {
@@ -63,7 +62,7 @@ namespace Revo.Infrastructure.Events
                 throw new ArgumentException($"Cannot serialize event of an unknown type {@event.GetType()}");
             }
 
-            return (JsonConvert.SerializeObject(@event, JsonSerializerSettings), versionedType.Id);
+            return (JsonConvert.SerializeObject(@event, jsonSerializerSettings), versionedType.Id);
         }
 
         public string SerializeEventMetadata(IReadOnlyDictionary<string, string> metadata)

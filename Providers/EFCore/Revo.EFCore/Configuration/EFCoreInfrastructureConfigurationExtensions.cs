@@ -115,7 +115,7 @@ namespace Revo.EFCore.Configuration
             {
                 if (section.UseAsyncEvents)
                 {
-                    c.LoadModule<EFCoreAsyncEventsModule>();
+                    c.LoadModule(new EFCoreAsyncEventsModule(section.CustomizeEventJsonSerializer));
                 }
             });
 
