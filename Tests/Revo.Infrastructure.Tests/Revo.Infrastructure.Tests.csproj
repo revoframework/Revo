@@ -4,6 +4,12 @@
     <TargetFramework>net5.0</TargetFramework>
     <Authors>Revo Framework</Authors>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="EventSourcing\**" />
+    <EmbeddedResource Remove="EventSourcing\**" />
+    <None Remove="EventSourcing\**" />
+  </ItemGroup>
   
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="1.3.0">
@@ -20,10 +26,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Revo.Infrastructure\Revo.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Revo.Testing\Revo.Testing.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Folder Include="EventSourcing\" />
   </ItemGroup>
   
 </Project>

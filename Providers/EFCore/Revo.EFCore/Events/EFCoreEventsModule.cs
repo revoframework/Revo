@@ -4,6 +4,7 @@ using Revo.Infrastructure;
 using Revo.Infrastructure.DataAccess.Migrations;
 using Revo.Infrastructure.Events;
 using Revo.Infrastructure.Events.Async;
+using Revo.Infrastructure.Events.Async.Generic;
 
 namespace Revo.EFCore.Events
 {
@@ -18,6 +19,10 @@ namespace Revo.EFCore.Events
             
             Bind<IEventSerializer>()
                 .To<EventSerializer>()
+                .InSingletonScope();
+
+            Bind<IQueuedAsyncEventMessageFactory>()
+                .To<QueuedAsyncEventMessageFactory>()
                 .InSingletonScope();
 
             Bind<ResourceDatabaseMigrationDiscoveryAssembly>()

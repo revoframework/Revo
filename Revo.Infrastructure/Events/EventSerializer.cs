@@ -40,7 +40,13 @@ namespace Revo.Infrastructure.Events
         {
             try
             {
-                Type clrType = versionedTypeRegistry.GetTypeInfo<IEvent>(typeId).ClrType;
+                var versionedType = versionedTypeRegistry.GetTypeInfo<IEvent>(typeId);
+                if (versionedType == null)
+                {
+                    throw new ArgumentException($"Cannot deserialize event of an unknown type ID {typeId}");
+                }
+
+                Type clrType = versionedType.ClrType;
                 return (IEvent)JsonConvert.DeserializeObject(eventJson, clrType, JsonSerializerSettings);
             }
             catch (JsonException e)
@@ -51,8 +57,13 @@ namespace Revo.Infrastructure.Events
 
         public (string EventJson, VersionedTypeId TypeId) SerializeEvent(IEvent @event)
         {
-            return (JsonConvert.SerializeObject(@event, JsonSerializerSettings),
-                versionedTypeRegistry.GetTypeInfo<IEvent>(@event.GetType()).Id);
+            var versionedType = versionedTypeRegistry.GetTypeInfo<IEvent>(@event.GetType());
+            if (versionedType == null)
+            {
+                throw new ArgumentException($"Cannot serialize event of an unknown type {@event.GetType()}");
+            }
+
+            return (JsonConvert.SerializeObject(@event, JsonSerializerSettings), versionedType.Id);
         }
 
         public string SerializeEventMetadata(IReadOnlyDictionary<string, string> metadata)
@@ -60,7 +71,7 @@ namespace Revo.Infrastructure.Events
             return JsonConvert.SerializeObject(metadata, Formatting.None);
         }
 
-        public JsonMetadata DeserializeEventMetadata(string metadataJson)
+        public IReadOnlyDictionary<string, string> DeserializeEventMetadata(string metadataJson)
         {
             return new JsonMetadata(metadataJson?.Length > 0
                 ? JObject.Parse(metadataJson) : new JObject());

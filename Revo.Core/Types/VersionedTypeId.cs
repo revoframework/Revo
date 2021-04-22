@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using Revo.Core.ValueObjects;
 
 namespace Revo.Core.Types
 {
-    public class VersionedTypeId
+    public class VersionedTypeId : ValueObject<VersionedTypeId>
     {
         public VersionedTypeId(string name, int version)
         {
@@ -16,22 +13,11 @@ namespace Revo.Core.Types
 
         public string Name { get; }
         public int Version { get; }
-
-        public override string ToString()
+        
+        protected override IEnumerable<(string Name, object Value)> GetValueComponents()
         {
-            return $"VersionedTypeId {{Name:{Name}, Version:{Version}}}";
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is VersionedTypeId other
-                   && other.Name == Name
-                   && other.Version == Version;
-        }
-
-        public override int GetHashCode()
-        {
-            return (Name.GetHashCode() * 397) ^ Version.GetHashCode();
+            yield return (nameof(Name), Name);
+            yield return (nameof(Version), Version);
         }
     }
 }

@@ -82,8 +82,8 @@ namespace Revo.Infrastructure.Tests.Events.Async
 
             Received.InOrder(() =>
             {
-                asyncEventQueueManager.EnqueueEventAsync(eventMessages[0], Arg.Any<IEnumerable<EventSequencing>>());
-                asyncEventQueueManager.EnqueueEventAsync(eventMessages[1], Arg.Any<IEnumerable<EventSequencing>>());
+                asyncEventQueueManager.EnqueueEventAsync(eventMessages[0], Arg.Any<IReadOnlyCollection<EventSequencing>>());
+                asyncEventQueueManager.EnqueueEventAsync(eventMessages[1], Arg.Any<IReadOnlyCollection<EventSequencing>>());
                 asyncEventQueueManager.CommitAsync();
             });
 
@@ -102,9 +102,9 @@ namespace Revo.Infrastructure.Tests.Events.Async
             List<EventSequencing> event1Sequencing = new List<EventSequencing>();
             List<EventSequencing> event2Sequencing = new List<EventSequencing>();
 
-            asyncEventQueueManager.When(x => x.EnqueueEventAsync(eventMessages[0], Arg.Any<IEnumerable<EventSequencing>>()))
+            asyncEventQueueManager.When(x => x.EnqueueEventAsync(eventMessages[0], Arg.Any<IReadOnlyCollection<EventSequencing>>()))
                 .Do(ci => event1Sequencing.AddRange(ci.ArgAt<IEnumerable<EventSequencing>>(1)));
-            asyncEventQueueManager.When(x => x.EnqueueEventAsync(eventMessages[1], Arg.Any<IEnumerable<EventSequencing>>()))
+            asyncEventQueueManager.When(x => x.EnqueueEventAsync(eventMessages[1], Arg.Any<IReadOnlyCollection<EventSequencing>>()))
                 .Do(ci => event2Sequencing.AddRange(ci.ArgAt<IEnumerable<EventSequencing>>(1)));
 
             await sut.DispatchToQueuesAsync(eventMessages, "eventSource", "checkpoint");
@@ -135,7 +135,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
                 "eventSource", "checkpoint");
 
             asyncEventQueueManager.Received(1).EnqueueEventAsync(notListenedEvent,
-                    Arg.Is<IEnumerable<EventSequencing>>(x => !x.Any()));
+                    Arg.Is<IReadOnlyCollection<EventSequencing>>(x => !x.Any()));
         }
 
         [Fact]

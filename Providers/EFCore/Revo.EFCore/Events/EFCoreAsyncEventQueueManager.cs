@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Revo.Core.Events;
 using Revo.Core.Transactions;
 using Revo.DataAccess.Entities;
 using Revo.EFCore.Repositories;
-using Revo.Infrastructure.Events;
 using Revo.Infrastructure.Events.Async;
 using Revo.Infrastructure.Events.Async.Generic;
+using Revo.Infrastructure.EventStores;
 
 namespace Revo.EFCore.Events
 {
@@ -18,10 +15,11 @@ namespace Revo.EFCore.Events
         private readonly IEFCoreTransactionCoordinator transactionCoordinator;
         private readonly List<QueuedAsyncEvent> transactionQueuedEvents = new List<QueuedAsyncEvent>();
 
-        public EFCoreAsyncEventQueueManager(ICrudRepository crudRepository, IEventSerializer eventSerializer,
+        public EFCoreAsyncEventQueueManager(ICrudRepository crudRepository,
+            IQueuedAsyncEventMessageFactory queuedAsyncEventMessageFactory,
             IExternalEventStore externalEventStore,
             IEFCoreTransactionCoordinator transactionCoordinator)
-            : base(crudRepository, eventSerializer, externalEventStore)
+            : base(crudRepository, queuedAsyncEventMessageFactory, externalEventStore)
         {
             this.transactionCoordinator = transactionCoordinator;
 

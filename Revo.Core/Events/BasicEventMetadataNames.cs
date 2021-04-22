@@ -1,4 +1,4 @@
-﻿namespace Revo.Domain.Events
+﻿namespace Revo.Core.Events
 {
     public static class BasicEventMetadataNames
     {

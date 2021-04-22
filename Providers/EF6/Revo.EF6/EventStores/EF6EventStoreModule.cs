@@ -4,7 +4,6 @@ using Revo.DataAccess.Entities;
 using Revo.EF6.DataAccess.Entities;
 using Revo.Infrastructure;
 using Revo.Infrastructure.DataAccess.Migrations;
-using Revo.Infrastructure.Events;
 using Revo.Infrastructure.Events.Async;
 using Revo.Infrastructure.EventStores;
 using Revo.Infrastructure.EventStores.Generic;

@@ -4,7 +4,7 @@ namespace Revo.Infrastructure.Events.Async.Generic
 {
     [TablePrefix(NamespacePrefix = "RAE", ColumnPrefix = "AEQ")]
     [DatabaseEntity]
-    public class AsyncEventQueue : IAsyncEventQueueState, IRowVersioned
+    public class AsyncEventQueue : IHasId<string>, IAsyncEventQueueState, IRowVersioned
     {
         public AsyncEventQueue(string id, long? lastSequenceNumberProcessed)
         {

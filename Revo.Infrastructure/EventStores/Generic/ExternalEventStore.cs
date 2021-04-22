@@ -23,7 +23,7 @@ namespace Revo.Infrastructure.EventStores.Generic
             this.eventSerializer = eventSerializer;
         }
 
-        public void PushEvent(IEventMessage eventMessage)
+        public void TryPushEvent(IEventMessage eventMessage)
         {
             var record = CreateExternalEventRecord(eventMessage);
             if (!externalEvents.ContainsKey(record.Id))
@@ -82,7 +82,8 @@ namespace Revo.Infrastructure.EventStores.Generic
         {
             Guid eventId = eventMessage.Metadata.GetEventId() ?? throw new InvalidOperationException($"Cannot store an external event ({eventMessage}) without ID");
             (string eventJson, VersionedTypeId typeId) = eventSerializer.SerializeEvent(eventMessage.Event);
-            string metadataJson = eventSerializer.SerializeEventMetadata(eventMessage.Metadata);
+            string metadataJson = eventSerializer.SerializeEventMetadata(
+                new FilteringMetadata(eventMessage.Metadata, BasicEventMetadataNames.EventId));
 
             return new ExternalEventRecord(eventId, eventJson, typeId.Name, typeId.Version, metadataJson);
         }

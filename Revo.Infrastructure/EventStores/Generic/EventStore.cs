@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Revo.Core.Core;
+using Revo.Core.Events;
 using Revo.Core.Types;
 using Revo.DataAccess.Entities;
 using Revo.Domain.Events;
