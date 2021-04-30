@@ -2,6 +2,9 @@
 
 ## [1.22.0] - 2020-0?-?
 
+### Added
+- added support for event serializer customization
+
 ### Fixed
 - external events and events published by non-event sourced aggregates are not stored to DB if not dispatched to any async event queues (no need to store them then)
 
