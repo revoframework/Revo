@@ -7,6 +7,7 @@
 
 ### Fixed
 - external events and events published by non-event sourced aggregates are not stored to DB if not dispatched to any async event queues (no need to store them then)
+- UseAllEFCoreInfrastructure/UseAllEF6Infrastructure did not run advancedAction, if supplied
 
 ### Changed
 - breaking change: BasicEventMetadataNames moved to Revo.Core.Events
