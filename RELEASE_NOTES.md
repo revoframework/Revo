@@ -1,6 +1,6 @@
 # RELEASE NOTES
 
-## [1.22.0] - 2020-0?-?
+## [1.22.0] - 2020-04-30
 
 ### Added
 - added support for event serializer customization
