@@ -15,13 +15,18 @@ namespace Revo.EFCore.Configuration
         public static IRevoConfiguration UseAllEFCoreInfrastructure(this IRevoConfiguration configuration,
             Action<EFCoreInfrastructureConfigurationSection> advancedAction = null)
         {
-            return configuration
+            configuration
                 .UseEFCoreDataAccess(null)
                 .UseEFCoreRepositories()
                 .UseEFCoreAsyncEvents()
                 .UseEFCoreEventStore()
                 .UseEFCoreProjections()
                 .UseEFCoreSagas();
+
+            var section = configuration.GetSection<EFCoreInfrastructureConfigurationSection>();
+            advancedAction?.Invoke(section);
+
+            return configuration;
         }
 
         public static IRevoConfiguration UseEFCoreEventStore(this IRevoConfiguration configuration,

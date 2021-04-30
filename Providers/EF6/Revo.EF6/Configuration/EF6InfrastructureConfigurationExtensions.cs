@@ -15,13 +15,18 @@ namespace Revo.EF6.Configuration
         public static IRevoConfiguration UseAllEF6Infrastructure(this IRevoConfiguration configuration,
             Action<EF6InfrastructureConfigurationSection> advancedAction = null)
         {
-            return configuration
+            configuration
                 .UseEF6DataAccess(null)
                 .UseEF6Repositories()
                 .UseEF6AsyncEvents()
                 .UseEF6EventStore()
                 .UseEF6Projections()
                 .UseEF6Sagas();
+            
+            var section = configuration.GetSection<EF6InfrastructureConfigurationSection>();
+            advancedAction?.Invoke(section);
+
+            return configuration;
         }
 
         public static IRevoConfiguration UseEF6EventStore(this IRevoConfiguration configuration,
