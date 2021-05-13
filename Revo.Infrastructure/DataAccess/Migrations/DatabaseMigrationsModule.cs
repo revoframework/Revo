@@ -1,4 +1,5 @@
 ﻿using Ninject.Modules;
+using Revo.Core.Core;
 using Revo.Core.Lifecycle;
 
 namespace Revo.Infrastructure.DataAccess.Migrations
@@ -31,7 +32,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
 
             Bind<IDatabaseMigrationExecutor>()
                 .To<DatabaseMigrationExecutor>()
-                .InSingletonScope();
+                .InTaskScope();
             
             Bind<IApplicationConfigurer>()
                 .To<DatabaseMigrationExecutionHook>()

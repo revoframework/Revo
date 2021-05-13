@@ -14,6 +14,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Revo.Core.Core;
+using Revo.Core.Events;
 
 namespace Revo.Tools.DatabaseMigrator
 {
@@ -242,7 +244,10 @@ namespace Revo.Tools.DatabaseMigrator
                     throw new ArgumentOutOfRangeException($"Unknown database provider value");
             }
 
-            migrationProvider = new AdoNetDatabaseMigrationProvider(dbConnection, scripter);
+            var serviceLocator = new NinjectServiceLocator(kernel);
+            var eventBus = new EventBus(serviceLocator);
+
+            migrationProvider = new AdoNetDatabaseMigrationProvider(dbConnection, scripter, eventBus);
         }
 
         public void Dispose()

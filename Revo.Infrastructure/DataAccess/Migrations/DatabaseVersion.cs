@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using Revo.Core.ValueObjects;
 
 namespace Revo.Infrastructure.DataAccess.Migrations
@@ -18,7 +19,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
         }
 
         public ImmutableArray<int> Fractions { get; }
-
+        
         public static DatabaseVersion Parse(string versionString)
         {
             var stringFractions = versionString.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);

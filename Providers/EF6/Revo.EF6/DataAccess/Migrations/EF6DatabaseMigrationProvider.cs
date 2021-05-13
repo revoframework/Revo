@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
+using Revo.Core.Events;
+using Revo.EF6.DataAccess.Entities;
+using Revo.EF6.DataAccess.Model;
 using Revo.Infrastructure.DataAccess.Migrations.Providers;
 
 namespace Revo.EF6.DataAccess.Migrations
@@ -8,11 +11,13 @@ namespace Revo.EF6.DataAccess.Migrations
     public class EF6DatabaseMigrationProvider : AdoNetStubDatabaseMigrationProvider
     {
         private readonly EF6ConnectionConfiguration connectionConfiguration;
-        private IDbConnection dbConnection;
+        private readonly IEF6DatabaseAccess databaseAccess;
 
-        public EF6DatabaseMigrationProvider(EF6ConnectionConfiguration connectionConfiguration, IMigrationScripterFactory scripterFactory)
+        public EF6DatabaseMigrationProvider(EF6ConnectionConfiguration connectionConfiguration, IMigrationScripterFactory scripterFactory,
+            IEventBus eventBus, IEF6DatabaseAccess databaseAccess) : base(eventBus)
         {
             this.connectionConfiguration = connectionConfiguration;
+            this.databaseAccess = databaseAccess;
 
             Scripter = scripterFactory.GetProviderScripter(connectionConfiguration);
         }
@@ -29,23 +34,18 @@ namespace Revo.EF6.DataAccess.Migrations
 
         protected override async Task<IDbConnection> GetDbConnectionAsync()
         {
-            if (dbConnection == null)
+            var dbContext = databaseAccess.GetDbContext(EntityTypeDiscovery.DefaultSchemaSpace);
+
+            if (dbContext.Database.Connection.State == ConnectionState.Closed)
             {
-                dbConnection = connectionConfiguration.ConnectionFactory
-                    .CreateConnection(connectionConfiguration.NameOrConnectionString);
+                await dbContext.Database.Connection.OpenAsync();
             }
 
-            if (dbConnection.State == ConnectionState.Closed)
-            {
-                dbConnection.Open();
-            }
-
-            return dbConnection;
+            return dbContext.Database.Connection;
         }
 
         public override void Dispose()
         {
-            dbConnection?.Dispose();
         }
     }
 }

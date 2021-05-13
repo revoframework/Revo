@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
+using Revo.EFCore.DataAccess.Entities;
 using Revo.Infrastructure.DataAccess.Migrations;
 using Revo.Infrastructure.DataAccess.Migrations.Providers;
 
@@ -24,21 +24,16 @@ namespace Revo.EFCore.DataAccess.Migrations
             this.migrationsConfiguration = migrationsConfiguration;
         }
 
-        public IDatabaseMigrationScripter GetProviderScripter(DbContextOptions<DatabaseMigrationDbContext> contextOptions)
+        public IDatabaseMigrationScripter GetProviderScripter(IEFCoreDatabaseAccess databaseAccess)
         {
             if (migrationsConfiguration.OverrideDatabaseMigrationScripter != null)
             {
                 return migrationsConfiguration.OverrideDatabaseMigrationScripter;
             }
 
-            var dbProviderExtension = contextOptions.Extensions.FirstOrDefault(x => x.Info.IsDatabaseProvider);
-            string typeName = dbProviderExtension?.GetType().FullName?.ToLowerInvariant();
-            if (typeName != null)
-            {
-                return ProviderScripters.FirstOrDefault(x => x.Key.Any(keyword => typeName.Contains(keyword))).Value;
-            }
-
-            return null;
+            var providerName = databaseAccess.GetDbContext(EFCoreDatabaseAccess.DefaultSchemaSpace)
+                .Database.ProviderName.ToLowerInvariant();
+            return ProviderScripters.FirstOrDefault(x => x.Key.Any(keyword => providerName.Contains(keyword))).Value;
         }
     }
 }

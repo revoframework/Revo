@@ -1,11 +1,13 @@
 ﻿using System.Data;
 using System.Threading.Tasks;
+using Revo.Core.Events;
 
 namespace Revo.Infrastructure.DataAccess.Migrations.Providers
 {
     public class AdoNetDatabaseMigrationProvider : AdoNetStubDatabaseMigrationProvider
     {
-        public AdoNetDatabaseMigrationProvider(IDbConnection dbConnection, IDatabaseMigrationScripter scripter)
+        public AdoNetDatabaseMigrationProvider(IDbConnection dbConnection, IDatabaseMigrationScripter scripter,
+            IEventBus eventBus) : base(eventBus)
         {
             DbConnection = dbConnection;
             Scripter = scripter;

@@ -19,7 +19,7 @@ namespace Revo.EFCore.DataAccess.Migrations
         {
             Bind<IDatabaseMigrationProvider>()
                 .To<EFCoreDatabaseMigrationProvider>()
-                .InSingletonScope();
+                .InTaskScope();
             
             Bind<IMigrationScripterFactory>()
                 .To<MigrationScripterFactory>()

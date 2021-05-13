@@ -1,5 +1,14 @@
 # RELEASE NOTES
 
+## [1.23.0] - 2020-??-??
+
+### Added
+- database migration hooks - can now listen to events like DatabaseMigrationBeforeAppliedEvent, DatabaseMigrationAppliedEvent and DatabaseMigrationsCommittedEvent
+
+### Changed
+- database migrations are run inside a unit of work when using EF Core and EF6 providers
+- EF Core/EF6 migration providers no longer create database upon startup
+
 ## [1.22.0] - 2020-04-30
 
 ### Added
