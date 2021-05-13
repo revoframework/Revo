@@ -1,12 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
+﻿using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Revo.DataAccess.Entities;
 using Revo.Domain.Entities.Basic;
 using Revo.Domain.Events;
-using Revo.Domain.ReadModel;
 using Revo.EFCore.DataAccess.Conventions;
 
 namespace Revo.EFCore.Domain

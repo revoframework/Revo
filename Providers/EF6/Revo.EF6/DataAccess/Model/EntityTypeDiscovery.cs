@@ -10,6 +10,8 @@ namespace Revo.EF6.DataAccess.Model
 {
     public class EntityTypeDiscovery
     {
+        public static readonly string DefaultSchemaSpace = "Default";
+
         private readonly ITypeExplorer typeExplorer;
 
         public EntityTypeDiscovery(ITypeExplorer typeExplorer)
@@ -32,7 +34,7 @@ namespace Revo.EF6.DataAccess.Model
                 return DetectEntitySchemaSpace(entityType.BaseType);
             }
 
-            return "Default";
+            return DefaultSchemaSpace;
         }
 
         /// <summary>

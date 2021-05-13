@@ -8,6 +8,8 @@ namespace Revo.EFCore.DataAccess.Entities
 {
     public class EFCoreDatabaseAccess : IEFCoreDatabaseAccess
     {
+        public static readonly string DefaultSchemaSpace = "Default";
+
         private readonly Dictionary<string, DbContext> dbContexts = new Dictionary<string, DbContext>();
         private readonly IDbContextFactory dbContextFactory;
         private readonly IRequestDbContextCache requestDbContextCache;        
@@ -62,7 +64,7 @@ namespace Revo.EFCore.DataAccess.Entities
 
         public DbContext GetDbContext(Type entityType)
         {
-            string schemaSpace = "Default"; //modelMetadataExplorer.GetEntityTypeSchemaSpace(entityType);
+            string schemaSpace = DefaultSchemaSpace; //modelMetadataExplorer.GetEntityTypeSchemaSpace(entityType);
             return GetDbContext(schemaSpace);
         }
     }

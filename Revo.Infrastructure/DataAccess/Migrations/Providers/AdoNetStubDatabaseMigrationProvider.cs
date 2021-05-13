@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using NLog;
 using Revo.Core.Core;
+using Revo.Core.Events;
+using Revo.Infrastructure.DataAccess.Migrations.Events;
 
 namespace Revo.Infrastructure.DataAccess.Migrations.Providers
 {
@@ -13,8 +16,14 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
+        private readonly IEventBus eventBus;
         private bool isInitialized = false;
 
+        protected AdoNetStubDatabaseMigrationProvider(IEventBus eventBus)
+        {
+            this.eventBus = eventBus;
+        }
+        
         protected abstract IDatabaseMigrationScripter Scripter { get; }
 
         public async Task<IReadOnlyCollection<IDatabaseMigrationRecord>> GetMigrationHistoryAsync()
@@ -72,6 +81,8 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
                         foreach (string sqlCommand in sqlMigration.SqlCommands)
                         {
                             Logger.Debug($"Executing database migration using ADO.NET provider: {migration}");
+                            
+                            await OnMigrationBeforeAppliedAsync(migration);
 
                             using (var dbCommand = dbConnection.CreateCommand())
                             {
@@ -88,8 +99,12 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
                                     dbCommand.ExecuteNonQuery();
                                 }
                             }
-                            
+
+                            await InsertMigrationRecordAsync(dbConnection, transaction, migration);
+
                             Logger.Info($"Applied database migration using ADO.NET provider: {migration}");
+
+                            await OnMigrationAppliedAsync(migration);
                         }
                     }
                     catch (Exception e)
@@ -97,64 +112,9 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
                         throw new DatabaseMigrationException($"Failed to apply migration ({migration}) to database", e);
                     }
                 }
-
+                
                 try
                 {
-                    foreach (var migration in migrations)
-                    {
-                        using (var dbCommand = dbConnection.CreateCommand())
-                        {
-                            dbCommand.CommandText = Scripter.InsertMigrationRecordSql;
-                            dbCommand.Transaction = transaction;
-                            var param = dbCommand.CreateParameter();
-                            param.DbType = DbType.Guid;
-                            param.ParameterName = "Id";
-                            param.Value = Guid.NewGuid();
-                            dbCommand.Parameters.Add(param);
-
-                            param = dbCommand.CreateParameter();
-                            param.DbType = DbType.String;
-                            param.ParameterName = "Version";
-                            param.Value = (object)migration.Version?.ToString() ?? DBNull.Value;
-                            dbCommand.Parameters.Add(param);
-
-                            param = dbCommand.CreateParameter();
-                            param.DbType = DbType.String;
-                            param.ParameterName = "ModuleName";
-                            param.Value = migration.ModuleName;
-                            dbCommand.Parameters.Add(param);
-
-                            param = dbCommand.CreateParameter();
-                            param.DbType = DbType.String;
-                            param.ParameterName = "FileName";
-                            param.Value = (object)(migration as FileSqlDatabaseMigration)?.FileName ?? DBNull.Value;
-                            dbCommand.Parameters.Add(param);
-
-                            param = dbCommand.CreateParameter();
-                            param.DbType = DbType.String;
-                            param.ParameterName = "Checksum";
-                            param.Value = migration.Checksum;
-                            dbCommand.Parameters.Add(param);
-
-                            param = dbCommand.CreateParameter();
-                            param.DbType = DbType.DateTimeOffset;
-                            param.ParameterName = "TimeApplied";
-                            param.Value = Clock.Current.Now.UtcDateTime;
-                            dbCommand.Parameters.Add(param);
-
-                            Logger.Debug($"Inserting {migrations} database migration record");
-
-                            if (dbCommand is DbCommand dbCommandAsync)
-                            {
-                                await dbCommandAsync.ExecuteNonQueryAsync();
-                            }
-                            else
-                            {
-                                dbCommand.ExecuteNonQuery();
-                            }
-                        }
-                    }
-
                     Logger.Debug($"Commiting {migrations.Count} database migrations using ADO.NET provider");
                     transaction.Commit();
                 }
@@ -162,6 +122,8 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
                 {
                     throw new DatabaseMigrationException($"Failed to commit {migrations.Count} applied migrations to database", e);
                 }
+                
+                await OnMigrationsCommittedAsync(migrations);
             }
         }
 
@@ -185,6 +147,30 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
         }
 
         protected abstract Task<IDbConnection> GetDbConnectionAsync();
+
+        private async Task OnMigrationBeforeAppliedAsync(IDatabaseMigration migration)
+        {
+            var migrationInfo = new DatabaseMigrationInfo(migration);
+            await eventBus.PublishAsync(
+                EventMessageDraft.FromEvent(
+                    new DatabaseMigrationBeforeAppliedEvent(migrationInfo)));
+        }
+
+        private async Task OnMigrationAppliedAsync(IDatabaseMigration migration)
+        {
+            var migrationInfo = new DatabaseMigrationInfo(migration);
+            await eventBus.PublishAsync(
+                EventMessageDraft.FromEvent(
+                    new DatabaseMigrationAppliedEvent(migrationInfo)));
+        }
+
+        private async Task OnMigrationsCommittedAsync(IReadOnlyCollection<IDatabaseMigration> migrations)
+        {
+            var migrationInfos = migrations.Select(x => new DatabaseMigrationInfo(x)).ToImmutableArray();
+            await eventBus.PublishAsync(
+                EventMessageDraft.FromEvent(
+                    new DatabaseMigrationsCommittedEvent(migrationInfos)));
+        }
         
         private async Task<IDbConnection> GetInitializedDbConnectionAsync()
         {
@@ -254,6 +240,62 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
                 reader.IsDBNull(columnDict["version"]) ? null : DatabaseVersion.Parse(reader.GetString(columnDict["version"])),
                 reader.GetString(columnDict["checksum"]),
                 reader.IsDBNull(columnDict["file_name"]) ? null : reader.GetString(columnDict["file_name"]));
+        }
+
+        private async Task InsertMigrationRecordAsync(IDbConnection dbConnection, IDbTransaction transaction,
+            IDatabaseMigration migration)
+        {
+            using (var dbCommand = dbConnection.CreateCommand())
+            {
+                dbCommand.CommandText = Scripter.InsertMigrationRecordSql;
+                dbCommand.Transaction = transaction;
+                var param = dbCommand.CreateParameter();
+                param.DbType = DbType.Guid;
+                param.ParameterName = "Id";
+                param.Value = Guid.NewGuid();
+                dbCommand.Parameters.Add(param);
+
+                param = dbCommand.CreateParameter();
+                param.DbType = DbType.String;
+                param.ParameterName = "Version";
+                param.Value = (object)migration.Version?.ToString() ?? DBNull.Value;
+                dbCommand.Parameters.Add(param);
+
+                param = dbCommand.CreateParameter();
+                param.DbType = DbType.String;
+                param.ParameterName = "ModuleName";
+                param.Value = migration.ModuleName;
+                dbCommand.Parameters.Add(param);
+
+                param = dbCommand.CreateParameter();
+                param.DbType = DbType.String;
+                param.ParameterName = "FileName";
+                param.Value = (object)(migration as FileSqlDatabaseMigration)?.FileName ?? DBNull.Value;
+                dbCommand.Parameters.Add(param);
+
+                param = dbCommand.CreateParameter();
+                param.DbType = DbType.String;
+                param.ParameterName = "Checksum";
+                param.Value = migration.Checksum;
+                dbCommand.Parameters.Add(param);
+
+                param = dbCommand.CreateParameter();
+                param.DbType = DbType.DateTimeOffset;
+                param.ParameterName = "TimeApplied";
+                param.Value = Clock.Current.Now.UtcDateTime;
+                dbCommand.Parameters.Add(param);
+
+                Logger.Debug($"Inserting {migration} database migration record");
+
+                if (dbCommand is DbCommand dbCommandAsync)
+                {
+                    await dbCommandAsync.ExecuteNonQueryAsync();
+                }
+                else
+                {
+                    dbCommand.ExecuteNonQuery();
+                }
+            }
         }
     }
 }

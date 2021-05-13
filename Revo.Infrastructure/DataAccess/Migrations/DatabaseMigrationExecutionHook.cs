@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Revo.Core.Commands;
 using Revo.Core.Core;
 using Revo.Core.Lifecycle;
 
@@ -6,14 +7,15 @@ namespace Revo.Infrastructure.DataAccess.Migrations
 {
     public class DatabaseMigrationExecutionHook : IApplicationConfigurer
     {
-        private readonly IDatabaseMigrationExecutor executor;
+        private readonly ILocalCommandBus localCommandBus;
         private readonly IDatabaseMigrationsConfiguration configuration;
         private readonly IEnvironment environment;
 
-        public DatabaseMigrationExecutionHook(IDatabaseMigrationExecutor executor,
-            IDatabaseMigrationsConfiguration configuration, IEnvironment environment)
+        public DatabaseMigrationExecutionHook(ILocalCommandBus localCommandBus,
+            IDatabaseMigrationsConfiguration configuration,
+            IEnvironment environment)
         {
-            this.executor = executor;
+            this.localCommandBus = localCommandBus;
             this.configuration = configuration;
             this.environment = environment;
         }
@@ -23,7 +25,8 @@ namespace Revo.Infrastructure.DataAccess.Migrations
             if (configuration.ApplyMigrationsUponStartup == true
                 || (environment.IsDevelopment && configuration.ApplyMigrationsUponStartup != false))
             {
-                Task.Run(async () => await executor.ExecuteAsync()).Wait();
+                Task.Run(async () => await localCommandBus
+                    .SendAsync(new ExecuteDatabaseMigrationsCommand())).Wait();
             }
         }
     }

@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Ninject;
-using Revo.Core.Core;
 
-namespace Revo.AspNetCore.Ninject
+namespace Revo.Core.Core
 {
     public class NinjectServiceLocator : IServiceLocator
     {

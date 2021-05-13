@@ -2,26 +2,23 @@
 using System.Data;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using MoreLinq.Extensions;
-using Revo.EFCore.DataAccess.Configuration;
+using Revo.Core.Events;
+using Revo.EFCore.DataAccess.Entities;
 using Revo.Infrastructure.DataAccess.Migrations.Providers;
 
 namespace Revo.EFCore.DataAccess.Migrations
 {
     public class EFCoreDatabaseMigrationProvider : AdoNetStubDatabaseMigrationProvider
     {
+        private readonly IEFCoreDatabaseAccess databaseAccess;
 
-        private readonly IEFCoreConfigurer[] configurers;
-        private DatabaseMigrationDbContext dbContext;
-
-        public EFCoreDatabaseMigrationProvider(IEFCoreConfigurer[] configurers, IMigrationScripterFactory scripterFactory)
+        public EFCoreDatabaseMigrationProvider(IEFCoreDatabaseAccess databaseAccess,
+            IMigrationScripterFactory scripterFactory,
+            IEventBus eventBus) : base(eventBus)
         {
-            this.configurers = configurers;
-
-            var optionsBuilder = new DbContextOptionsBuilder<DatabaseMigrationDbContext>();
-            configurers.ForEach(x => x.OnConfiguring(optionsBuilder));
-            var options = optionsBuilder.Options;
-            Scripter = scripterFactory.GetProviderScripter(options);
+            this.databaseAccess = databaseAccess;
+            
+            Scripter = scripterFactory.GetProviderScripter(databaseAccess);
         }
 
         protected override IDatabaseMigrationScripter Scripter { get; }
@@ -36,14 +33,8 @@ namespace Revo.EFCore.DataAccess.Migrations
 
         protected override async Task<IDbConnection> GetDbConnectionAsync()
         {
-            if (dbContext == null)
-            {
-                var optionsBuilder = new DbContextOptionsBuilder<DatabaseMigrationDbContext>();
-                configurers.ForEach(x => x.OnConfiguring(optionsBuilder));
-                dbContext = new DatabaseMigrationDbContext(optionsBuilder.Options);
-                await dbContext.Database.EnsureCreatedAsync();
-            }
-
+            var dbContext = databaseAccess.GetDbContext(EFCoreDatabaseAccess.DefaultSchemaSpace);
+            
             if (dbContext.Database.GetDbConnection().State == ConnectionState.Closed)
             {
                 await dbContext.Database.OpenConnectionAsync();
@@ -54,7 +45,6 @@ namespace Revo.EFCore.DataAccess.Migrations
 
         public override void Dispose()
         {
-            dbContext?.Dispose();
         }
     }
 }

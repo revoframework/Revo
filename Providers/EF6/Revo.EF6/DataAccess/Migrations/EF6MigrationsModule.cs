@@ -18,7 +18,7 @@ namespace Revo.EF6.DataAccess.Migrations
         {
             Bind<IDatabaseMigrationProvider>()
                 .To<EF6DatabaseMigrationProvider>()
-                .InSingletonScope();
+                .InTaskScope();
             
             Bind<IMigrationScripterFactory>()
                 .To<MigrationScripterFactory>()

@@ -60,9 +60,9 @@ namespace Revo.Examples.Todos
                 .UseAspNetCore()
                 .UseEFCoreDataAccess(
                     contextBuilder => contextBuilder
-                        .UseSqlite("Data Source=todos.db"), // NOTE: By default, this example uses SQLite database for simplicity. For real applications, you'll want to switch to more featured RDBMS as shown below.
-                        // .UseNpgsql(connectionString) // for PostgreSQL
-                        // .UseSqlServer(connectionString) // for SQL Server you will also need to comment out SnakeCaseColumnNamesConvention and LowerCaseConventionbelow
+                        //.UseSqlite("Data Source=todos.db"), // NOTE: By default, this example uses SQLite database for simplicity. For real applications, you'll want to switch to more featured RDBMS as shown below.
+                         .UseNpgsql(Configuration["ConnectionStrings:PostgreSQL"]), // for PostgreSQL
+                        // .UseSqlServer(Configuration["ConnectionStrings:MSSQL"]), // for SQL Server you will also need to comment out SnakeCaseColumnNamesConvention and LowerCaseConventionbelow
                     advancedAction: config =>
                     {
                         config
