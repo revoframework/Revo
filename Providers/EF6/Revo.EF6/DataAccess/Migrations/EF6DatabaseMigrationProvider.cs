@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 using Revo.Core.Events;
@@ -10,19 +11,51 @@ namespace Revo.EF6.DataAccess.Migrations
 {
     public class EF6DatabaseMigrationProvider : AdoNetStubDatabaseMigrationProvider
     {
-        private readonly EF6ConnectionConfiguration connectionConfiguration;
         private readonly IEF6DatabaseAccess databaseAccess;
 
-        public EF6DatabaseMigrationProvider(EF6ConnectionConfiguration connectionConfiguration, IMigrationScripterFactory scripterFactory,
+        public EF6DatabaseMigrationProvider(EF6ConnectionConfiguration connectionConfiguration,
+            IMigrationScripterFactory scripterFactory,
             IEventBus eventBus, IEF6DatabaseAccess databaseAccess) : base(eventBus)
         {
-            this.connectionConfiguration = connectionConfiguration;
             this.databaseAccess = databaseAccess;
 
             Scripter = scripterFactory.GetProviderScripter(connectionConfiguration);
         }
 
         protected override IDatabaseMigrationScripter Scripter { get; }
+
+        protected override Task<IDbTransaction> BeginDbTransactionAsync(IDbConnection dbConnection)
+        {
+            var dbContext = databaseAccess.GetDbContext(EntityTypeDiscovery.DefaultSchemaSpace);
+            var dbContextTransaction = dbContext.Database.BeginTransaction();
+            return Task.FromResult<IDbTransaction>(dbContextTransaction.UnderlyingTransaction);
+        }
+
+        protected override Task CommitDbTransactionAsync(IDbTransaction dbTransaction)
+        {
+            var dbContext = databaseAccess.GetDbContext(EntityTypeDiscovery.DefaultSchemaSpace);
+            if (dbContext.Database.CurrentTransaction == null
+                || dbContext.Database.CurrentTransaction.UnderlyingTransaction != dbTransaction)
+            {
+                throw new ArgumentException("Invalid dbTransaction passed");
+            }
+
+            dbContext.Database.CurrentTransaction.Commit();
+            return Task.CompletedTask;
+        }
+
+        protected override Task RollbackDbTransactionAsync(IDbTransaction dbTransaction)
+        {
+            var dbContext = databaseAccess.GetDbContext(EntityTypeDiscovery.DefaultSchemaSpace);
+            if (dbContext.Database.CurrentTransaction == null
+                || dbContext.Database.CurrentTransaction.UnderlyingTransaction != dbTransaction)
+            {
+                throw new ArgumentException("Invalid dbTransaction passed");
+            }
+
+            dbContext.Database.CurrentTransaction.Rollback();
+            return Task.CompletedTask;
+        }
 
         public override string[] GetProviderEnvironmentTags()
         {

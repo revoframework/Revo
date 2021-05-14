@@ -12,17 +12,17 @@ namespace Revo.Domain.Core
     {
         public override void Load()
         {
-            Bind<IApplicationStartListener>()
+            Bind<IApplicationStartedListener>()
                 .To<ConventionEventApplyRegistratorCache>()
                 .InSingletonScope();
 
-            Bind<ISagaConventionConfigurationCache, IApplicationStartListener>()
+            Bind<ISagaConventionConfigurationCache, IApplicationStartedListener>()
                 .To<SagaConventionConfigurationCache>()
                 .InSingletonScope();
 
             if (!Kernel.GetBindings(typeof(IEntityTypeManager)).Any())
             {
-                Bind<IEntityTypeManager, IApplicationStartListener>()
+                Bind<IEntityTypeManager, IApplicationStartedListener>()
                     .To<EntityTypeManager>()
                     .InTaskScope();
             }

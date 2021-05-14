@@ -13,6 +13,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
         private string moduleName;
         private DatabaseVersion version;
         private string[][] tags;
+        public DatabaseMigrationTransactionMode transactionMode = DatabaseMigrationTransactionMode.Default;
         private bool isBaseline;
         private bool isRepeatable;
         private string[] sqlCommands;
@@ -91,6 +92,19 @@ namespace Revo.Infrastructure.DataAccess.Migrations
                 }
 
                 return description;
+            }
+        }
+
+        public override DatabaseMigrationTransactionMode TransactionMode
+        {
+            get
+            {
+                if (!hasParsedFile)
+                {
+                    ParseFile();
+                }
+
+                return transactionMode;
             }
         }
 
@@ -213,6 +227,27 @@ namespace Revo.Infrastructure.DataAccess.Migrations
                     string moduleName = line.Substring(0, at);
                     string versionString = line.Substring(at + 1);
                     dependencies.Add(new DatabaseMigrationSpecifier(moduleName, DatabaseVersion.Parse(versionString)));
+                }
+            }
+            else if (line.StartsWith("transactionMode:"))
+            {
+                line = line.Substring("transactionMode:".Length).Trim().ToLowerInvariant();
+                switch (line)
+                {
+                    case "default":
+                        transactionMode = DatabaseMigrationTransactionMode.Default;
+                        break;
+
+                    case "isolated":
+                        transactionMode = DatabaseMigrationTransactionMode.Isolated;
+                        break;
+
+                    case "withouttransaction":
+                        transactionMode = DatabaseMigrationTransactionMode.WithoutTransaction;
+                        break;
+
+                    default:
+                        throw new FormatException($"Unknown value '{line}' for transactionMode in {this}");
                 }
             }
         }

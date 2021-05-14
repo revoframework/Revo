@@ -139,7 +139,35 @@ DROP TABLE def;
                     new DatabaseMigrationSpecifier("myapp-base", DatabaseVersion.Parse("1.2.3")),
                     new DatabaseMigrationSpecifier("vendor-module", null));
         }
-        
+
+        [Fact]
+        public void HasDefaultTransactionMode()
+        {
+            var sql =
+                $@"
+-- Hello
+DROP TABLE def;
+";
+            sut = new TestFileSqlDatabaseMigration("myapp_1.0.1.sql", sql);
+            sut.TransactionMode.Should().Be(DatabaseMigrationTransactionMode.Default);
+        }
+
+        [Theory]
+        [InlineData("default", DatabaseMigrationTransactionMode.Default)]
+        [InlineData("isolated", DatabaseMigrationTransactionMode.Isolated)]
+        [InlineData("withoutTransaction", DatabaseMigrationTransactionMode.WithoutTransaction)]
+        public void ParsesTransactionModes(string transactionModeString, DatabaseMigrationTransactionMode transactionMode)
+        {
+            var sql =
+                $@"
+-- Hello
+-- transactionMode: {transactionModeString}
+DROP TABLE def;
+";
+            sut = new TestFileSqlDatabaseMigration("myapp_1.0.1.sql", sql);
+            sut.TransactionMode.Should().Be(transactionMode);
+        }
+
         [Fact]
         public void ShouldNotParseAfterContent()
         {

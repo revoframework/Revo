@@ -11,6 +11,8 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
         public DatabaseVersion Version { get; set; }
         public IReadOnlyCollection<DatabaseMigrationSpecifier> Dependencies { get; set; } = new DatabaseMigrationSpecifier[0];
         public string[][] Tags { get; set; } = new string[0][];
+        public DatabaseMigrationTransactionMode TransactionMode { get; set; } =
+            DatabaseMigrationTransactionMode.Default;
         public string Description { get; set; }
         public string Checksum { get; set; }
         public string ToString(bool includeClassName)

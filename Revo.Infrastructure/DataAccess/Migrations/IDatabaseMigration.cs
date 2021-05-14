@@ -42,6 +42,12 @@ namespace Revo.Infrastructure.DataAccess.Migrations
         /// </summary>
         string[][] Tags { get; }
 
+        /// <summary>
+        /// Specifies how the database transaction should be handled for this migration.
+        /// Defaults to provider's Default, which will usually wrap all current migrations inside single transaction.
+        /// </summary>
+        DatabaseMigrationTransactionMode TransactionMode { get; }
+
         string Description { get; }
         string Checksum { get; }
         string ToString(bool includeClassName);

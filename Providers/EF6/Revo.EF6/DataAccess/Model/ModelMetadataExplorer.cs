@@ -12,7 +12,7 @@ using Revo.EF6.DataAccess.Entities;
 
 namespace Revo.EF6.DataAccess.Model
 {
-    public class ModelMetadataExplorer : IModelMetadataExplorer, IApplicationStartListener
+    public class ModelMetadataExplorer : IModelMetadataExplorer, IApplicationStartedListener
     {
         private readonly IDbContextFactory dbContextFactory;
         private readonly EntityTypeDiscovery entityTypeDiscovery;

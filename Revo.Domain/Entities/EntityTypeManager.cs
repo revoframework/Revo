@@ -6,7 +6,7 @@ using Revo.Core.Types;
 
 namespace Revo.Domain.Entities
 {
-    public class EntityTypeManager : IEntityTypeManager, IApplicationStartListener
+    public class EntityTypeManager : IEntityTypeManager, IApplicationStartedListener
     {
         private readonly ITypeExplorer typeExplorer;
         private Lazy<Dictionary<Type, DomainClassInfo>> typesToClassIds;

@@ -7,7 +7,7 @@ using Revo.EasyNetQ.Configuration;
 namespace Revo.EasyNetQ
 {
     public class BusInitializer :
-        IApplicationStartListener,
+        IApplicationStartedListener,
         IApplicationStopListener
     {
         private readonly IBus bus;

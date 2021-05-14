@@ -4,6 +4,7 @@
 
 ### Added
 - database migration hooks - can now listen to events like DatabaseMigrationBeforeAppliedEvent, DatabaseMigrationAppliedEvent and DatabaseMigrationsCommittedEvent
+- transactionMode for database migrations (isolated, without) for overriding their transaction behavior
 
 ### Changed
 - database migrations are run inside a unit of work when using EF Core and EF6 providers
