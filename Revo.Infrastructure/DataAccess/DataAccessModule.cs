@@ -7,7 +7,7 @@ namespace Revo.Infrastructure.DataAccess
     {
         public override void Load()
         {
-            Bind<IDatabaseInitializerLoader, IApplicationStartListener>()
+            Bind<IDatabaseInitializerLoader, IApplicationStartedListener>()
                 .To<DatabaseInitializerLoader>()
                 .InSingletonScope();
 

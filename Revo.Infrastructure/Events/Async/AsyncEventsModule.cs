@@ -11,7 +11,7 @@ namespace Revo.Infrastructure.Events.Async
     {
         public override void Load()
         {
-            Bind<IApplicationStartListener>()
+            Bind<IApplicationStartedListener>()
                 .To<AsyncEventExecutionCatchUp>()
                 .InSingletonScope();
 

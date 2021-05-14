@@ -8,7 +8,7 @@ using Revo.Infrastructure.Jobs.InMemory;
 
 namespace Revo.Extensions.Notifications.Channels.Buffering
 {
-    public class BufferedNotificationStartup : IApplicationStartListener
+    public class BufferedNotificationStartup : IApplicationStartedListener
     {
         private readonly IInMemoryJobScheduler inMemoryJobScheduler;
 

@@ -10,7 +10,7 @@ using Revo.Core.Types;
 
 namespace Revo.Infrastructure.Security.Commands
 {
-    public class CommandPermissionCache : ICommandPermissionCache, IApplicationStartListener
+    public class CommandPermissionCache : ICommandPermissionCache, IApplicationStartedListener
     {
         private readonly IPermissionTypeRegistry permissionTypeRegistry;
         private readonly PermissionTypeIndexer permissionTypeIndexer;

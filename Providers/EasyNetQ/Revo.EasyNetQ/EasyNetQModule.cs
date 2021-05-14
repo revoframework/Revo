@@ -24,7 +24,7 @@ namespace Revo.EasyNetQ
 
             if (configurationSection.IsActive)
             {
-                Bind<IApplicationStartListener, IApplicationStopListener>()
+                Bind<IApplicationStartedListener, IApplicationStoppingListener>()
                     .To<BusInitializer>()
                     .InSingletonScope();
 

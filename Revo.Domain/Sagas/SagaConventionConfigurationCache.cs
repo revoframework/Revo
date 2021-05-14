@@ -8,7 +8,7 @@ using Revo.Core.Types;
 
 namespace Revo.Domain.Sagas
 {
-    public class SagaConventionConfigurationCache : ISagaConventionConfigurationCache, IApplicationStartListener
+    public class SagaConventionConfigurationCache : ISagaConventionConfigurationCache, IApplicationStartedListener
     {
         private static Dictionary<Type, SagaConfigurationInfo> configurationInfos;
 

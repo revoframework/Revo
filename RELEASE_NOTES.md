@@ -9,6 +9,7 @@
 ### Changed
 - database migrations are run inside a unit of work when using EF Core and EF6 providers
 - EF Core/EF6 migration providers no longer create database upon startup
+- renamed lifecycle hook interfaces (IApplicationStartedListener, IApplicationStoppingListener) and added new IApplicationStartingListener hook
 
 ## [1.22.0] - 2020-04-30
 

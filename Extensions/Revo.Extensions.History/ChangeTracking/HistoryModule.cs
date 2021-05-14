@@ -10,7 +10,7 @@ namespace Revo.Extensions.History.ChangeTracking
     {
         public override void Load()
         {
-            Bind<IChangeDataTypeCache, IApplicationStartListener>()
+            Bind<IChangeDataTypeCache, IApplicationStartedListener>()
                 .To<ChangeDataTypeCache>()
                 .InSingletonScope();
 

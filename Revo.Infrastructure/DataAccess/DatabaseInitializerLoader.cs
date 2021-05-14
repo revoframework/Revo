@@ -9,7 +9,7 @@ using Revo.Infrastructure.Repositories;
 
 namespace Revo.Infrastructure.DataAccess
 {
-    public class DatabaseInitializerLoader : IDatabaseInitializerLoader, IApplicationStartListener
+    public class DatabaseInitializerLoader : IDatabaseInitializerLoader, IApplicationStartedListener
     {
         private readonly IDatabaseInitializerDiscovery databaseInitializerDiscovery;
         private readonly IDatabaseInitializerComparer comparer;

@@ -11,7 +11,7 @@ using Revo.EF6.DataAccess.Model;
 
 namespace Revo.EF6.DataAccess.Entities
 {
-    public class DbContextFactory : IDbContextFactory, IApplicationStartListener
+    public class DbContextFactory : IDbContextFactory, IApplicationStartedListener
     {
         private readonly ModelDefinitionDiscovery modelDefinitionDiscovery;
         private readonly EntityTypeDiscovery entityTypeDiscovery;

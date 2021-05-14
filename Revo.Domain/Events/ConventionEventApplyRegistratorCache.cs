@@ -3,18 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Revo.Core.Core;
 using Revo.Core.Lifecycle;
 using Revo.Core.Types;
 using Revo.Domain.Entities;
 
 namespace Revo.Domain.Events
 {
-    public class ConventionEventApplyRegistratorCache : IApplicationStartListener
+    public class ConventionEventApplyRegistratorCache : IApplicationStartedListener
     {
         private static Lazy<Dictionary<Type, EventTypeApplyDelegates>> componentTypeDelegates;
         private static ITypeExplorer typeExplorer = new TypeExplorer();
-        private static object loadLock = new object();
 
         static ConventionEventApplyRegistratorCache()
         {

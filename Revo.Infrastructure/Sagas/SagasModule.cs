@@ -24,7 +24,7 @@ namespace Revo.Infrastructure.Sagas
                 .To<ConventionSagaConfigurator>()
                 .InSingletonScope();
 
-            Bind<IApplicationStartListener>()
+            Bind<IApplicationStartedListener>()
                 .To<SagaConfigurationLoader>()
                 .InSingletonScope();
 

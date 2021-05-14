@@ -64,14 +64,15 @@ namespace Revo.Core.Configuration
 
         public void RunAppStartListeners()
         {
-            var initializer = kernel.Get<IApplicationStartListenerInitializer>();
-            initializer.InitializeStarted();
+            var initializer = kernel.Get<IApplicationLifecycleNotifier>();
+            initializer.NotifyStarting();
+            initializer.NotifyStarted();
         }
 
         public void RunAppStopListeners()
         {
-            var initializer = kernel.Get<IApplicationStartListenerInitializer>();
-            initializer.DeinitializeStopping();
+            var initializer = kernel.Get<IApplicationLifecycleNotifier>();
+            initializer.NotifyStopping();
         }
 
         private INinjectModule[] GetNinjectModules(Assembly assembly)

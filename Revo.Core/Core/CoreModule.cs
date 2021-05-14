@@ -73,7 +73,7 @@ namespace Revo.Core.Core
                 .To<PermissionTypeRegistry>()
                 .InSingletonScope();
 
-            Bind<PermissionTypeIndexer, IApplicationStartListener>()
+            Bind<PermissionTypeIndexer, IApplicationStartedListener>()
                 .To<PermissionTypeIndexer>()
                 .InSingletonScope();
 

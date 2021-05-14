@@ -9,7 +9,7 @@ using Revo.Core.Lifecycle;
 
 namespace Revo.Infrastructure.Jobs.InMemory
 {
-    public class InMemoryJobWorkerProcess : IApplicationStartListener, IApplicationStopListener, IInMemoryJobWorkerProcess
+    public class InMemoryJobWorkerProcess : IApplicationStartedListener, IApplicationStoppingListener, IInMemoryJobWorkerProcess
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
