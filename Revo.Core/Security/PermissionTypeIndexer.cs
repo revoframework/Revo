@@ -7,7 +7,7 @@ using Revo.Core.Types;
 
 namespace Revo.Core.Security
 {
-    public class PermissionTypeIndexer : IApplicationStartListener
+    public class PermissionTypeIndexer : IApplicationStartedListener
     {
         private readonly IPermissionTypeRegistry permissionTypeRegistry;
         private readonly ITypeExplorer typeExplorer;

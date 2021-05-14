@@ -17,6 +17,8 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly IEventBus eventBus;
+        private readonly List<IDatabaseMigration> uncommittedMigrations = new List<IDatabaseMigration>();
+        private IDbTransaction dbTransaction;
         private bool isInitialized = false;
 
         protected AdoNetStubDatabaseMigrationProvider(IEventBus eventBus)
@@ -67,44 +69,78 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
         {
             var dbConnection = await GetInitializedDbConnectionAsync();
             
-            using (var transaction = dbConnection.BeginTransaction())
+            try
             {
                 foreach (var migration in migrations)
                 {
                     if (!(migration is SqlDatabaseMigration sqlMigration))
                     {
-                        throw new DatabaseMigrationException($"Cannot apply non-SQL migration ({migration}) to database with ADO.NET (not supported)");
+                        throw new DatabaseMigrationException(
+                            $"Cannot apply non-SQL migration ({migration}) to database with ADO.NET (not supported)");
+                    }
+                    
+                    switch (migration.TransactionMode)
+                    {
+                        case DatabaseMigrationTransactionMode.Default:
+                            if (dbTransaction == null)
+                            {
+                                dbTransaction = await BeginDbTransactionAsync(dbConnection);
+                            }
+                            break;
+                        case DatabaseMigrationTransactionMode.Isolated:
+                            if (dbTransaction != null)
+                            {
+                                await CommitTransactionAsync();
+                            }
+
+                            dbTransaction = await BeginDbTransactionAsync(dbConnection);
+                            break;
+                        case DatabaseMigrationTransactionMode.WithoutTransaction:
+                            if (dbTransaction != null)
+                            {
+                                await CommitTransactionAsync();
+                            }
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
                     }
 
                     try
                     {
+                        Logger.Debug($"Executing database migration using ADO.NET provider: {migration}");
+
+                        await OnMigrationBeforeAppliedAsync(migration);
+
+                        uncommittedMigrations.Add(migration);
+
                         foreach (string sqlCommand in sqlMigration.SqlCommands)
                         {
-                            Logger.Debug($"Executing database migration using ADO.NET provider: {migration}");
-                            
-                            await OnMigrationBeforeAppliedAsync(migration);
-
                             using (var dbCommand = dbConnection.CreateCommand())
                             {
                                 dbCommand.CommandText = sqlCommand;
-                                dbCommand.Transaction = transaction;
+                                dbCommand.Transaction = dbTransaction;
 
                                 if (dbCommand is DbCommand dbCommandAsync)
                                 {
                                     await dbCommandAsync.ExecuteNonQueryAsync();
-                
+
                                 }
                                 else
                                 {
                                     dbCommand.ExecuteNonQuery();
                                 }
                             }
+                        }
 
-                            await InsertMigrationRecordAsync(dbConnection, transaction, migration);
+                        await InsertMigrationRecordAsync(migration);
 
-                            Logger.Info($"Applied database migration using ADO.NET provider: {migration}");
+                        Logger.Info($"Applied database migration using ADO.NET provider: {migration}");
 
-                            await OnMigrationAppliedAsync(migration);
+                        await OnMigrationAppliedAsync(migration);
+
+                        if (migration.TransactionMode == DatabaseMigrationTransactionMode.Isolated)
+                        {
+                            await CommitTransactionAsync();
                         }
                     }
                     catch (Exception e)
@@ -112,19 +148,39 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
                         throw new DatabaseMigrationException($"Failed to apply migration ({migration}) to database", e);
                     }
                 }
-                
-                try
+
+                if (uncommittedMigrations.Count > 0)
                 {
-                    Logger.Debug($"Commiting {migrations.Count} database migrations using ADO.NET provider");
-                    transaction.Commit();
+                    await CommitTransactionAsync();
                 }
-                catch (Exception e)
-                {
-                    throw new DatabaseMigrationException($"Failed to commit {migrations.Count} applied migrations to database", e);
-                }
-                
-                await OnMigrationsCommittedAsync(migrations);
             }
+            finally
+            {
+                if (dbTransaction != null)
+                {
+                    await RollbackDbTransactionAsync(dbTransaction);
+                    dbTransaction = null;
+                }
+
+                uncommittedMigrations.Clear();
+            }
+        }
+
+        private async Task CommitTransactionAsync()
+        {
+            try
+            {
+                Logger.Debug($"Commiting {uncommittedMigrations.Count} database migrations using ADO.NET provider");
+                await CommitDbTransactionAsync(dbTransaction);
+                dbTransaction = null;
+            }
+            catch (Exception e)
+            {
+                throw new DatabaseMigrationException($"Failed to commit {uncommittedMigrations.Count} applied migrations to database", e);
+            }
+
+            await OnMigrationsCommittedAsync(uncommittedMigrations);
+            uncommittedMigrations.Clear();
         }
 
         public bool SupportsMigration(IDatabaseMigration migration)
@@ -147,6 +203,23 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
         }
 
         protected abstract Task<IDbConnection> GetDbConnectionAsync();
+
+        protected virtual Task<IDbTransaction> BeginDbTransactionAsync(IDbConnection dbConnection)
+        {
+            return Task.FromResult(dbConnection.BeginTransaction());
+        }
+
+        protected virtual Task CommitDbTransactionAsync(IDbTransaction dbTransaction)
+        {
+            dbTransaction.Commit();
+            return Task.CompletedTask;
+        }
+
+        protected virtual Task RollbackDbTransactionAsync(IDbTransaction dbTransaction)
+        {
+            dbTransaction.Rollback();
+            return Task.CompletedTask;
+        }
 
         private async Task OnMigrationBeforeAppliedAsync(IDatabaseMigration migration)
         {
@@ -242,13 +315,12 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
                 reader.IsDBNull(columnDict["file_name"]) ? null : reader.GetString(columnDict["file_name"]));
         }
 
-        private async Task InsertMigrationRecordAsync(IDbConnection dbConnection, IDbTransaction transaction,
-            IDatabaseMigration migration)
+        private async Task InsertMigrationRecordAsync(IDatabaseMigration migration)
         {
-            using (var dbCommand = dbConnection.CreateCommand())
+            using (var dbCommand = dbTransaction.Connection.CreateCommand())
             {
                 dbCommand.CommandText = Scripter.InsertMigrationRecordSql;
-                dbCommand.Transaction = transaction;
+                dbCommand.Transaction = dbTransaction;
                 var param = dbCommand.CreateParameter();
                 param.DbType = DbType.Guid;
                 param.ParameterName = "Id";

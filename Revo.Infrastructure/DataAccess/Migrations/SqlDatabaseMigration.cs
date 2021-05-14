@@ -10,8 +10,10 @@ namespace Revo.Infrastructure.DataAccess.Migrations
         public abstract DatabaseVersion Version { get; }
         public virtual bool IsBaseline => false;
         public virtual bool IsRepeatable => false;
+        public virtual bool InIsolatedTransaction => false;
         public virtual IReadOnlyCollection<DatabaseMigrationSpecifier> Dependencies => new DatabaseMigrationSpecifier[0];
         public virtual string[][] Tags => new string[0][];
+        public virtual DatabaseMigrationTransactionMode TransactionMode => DatabaseMigrationTransactionMode.Default;
         public virtual string Description => null;
 
         public string Checksum
