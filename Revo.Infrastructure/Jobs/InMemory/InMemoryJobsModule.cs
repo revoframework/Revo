@@ -18,11 +18,11 @@ namespace Revo.Infrastructure.Jobs.InMemory
 
         public override void Load()
         {
-            Bind<IInMemoryJobWorkerProcess, IApplicationStartListener, IApplicationStopListener>()
+            Bind<IInMemoryJobWorkerProcess, IApplicationStartedListener, IApplicationStoppingListener>()
                 .To<InMemoryJobWorkerProcess>()
                 .InSingletonScope();
 
-            Bind<IInMemoryJobSchedulerProcess, IApplicationStartListener, IApplicationStopListener>()
+            Bind<IInMemoryJobSchedulerProcess, IApplicationStartedListener, IApplicationStoppingListener>()
                 .To<InMemoryJobSchedulerProcess>()
                 .InSingletonScope();
 

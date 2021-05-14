@@ -5,7 +5,7 @@ using Revo.Core.Lifecycle;
 
 namespace Revo.Infrastructure.DataAccess.Migrations
 {
-    public class DatabaseMigrationExecutionHook : IApplicationConfigurer
+    public class DatabaseMigrationExecutionHook : IApplicationStartingListener
     {
         private readonly ILocalCommandBus localCommandBus;
         private readonly IDatabaseMigrationsConfiguration configuration;
@@ -20,7 +20,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
             this.environment = environment;
         }
 
-        public void Configure()
+        public void OnApplicationStarting()
         {
             if (configuration.ApplyMigrationsUponStartup == true
                 || (environment.IsDevelopment && configuration.ApplyMigrationsUponStartup != false))

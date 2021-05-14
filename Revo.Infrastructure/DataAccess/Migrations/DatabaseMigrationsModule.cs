@@ -34,7 +34,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
                 .To<DatabaseMigrationExecutor>()
                 .InTaskScope();
             
-            Bind<IApplicationConfigurer>()
+            Bind<IApplicationStartingListener>()
                 .To<DatabaseMigrationExecutionHook>()
                 .InSingletonScope();
 

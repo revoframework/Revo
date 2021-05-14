@@ -8,7 +8,7 @@ namespace Revo.EasyNetQ
 {
     public class BusInitializer :
         IApplicationStartedListener,
-        IApplicationStopListener
+        IApplicationStoppingListener
     {
         private readonly IBus bus;
         private readonly IEasyNetQSubscriptionHandler subscriptionHandler;

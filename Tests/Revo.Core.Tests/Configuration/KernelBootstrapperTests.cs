@@ -114,19 +114,24 @@ namespace Revo.Core.Tests.Configuration
         [Fact]
         public void RunAppStartListeners()
         {
-            var initializer = Substitute.For<IApplicationStartListenerInitializer>();
-            kernel.Resolve(Arg.Is<IRequest>(x => x.Service == typeof(IApplicationStartListenerInitializer))).Returns(new[] { initializer });
+            var initializer = Substitute.For<IApplicationLifecycleNotifier>();
+            kernel.Resolve(Arg.Is<IRequest>(x => x.Service == typeof(IApplicationLifecycleNotifier))).Returns(new[] { initializer });
             sut.RunAppStartListeners();
-            initializer.Received(1).InitializeStarted();
+
+            Received.InOrder(() =>
+            {
+                initializer.NotifyStarting();
+                initializer.NotifyStarted();
+            });
         }
 
         [Fact]
         public void RunAppStopListeners()
         {
-            var initializer = Substitute.For<IApplicationStartListenerInitializer>();
-            kernel.Resolve(Arg.Is<IRequest>(x => x.Service == typeof(IApplicationStartListenerInitializer))).Returns(new[] { initializer });
+            var initializer = Substitute.For<IApplicationLifecycleNotifier>();
+            kernel.Resolve(Arg.Is<IRequest>(x => x.Service == typeof(IApplicationLifecycleNotifier))).Returns(new[] { initializer });
             sut.RunAppStopListeners();
-            initializer.Received(1).DeinitializeStopping();
+            initializer.Received(1).NotifyStopping();
         }
 
         public class TestModule : NinjectModule

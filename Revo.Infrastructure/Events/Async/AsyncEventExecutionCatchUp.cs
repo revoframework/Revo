@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NLog;
@@ -9,7 +8,7 @@ using Revo.Core.Lifecycle;
 
 namespace Revo.Infrastructure.Events.Async
 {
-    public class AsyncEventExecutionCatchUp : IApplicationStartListener
+    public class AsyncEventExecutionCatchUp : IApplicationStartedListener
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 

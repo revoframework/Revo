@@ -6,7 +6,7 @@ using Revo.Core.Types;
 
 namespace Revo.Extensions.History.ChangeTracking
 {
-    public class ChangeDataTypeCache : IApplicationStartListener, IChangeDataTypeCache
+    public class ChangeDataTypeCache : IApplicationStartedListener, IChangeDataTypeCache
     {
         private readonly ITypeExplorer typeExplorer;
         private Dictionary<string, Type> namesToTypes;

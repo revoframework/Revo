@@ -21,7 +21,7 @@ namespace Revo.Extensions.Notifications
                 .To<NotificationSerializer>()
                 .InSingletonScope();
             
-            Bind<IApplicationStartListener>()
+            Bind<IApplicationStartedListener>()
                 .To<BufferedNotificationStartup>()
                 .InSingletonScope();
 

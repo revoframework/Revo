@@ -55,7 +55,7 @@ namespace Revo.EF6.DataAccess
                 .To<RequestDbContextCache>()
                 .InRequestScope();
 
-            Bind<IModelMetadataExplorer, IApplicationStartListener>()
+            Bind<IModelMetadataExplorer, IApplicationStartedListener>()
                 .To<ModelMetadataExplorer>()
                 .InSingletonScope();
 
@@ -67,7 +67,7 @@ namespace Revo.EF6.DataAccess
                 .ToSelf()
                 .InSingletonScope();
 
-            Bind<IDbContextFactory, IApplicationStartListener>()
+            Bind<IDbContextFactory, IApplicationStartedListener>()
                 .To<DbContextFactory>()
                 .InSingletonScope();
 

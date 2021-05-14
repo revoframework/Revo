@@ -15,8 +15,8 @@ namespace Revo.Core.Lifecycle
                 .To<ApplicationConfigurerInitializer>()
                 .InSingletonScope();
 
-            Bind<IApplicationStartListenerInitializer>()
-                .To<ApplicationStartListenerInitializer>()
+            Bind<IApplicationLifecycleNotifier>()
+                .To<ApplicationLifecycleNotifier>()
                 .InSingletonScope();
         }
     }
