@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MoreLinq;
 using Revo.Core.Events;
 using Revo.DataAccess.Entities;
 using Revo.Domain.Events;
@@ -133,7 +134,6 @@ namespace Revo.Infrastructure.Events.Async.Generic
             await EnqueueExternalEventsAsync(queuedEvents);
             await CreateQueuesAsync(queuedEvents);
             
-            eventsToQueues.Clear();
             return queuedEvents;
         }
 
@@ -155,9 +155,10 @@ namespace Revo.Infrastructure.Events.Async.Generic
         private void EnqueueEventStoreEvents(List<QueuedAsyncEvent> queuedEvents)
         {
             // all event store events need to be marked as dispatched (even whey they haven't been dispatched to any queues)
-            var eventStoreEvents = eventsToQueues.Where(x =>
-                (x.Key as IEventStoreEventMessage)?.Record is IEventStreamRowEventStoreRecord).ToArray();
-
+            var eventStoreEvents = eventsToQueues
+                .Where(x => (x.Key as IEventStoreEventMessage)?.Record is IEventStreamRowEventStoreRecord)
+                .ToArray();
+            
             foreach (var eventToQueues in eventStoreEvents)
             {
                 var storeMessage = (IEventStoreEventMessage)eventToQueues.Key;
@@ -187,6 +188,8 @@ namespace Revo.Infrastructure.Events.Async.Generic
                     }
                 }
             }
+            
+            eventStoreEvents.ForEach(x => eventsToQueues.Remove(x.Key));
         }
 
         private async Task EnqueueExternalEventsAsync(List<QueuedAsyncEvent> queuedEvents)
@@ -202,11 +205,20 @@ namespace Revo.Infrastructure.Events.Async.Generic
                     var eventId = x.Key.Metadata.GetEventId();
                     if (eventId == null)
                     {
-                        return new KeyValuePair<IEventMessage, List<EventSequencing>>(
-                            CloneMessageWithId(x.Key), x.Value);
+                        return new
+                        {
+                            OriginalMessage = x.Key,
+                            Message = CloneMessageWithId(x.Key),
+                            EventSequencings = x.Value
+                        };
                     }
 
-                    return x;
+                    return new
+                    {
+                        OriginalMessage = x.Key,
+                        Message = x.Key,
+                        EventSequencings = x.Value
+                    };
                 })
                 .ToArray();
             
@@ -214,7 +226,8 @@ namespace Revo.Infrastructure.Events.Async.Generic
             {
                 foreach (var externalEvent in externalEvents)
                 {
-                    externalEventStore.TryPushEvent(externalEvent.Key);
+                    externalEventStore.TryPushEvent(externalEvent.Message);
+                    eventsToQueues.Remove(externalEvent.OriginalMessage); // we need to remove the events before the CommitAsync below, which might trigger another execution of this method
                 }
 
                 var externalEventRecords = await externalEventStore.CommitAsync();
@@ -233,7 +246,12 @@ namespace Revo.Infrastructure.Events.Async.Generic
                         crudRepository.SetEntityState(externalEventRecord, EntityState.Modified);
                     }
 
-                    var sequencings = externalEvents.First(x => x.Key.Metadata.GetEventId() == externalEventRecord.Id).Value;
+                    var sequencings = externalEvents.FirstOrDefault(x =>
+                        x.Message.Metadata.GetEventId() == externalEventRecord.Id)?.EventSequencings;
+                    if (sequencings == null) // may happen with providers like EF Core with coordinated transactions
+                    {
+                        continue;
+                    }
 
                     foreach (var sequencing in sequencings)
                     {

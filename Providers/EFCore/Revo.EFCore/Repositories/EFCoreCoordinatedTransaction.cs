@@ -49,14 +49,14 @@ namespace Revo.EFCore.Repositories
                     case EFCoreProjectionSubSystem _:
                         return 103;
 
+                    case EFCoreAsyncEventQueueManager _:
+                        return 104;
+
                     case EFCoreEventStore _:
                         return 105;
 
                     case EFCoreExternalEventStore _:
                         return 106;
-
-                    case EFCoreAsyncEventQueueManager _:
-                        return 107;
 
                     default:
                         return 0;

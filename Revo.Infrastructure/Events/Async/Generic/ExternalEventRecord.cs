@@ -6,7 +6,7 @@ namespace Revo.Infrastructure.Events.Async.Generic
 {
     [TablePrefix(NamespacePrefix = "RAE", ColumnPrefix = "EER")]
     [DatabaseEntity]
-    public class ExternalEventRecord
+    public class ExternalEventRecord : IHasId<Guid>
     {
         public ExternalEventRecord(Guid id, string eventJson, string eventName, int eventVersion,
             string metadataJson)

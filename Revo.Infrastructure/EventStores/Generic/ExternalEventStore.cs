@@ -52,8 +52,7 @@ namespace Revo.Infrastructure.EventStores.Generic
         protected virtual async Task<ExternalEventRecord[]> GetExistingEventRecordsAsync(Guid[] ids)
         {
             return await crudRepository
-                .Where<ExternalEventRecord>(x => ids.Contains(x.Id))
-                .ToArrayAsync(crudRepository);
+                .FindManyAsync<ExternalEventRecord>(ids);
         }
 
         protected async Task<ExternalEventRecord[]> PrepareRecordsAsync()
