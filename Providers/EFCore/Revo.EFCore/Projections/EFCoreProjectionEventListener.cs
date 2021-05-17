@@ -42,8 +42,8 @@ namespace Revo.EFCore.Projections
                     ? entityTypeManager.TryGetClassInfoByClassId(aggregateClassId.Value)
                     : null;
                 
-                if (classInfo == null
-                    || projectorResolver.HasAnyProjectors(classInfo.ClrType))
+                if (classInfo != null
+                    && projectorResolver.HasAnyProjectors(classInfo.ClrType))
                 {
                     yield return new EventSequencing()
                     {

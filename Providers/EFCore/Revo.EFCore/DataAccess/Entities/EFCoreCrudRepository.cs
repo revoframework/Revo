@@ -371,7 +371,8 @@ namespace Revo.EFCore.DataAccess.Entities
 
         public bool IsAttached<T>(T entity) where T : class
         {
-            return DatabaseAccess.GetDbContext(typeof(T)).Set<T>().Local.Any(x => x == entity);
+            return DatabaseAccess.GetDbContext(typeof(T)).Entry(entity).State !=
+                   Microsoft.EntityFrameworkCore.EntityState.Detached;
         }
 
         public IEFCoreCrudRepository IncludeFilters(params IRepositoryFilter[] repositoryFilters)

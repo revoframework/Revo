@@ -280,7 +280,67 @@ namespace Revo.Infrastructure.Tests.Events.Async.Generic
             externalEventRecord.Should().NotBeNull();
             externalEventRecord.IsDispatchedToAsyncQueues.Should().BeTrue();
         }
-        
+
+        [Fact]
+        public async Task EnqueueEventAsync_ExternalEvent_AnotherEnqueueCalledFromCommit()
+        {
+            // This test is important for providers like EF Core that use coordinated transaction for committing multiple things at once.
+            // Because of this, AsyncEventQueueManager.CommitAsync may get invoked again from the transaction coordinator during ExternalEventStore.CommitAsync,
+            // in which case we must make sure the events don't get enqueued twice.
+
+            var eventMessage = EventMessageDraft
+                .FromEvent(new TestEvent());
+
+            Guid? eventId = null;
+            externalEventStore
+                .When(x => x.TryPushEvent(Arg.Is<IEventMessage>(arg => arg.Event == eventMessage.Event)))
+                .Do(ci => eventId = ci.Arg<IEventMessage>().Metadata.GetEventId());
+
+            ExternalEventRecord externalEventRecord = null;
+
+            int storeCommitsRunning = 0;
+
+            externalEventStore.CommitAsync()
+                .Returns(async ci =>
+                {
+                    externalEventStore.ReceivedWithAnyArgs(1).TryPushEvent(null);
+                    eventId.Should().NotBeNull();
+
+                    externalEventRecord = new ExternalEventRecord(eventId.Value,
+                        "{}", "TestEvent", 1, "{}");
+                    
+                    if (storeCommitsRunning == 0)
+                    {
+                        storeCommitsRunning++;
+                        try
+                        {
+                            await sut.CommitAsync();
+                        }
+                        finally
+                        {
+                            storeCommitsRunning--;
+                        }
+                    }
+
+                    return new[] { externalEventRecord };
+                });
+
+            var resultEventMessage = eventMessage.Clone();
+            queuedAsyncEventMessageFactory.CreateEventMessage(
+                    Arg.Is<QueuedAsyncEvent>(x => x.ExternalEventRecord == externalEventRecord))
+                .Returns(resultEventMessage);
+
+            await sut.EnqueueEventAsync(eventMessage, new[]
+            {
+                new EventSequencing() {SequenceName = "queue1"}
+            });
+            var result = await sut.CommitAsync();
+            
+            var queuedEvents = crudRepository.FindAll<QueuedAsyncEvent>().ToArray();
+            queuedEvents.Should().HaveCount(1);
+            result.Should().HaveCount(1);
+        }
+
         [Fact]
         public async Task DequeueEventAsync()
         {

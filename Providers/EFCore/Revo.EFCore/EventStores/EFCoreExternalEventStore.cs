@@ -15,7 +15,7 @@ namespace Revo.EFCore.EventStores
     public class EFCoreExternalEventStore : ExternalEventStore, ITransactionParticipant
     {
         private readonly IEFCoreTransactionCoordinator transactionCoordinator;
-        private readonly HashSet<ExternalEventRecord> transactionRecords = new HashSet<ExternalEventRecord>();
+        private HashSet<ExternalEventRecord> transactionRecords = new HashSet<ExternalEventRecord>();
 
         public EFCoreExternalEventStore(ICrudRepository crudRepository,
             IEventSerializer eventSerializer, IEFCoreTransactionCoordinator transactionCoordinator)
@@ -28,11 +28,12 @@ namespace Revo.EFCore.EventStores
 
         public override async Task<ExternalEventRecord[]> CommitAsync()
         {
+            var currentTransactionRecords = transactionRecords;
             var records = await PrepareRecordsAsync();
-            records.ForEach(x => transactionRecords.Add(x));
+            records.ForEach(x => currentTransactionRecords.Add(x));
 
             await transactionCoordinator.CommitAsync();
-            return transactionRecords.ToArray();
+            return currentTransactionRecords.ToArray();
         }
 
         public async Task OnBeforeCommitAsync()
@@ -43,13 +44,13 @@ namespace Revo.EFCore.EventStores
 
         public Task OnCommitSucceededAsync()
         {
-            transactionRecords.Clear();
+            // new, so we don't clear currentTransactionRecords in CommitAsync
+            transactionRecords = new HashSet<ExternalEventRecord>();
             return Task.CompletedTask;
         }
 
         public Task OnCommitFailedAsync()
         {
-            transactionRecords.Clear();
             return Task.CompletedTask;
         }
 

@@ -7,12 +7,16 @@
 - transactionMode for database migrations (isolated, without) for overriding their transaction behavior
 
 ### Fixed
-- ExternalEventSourceCatchUp should dispatch messages with metadata mapped from the event record (e.g. ID) + added test
+- ExternalEventSourceCatchUp should dispatch messages with metadata mapped from the event record (e.g. ID)
+- async events might occasionally have gotten enqueued twice during EF Core's coordinated transaction
 
 ### Changed
 - database migrations are run inside a unit of work when using EF Core and EF6 providers
 - EF Core/EF6 migration providers no longer create database upon startup
 - renamed lifecycle hook interfaces (IApplicationStartedListener, IApplicationStoppingListener) and added new IApplicationStartingListener hook
+
+### Improved
+- better performance when enqueueing async events & for EFCoreCrudRepository.IsAttached
 
 ## [1.22.0] - 2020-04-30
 

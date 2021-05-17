@@ -13,7 +13,7 @@ namespace Revo.EFCore.Events
     public class EFCoreAsyncEventQueueManager : AsyncEventQueueManager, ITransactionParticipant
     {
         private readonly IEFCoreTransactionCoordinator transactionCoordinator;
-        private readonly List<QueuedAsyncEvent> transactionQueuedEvents = new List<QueuedAsyncEvent>();
+        private List<QueuedAsyncEvent> transactionQueuedEvents = new List<QueuedAsyncEvent>();
 
         public EFCoreAsyncEventQueueManager(ICrudRepository crudRepository,
             IQueuedAsyncEventMessageFactory queuedAsyncEventMessageFactory,
@@ -28,11 +28,9 @@ namespace Revo.EFCore.Events
         
         public override async Task<IReadOnlyCollection<IAsyncEventQueueRecord>> CommitAsync()
         {
-            var queuedEvents = await EnqueueEventsToRepositoryAsync();
-            transactionQueuedEvents.AddRange(queuedEvents);
-
+            var currentTransactionQueuedEvents = transactionQueuedEvents;
             await transactionCoordinator.CommitAsync();
-            return transactionQueuedEvents.Select(SelectRecordFromQueuedEvent).ToList();
+            return currentTransactionQueuedEvents.Select(SelectRecordFromQueuedEvent).ToList();
         }
 
         public async Task OnBeforeCommitAsync()
@@ -43,6 +41,8 @@ namespace Revo.EFCore.Events
 
         public Task OnCommitSucceededAsync()
         {
+            // new, so we don't clear currentTransactionQueuedEvents in CommitAsync
+            transactionQueuedEvents = new List<QueuedAsyncEvent>();
             return Task.CompletedTask;
         }
 
