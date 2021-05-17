@@ -6,6 +6,9 @@
 - database migration hooks - can now listen to events like DatabaseMigrationBeforeAppliedEvent, DatabaseMigrationAppliedEvent and DatabaseMigrationsCommittedEvent
 - transactionMode for database migrations (isolated, without) for overriding their transaction behavior
 
+### Fixed
+- ExternalEventSourceCatchUp should dispatch messages with metadata mapped from the event record (e.g. ID) + added test
+
 ### Changed
 - database migrations are run inside a unit of work when using EF Core and EF6 providers
 - EF Core/EF6 migration providers no longer create database upon startup

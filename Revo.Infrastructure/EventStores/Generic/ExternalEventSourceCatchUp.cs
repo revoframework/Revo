@@ -33,12 +33,7 @@ namespace Revo.Infrastructure.EventStores.Generic
             if (nondispatchedEvents.Count > 0)
             {
                 var messages = nondispatchedEvents.Select(x =>
-                {
-                    var @event = eventSerializer.DeserializeEvent(x.EventJson,
-                        new VersionedTypeId(x.EventName, x.EventVersion));
-                    var metadata = eventSerializer.DeserializeEventMetadata(x.MetadataJson);
-                    return EventMessage.FromEvent(@event, metadata);
-                });
+                    ExternalEventMessageAdapter.FromRecord(x, eventSerializer));
 
                 await asyncEventQueueDispatcher.DispatchToQueuesAsync(messages, null, null);
             }

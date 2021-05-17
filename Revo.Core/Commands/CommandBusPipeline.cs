@@ -24,7 +24,7 @@ namespace Revo.Core.Commands
         public Task<object> ProcessAsync(ICommandBase command, CommandBusMiddlewareDelegate executionHandler,
             ICommandBus commandBus, CommandExecutionOptions executionOptions, CancellationToken cancellationToken)
         {
-            var processMethod = GetType().GetRuntimeMethods().Single(x => x.Name == "ProcessInternalAsync");
+            var processMethod = GetType().GetRuntimeMethods().Single(x => x.Name == nameof(ProcessInternalAsync));
             var boundProcessMethod = processMethod.MakeGenericMethod(command.GetType());
 
             return (Task<object>)boundProcessMethod.Invoke(this, new object[]
