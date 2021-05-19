@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Ninject;
 using NLog;
+using Revo.Core.Collections;
 using Revo.Core.Lifecycle;
 using Revo.Core.Types;
 
@@ -32,26 +33,31 @@ namespace Revo.Core.Commands
         private void DiscoverCommandHandlers()
         {
             var commandHandlerTypes = typeExplorer.GetAllTypes()
-                .Where(x => x.IsClass && !x.IsAbstract && !x.IsGenericTypeDefinition
-                    && CommandHandlerBindingExtensions.GetCommandHandlerInterfaces(x).Length > 0)
-                .ToArray();
+                .Where(x => x.IsClass && !x.IsAbstract && !x.IsGenericTypeDefinition);
 
-            RegisterCommandHandlers(commandHandlerTypes);
-            Logger.Debug($"Discovered {commandHandlerTypes.Length} command handlers: {string.Join(", ", commandHandlerTypes.Select(x => x.FullName))}");
+            var handlersToInterfaces = new MultiValueDictionary<Type, Type>();
+            foreach (var commandHandlerType in commandHandlerTypes)
+            {
+                var interfaces = CommandHandlerBindingExtensions.GetCommandHandlerInterfaces(commandHandlerType);
+                if (interfaces.Length > 0)
+                {
+                    handlersToInterfaces.AddRange(commandHandlerType, interfaces);
+                }
+            }
+
+            RegisterCommandHandlers(handlersToInterfaces);
+            Logger.Debug($"Discovered {handlersToInterfaces.Count} command handlers: {string.Join(", ", commandHandlerTypes.Select(x => x.FullName))}");
         }
 
-        private void RegisterCommandHandlers(IEnumerable<Type> commandHandlerTypes)
+        private void RegisterCommandHandlers(IReadOnlyDictionary<Type, IReadOnlyCollection<Type>> handlersToInterfaces)
         {
             Func<ICommandBus> commandBusLambda = () => kernel.Get<ILocalCommandBus>();
 
-            foreach (Type commandHandlerType in commandHandlerTypes)
+            foreach (var commandHandlerType in handlersToInterfaces)
             {
-                kernel.BindCommandHandler(commandHandlerType);
+                kernel.BindCommandHandler(commandHandlerType.Key);
 
-                var interfaces = CommandHandlerBindingExtensions
-                    .GetCommandHandlerInterfaces(commandHandlerType);
-
-                foreach (var handlerInterface in interfaces)
+                foreach (var handlerInterface in commandHandlerType.Value)
                 {
                     var commandType = handlerInterface.GetGenericArguments()[0];
                     if (!commandRouter.HasRoute(commandType))

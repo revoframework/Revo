@@ -9,6 +9,7 @@
 ### Fixed
 - ExternalEventSourceCatchUp should dispatch messages with metadata mapped from the event record (e.g. ID)
 - async events might occasionally have gotten enqueued twice during EF Core's coordinated transaction
+- support for generic commands (still without automatic discovery of generic command handlers, though, needs to register manually)
 
 ### Changed
 - database migrations are run inside a unit of work when using EF Core and EF6 providers
