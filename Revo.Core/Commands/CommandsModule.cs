@@ -41,6 +41,9 @@ namespace Revo.Core.Commands
                 .To<UnitOfWorkCommandBusMiddleware>()
                 .InTransientScope();
 
+            Bind<ICommandTypeDiscovery>()
+                .To<CommandTypeDiscovery>();
+
             if (configurationSection.AutoDiscoverCommandHandlers)
             {
                 Bind<IApplicationConfigurer>()
