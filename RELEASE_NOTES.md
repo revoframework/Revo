@@ -1,6 +1,6 @@
 # RELEASE NOTES
 
-## [1.23.0] - 2020-??-??
+## [1.23.0] - 2020-05-19
 
 ### Added
 - database migration hooks - can now listen to events like DatabaseMigrationBeforeAppliedEvent, DatabaseMigrationAppliedEvent and DatabaseMigrationsCommittedEvent
