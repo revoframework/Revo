@@ -38,7 +38,8 @@ namespace Revo.Infrastructure.Tests.Events.Async
                 AsyncProcessRetryTimeout = TimeSpan.FromMilliseconds(500),
                 AsyncProcessRetryTimeoutMultiplier = 6,
                 SyncProcessRetryTimeout = TimeSpan.FromMilliseconds(600),
-                SyncProcessRetryTimeoutMultiplier = 4
+                SyncProcessRetryTimeoutMultiplier = 4,
+                WaitForEventCatchUpsUponStartup = true
             };
 
             sut = new AsyncEventExecutionCatchUp(

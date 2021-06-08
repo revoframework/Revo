@@ -1,5 +1,10 @@
 # RELEASE NOTES
 
+## [1.24.0] - 2020-06-08
+
+### Changed
+- by default, event source and event queue catch-ups now don't block application startup until finished (IAsyncEventPipelineConfiguration.WaitForEventCatchUpsUponStartup)
+
 ## [1.23.0] - 2020-05-19
 
 ### Added

@@ -30,7 +30,12 @@ namespace Revo.Infrastructure.Events.Async
 
         public void OnApplicationStarted()
         {
-            Task.Run(InitializeAsync).GetAwaiter().GetResult();
+            var task = Task.Run(InitializeAsync);
+
+            if (asyncEventPipelineConfiguration.WaitForEventCatchUpsUponStartup)
+            {
+                task.GetAwaiter().GetResult();
+            }
         }
 
         private async Task InitializeAsync()

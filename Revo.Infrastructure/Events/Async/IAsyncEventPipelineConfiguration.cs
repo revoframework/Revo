@@ -20,7 +20,7 @@ namespace Revo.Infrastructure.Events.Async
         int SyncQueueProcessingParallelism { get; }
 
         /// <summary>
-        /// Maximum total nnumber of Tasks to be run in parallel by the event daemon when asynchronously processing event queues.
+        /// Maximum total number of Tasks to be run in parallel by the event daemon when asynchronously processing event queues.
         /// Does not directly influence the amount of threads spawned, only limits the number of unfinished processing tasks at a time.
         /// </summary>
         //int AsyncQueueProcessingParallelism { get; }
@@ -29,6 +29,7 @@ namespace Revo.Infrastructure.Events.Async
         TimeSpan AsyncRescheduleDelayAfterSyncProcessFailure { get; }
         TimeSpan AsyncProcessRetryTimeout { get; }
         int AsyncProcessRetryTimeoutMultiplier { get; }
+        bool WaitForEventCatchUpsUponStartup { get; }
 
         int SyncProcessAttemptCount { get; }
         TimeSpan SyncProcessRetryTimeout { get; }
