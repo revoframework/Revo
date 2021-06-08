@@ -11,7 +11,8 @@ namespace Revo.Infrastructure.Events.Async
         public TimeSpan AsyncRescheduleDelayAfterSyncProcessFailure { get; set; } = TimeSpan.FromMinutes(1);
         public TimeSpan AsyncProcessRetryTimeout { get; set; } = TimeSpan.FromMilliseconds(500);
         public int AsyncProcessRetryTimeoutMultiplier { get; set; } = 6;
-        
+        public bool WaitForEventCatchUpsUponStartup { get; set; } = false;
+
         public int SyncProcessAttemptCount { get; set; } = 3;
         public TimeSpan SyncProcessRetryTimeout { get; set; } = TimeSpan.FromMilliseconds(500);
         public int SyncProcessRetryTimeoutMultiplier { get; set; } = 4;
