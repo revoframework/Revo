@@ -1,5 +1,10 @@
 # RELEASE NOTES
 
+## [1.25.0] - 2020-07-27
+
+### Added
+- added SendLambdaCommand extension: easily executes specified lambda like it was performed by any regular command handler
+
 ## [1.24.0] - 2020-06-08
 
 ### Changed
