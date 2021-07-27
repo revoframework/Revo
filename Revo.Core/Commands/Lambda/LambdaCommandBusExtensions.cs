@@ -6,13 +6,13 @@ namespace Revo.Core.Commands.Lambda
 {
     public static class LambdaCommandBusExtensions
     {
-        #region SendLambdaCommand for commands
+        #region SendLambdaCommandAsync for commands
 
         /// <summary>
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand(this ICommandBus commandBus, Func<Task> command,
+        public static Task SendLambdaCommandAsync(this ICommandBus commandBus, Func<Task> command,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             return commandBus.SendAsync(new LambdaCommand(command), cancellationToken);
@@ -22,18 +22,7 @@ namespace Revo.Core.Commands.Lambda
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand<T1>(this ICommandBus commandBus, Func<Task, T1> command,
-            CancellationToken cancellationToken = default(CancellationToken))
-        {
-            return commandBus.SendAsync(new LambdaCommand(command), cancellationToken);
-        }
-
-
-        /// <summary>
-        /// Executes specified lambda function like it was performed by any regular command handler.
-        /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
-        /// </summary>
-        public static Task SendLambdaCommand<T1, T2>(this ICommandBus commandBus, Func<Task, T1, T2> command,
+        public static Task SendLambdaCommandAsync<T1>(this ICommandBus commandBus, Func<T1, Task> command,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             return commandBus.SendAsync(new LambdaCommand(command), cancellationToken);
@@ -44,17 +33,18 @@ namespace Revo.Core.Commands.Lambda
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand<T1, T2, T3>(this ICommandBus commandBus, Func<Task, T1, T2, T3> command,
+        public static Task SendLambdaCommandAsync<T1, T2>(this ICommandBus commandBus, Func<T1, T2, Task> command,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             return commandBus.SendAsync(new LambdaCommand(command), cancellationToken);
         }
-        
+
+
         /// <summary>
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand<T1, T2, T3, T4>(this ICommandBus commandBus, Func<Task, T1, T2, T3, T4> command,
+        public static Task SendLambdaCommandAsync<T1, T2, T3>(this ICommandBus commandBus, Func<T1, T2, T3, Task> command,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             return commandBus.SendAsync(new LambdaCommand(command), cancellationToken);
@@ -64,7 +54,17 @@ namespace Revo.Core.Commands.Lambda
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand<T1, T2, T3, T4, T5>(this ICommandBus commandBus, Func<Task, T1, T2, T3, T4, T5> command,
+        public static Task SendLambdaCommandAsync<T1, T2, T3, T4>(this ICommandBus commandBus, Func<T1, T2, T3, T4, Task> command,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return commandBus.SendAsync(new LambdaCommand(command), cancellationToken);
+        }
+        
+        /// <summary>
+        /// Executes specified lambda function like it was performed by any regular command handler.
+        /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
+        /// </summary>
+        public static Task SendLambdaCommandAsync<T1, T2, T3, T4, T5>(this ICommandBus commandBus, Func<T1, T2, T3, T4, T5, Task> command,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             return commandBus.SendAsync(new LambdaCommand(command), cancellationToken);
@@ -74,7 +74,7 @@ namespace Revo.Core.Commands.Lambda
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand<T1, T2, T3, T4, T5, T6>(this ICommandBus commandBus, Func<Task, T1, T2, T3, T4, T5, T6> command,
+        public static Task SendLambdaCommandAsync<T1, T2, T3, T4, T5, T6>(this ICommandBus commandBus, Func<T1, T2, T3, T4, T5, T6, Task> command,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             return commandBus.SendAsync(new LambdaCommand(command), cancellationToken);
@@ -84,7 +84,7 @@ namespace Revo.Core.Commands.Lambda
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand<T1, T2, T3, T4, T5, T6, T7>(this ICommandBus commandBus, Func<Task, T1, T2, T3, T4, T5, T6, T7> command,
+        public static Task SendLambdaCommandAsync<T1, T2, T3, T4, T5, T6, T7>(this ICommandBus commandBus, Func<T1, T2, T3, T4, T5, T6, T7, Task> command,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             return commandBus.SendAsync(new LambdaCommand(command), cancellationToken);
@@ -92,13 +92,13 @@ namespace Revo.Core.Commands.Lambda
 
         #endregion
 
-        #region SendLambdaCommand for commands, with CommandExecutionOptions
+        #region SendLambdaCommandAsync for commands, with CommandExecutionOptions
 
         /// <summary>
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand(this ICommandBus commandBus, Func<Task> command,
+        public static Task SendLambdaCommandAsync(this ICommandBus commandBus, Func<Task> command,
             CommandExecutionOptions executionOptions,
             CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -109,7 +109,7 @@ namespace Revo.Core.Commands.Lambda
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand<T1>(this ICommandBus commandBus, Func<Task, T1> command,
+        public static Task SendLambdaCommandAsync<T1>(this ICommandBus commandBus, Func<T1, Task> command,
             CommandExecutionOptions executionOptions,
             CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -120,7 +120,7 @@ namespace Revo.Core.Commands.Lambda
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand<T1, T2>(this ICommandBus commandBus, Func<Task, T1, T2> command,
+        public static Task SendLambdaCommandAsync<T1, T2>(this ICommandBus commandBus, Func<T1, T2, Task> command,
             CommandExecutionOptions executionOptions,
             CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -131,8 +131,8 @@ namespace Revo.Core.Commands.Lambda
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand<T1, T2, T3>(this ICommandBus commandBus,
-            Func<Task, T1, T2, T3> command,
+        public static Task SendLambdaCommandAsync<T1, T2, T3>(this ICommandBus commandBus,
+            Func<T1, T2, T3, Task> command,
             CommandExecutionOptions executionOptions,
             CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -143,8 +143,8 @@ namespace Revo.Core.Commands.Lambda
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand<T1, T2, T3, T4>(this ICommandBus commandBus,
-            Func<Task, T1, T2, T3, T4> command,
+        public static Task SendLambdaCommandAsync<T1, T2, T3, T4>(this ICommandBus commandBus,
+            Func<T1, T2, T3, T4, Task> command,
             CommandExecutionOptions executionOptions,
             CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -155,8 +155,8 @@ namespace Revo.Core.Commands.Lambda
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand<T1, T2, T3, T4, T5>(this ICommandBus commandBus,
-            Func<Task, T1, T2, T3, T4, T5> command,
+        public static Task SendLambdaCommandAsync<T1, T2, T3, T4, T5>(this ICommandBus commandBus,
+            Func<T1, T2, T3, T4, T5, Task> command,
             CommandExecutionOptions executionOptions,
             CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -167,8 +167,8 @@ namespace Revo.Core.Commands.Lambda
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand<T1, T2, T3, T4, T5, T6>(this ICommandBus commandBus,
-            Func<Task, T1, T2, T3, T4, T5, T6> command,
+        public static Task SendLambdaCommandAsync<T1, T2, T3, T4, T5, T6>(this ICommandBus commandBus,
+            Func<T1, T2, T3, T4, T5, T6, Task> command,
             CommandExecutionOptions executionOptions,
             CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -179,8 +179,8 @@ namespace Revo.Core.Commands.Lambda
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand<T1, T2, T3, T4, T5, T6, T7>(this ICommandBus commandBus,
-            Func<Task, T1, T2, T3, T4, T5, T6, T7> command,
+        public static Task SendLambdaCommandAsync<T1, T2, T3, T4, T5, T6, T7>(this ICommandBus commandBus,
+            Func<T1, T2, T3, T4, T5, T6, T7, Task> command,
             CommandExecutionOptions executionOptions,
             CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -189,186 +189,186 @@ namespace Revo.Core.Commands.Lambda
 
         #endregion
 
-        #region SendLambdaCommand for queries
+        #region SendLambdaCommandAsync for queries
 
         /// <summary>
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand<TResult>(this ICommandBus commandBus, Func<Task<TResult>, TResult> query,
+        public static Task SendLambdaCommandAsync<TResult>(this ICommandBus commandBus, Func<Task<TResult>> query,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return commandBus.SendAsync(new LambdaQuery(query, typeof(TResult)), cancellationToken);
+            return commandBus.SendAsync(new LambdaResultCommand(query, typeof(TResult)), cancellationToken);
         }
 
         /// <summary>
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand<TResult, T1>(this ICommandBus commandBus, Func<T1, TResult> query,
+        public static Task SendLambdaCommandAsync<TResult, T1>(this ICommandBus commandBus, Func<T1, Task<TResult>> query,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return commandBus.SendAsync(new LambdaQuery(query, typeof(TResult)), cancellationToken);
+            return commandBus.SendAsync(new LambdaResultCommand(query, typeof(TResult)), cancellationToken);
         }
 
         /// <summary>
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand<TResult, T1, T2>(this ICommandBus commandBus, Func<T1, T2, TResult> query,
+        public static Task SendLambdaCommandAsync<TResult, T1, T2>(this ICommandBus commandBus, Func<T1, T2, Task<TResult>> query,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return commandBus.SendAsync(new LambdaQuery(query, typeof(TResult)), cancellationToken);
+            return commandBus.SendAsync(new LambdaResultCommand(query, typeof(TResult)), cancellationToken);
         }
 
         /// <summary>
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand<TResult, T1, T2, T3>(this ICommandBus commandBus, Func<T1, T2, T3, TResult> query,
+        public static Task SendLambdaCommandAsync<TResult, T1, T2, T3>(this ICommandBus commandBus, Func<T1, T2, T3, Task<TResult>> query,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return commandBus.SendAsync(new LambdaQuery(query, typeof(TResult)), cancellationToken);
+            return commandBus.SendAsync(new LambdaResultCommand(query, typeof(TResult)), cancellationToken);
         }
 
         /// <summary>
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand<TResult, T1, T2, T3, T4>(this ICommandBus commandBus, Func<T1, T2, T3, T4, TResult> query,
+        public static Task SendLambdaCommandAsync<TResult, T1, T2, T3, T4>(this ICommandBus commandBus, Func<T1, T2, T3, T4, Task<TResult>> query,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return commandBus.SendAsync(new LambdaQuery(query, typeof(TResult)), cancellationToken);
+            return commandBus.SendAsync(new LambdaResultCommand(query, typeof(TResult)), cancellationToken);
         }
 
         /// <summary>
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand<TResult, T1, T2, T3, T4, T5>(this ICommandBus commandBus,
-            Func<T1, T2, T3, T4, T5, TResult> query,
+        public static Task SendLambdaCommandAsync<TResult, T1, T2, T3, T4, T5>(this ICommandBus commandBus,
+            Func<T1, T2, T3, T4, T5, Task<TResult>> query,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return commandBus.SendAsync(new LambdaQuery(query, typeof(TResult)), cancellationToken);
+            return commandBus.SendAsync(new LambdaResultCommand(query, typeof(TResult)), cancellationToken);
         }
 
         /// <summary>
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand<TResult, T1, T2, T3, T4, T5, T6>(this ICommandBus commandBus,
-            Func<T1, T2, T3, T4, T5, T6, TResult> query,
+        public static Task SendLambdaCommandAsync<TResult, T1, T2, T3, T4, T5, T6>(this ICommandBus commandBus,
+            Func<T1, T2, T3, T4, T5, T6, Task<TResult>> query,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return commandBus.SendAsync(new LambdaQuery(query, typeof(TResult)), cancellationToken);
+            return commandBus.SendAsync(new LambdaResultCommand(query, typeof(TResult)), cancellationToken);
         }
 
         /// <summary>
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand<TResult, T1, T2, T3, T4, T5, T6, T7>(this ICommandBus commandBus,
-            Func<T1, T2, T3, T4, T5, T6, T7, TResult> query,
+        public static Task SendLambdaCommandAsync<TResult, T1, T2, T3, T4, T5, T6, T7>(this ICommandBus commandBus,
+            Func<T1, T2, T3, T4, T5, T6, T7, Task<TResult>> query,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return commandBus.SendAsync(new LambdaQuery(query, typeof(TResult)), cancellationToken);
+            return commandBus.SendAsync(new LambdaResultCommand(query, typeof(TResult)), cancellationToken);
         }
 
         #endregion
 
-        #region SendLambdaCommand for queries, with CommandExecutionOptions
+        #region SendLambdaCommandAsync for queries, with CommandExecutionOptions
 
         /// <summary>
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand<TResult>(this ICommandBus commandBus, Func<Task<TResult>, TResult> query,
+        public static Task SendLambdaCommandAsync<TResult>(this ICommandBus commandBus, Func<Task<TResult>> query,
             CommandExecutionOptions executionOptions,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return commandBus.SendAsync(new LambdaQuery(query, typeof(TResult)), executionOptions, cancellationToken);
+            return commandBus.SendAsync(new LambdaResultCommand(query, typeof(TResult)), executionOptions, cancellationToken);
         }
 
         /// <summary>
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand<TResult, T1>(this ICommandBus commandBus, Func<T1, TResult> query,
+        public static Task SendLambdaCommandAsync<TResult, T1>(this ICommandBus commandBus, Func<T1, Task<TResult>> query,
             CommandExecutionOptions executionOptions,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return commandBus.SendAsync(new LambdaQuery(query, typeof(TResult)), executionOptions, cancellationToken);
+            return commandBus.SendAsync(new LambdaResultCommand(query, typeof(TResult)), executionOptions, cancellationToken);
         }
 
         /// <summary>
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand<TResult, T1, T2>(this ICommandBus commandBus, Func<T1, T2, TResult> query,
+        public static Task SendLambdaCommandAsync<TResult, T1, T2>(this ICommandBus commandBus, Func<T1, T2, Task<TResult>> query,
             CommandExecutionOptions executionOptions,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return commandBus.SendAsync(new LambdaQuery(query, typeof(TResult)), executionOptions, cancellationToken);
+            return commandBus.SendAsync(new LambdaResultCommand(query, typeof(TResult)), executionOptions, cancellationToken);
         }
 
         /// <summary>
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand<TResult, T1, T2, T3>(this ICommandBus commandBus,
-            Func<T1, T2, T3, TResult> query,
+        public static Task SendLambdaCommandAsync<TResult, T1, T2, T3>(this ICommandBus commandBus,
+            Func<T1, T2, T3, Task<TResult>> query,
             CommandExecutionOptions executionOptions,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return commandBus.SendAsync(new LambdaQuery(query, typeof(TResult)), executionOptions, cancellationToken);
+            return commandBus.SendAsync(new LambdaResultCommand(query, typeof(TResult)), executionOptions, cancellationToken);
         }
 
         /// <summary>
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand<TResult, T1, T2, T3, T4>(this ICommandBus commandBus,
-            Func<T1, T2, T3, T4, TResult> query,
+        public static Task SendLambdaCommandAsync<TResult, T1, T2, T3, T4>(this ICommandBus commandBus,
+            Func<T1, T2, T3, T4, Task<TResult>> query,
             CommandExecutionOptions executionOptions,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return commandBus.SendAsync(new LambdaQuery(query, typeof(TResult)), executionOptions, cancellationToken);
+            return commandBus.SendAsync(new LambdaResultCommand(query, typeof(TResult)), executionOptions, cancellationToken);
         }
 
         /// <summary>
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand<TResult, T1, T2, T3, T4, T5>(this ICommandBus commandBus,
-            Func<T1, T2, T3, T4, T5, TResult> query,
+        public static Task SendLambdaCommandAsync<TResult, T1, T2, T3, T4, T5>(this ICommandBus commandBus,
+            Func<T1, T2, T3, T4, T5, Task<TResult>> query,
             CommandExecutionOptions executionOptions,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return commandBus.SendAsync(new LambdaQuery(query, typeof(TResult)), executionOptions, cancellationToken);
+            return commandBus.SendAsync(new LambdaResultCommand(query, typeof(TResult)), executionOptions, cancellationToken);
         }
 
         /// <summary>
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand<TResult, T1, T2, T3, T4, T5, T6>(this ICommandBus commandBus,
-            Func<T1, T2, T3, T4, T5, T6, TResult> query,
+        public static Task SendLambdaCommandAsync<TResult, T1, T2, T3, T4, T5, T6>(this ICommandBus commandBus,
+            Func<T1, T2, T3, T4, T5, T6, Task<TResult>> query,
             CommandExecutionOptions executionOptions,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return commandBus.SendAsync(new LambdaQuery(query, typeof(TResult)), executionOptions, cancellationToken);
+            return commandBus.SendAsync(new LambdaResultCommand(query, typeof(TResult)), executionOptions, cancellationToken);
         }
 
         /// <summary>
         /// Executes specified lambda function like it was performed by any regular command handler.
         /// This includes scoped resolution of its parameter dependencies, committing the unit of work, etc.
         /// </summary>
-        public static Task SendLambdaCommand<TResult, T1, T2, T3, T4, T5, T6, T7>(this ICommandBus commandBus,
-            Func<T1, T2, T3, T4, T5, T6, T7, TResult> query,
+        public static Task SendLambdaCommandAsync<TResult, T1, T2, T3, T4, T5, T6, T7>(this ICommandBus commandBus,
+            Func<T1, T2, T3, T4, T5, T6, T7, Task<TResult>> query,
             CommandExecutionOptions executionOptions,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return commandBus.SendAsync(new LambdaQuery(query, typeof(TResult)), executionOptions, cancellationToken);
+            return commandBus.SendAsync(new LambdaResultCommand(query, typeof(TResult)), executionOptions, cancellationToken);
         }
 
         #endregion

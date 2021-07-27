@@ -1,5 +1,10 @@
 # RELEASE NOTES
 
+## [1.25.1] - 2020-07-27
+
+### Fixed
+- fixed LambdaCommandBusExtensions.SendLambdaCommandAsync overloads that did not return value, added 'Async' suffix to method name for consistency
+
 ## [1.25.0] - 2020-07-27
 
 ### Added
