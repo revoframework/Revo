@@ -2,9 +2,9 @@
 
 namespace Revo.Core.Commands.Lambda
 {
-    public class LambdaQuery : IQuery<object>
+    public class LambdaResultCommand : ICommand<object>
     {
-        public LambdaQuery(Delegate @delegate, Type resultType)
+        public LambdaResultCommand(Delegate @delegate, Type resultType)
         {
             Delegate = @delegate;
             ResultType = resultType;
