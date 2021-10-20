@@ -28,14 +28,14 @@ namespace Revo.Core.Tests.Commands
         public void Discover_FindsCommandType()
         {
             typeExplorer.GetAllTypes().Returns(new[] { typeof(TestCommand) });
-            sut.DiscoverCommandTypes().Should().BeEquivalentTo(typeof(TestCommand));
+            sut.DiscoverCommandTypes().Should().BeEquivalentTo(new[] { typeof(TestCommand) });
         }
 
         [Fact]
         public void Discover_FindsGenericCommandType()
         {
             typeExplorer.GetAllTypes().Returns(new[] { typeof(TestGenericCommand<>) });
-            sut.DiscoverCommandTypes().Should().BeEquivalentTo(typeof(TestGenericCommand<>));
+            sut.DiscoverCommandTypes().Should().BeEquivalentTo(new[] { typeof(TestGenericCommand<>) });
         }
 
         private class UnrelevantClass

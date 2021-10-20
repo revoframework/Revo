@@ -10,7 +10,7 @@ Framework infrastruture package - event stores, projections, jobs, etc.</Descrip
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="EasyNetQ" Version="3.4.0" />
+    <PackageReference Include="EasyNetQ" Version="6.3.1" />
   </ItemGroup>
   
   <ItemGroup>

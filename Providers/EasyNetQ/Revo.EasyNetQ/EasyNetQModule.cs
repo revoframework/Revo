@@ -36,6 +36,10 @@ namespace Revo.EasyNetQ
                     .To<EasyNetQBus>()
                     .InTaskScope();
 
+                Bind<IEasyNetQBlockingSubscriptionHandler>()
+                    .To<EasyNetQBlockingSubscriptionHandler>()
+                    .InSingletonScope();
+
                 Bind<IEasyNetQSubscriptionHandler>()
                     .To<EasyNetQSubscriptionHandler>()
                     .InSingletonScope();

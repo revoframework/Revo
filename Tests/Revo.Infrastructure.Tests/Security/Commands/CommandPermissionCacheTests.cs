@@ -57,14 +57,14 @@ namespace Revo.Infrastructure.Tests.Security.Commands
         public void GetCommandPermissions_AuthorizedCommand()
         {
             sut.GetCommandPermissions(new AuthorizedCommand())
-                .Should().BeEquivalentTo(new Permission(TestPermissionType.Id, null, null));
+                .Should().BeEquivalentTo(new [] { new Permission(TestPermissionType.Id, null, null) });
         }
 
         [Fact]
         public void GetCommandPermissions_GenericAuthorizedCommandCommand()
         {
             sut.GetCommandPermissions(new GenericAuthorizedCommand<string>())
-                .Should().BeEquivalentTo(new Permission(TestPermissionType.Id, null, null));
+                .Should().BeEquivalentTo(new[] { new Permission(TestPermissionType.Id, null, null) });
         }
 
         [Fact]

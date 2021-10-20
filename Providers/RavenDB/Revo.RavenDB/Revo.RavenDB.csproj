@@ -10,7 +10,7 @@ RavenDB data access and infrastructure services.</Description>
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="RavenDB.Client" Version="5.0.4" />
+    <PackageReference Include="RavenDB.Client" Version="5.2.3" />
   </ItemGroup>
   
   <ItemGroup>

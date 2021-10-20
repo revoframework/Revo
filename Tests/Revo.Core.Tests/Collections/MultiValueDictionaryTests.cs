@@ -55,7 +55,7 @@ namespace Revo.Core.Tests.Collections
         public void Add_AddsNewCollection()
         {
             sut.Add("a", "b");
-            sut.Should().BeEquivalentTo(new KeyValuePair<string, IReadOnlyCollection<string>>("a", new List<string>() { "b" }));
+            sut.Should().BeEquivalentTo(new[] { new KeyValuePair<string, IReadOnlyCollection<string>>("a", new List<string>() { "b" }) });
         }
 
         [Fact]
@@ -63,7 +63,7 @@ namespace Revo.Core.Tests.Collections
         {
             sut.Add("a", "b");
             sut.Add("a", "c");
-            sut.Should().BeEquivalentTo(new KeyValuePair<string, IReadOnlyCollection<string>>("a", new List<string>() { "b", "c" }));
+            sut.Should().BeEquivalentTo(new[] { new KeyValuePair<string, IReadOnlyCollection<string>>("a", new List<string>() { "b", "c" }) });
         }
 
         [Fact]
@@ -71,9 +71,11 @@ namespace Revo.Core.Tests.Collections
         {
             sut.Add("a", "c");
             sut.Add("b", "c");
-            sut.Should().BeEquivalentTo(
-                new KeyValuePair<string, IReadOnlyCollection<string>>("a", new List<string>() { "c" }),
-                new KeyValuePair<string, IReadOnlyCollection<string>>("b", new List<string>() { "c" }));
+            sut.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, IReadOnlyCollection<string>>("a", new List<string>() {"c"}),
+                new KeyValuePair<string, IReadOnlyCollection<string>>("b", new List<string>() {"c"})
+            });
         }
 
         [Fact]
@@ -82,7 +84,7 @@ namespace Revo.Core.Tests.Collections
             sut.AddRange("a", new List<string>() { "1", "2" });
             
             sut.Should().BeEquivalentTo(
-                new KeyValuePair<string, IReadOnlyCollection<string>>("a", new List<string>() { "1", "2" }));
+                new[] { new KeyValuePair<string, IReadOnlyCollection<string>>("a", new List<string>() { "1", "2" }) });
         }
 
         [Fact]
@@ -121,11 +123,12 @@ namespace Revo.Core.Tests.Collections
             sut.Add("a", "c");
             sut.Add("b", "c");
 
-            IEnumerable enumerable = sut;
-            enumerable.Should().HaveCount(2);
-            enumerable.Should().BeEquivalentTo(
-                new KeyValuePair<string, IReadOnlyCollection<string>>("a", new List<string>() { "c" }),
-                new KeyValuePair<string, IReadOnlyCollection<string>>("b", new List<string>() { "c" }));
+            sut.Should().HaveCount(2);
+            sut.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, IReadOnlyCollection<string>>("a", new List<string>() {"c"}),
+                new KeyValuePair<string, IReadOnlyCollection<string>>("b", new List<string>() {"c"})
+            });
         }
 
         [Fact]
@@ -174,9 +177,11 @@ namespace Revo.Core.Tests.Collections
             sut.Add("a", "2");
             sut.Add("b", "3");
 
-            sut.Values.Should().BeEquivalentTo(
+            sut.Values.Should().BeEquivalentTo(new[]
+            {
                 new[] {"1", "2"},
-                new[] {"3"});
+                new[] {"3"}
+            });
         }
 
         [Fact]
@@ -186,10 +191,12 @@ namespace Revo.Core.Tests.Collections
             sut.Add("a", "2");
             sut.Add("b", "3");
             sut.Remove("a", "2");
-            
-            sut.Should().BeEquivalentTo(
-                new KeyValuePair<string, IReadOnlyCollection<string>>("a", new List<string>() { "1" }),
-                new KeyValuePair<string, IReadOnlyCollection<string>>("b", new List<string>() { "3" }));
+
+            sut.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, IReadOnlyCollection<string>>("a", new List<string>() {"1"}),
+                new KeyValuePair<string, IReadOnlyCollection<string>>("b", new List<string>() {"3"})
+            });
         }
 
         [Fact]
@@ -210,7 +217,7 @@ namespace Revo.Core.Tests.Collections
             sut.Remove("a");
             
             sut.Should().BeEquivalentTo(
-                new KeyValuePair<string, IReadOnlyCollection<string>>("b", new List<string>() { "3" }));
+                new[] { new KeyValuePair<string, IReadOnlyCollection<string>>("b", new List<string>() { "3" }) });
         }
 
         [Fact]

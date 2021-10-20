@@ -81,7 +81,7 @@ namespace Revo.Infrastructure.Tests.Repositories
             result.Id.Should().Be(entityId);
             result.Should().BeOfType<MyEntity2>();
             var typedResult = (MyEntity2) result;
-            typedResult.LoadedEvents.Should().Equal(eventStoreRecords.Select(x => x.Event));
+            typedResult.LoadedEvents.Should().Equal(eventStoreRecords.Select(x => (DomainAggregateEvent) x.Event));
         }
         
         [Fact]

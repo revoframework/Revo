@@ -355,7 +355,7 @@ namespace Revo.Infrastructure.Tests.Events.Async.Generic
             var result = await sut.CommitAsync();
 
             result.Should().BeEmpty();
-            crudRepository.FindAll<AsyncEventQueue>().Should().BeEquivalentTo(queue);
+            crudRepository.FindAll<AsyncEventQueue>().Should().BeEquivalentTo(new[] { queue });
             crudRepository.FindAll<QueuedAsyncEvent>().Should().BeEmpty();
             queue.LastSequenceNumberProcessed.Should().Be(1);
         }

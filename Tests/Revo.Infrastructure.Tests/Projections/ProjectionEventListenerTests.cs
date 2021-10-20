@@ -118,7 +118,7 @@ namespace Revo.Infrastructure.Tests.Projections
                 .Do(ci =>
                 {
                     var events = ci.ArgAt<IReadOnlyCollection<IEventMessage<DomainAggregateEvent>>>(0);
-                    events.Should().BeEquivalentTo(ev1, ev2, ev3);
+                    events.Should().BeEquivalentTo(new[] { ev1, ev2, ev3 });
 
                     commandContextStack.UnitOfWork.Should().Be(unitOfWork);
                 });

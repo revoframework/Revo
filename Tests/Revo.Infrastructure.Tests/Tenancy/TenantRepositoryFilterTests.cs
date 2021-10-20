@@ -58,7 +58,7 @@ namespace Revo.Infrastructure.Tests.Tenancy
             tenantContext.Tenant.Returns((ITenant)null);
 
             var results = sut.FilterResults(entities.AsQueryable());
-            results.Should().BeEquivalentTo(entities[0]);
+            results.Should().BeEquivalentTo(new[]{ entities[0] });
         }
 
         [Fact]

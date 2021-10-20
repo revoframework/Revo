@@ -10,8 +10,8 @@ Extension for automatic discovery and registration of AutoMapper profiles.</Desc
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="9.0.0" />
-    <PackageReference Include="AutoMapper.Extensions.ExpressionMapping" Version="3.1.1" />
+    <PackageReference Include="AutoMapper" Version="10.1.1" />
+    <PackageReference Include="AutoMapper.Extensions.ExpressionMapping" Version="4.1.2" />
   </ItemGroup>
   
   <ItemGroup>

@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using EasyNetQ.FluentConfiguration;
+using EasyNetQ;
 using Revo.Core.Events;
 
 namespace Revo.EasyNetQ
