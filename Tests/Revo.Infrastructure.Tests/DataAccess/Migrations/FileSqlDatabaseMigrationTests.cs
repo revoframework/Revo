@@ -135,9 +135,11 @@ DROP TABLE def;
 
             sut = new TestFileSqlDatabaseMigration("myapp_1.0.1.sql", sql);
             sut.Dependencies.Should()
-                .BeEquivalentTo(
+                .BeEquivalentTo(new[]
+                {
                     new DatabaseMigrationSpecifier("myapp-base", DatabaseVersion.Parse("1.2.3")),
-                    new DatabaseMigrationSpecifier("vendor-module", null));
+                    new DatabaseMigrationSpecifier("vendor-module", null)
+                });
         }
 
         [Fact]

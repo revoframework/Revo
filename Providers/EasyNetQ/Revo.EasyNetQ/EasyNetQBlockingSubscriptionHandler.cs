@@ -4,23 +4,23 @@ using Revo.Core.Events;
 
 namespace Revo.EasyNetQ
 {
-    public class EasyNetQSubscriptionHandler : IEasyNetQSubscriptionHandler
+    public class EasyNetQBlockingSubscriptionHandler : IEasyNetQBlockingSubscriptionHandler
     {
         private readonly IEventBus eventBus;
 
-        public EasyNetQSubscriptionHandler(IEventBus eventBus)
+        public EasyNetQBlockingSubscriptionHandler(IEventBus eventBus)
         {
             this.eventBus = eventBus;
         }
 
-        public async Task HandleMessageAsync(object message)
+        public void HandleMessage(object message)
         {
             if (message is IEventMessage eventMessage)
             {
-                using (TaskContext.Enter())
+                Task.Factory.StartNewWithContext(async () =>
                 {
                     await eventBus.PublishAsync(eventMessage);
-                }
+                }).GetAwaiter().GetResult();
             }
         }
     }

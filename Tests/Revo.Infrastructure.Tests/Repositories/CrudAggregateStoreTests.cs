@@ -69,7 +69,7 @@ namespace Revo.Infrastructure.Tests.Repositories
             crudRepository.AttachRange(new[] { entity1, entity2 });
 
             var result = await sut.GetManyAsync<TestAggregate>(entity1.Id, entity2.Id);
-            result.Should().BeEquivalentTo(entity1, entity2);
+            result.Should().BeEquivalentTo(new[] { entity1, entity2 });
         }
 
         [Fact]

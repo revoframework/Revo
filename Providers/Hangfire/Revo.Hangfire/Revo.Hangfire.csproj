@@ -10,7 +10,7 @@ Hangfire background job support.</Description>
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Hangfire" Version="1.7.17" />
+    <PackageReference Include="Hangfire" Version="1.7.25" />
     <PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />
   </ItemGroup>
   

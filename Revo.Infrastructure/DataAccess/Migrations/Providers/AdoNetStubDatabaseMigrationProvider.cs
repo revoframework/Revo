@@ -107,7 +107,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
 
                     try
                     {
-                        Logger.Debug($"Executing database migration using ADO.NET provider: {migration}");
+                        Logger.Info($"Executing database migration using ADO.NET provider: {migration}");
 
                         await OnMigrationBeforeAppliedAsync(migration);
 

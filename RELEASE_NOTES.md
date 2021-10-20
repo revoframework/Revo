@@ -1,5 +1,13 @@
 # RELEASE NOTES
 
+## [1.26.0] - 2020-10-20
+
+### Added
+- EasyNetQ subscriptions can now be registered as blocking (i.e. processed sequentially, waiting until the event listeners complete before processing next message)
+
+### Changed
+- major version updates for dependencies: AutoMapper 10, EasyNetQ 6
+
 ## [1.25.1] - 2020-07-27
 
 ### Fixed
@@ -300,15 +308,15 @@
 
 ### Changed
 - **flattened and simplified package structure** (now provider-centric) - vendor-specific modules were moved
-to Providers directory and some of them were merged/renamed:  
+to Providers directory and some of them were merged/renamed:
   - _Revo.Platforms.AspNet → Revo.AspNet_
-  - _Revo.DataAccess.EF6 and Revo.Infrastructure.EF6 → Revo.EF6_  
-  - _Revo.DataAccess.RavenDB → Revo.RavenDB_  
+  - _Revo.DataAccess.EF6 and Revo.Infrastructure.EF6 → Revo.EF6_
+  - _Revo.DataAccess.RavenDB → Revo.RavenDB_
   - _Revo.Integrations.Rebus → Revo.Rebus_
-- **improved AsyncEventWorker concurrency** - framework did not prevent multiple workers from parallel processing of one async event queue, causing occasional (e.g. when under heavy load) concurrency exceptions 
+- **improved AsyncEventWorker concurrency** - framework did not prevent multiple workers from parallel processing of one async event queue, causing occasional (e.g. when under heavy load) concurrency exceptions
 (which are eventually handled by an automatic retry); now allowing only one active worker per a queue in an application instance
 - **Ninject binding extensions InRequestOrJobScope** is now two separate methods with corresponding fallbacks in order - InTaskScope (mostly preferred) and InRequestScope
-  
+
 ### Removed
 - **IAutoMapperDefinition** - removed as obsolete and replaced with AutoMapper's own profiles (auto-discovered again)
 - **removed implicit ASP.NET Web API configuration** - i.e. default OData and serializer settings

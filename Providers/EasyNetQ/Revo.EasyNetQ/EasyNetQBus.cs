@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using EasyNetQ;
-using EasyNetQ.FluentConfiguration;
 using Revo.Core.Events;
 using Revo.Infrastructure.Events;
 
@@ -44,7 +43,7 @@ namespace Revo.EasyNetQ
                 message = (IEventMessage<TEvent>) EventMessage.FromEvent(message.Event, message.Metadata);
             }
             
-            await bus.PublishAsync(message);
+            await bus.PubSub.PublishAsync(message);
         }
 
         public async Task PublishAsync<TEvent>(IEventMessage<TEvent> message, string topic) where TEvent : IEvent
@@ -55,7 +54,7 @@ namespace Revo.EasyNetQ
                 message = (IEventMessage<TEvent>) EventMessage.FromEvent(message.Event, message.Metadata);
             }
             
-            await bus.PublishAsync(message, topic);
+            await bus.PubSub.PublishAsync(message, topic);
         }
 
         public async Task PublishAsync<TEvent>(IEventMessage<TEvent> message, Action<IPublishConfiguration> publishConfiguration) where TEvent : IEvent
@@ -66,7 +65,7 @@ namespace Revo.EasyNetQ
                 message = (IEventMessage<TEvent>) EventMessage.FromEvent(message.Event, message.Metadata);
             }
             
-            await bus.PublishAsync(message, publishConfiguration);
+            await bus.PubSub.PublishAsync(message, publishConfiguration);
         }
     }
 }

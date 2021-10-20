@@ -4,6 +4,6 @@ namespace Revo.EasyNetQ
 {
     public interface IEasyNetQSubscriptionHandler
     {
-        Task HandleMessage(object message);
+        Task HandleMessageAsync(object message);
     }
 }

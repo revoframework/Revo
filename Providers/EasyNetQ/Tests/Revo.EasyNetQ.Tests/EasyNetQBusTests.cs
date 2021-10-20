@@ -13,12 +13,15 @@ namespace Revo.EasyNetQ.Tests
     public class EasyNetQBusTests
     {
         private IBus bus;
+        private IPubSub pubSub;
         private IEventMessageFactory eventMessageFactory;
         private EasyNetQBus sut;
 
         public EasyNetQBusTests()
         {
             bus = Substitute.For<IBus>();
+            pubSub = Substitute.For<IPubSub>();
+            bus.PubSub.Returns(pubSub);
             eventMessageFactory = Substitute.For<IEventMessageFactory>();
 
             sut = new EasyNetQBus(bus, eventMessageFactory);
@@ -36,7 +39,7 @@ namespace Revo.EasyNetQ.Tests
             
             await sut.PublishAsync(event1);
 
-            bus.Received(1).PublishAsync(Arg.Is<IEventMessage<Event1>>(
+            pubSub.Received(1).PublishAsync(Arg.Is<IEventMessage<Event1>>(
                 x => x.GetType().IsConstructedGenericType
                      && x.GetType().GetGenericTypeDefinition() == typeof(EventMessage<>)
                      && x.Event == event1
@@ -54,7 +57,7 @@ namespace Revo.EasyNetQ.Tests
 
             await sut.PublishAsync(message);
 
-            bus.Received(1).PublishAsync(Arg.Is<IEventMessage<Event1>>(
+            pubSub.Received(1).PublishAsync(Arg.Is<IEventMessage<Event1>>(
                 x => x.GetType().IsConstructedGenericType
                      && x.GetType().GetGenericTypeDefinition() == typeof(EventMessage<>)
                      && x.Event == event1

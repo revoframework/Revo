@@ -56,7 +56,7 @@ namespace Revo.Core.Tests.Events
         public void GetEnumerator()
         {
             sut.Should().BeEquivalentTo(
-                new KeyValuePair<string, string>("key3", "value3"));
+                new[] { new KeyValuePair<string, string>("key3", "value3") });
         }
 
         [Fact]
