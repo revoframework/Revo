@@ -64,7 +64,7 @@ namespace Revo.EasyNetQ
 
             await bus.PubSub.SubscribeAsync(subscriptionConfiguration.SubscriptionId,
                 onMessage,
-                subscriptionConfiguration.ConfigurationAction);
+                subscriptionConfiguration.ConfigurationAction ?? (_ => { }));
         }
 
         private async Task Subscribe<T>(EasyNetQSubscriptionsConfiguration.SubscriptionConfiguration subscriptionConfiguration)
@@ -72,7 +72,7 @@ namespace Revo.EasyNetQ
         {
             await bus.PubSub.SubscribeAsync<IEventMessage<T>>(subscriptionConfiguration.SubscriptionId,
                 (e, c) => subscriptionHandler.HandleMessageAsync(e),
-                subscriptionConfiguration.ConfigurationAction);
+                subscriptionConfiguration.ConfigurationAction ?? (_ => { }));
         }
     }
 }

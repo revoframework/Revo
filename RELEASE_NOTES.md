@@ -1,5 +1,11 @@
 # RELEASE NOTES
 
+## [1.26.1] - 2020-10-21
+
+### Fixed
+
+- EasyNetQ subscription AddType configuration should provide default empty configuration callback when passed null
+
 ## [1.26.0] - 2020-10-20
 
 ### Added
