@@ -90,13 +90,10 @@ namespace Revo.EasyNetQ.Tests
         {
             var cfgAction1 = Substitute.For<Action<ISubscriptionConfiguration>>();
             configurationSection.Subscriptions
-                .AddType<Event1>("sub1", cfgAction1)
-                .AddType<Event2>("sub2", null);
+                .AddType<Event1>("sub1", cfgAction1);
             
             Dictionary<string, Action<ISubscriptionConfiguration>> configActions = new Dictionary<string, Action<ISubscriptionConfiguration>>();
             pubSub.WhenForAnyArgs(x => x.SubscribeAsync<IEventMessage<Event1>>(null, null, null))
-                .Do(ci => configActions[ci.ArgAt<string>(0)] = ci.ArgAt<Action<ISubscriptionConfiguration>>(2));
-            pubSub.WhenForAnyArgs(x => x.SubscribeAsync<IEventMessage<Event2>>(null, null, null))
                 .Do(ci => configActions[ci.ArgAt<string>(0)] = ci.ArgAt<Action<ISubscriptionConfiguration>>(2));
             
             sut.OnApplicationStarted();
@@ -104,9 +101,21 @@ namespace Revo.EasyNetQ.Tests
             var subCfg1 = Substitute.For<ISubscriptionConfiguration>();
             configActions["sub1"](subCfg1);
             cfgAction1.Received(1).Invoke(subCfg1);
+        }
+
+        [Fact]
+        public void OnApplicationStarted_ConfigurationAction_Null()
+        {
+            configurationSection.Subscriptions
+                .AddType<Event1>("sub1", null);
             
-            var subCfg2 = Substitute.For<ISubscriptionConfiguration>();
-            configActions["sub2"].Should().BeNull();
+            Dictionary<string, Action<ISubscriptionConfiguration>> configActions = new Dictionary<string, Action<ISubscriptionConfiguration>>();
+            pubSub.WhenForAnyArgs(x => x.SubscribeAsync<IEventMessage<Event1>>(null, null, null))
+                .Do(ci => configActions[ci.ArgAt<string>(0)] = ci.ArgAt<Action<ISubscriptionConfiguration>>(2));
+            
+            sut.OnApplicationStarted();
+            
+            configActions["sub1"].Should().NotBeNull();
         }
 
         public class Event1 : IEvent
