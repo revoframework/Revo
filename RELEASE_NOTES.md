@@ -1,5 +1,11 @@
 # RELEASE NOTES
 
+## [1.27.0] - 2020-??-??
+
+### Changed
+
+- MetadataExtensions.GetPublishDate and GetStoreDate now return a nullable value
+
 ## [1.26.1] - 2020-10-21
 
 ### Fixed
