@@ -37,14 +37,32 @@ namespace Revo.Domain.Events
             return stringValue != null ? (long?) long.Parse(GetStringValue(metadata, BasicEventMetadataNames.StreamSequenceNumber)) : null;
         }
 
-        public static DateTimeOffset GetPublishDate(this IReadOnlyDictionary<string, string> metadata)
+        public static DateTimeOffset? GetPublishDate(this IReadOnlyDictionary<string, string> metadata)
         {
-            return DateTimeOffset.Parse(GetStringValue(metadata, BasicEventMetadataNames.PublishDate), CultureInfo.InvariantCulture);
+            var date = GetStringValue(metadata, BasicEventMetadataNames.PublishDate);
+            if (date != null)
+            {
+                return DateTimeOffset.Parse(date, CultureInfo.InvariantCulture);
+            }
+
+            return null;
         }
 
-        public static DateTimeOffset GetStoreDate(this IReadOnlyDictionary<string, string> metadata)
+        public static DateTimeOffset? GetStoreDate(this IReadOnlyDictionary<string, string> metadata)
         {
-            return DateTimeOffset.Parse(GetStringValue(metadata, BasicEventMetadataNames.StoreDate), CultureInfo.InvariantCulture);
+            var date = GetStringValue(metadata, BasicEventMetadataNames.StoreDate);
+            if (date != null)
+            {
+                return DateTimeOffset.Parse(date, CultureInfo.InvariantCulture);
+            }
+
+            return null;
+        }
+
+        public static Guid? GetUserId(this IReadOnlyDictionary<string, string> metadata)
+        {
+            string stringValue = GetStringValue(metadata, BasicEventMetadataNames.UserId);
+            return stringValue != null ? (Guid?)Guid.Parse(stringValue) : null;
         }
 
         public static void ReplaceMetadata(this IEventMessageDraft messageDraft, string key, string newValue)
