@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using NSubstitute;
 using Revo.Core.Events;
 using Revo.DataAccess.Entities;
@@ -13,11 +7,14 @@ using Revo.Domain.Entities;
 using Revo.Domain.Entities.Attributes;
 using Revo.Domain.Entities.EventSourcing;
 using Revo.Domain.Events;
-using Revo.Domain.ReadModel;
 using Revo.Domain.Tenancy;
 using Revo.Domain.Tenancy.Events;
 using Revo.Infrastructure.Projections;
 using Revo.Testing.Infrastructure;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Revo.Infrastructure.Tests.Projections
@@ -78,12 +75,21 @@ namespace Revo.Infrastructure.Tests.Projections
             }
 
             [Fact]
-            public async Task CreateProjectionTargetAsync_SetsEntityTenant()
+            public async Task CreateProjectionTargetAsync_SetsEntityTenantFromEvent()
             {
                 Guid tenantId = Guid.Parse("7C836285-7B76-49F5-9D1D-275EA724F5FB");
                 var tenantEvent = new TenantAggregateRootCreated(tenantId).ToMessageDraft();
                 tenantEvent.SetMetadata(BasicEventMetadataNames.StreamSequenceNumber, (events.Last().Metadata.GetStreamSequenceNumber() + 1).ToString());
                 events.Add(tenantEvent);
+                await sut.ProjectEventsAsync(Guid.NewGuid(), events);
+                crudRepository.FindAllWithAdded<TestReadModel>().First().TenantId.Should().Be(tenantId);
+            }
+
+            [Fact]
+            public async Task CreateProjectionTargetAsync_SetsEntityTenantFromEventMetadata()
+            {
+                Guid tenantId = Guid.Parse("7C836285-7B76-49F5-9D1D-275EA724F5FB");
+                events.First().SetMetadata(BasicEventMetadataNames.AggregateTenantId, tenantId.ToString());
                 await sut.ProjectEventsAsync(Guid.NewGuid(), events);
                 crudRepository.FindAllWithAdded<TestReadModel>().First().TenantId.Should().Be(tenantId);
             }
