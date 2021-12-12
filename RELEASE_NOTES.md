@@ -2,6 +2,10 @@
 
 ## [1.27.0] - 2020-??-??
 
+### Fixed
+
+- ProjectionEventListener now runs the async projections with correct tenant context from the events
+
 ### Changed
 
 - MetadataExtensions.GetPublishDate and GetStoreDate now return a nullable value

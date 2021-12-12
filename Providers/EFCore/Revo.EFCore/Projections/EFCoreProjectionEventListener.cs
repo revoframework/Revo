@@ -7,15 +7,16 @@ using Revo.Domain.Entities;
 using Revo.Domain.Events;
 using Revo.Infrastructure.Events.Async;
 using Revo.Infrastructure.Projections;
+using Revo.Infrastructure.Tenancy;
 
 namespace Revo.EFCore.Projections
 {
     public class EFCoreProjectionEventListener : ProjectionEventListener
     {
-        public EFCoreProjectionEventListener(IEFCoreProjectionSubSystem projectionSubSystem,
-            IUnitOfWorkFactory unitOfWorkFactory, CommandContextStack commandContextStack,
-            EFCoreProjectionEventSequencer eventSequencer) :
-            base(projectionSubSystem, unitOfWorkFactory, commandContextStack)
+        public EFCoreProjectionEventListener(Func<IEFCoreProjectionSubSystem> projectionSubSystemFunc,
+            IUnitOfWorkFactory unitOfWorkFactory, Func<CommandContextStack> commandContextStackFunc,
+            ITenantProvider tenantProvider, EFCoreProjectionEventSequencer eventSequencer) :
+            base(projectionSubSystemFunc, unitOfWorkFactory, commandContextStackFunc, tenantProvider)
         {
             EventSequencer = eventSequencer;
         }

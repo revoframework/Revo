@@ -1,27 +1,34 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Revo.Core.Commands;
+﻿using Revo.Core.Commands;
+using Revo.Core.Core;
 using Revo.Core.Events;
 using Revo.Core.Transactions;
 using Revo.Domain.Events;
 using Revo.Infrastructure.Events.Async;
+using Revo.Infrastructure.Tenancy;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Revo.Infrastructure.Projections
 {
     public abstract class ProjectionEventListener :
         IAsyncEventListener<DomainAggregateEvent>
     {
-        private readonly IProjectionSubSystem projectionSubSystem;
+        private readonly Func<IProjectionSubSystem> projectionSubSystemFunc;
         private readonly IUnitOfWorkFactory unitOfWorkFactory;
-        private readonly CommandContextStack commandContextStack;
+        private readonly Func<CommandContextStack> commandContextStackFunc;
+        private readonly ITenantProvider tenantProvider;
         private readonly List<IEventMessage<DomainAggregateEvent>> events = new List<IEventMessage<DomainAggregateEvent>>();
 
-        public ProjectionEventListener(IProjectionSubSystem projectionSubSystem,
-            IUnitOfWorkFactory unitOfWorkFactory, CommandContextStack commandContextStack)
+        public ProjectionEventListener(Func<IProjectionSubSystem> projectionSubSystemFunc,
+            IUnitOfWorkFactory unitOfWorkFactory, Func<CommandContextStack> commandContextStackFunc,
+            ITenantProvider tenantProvider)
         {
-            this.projectionSubSystem = projectionSubSystem;
+            this.projectionSubSystemFunc = projectionSubSystemFunc;
             this.unitOfWorkFactory = unitOfWorkFactory;
-            this.commandContextStack = commandContextStack;
+            this.commandContextStackFunc = commandContextStackFunc;
+            this.tenantProvider = tenantProvider;
         }
 
         public abstract IAsyncEventSequencer EventSequencer { get; }
@@ -39,24 +46,34 @@ namespace Revo.Infrastructure.Projections
 
         public async Task ExecuteProjectionsAsync()
         {
-            using (IUnitOfWork uow = unitOfWorkFactory.CreateUnitOfWork())
+            var eventsByTenant = events.GroupBy(x => x.Metadata.GetAggregateTenantId());
+            foreach (var tenantEvents in eventsByTenant)
             {
-                commandContextStack.Push(new CommandContext(null, uow));
-
-                try
+                var tenant = tenantProvider.GetTenant(tenantEvents.Key);
+                using (TenantContextOverride.Push(tenant))
+                using (TaskContext.Enter())
+                using (IUnitOfWork uow = unitOfWorkFactory.CreateUnitOfWork())
                 {
-                    uow.Begin();
+                    var commandContextStack = commandContextStackFunc();
+                    commandContextStack.Push(new CommandContext(null, uow));
 
-                    await projectionSubSystem.ExecuteProjectionsAsync(events, uow, GetEventProjectionOptions());
-                    events.Clear();
+                    try
+                    {
+                        uow.Begin();
 
-                    await uow.CommitAsync();
-                }
-                finally
-                {
-                    commandContextStack.Pop();
+                        var projectionSubSystem = projectionSubSystemFunc();
+                        await projectionSubSystem.ExecuteProjectionsAsync(tenantEvents.ToArray(), uow, GetEventProjectionOptions());
+
+                        await uow.CommitAsync();
+                    }
+                    finally
+                    {
+                        commandContextStack.Pop();
+                    }
                 }
             }
+
+            events.Clear();
         }
 
         protected virtual EventProjectionOptions GetEventProjectionOptions()
