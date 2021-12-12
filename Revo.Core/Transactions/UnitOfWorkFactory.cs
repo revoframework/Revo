@@ -1,6 +1,5 @@
-﻿using System;
-using System.Linq;
-using Revo.Core.Events;
+﻿using Revo.Core.Events;
+using System;
 
 namespace Revo.Core.Transactions
 {
