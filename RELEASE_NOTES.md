@@ -1,6 +1,12 @@
 # RELEASE NOTES
 
-## [1.27.0] - 2020-??-??
+## [1.27.0] - 2020-12-12
+
+### Changed
+
+- Fixed NuGet release
+
+## [1.27.0] - 2020-12-12
 
 ### Added
 - CrudEntityEventToPocoProjector now sets read model TenantId from metadata of first event if no TenantAggregateRootCreated is published (e.g. for non-event sourced entities)
