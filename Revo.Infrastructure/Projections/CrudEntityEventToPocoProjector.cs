@@ -67,6 +67,10 @@ namespace Revo.Infrastructure.Projections
                 {
                     tenantReadModel.TenantId = tenantAggregateCreatedEvent.Event.TenantId;
                 }
+                else
+                {
+                    tenantReadModel.TenantId = events.FirstOrDefault()?.Metadata.GetAggregateTenantId();
+                }
             }
 
             Repository.Add(rm);

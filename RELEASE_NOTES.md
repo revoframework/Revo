@@ -2,6 +2,9 @@
 
 ## [1.27.0] - 2020-??-??
 
+### Added
+- CrudEntityEventToPocoProjector now sets read model TenantId from metadata of first event if no TenantAggregateRootCreated is published (e.g. for non-event sourced entities)
+
 ### Fixed
 
 - ProjectionEventListener now runs the async projections with correct tenant context from the events
