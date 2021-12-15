@@ -9,10 +9,11 @@ namespace Revo.Core.Tests.Events
     public class JsonMetadataTests
     {
         private JsonMetadata sut;
+        private JObject json;
 
         public JsonMetadataTests()
         {
-            var json = new JObject();
+            json = new JObject();
             json["key1"] = "value1";
             json["key2"] = "value2";
 
@@ -30,6 +31,14 @@ namespace Revo.Core.Tests.Events
         public void TryGetValue_NonExistentKey()
         {
             sut.TryGetValue("key3", out var _).Should().BeFalse();
+        }
+
+        [Fact]
+        public void TryGetValue_Null()
+        {
+            json["key3"] = null;
+            sut.TryGetValue("key3", out var value).Should().BeTrue();
+            value.Should().Be(null);
         }
 
         [Fact]

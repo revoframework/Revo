@@ -38,7 +38,7 @@ namespace Revo.Core.Events
         {
             if (jsonMetadata.TryGetValue(key, out JToken token))
             {
-                value = token.ToString();
+                value = token.Type != JTokenType.Null ? token.ToString() : null;
                 return true;
             }
 
