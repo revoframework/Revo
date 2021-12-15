@@ -1,6 +1,12 @@
 # RELEASE NOTES
 
-## [1.27.0] - 2020-12-12
+## [1.27.2] - 2020-12-12
+
+### Changed
+
+- returning null values in JsonMetadata
+
+## [1.27.1] - 2020-12-12
 
 ### Changed
 
