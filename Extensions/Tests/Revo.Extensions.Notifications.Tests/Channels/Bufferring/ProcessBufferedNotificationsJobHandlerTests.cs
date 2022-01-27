@@ -27,13 +27,13 @@ namespace Revo.Extensions.Notifications.Tests.Channels.Bufferring
         public ProcessBufferedNotificationsJobHandlerTests()
         {
             bufferGovernor1 = Substitute.For<IBufferGovernor>();
-            bufferGovernor1.Id.Returns(Guid.NewGuid());
+            bufferGovernor1.Name.Returns("governor1");
             inMemoryCrudRepository = new InMemoryCrudRepository();
             notificationSerializer = Substitute.For<INotificationSerializer>();
             notificationPipeline1 = Substitute.For<INotificationPipeline>();
-            notificationPipeline1.Id.Returns(Guid.NewGuid());
+            notificationPipeline1.Name.Returns("pipeline1");
             notificationPipeline2 = Substitute.For<INotificationPipeline>();
-            notificationPipeline2.Id.Returns(Guid.NewGuid());
+            notificationPipeline2.Name.Returns("pipeline2");
 
             inMemoryJobScheduler = Substitute.For<IInMemoryJobScheduler>();
 
@@ -53,8 +53,8 @@ namespace Revo.Extensions.Notifications.Tests.Channels.Bufferring
         {
             var notificationsToRelease = new MultiValueDictionary<NotificationBuffer, BufferedNotification>();
 
-            NotificationBuffer buffer1 = new NotificationBuffer(Guid.NewGuid(), bufferGovernor1.Id,
-                notificationPipeline1.Id);
+            NotificationBuffer buffer1 = new NotificationBuffer(Guid.NewGuid(), "buffer1", bufferGovernor1.Name,
+                notificationPipeline1.Name);
             inMemoryCrudRepository.Attach(buffer1);
             BufferedNotification notification1 = new BufferedNotification(Guid.NewGuid(), "Notification1", "{}",
                 buffer1, DateTime.Today);
@@ -65,8 +65,8 @@ namespace Revo.Extensions.Notifications.Tests.Channels.Bufferring
             notificationsToRelease.Add(buffer1, notification2);
             inMemoryCrudRepository.Attach(notification2);
 
-            NotificationBuffer buffer2 = new NotificationBuffer(Guid.NewGuid(), bufferGovernor1.Id,
-                notificationPipeline2.Id);
+            NotificationBuffer buffer2 = new NotificationBuffer(Guid.NewGuid(), "buffer2", bufferGovernor1.Name,
+                notificationPipeline2.Name);
             inMemoryCrudRepository.Attach(buffer2);
             BufferedNotification notification3 = new BufferedNotification(Guid.NewGuid(), "Notification3", "{}",
                 buffer2, DateTime.Today);
@@ -96,8 +96,8 @@ namespace Revo.Extensions.Notifications.Tests.Channels.Bufferring
         {
             var notificationsToRelease = new MultiValueDictionary<NotificationBuffer, BufferedNotification>();
 
-            NotificationBuffer buffer1 = new NotificationBuffer(Guid.NewGuid(), bufferGovernor1.Id,
-                notificationPipeline1.Id);
+            NotificationBuffer buffer1 = new NotificationBuffer(Guid.NewGuid(), "buffer1", bufferGovernor1.Name,
+                notificationPipeline1.Name);
             inMemoryCrudRepository.Attach(buffer1);
             BufferedNotification notification1 = new BufferedNotification(Guid.NewGuid(), "Notification1", "{}",
                 buffer1, DateTime.Today);

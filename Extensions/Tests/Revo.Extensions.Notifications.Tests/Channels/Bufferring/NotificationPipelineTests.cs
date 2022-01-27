@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using NSubstitute;
+﻿using NSubstitute;
 using Revo.Extensions.Notifications.Channels.Buffering;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Revo.Extensions.Notifications.Tests.Channels.Bufferring
 {
     public class NotificationPipelineTests
     {
-        private readonly Guid pipelineId = Guid.NewGuid();
         private readonly IBufferedNotificationChannel channel1;
         private readonly IBufferedNotificationChannel channel2;
         private readonly NotificationPipeline sut;
@@ -18,13 +15,13 @@ namespace Revo.Extensions.Notifications.Tests.Channels.Bufferring
         {
             channel1 = Substitute.For<IBufferedNotificationChannel>();
             channel2 = Substitute.For<IBufferedNotificationChannel>();
-            sut = new NotificationPipeline(pipelineId, new[] {channel1, channel2});
+            sut = new NotificationPipeline("pipeline1", new[] {channel1, channel2});
         }
 
         [Fact]
-        public void Id_ReturnsCorrectValue()
+        public void Name_ReturnsCorrectValue()
         {
-            Assert.Equal(pipelineId, sut.Id);
+            Assert.Equal("pipeline1", sut.Name);
         }
 
         [Fact]

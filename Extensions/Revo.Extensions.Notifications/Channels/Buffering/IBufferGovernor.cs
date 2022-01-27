@@ -8,7 +8,7 @@ namespace Revo.Extensions.Notifications.Channels.Buffering
 {
     public interface IBufferGovernor
     {
-        Guid Id { get; }
+        string Name { get; }
         //Task AddNotificationAsync(INotification notification);
         Task<MultiValueDictionary<NotificationBuffer, BufferedNotification>> SelectNotificationsForReleaseAsync(IReadRepository readRepository);
     }

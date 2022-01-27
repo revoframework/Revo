@@ -12,19 +12,19 @@ namespace Revo.Extensions.Notifications.Channels.Buffering
     {
         private readonly TimeSpan minTimeDelay;
 
-        public AggregatingBufferGovernor(Guid id, TimeSpan minTimeDelay)
+        public AggregatingBufferGovernor(string name, TimeSpan minTimeDelay)
         {
-            Id = id;
+            Name = name;
             this.minTimeDelay = minTimeDelay;
         }
 
-        public Guid Id { get; }
+        public string Name { get; }
 
         public async Task<MultiValueDictionary<NotificationBuffer, BufferedNotification>> SelectNotificationsForReleaseAsync(IReadRepository readRepository)
         {
             DateTimeOffset maxDate = Clock.Current.Now.Subtract(minTimeDelay);
             var notifications = readRepository.FindAll<BufferedNotification>()
-                .Where(x => x.TimeQueued <= maxDate && x.Buffer.GovernorId == Id);
+                .Where(x => x.TimeQueued <= maxDate && x.Buffer.GovernorName == Name);
             var buffers = await notifications
                 .Include(readRepository, x => x.Buffer.Notifications)
                 .Select(x => x.Buffer)

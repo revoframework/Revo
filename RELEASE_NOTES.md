@@ -1,8 +1,13 @@
 # RELEASE NOTES
 
-## [1.27.2] - 2020-12-12
+## [1.28.0] - 2020-01-27
 
 ### Changed
+- breaking change (notifications extension): notification buffers, pipeline and governors are now identified using arbitrary string names instead of GUIDs for more flexibility
+
+## [1.27.2] - 2020-12-15
+
+### Fixed
 
 - returning null values in JsonMetadata
 

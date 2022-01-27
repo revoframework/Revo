@@ -13,19 +13,19 @@ namespace Revo.Extensions.Notifications.Tests.Channels.Bufferring
     public class AggregatingBufferGovernorTests
     {
         private readonly AggregatingBufferGovernor sut;
-        private readonly Guid governorId = Guid.NewGuid();
+        private readonly string governorName = "governor1";
         private readonly InMemoryCrudRepository inMemoryCrudRepository;
 
         public AggregatingBufferGovernorTests()
         {
-            sut = new AggregatingBufferGovernor(governorId, TimeSpan.FromMinutes(5));
+            sut = new AggregatingBufferGovernor(governorName, TimeSpan.FromMinutes(5));
             inMemoryCrudRepository = new InMemoryCrudRepository();
         }
 
         [Fact]
         public void Id_ReturnsCorrectValue()
         {
-            Assert.Equal(governorId, sut.Id);
+            Assert.Equal(governorName, sut.Name);
         }
 
         [Fact]
@@ -34,7 +34,7 @@ namespace Revo.Extensions.Notifications.Tests.Channels.Bufferring
             FakeClock.Setup();
             FakeClock.Now = DateTime.Now;
 
-            NotificationBuffer buffer1 = new NotificationBuffer(Guid.NewGuid(), governorId, Guid.NewGuid());
+            NotificationBuffer buffer1 = new NotificationBuffer(Guid.NewGuid(), "buffer1", governorName, "pipeline1");
             inMemoryCrudRepository.Attach(buffer1);
             BufferedNotification notification1 = new BufferedNotification(Guid.NewGuid(), "Notification1", "{}",
                 buffer1, FakeClock.Now.Subtract(TimeSpan.FromMinutes(6)));
@@ -44,14 +44,14 @@ namespace Revo.Extensions.Notifications.Tests.Channels.Bufferring
             inMemoryCrudRepository.Attach(notification2);
             buffer1.Notifications = new List<BufferedNotification>() { notification1, notification2 };
 
-            NotificationBuffer buffer2 = new NotificationBuffer(Guid.NewGuid(), governorId, Guid.NewGuid());
+            NotificationBuffer buffer2 = new NotificationBuffer(Guid.NewGuid(), "buffer2", governorName, "pipeline2");
             inMemoryCrudRepository.Attach(buffer2);
             BufferedNotification notification3 = new BufferedNotification(Guid.NewGuid(), "Notification3", "{}",
                 buffer2, FakeClock.Now.Subtract(TimeSpan.FromMinutes(8)));
             inMemoryCrudRepository.Attach(notification3);
             buffer2.Notifications = new List<BufferedNotification>() { notification3 };
 
-            NotificationBuffer buffer3 = new NotificationBuffer(Guid.NewGuid(), governorId, Guid.NewGuid());
+            NotificationBuffer buffer3 = new NotificationBuffer(Guid.NewGuid(), "buffer3", governorName, "pipeline3");
             inMemoryCrudRepository.Attach(buffer3);
             BufferedNotification notification4 = new BufferedNotification(Guid.NewGuid(), "Notification3", "{}",
                 buffer3, FakeClock.Now.Subtract(TimeSpan.FromMinutes(1)));
@@ -74,14 +74,14 @@ namespace Revo.Extensions.Notifications.Tests.Channels.Bufferring
             FakeClock.Setup();
             FakeClock.Now = DateTime.Now;
 
-            NotificationBuffer buffer1 = new NotificationBuffer(Guid.NewGuid(), governorId, Guid.NewGuid());
+            NotificationBuffer buffer1 = new NotificationBuffer(Guid.NewGuid(), "buffer1", governorName, "pipeline1");
             inMemoryCrudRepository.Attach(buffer1);
             BufferedNotification notification1 = new BufferedNotification(Guid.NewGuid(), "Notification1", "{}",
                 buffer1, FakeClock.Now.Subtract(TimeSpan.FromMinutes(6)));
             inMemoryCrudRepository.Attach(notification1);
             buffer1.Notifications = new List<BufferedNotification>() { notification1 };
 
-            NotificationBuffer buffer2 = new NotificationBuffer(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
+            NotificationBuffer buffer2 = new NotificationBuffer(Guid.NewGuid(), "buffer2", "governor2", "pipeline1");
             inMemoryCrudRepository.Attach(buffer2);
             BufferedNotification notification3 = new BufferedNotification(Guid.NewGuid(), "Notification3", "{}",
                 buffer2, FakeClock.Now.Subtract(TimeSpan.FromMinutes(8)));

@@ -1,12 +1,14 @@
 -- Revo.Extensions.Notifications SQL baseline schema for common providers (EF Core, EF6)
 -- SQLite version
+-- version: 2
 
 -- NOTIFICATIONS
 
 CREATE TABLE rno_notification_buffer (
 	rno_nbf_notification_buffer_id uuid PRIMARY KEY,
-	rno_nbf_pipeline_id uuid NOT NULL,
-	rno_nbf_governor_id uuid NOT NULL
+	rno_nbf_name text NOT NULL UNIQUE,
+	rno_nbf_pipeline_name text NOT NULL,
+	rno_nbf_governor_name text NOT NULL
 );
 
 CREATE TABLE rno_buffered_notification (
