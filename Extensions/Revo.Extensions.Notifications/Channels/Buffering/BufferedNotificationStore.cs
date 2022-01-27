@@ -19,13 +19,13 @@ namespace Revo.Extensions.Notifications.Channels.Buffering
             return crudRepository.SaveChangesAsync();
         }
 
-        public async Task Add(SerializedNotification serializedNotification, Guid bufferId,
-            DateTimeOffset timeQueued, Guid bufferGovernorId, Guid notificationPipelineId)
+        public async Task Add(SerializedNotification serializedNotification, string bufferName,
+            DateTimeOffset timeQueued, string bufferGovernorName, string notificationPipelineName)
         {
-            NotificationBuffer buffer = await crudRepository.FindAsync<NotificationBuffer>(bufferId);
+            NotificationBuffer buffer = await crudRepository.FirstOrDefaultAsync<NotificationBuffer>(x => x.Name == bufferName);
             if (buffer == null)
             {
-                buffer = new NotificationBuffer(bufferId, bufferGovernorId, notificationPipelineId);
+                buffer = new NotificationBuffer(Guid.NewGuid(), bufferName, bufferGovernorName, notificationPipelineName);
                 crudRepository.Add(buffer); // TODO race condition - use AddOrUpdate instead
             }
 

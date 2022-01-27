@@ -39,12 +39,12 @@ namespace Revo.Extensions.Notifications.Channels.Buffering
             {
                 MultiValueDictionary<NotificationBuffer, BufferedNotification> toRelease = await bufferGovernor
                     .SelectNotificationsForReleaseAsync(crudRepository);
-                var byPipeline = toRelease.GroupBy(x => x.Key.PipelineId);
+                var byPipeline = toRelease.GroupBy(x => x.Key.PipelineName);
 
                 foreach (var pipelineNotifications in byPipeline)
                 {
                     INotificationPipeline pipeline =
-                        notificationPipelines.FirstOrDefault(x => x.Id == pipelineNotifications.Key);
+                        notificationPipelines.FirstOrDefault(x => x.Name == pipelineNotifications.Key);
                     if (pipeline == null)
                     {
                         throw new InvalidOperationException(

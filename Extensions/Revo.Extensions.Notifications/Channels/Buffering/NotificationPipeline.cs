@@ -8,14 +8,14 @@ namespace Revo.Extensions.Notifications.Channels.Buffering
     {
         private readonly IBufferedNotificationChannel[] bufferedNotificationChannels;
 
-        public NotificationPipeline(Guid id,
+        public NotificationPipeline(string name,
             IBufferedNotificationChannel[] bufferedNotificationChannels)
         {
-            Id = id;
+            Name = name;
             this.bufferedNotificationChannels = bufferedNotificationChannels;
         }
 
-        public Guid Id { get; }
+        public string Name { get; }
 
         public async Task ProcessNotificationsAsync(IReadOnlyCollection<INotification> notifications)
         {

@@ -1,13 +1,15 @@
 -- Revo.Extensions.Notifications SQL baseline schema for common providers (EF Core, EF6)
 -- MSSQL version
+-- version: 2
 
 -- NOTIFICATIONS
 
 CREATE TABLE [dbo].[RNO_NOTIFICATION_BUFFER] (
 	[RNO_NBF_NotificationBufferId] [UNIQUEIDENTIFIER] NOT NULL,
 	[RNO_NBF_Ordinal] [INT] IDENTITY(1,1) NOT NULL,
-	[RNO_NBF_PipelineId] [UNIQUEIDENTIFIER] NOT NULL,
-	[RNO_NBF_GovernorId] [UNIQUEIDENTIFIER] NOT NULL
+	[RNO_NBF_Name] [NVARCHAR] (256) NOT NULL UNIQUE,
+	[RNO_NBF_PipelineName] [NVARCHAR] (MAX) NOT NULL,
+	[RNO_NBF_GovernorName] [NVARCHAR] (MAX) NOT NULL
 	CONSTRAINT [RNO_NOTIFICATION_BUFFER_PK] PRIMARY KEY NONCLUSTERED ([RNO_NBF_NotificationBufferId])
 );
 

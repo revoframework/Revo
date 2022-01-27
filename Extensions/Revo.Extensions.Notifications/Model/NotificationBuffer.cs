@@ -8,11 +8,12 @@ namespace Revo.Extensions.Notifications.Model
     [TablePrefix(NamespacePrefix = "RNO", ColumnPrefix = "NBF")]
     public class NotificationBuffer : ReadModelBase
     {
-        public NotificationBuffer(Guid id, Guid governorId, Guid pipelineId)
+        public NotificationBuffer(Guid id, string name, string governorName, string pipelineName)
         {
             Id = id;
-            GovernorId = governorId;
-            PipelineId = pipelineId;
+            Name = name;
+            GovernorName = governorName;
+            PipelineName = pipelineName;
         }
 
         protected NotificationBuffer()
@@ -20,8 +21,9 @@ namespace Revo.Extensions.Notifications.Model
         }
 
         public Guid Id { get; private set; }
-        public Guid PipelineId { get; private set; }
-        public Guid GovernorId { get; set; }
+        public string Name { get; private set; }
+        public string PipelineName { get; private set; }
+        public string GovernorName { get; set; }
         public List<BufferedNotification> Notifications { get; set; }
     }
 }

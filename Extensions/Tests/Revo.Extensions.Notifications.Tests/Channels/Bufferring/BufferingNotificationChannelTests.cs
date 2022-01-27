@@ -19,10 +19,10 @@ namespace Revo.Extensions.Notifications.Tests.Channels.Bufferring
         public BufferingNotificationChannelTests()
         {
             bufferGovernor = Substitute.For<IBufferGovernor>();
-            bufferGovernor.Id.Returns(Guid.NewGuid());
+            bufferGovernor.Name.Returns("governor1");
             bufferSelector = Substitute.For<IBufferSelector<Notification1>>();
             notificationPipeline = Substitute.For<INotificationPipeline>();
-            notificationPipeline.Id.Returns(Guid.NewGuid());
+            notificationPipeline.Name.Returns("pipeline1");
             notificationSerializer = Substitute.For<INotificationSerializer>();
             bufferedNotificationStore = Substitute.For<IBufferedNotificationStore>();
 
@@ -37,7 +37,6 @@ namespace Revo.Extensions.Notifications.Tests.Channels.Bufferring
         public async Task SendNotificationAsync_SavesNotificationToBuffer()
         {
             Notification1 n1 = new Notification1();
-            Guid bufferId = Guid.NewGuid();
             SerializedNotification serializedNotification = new SerializedNotification()
             {
                 NotificationClassName = "Notification1",
@@ -45,13 +44,13 @@ namespace Revo.Extensions.Notifications.Tests.Channels.Bufferring
             };
 
             notificationSerializer.ToJson(n1).Returns(serializedNotification);
-            bufferSelector.SelectBufferIdAsync(n1).Returns(bufferId);
+            bufferSelector.SelectBufferIdAsync(n1).Returns("buffer1");
 
             await sut.PushNotificationAsync(n1);
 
             bufferedNotificationStore.Received(1)
-                .Add(serializedNotification, bufferId, FakeClock.Now, bufferGovernor.Id,
-                    notificationPipeline.Id);
+                .Add(serializedNotification, "buffer1", FakeClock.Now, bufferGovernor.Name,
+                    notificationPipeline.Name);
         }
 
         public class Notification1 : INotification

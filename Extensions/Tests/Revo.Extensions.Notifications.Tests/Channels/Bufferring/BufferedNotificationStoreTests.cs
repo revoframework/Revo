@@ -23,14 +23,14 @@ namespace Revo.Extensions.Notifications.Tests.Channels.Bufferring
         [Fact]
         public async Task Add_AddsToRepository()
         {
-            NotificationBuffer buffer = new NotificationBuffer(Guid.NewGuid(), Guid.NewGuid(),
-                Guid.NewGuid());
+            NotificationBuffer buffer = new NotificationBuffer(Guid.NewGuid(), "buffer1",
+                "governor1", "pipeline1");
             inMemoryCrudRepository.Attach(buffer);
 
             DateTimeOffset now = DateTimeOffset.Now;
 
             await sut.Add(new SerializedNotification() { NotificationClassName = "Notification1", NotificationJson = "{}" },
-                buffer.Id, now, Guid.NewGuid(), Guid.NewGuid());
+                buffer.Name, now, "governor1", "pipeline1");
 
             Assert.Equal(1, inMemoryCrudRepository.FindAllWithAdded<BufferedNotification>().Count());
             Assert.Single(inMemoryCrudRepository.FindAllWithAdded<BufferedNotification>(),
@@ -45,18 +45,17 @@ namespace Revo.Extensions.Notifications.Tests.Channels.Bufferring
         [Fact]
         public async Task SendNotificationAsync_CreatesNewBuffer()
         {
-            Guid bufferId = Guid.NewGuid();
             Guid bufferGovernorId = Guid.NewGuid();
             Guid notificationPipelineId = Guid.NewGuid();
 
             await sut.Add(new SerializedNotification() { NotificationClassName = "Notification1", NotificationJson = "{}" },
-                bufferId, DateTime.Now, bufferGovernorId, notificationPipelineId);
+                "buffer1", DateTime.Now, "governor1", "pipeline1");
 
             Assert.Equal(1, inMemoryCrudRepository.FindAllWithAdded<NotificationBuffer>().Count());
             Assert.Single(inMemoryCrudRepository.FindAllWithAdded<NotificationBuffer>(),
-                x => x.Id == bufferId
-                && x.GovernorId == bufferGovernorId
-                && x.PipelineId == notificationPipelineId);
+                x => x.Name == "buffer1"
+                && x.GovernorName == "governor1"
+                && x.PipelineName == "pipeline1");
             Assert.Equal(1, inMemoryCrudRepository.FindAllWithAdded<BufferedNotification>().Count());
             Assert.Single(inMemoryCrudRepository.FindAllWithAdded<BufferedNotification>(),
                 x => x.Buffer == inMemoryCrudRepository.FindAllWithAdded<NotificationBuffer>().First());
@@ -66,7 +65,7 @@ namespace Revo.Extensions.Notifications.Tests.Channels.Bufferring
         public async Task OnTransactionSucceededAsync_SavesRepository()
         {
             sut.Add(new SerializedNotification() { NotificationClassName = "Notification1", NotificationJson = "{}" },
-                Guid.NewGuid(), DateTimeOffset.Now, Guid.NewGuid(), Guid.NewGuid());
+                "buffer1", DateTimeOffset.Now, "governor1", "pipeline1");
             await sut.CommitAsync();
 
             inMemoryCrudRepository.Received(1).SaveChangesAsync();
