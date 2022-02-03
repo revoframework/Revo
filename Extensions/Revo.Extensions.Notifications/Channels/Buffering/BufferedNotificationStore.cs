@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Revo.DataAccess.Entities;
 using Revo.Extensions.Notifications.Model;
@@ -8,25 +10,29 @@ namespace Revo.Extensions.Notifications.Channels.Buffering
     public class BufferedNotificationStore : IBufferedNotificationStore
     {
         private readonly ICrudRepository crudRepository;
+        private readonly List<NotificationBuffer> uncommittedNewBuffers = new List<NotificationBuffer>();
 
         public BufferedNotificationStore(ICrudRepository crudRepository)
         {
             this.crudRepository = crudRepository;
         }
         
-        public Task CommitAsync()
+        public async Task CommitAsync()
         {
-            return crudRepository.SaveChangesAsync();
+            await crudRepository.SaveChangesAsync();
+            uncommittedNewBuffers.Clear();
         }
 
         public async Task Add(SerializedNotification serializedNotification, string bufferName,
             DateTimeOffset timeQueued, string bufferGovernorName, string notificationPipelineName)
         {
-            NotificationBuffer buffer = await crudRepository.FirstOrDefaultAsync<NotificationBuffer>(x => x.Name == bufferName);
+            NotificationBuffer buffer = uncommittedNewBuffers.FirstOrDefault(x => x.Name == bufferName)
+                ?? await crudRepository.FirstOrDefaultAsync<NotificationBuffer>(x => x.Name == bufferName);
             if (buffer == null)
             {
                 buffer = new NotificationBuffer(Guid.NewGuid(), bufferName, bufferGovernorName, notificationPipelineName);
-                crudRepository.Add(buffer); // TODO race condition - use AddOrUpdate instead
+                crudRepository.Add(buffer);
+                uncommittedNewBuffers.Add(buffer);
             }
 
             BufferedNotification notification = new BufferedNotification(
