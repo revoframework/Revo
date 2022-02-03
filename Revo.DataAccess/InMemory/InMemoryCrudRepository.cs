@@ -41,7 +41,8 @@ namespace Revo.DataAccess.InMemory
 
         public Task<T> GetAsync<T>(object id) where T : class
         {
-            return Task.FromResult(EntityEntries.Select(x => x.Instance).OfType<T>().First(x => HasEntityId(x, id)));
+            return Task.FromResult(EntityEntries.Select(x => x.Instance)
+                .OfType<T>().First(x => HasEntityId(x, id)));
         }
 
         public Task<T> GetAsync<T>(CancellationToken cancellationToken, object id) where T : class
@@ -73,17 +74,17 @@ namespace Revo.DataAccess.InMemory
 
         public T FirstOrDefault<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            return EntityEntries.Select(x => x.Instance).OfType<T>().FirstOrDefault(predicate.Compile());
+            return FindAll<T>().FirstOrDefault(predicate.Compile());
         }
 
         public T First<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            return EntityEntries.Select(x => x.Instance).OfType<T>().First(predicate.Compile());
+            return FindAll<T>().First(predicate.Compile());
         }
 
         public Task<T> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken)) where T : class
         {
-            return Task.FromResult(EntityEntries.Select(x => x.Instance).OfType<T>().FirstOrDefault(predicate.Compile()));
+            return Task.FromResult(FindAll<T>().FirstOrDefault(predicate.Compile()));
         }
 
         public Task<T> FirstAsync<T>(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken)) where T : class
@@ -134,11 +135,7 @@ namespace Revo.DataAccess.InMemory
 
         public Task<T[]> FindAllAsync<T>(CancellationToken cancellationToken = default(CancellationToken)) where T : class
         {
-            return Task.FromResult(EntityEntries
-                .Where(x => (x.State & EntityState.Added) == 0 && (x.State & EntityState.Detached) == 0)
-                .Select(x => x.Instance)
-                .OfType<T>()
-                .ToArray());
+            return Task.FromResult(FindAll<T>().ToArray());
         }
 
         public IEnumerable<T> FindAllWithAdded<T>() where T : class
