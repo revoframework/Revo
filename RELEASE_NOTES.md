@@ -1,23 +1,23 @@
 # RELEASE NOTES
 
-## [1.28.0] - 2020-01-27
+## [1.28.0] - 2022-01-27
 
 ### Changed
 - breaking change (notifications extension): notification buffers, pipeline and governors are now identified using arbitrary string names instead of GUIDs for more flexibility
 
-## [1.27.2] - 2020-12-15
+## [1.27.2] - 2021-12-15
 
 ### Fixed
 
 - returning null values in JsonMetadata
 
-## [1.27.1] - 2020-12-12
+## [1.27.1] - 2021-12-12
 
 ### Changed
 
 - Fixed NuGet release
 
-## [1.27.0] - 2020-12-12
+## [1.27.0] - 2021-12-12
 
 ### Added
 - CrudEntityEventToPocoProjector now sets read model TenantId from metadata of first event if no TenantAggregateRootCreated is published (e.g. for non-event sourced entities)
@@ -30,13 +30,13 @@
 
 - MetadataExtensions.GetPublishDate and GetStoreDate now return a nullable value
 
-## [1.26.1] - 2020-10-21
+## [1.26.1] - 2021-10-21
 
 ### Fixed
 
 - EasyNetQ subscription AddType configuration should provide default empty configuration callback when passed null
 
-## [1.26.0] - 2020-10-20
+## [1.26.0] - 2021-10-20
 
 ### Added
 - EasyNetQ subscriptions can now be registered as blocking (i.e. processed sequentially, waiting until the event listeners complete before processing next message)
@@ -44,22 +44,22 @@
 ### Changed
 - major version updates for dependencies: AutoMapper 10, EasyNetQ 6
 
-## [1.25.1] - 2020-07-27
+## [1.25.1] - 2021-07-27
 
 ### Fixed
 - fixed LambdaCommandBusExtensions.SendLambdaCommandAsync overloads that did not return value, added 'Async' suffix to method name for consistency
 
-## [1.25.0] - 2020-07-27
+## [1.25.0] - 2021-07-27
 
 ### Added
 - added SendLambdaCommand extension: easily executes specified lambda like it was performed by any regular command handler
 
-## [1.24.0] - 2020-06-08
+## [1.24.0] - 2021-06-08
 
 ### Changed
 - by default, event source and event queue catch-ups now don't block application startup until finished (IAsyncEventPipelineConfiguration.WaitForEventCatchUpsUponStartup)
 
-## [1.23.0] - 2020-05-19
+## [1.23.0] - 2021-05-19
 
 ### Added
 - database migration hooks - can now listen to events like DatabaseMigrationBeforeAppliedEvent, DatabaseMigrationAppliedEvent and DatabaseMigrationsCommittedEvent
@@ -78,7 +78,7 @@
 ### Improved
 - better performance when enqueueing async events & for EFCoreCrudRepository.IsAttached
 
-## [1.22.0] - 2020-04-30
+## [1.22.0] - 2021-04-30
 
 ### Added
 - added support for event serializer customization
@@ -91,12 +91,12 @@
 - breaking change: BasicEventMetadataNames moved to Revo.Core.Events
 - manually published events no longer require explicitly set event message ID
 
-## [1.21.0] - 2020-02-16
+## [1.21.0] - 2021-02-16
 
 ### Added
 - added option to rerun repeatable database migrations when their dependencies get updated (RerunRepeatableMigrationsOnDependencyUpdate - default to true)
 
-## [1.20.2] - 2020-02-12
+## [1.20.2] - 2021-02-12
 
 ### Fixed
 - JobRunner was causing AmbiguousMatchException when a job handler class implemented more IJobHandler interfaces
