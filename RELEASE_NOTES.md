@@ -1,5 +1,11 @@
 # RELEASE NOTES
 
+## [1.28.1] - 2022-02-03
+
+### Fixed
+- fixed BufferedNotificationStore creating the same buffer multiple times
+- fixed InMemoryCrudRepository returning non-saved entries & added tests
+
 ## [1.28.0] - 2022-01-27
 
 ### Changed
