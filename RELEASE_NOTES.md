@@ -1,5 +1,10 @@
 # RELEASE NOTES
 
+## [1.29.0] - 2022-03-01
+
+### Added
+- EasyNetQ custom service registration
+
 ## [1.28.1] - 2022-02-03
 
 ### Fixed
