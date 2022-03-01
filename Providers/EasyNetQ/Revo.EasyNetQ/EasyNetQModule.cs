@@ -29,7 +29,11 @@ namespace Revo.EasyNetQ
                     .InSingletonScope();
 
                 Bind<IBus>()
-                    .ToMethod(ctx => RabbitHutch.CreateBus(configurationSection.Connection.ConnectionString))
+                    .ToMethod(ctx => RabbitHutch.CreateBus(configurationSection.Connection.ConnectionString,
+                        serviceRegister =>
+                        {
+                            configurationSection.RegisterServices?.Invoke(serviceRegister);
+                        }))
                     .InSingletonScope();
 
                 Bind<IEasyNetQBus>()
