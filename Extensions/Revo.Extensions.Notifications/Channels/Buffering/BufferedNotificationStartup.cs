@@ -19,7 +19,7 @@ namespace Revo.Extensions.Notifications.Channels.Buffering
 
         public void OnApplicationStarted()
         {
-            var scheduledTime = Clock.Current.Now + TimeSpan.FromMinutes(1);
+            var scheduledTime = Clock.Current.UtcNow + TimeSpan.FromMinutes(1);
             inMemoryJobScheduler.EnqeueJobAsync(new ProcessBufferedNotificationsJob(scheduledTime)).Wait();
         }
     }

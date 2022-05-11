@@ -40,7 +40,7 @@ namespace Revo.EFCore.Domain
                     var originalEntity = modelBuilder.Model.GetEntityTypes().FirstOrDefault(x => x.ClrType == attr.EntityType)
                                          ?? throw new InvalidOperationException($"Cannot map {entity.ClrType} as ReadModelForEntity for {attr.EntityType} because the latter is not part of the model.");
 
-                    entity.FindProperty("Id").SetColumnName(originalEntity.FindProperty("Id").GetColumnName());
+                    entity.FindProperty("Id").SetColumnName(originalEntity.FindProperty("Id").GetColumnBaseName());
                 }
             }
         }

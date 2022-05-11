@@ -354,7 +354,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
                 param = dbCommand.CreateParameter();
                 param.DbType = DbType.DateTimeOffset;
                 param.ParameterName = "TimeApplied";
-                param.Value = Clock.Current.Now.UtcDateTime;
+                param.Value = Clock.Current.UtcNow.UtcDateTime;
                 dbCommand.Parameters.Add(param);
 
                 Logger.Debug($"Inserting {migration} database migration record");

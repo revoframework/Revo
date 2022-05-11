@@ -38,7 +38,7 @@ namespace Revo.Extensions.History.ChangeTracking
             Guid? entityId = null, Guid? entityClassId = null, Guid? userId = null) where T : ChangeData
         {
             var actorName = actorContext.CurrentActorName;
-            var now = Clock.Current.Now;
+            var now = Clock.Current.UtcNow;
             TrackedChange change = new TrackedChange(Guid.NewGuid(), changeData, actorName: actorName,
                 aggregateId: aggregateId, aggregateClassId: aggregateClassId,
                 entityId: entityId, entityClassId: entityClassId, changeTime: now,

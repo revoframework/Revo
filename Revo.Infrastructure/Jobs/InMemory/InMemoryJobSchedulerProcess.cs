@@ -39,7 +39,7 @@ namespace Revo.Infrastructure.Jobs.InMemory
         {
             while (!unscheduledJobs.IsCompleted)
             {
-                var now = Clock.Current.Now;
+                var now = Clock.Current.UtcNow;
                 EnqueueJobs(now);
 
                 ScheduledJob scheduledJob;

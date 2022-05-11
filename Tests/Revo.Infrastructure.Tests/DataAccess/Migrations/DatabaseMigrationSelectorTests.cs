@@ -573,7 +573,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                     {
                         ModuleName = "appModule1",
                         Checksum = "xyz",
-                        TimeApplied = Clock.Current.Now
+                        TimeApplied = Clock.Current.UtcNow
                     }
                 });
 
@@ -603,7 +603,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                     {
                         ModuleName = "appModule1",
                         Checksum = "abc",
-                        TimeApplied = Clock.Current.Now
+                        TimeApplied = Clock.Current.UtcNow
                     }
                 });
 
@@ -637,7 +637,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
                     {
                         ModuleName = "view",
                         Checksum = "xyz",
-                        TimeApplied = Clock.Current.Now
+                        TimeApplied = Clock.Current.UtcNow
                     }
                 });
 

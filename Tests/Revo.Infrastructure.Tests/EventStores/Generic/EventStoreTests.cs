@@ -65,12 +65,12 @@ namespace Revo.Infrastructure.Tests.EventStores.Generic
 
             eventStreamRows = new[]
             {
-                new EventStreamRow(Guid.NewGuid(), "{\"bar\":1}", "EventName", 5, eventStreams[0].Id, 1, Clock.Current.Now, "{\"doh\":\"1\"}"),
-                new EventStreamRow(Guid.NewGuid(), "{\"bar\":2}", "EventName", 5, eventStreams[0].Id, 2, Clock.Current.Now, "{\"doh\":\"2\"}"),
-                new EventStreamRow(Guid.NewGuid(), "{\"bar\":3}", "EventName", 5, eventStreams[1].Id, 3, Clock.Current.Now, "{\"doh\":\"3\"}"),
-                new EventStreamRow(Guid.NewGuid(), "{\"bar\":4}", "EventName", 5, eventStreams[1].Id, 2, Clock.Current.Now, "{\"doh\":\"4\"}"),
-                new EventStreamRow(Guid.NewGuid(), "{\"bar\":5}", "EventName", 5, eventStreams[1].Id, 4, Clock.Current.Now, "{\"doh\":\"5\"}"),
-                new EventStreamRow(Guid.NewGuid(), "{\"bar\":6}", "EventName", 5, eventStreams[1].Id, 5, Clock.Current.Now, "{\"doh\":\"6\"}")
+                new EventStreamRow(Guid.NewGuid(), "{\"bar\":1}", "EventName", 5, eventStreams[0].Id, 1, Clock.Current.UtcNow, "{\"doh\":\"1\"}"),
+                new EventStreamRow(Guid.NewGuid(), "{\"bar\":2}", "EventName", 5, eventStreams[0].Id, 2, Clock.Current.UtcNow, "{\"doh\":\"2\"}"),
+                new EventStreamRow(Guid.NewGuid(), "{\"bar\":3}", "EventName", 5, eventStreams[1].Id, 3, Clock.Current.UtcNow, "{\"doh\":\"3\"}"),
+                new EventStreamRow(Guid.NewGuid(), "{\"bar\":4}", "EventName", 5, eventStreams[1].Id, 2, Clock.Current.UtcNow, "{\"doh\":\"4\"}"),
+                new EventStreamRow(Guid.NewGuid(), "{\"bar\":5}", "EventName", 5, eventStreams[1].Id, 4, Clock.Current.UtcNow, "{\"doh\":\"5\"}"),
+                new EventStreamRow(Guid.NewGuid(), "{\"bar\":6}", "EventName", 5, eventStreams[1].Id, 5, Clock.Current.UtcNow, "{\"doh\":\"6\"}")
             };
 
             expectedStoreRecords = eventStreamRows.Select((x, i) =>
@@ -186,7 +186,7 @@ namespace Revo.Infrastructure.Tests.EventStores.Generic
             newRows[0].EventName.Should().Be("EventName");
             newRows[0].EventVersion.Should().Be(5);
             newRows[0].Id.Should().NotBeEmpty();
-            newRows[0].StoreDate.Should().Be(Clock.Current.Now);
+            newRows[0].StoreDate.Should().Be(Clock.Current.UtcNow);
             newRows[0].IsDispatchedToAsyncQueues.Should().BeFalse();
             newRows[0].StreamSequenceNumber.Should().Be(3);
             newRows[0].StreamId.Should().Be(eventStreams[0].Id);
@@ -210,7 +210,7 @@ namespace Revo.Infrastructure.Tests.EventStores.Generic
             records.ElementAt(0).AdditionalMetadata.Should().Contain(uncommittedRecords[0].Metadata);
             records.ElementAt(0).Event.Should().BeEquivalentTo(uncommittedRecords[0].Event, cfg => cfg.RespectingRuntimeTypes());
             records.ElementAt(0).EventId.Should().NotBeEmpty();
-            records.ElementAt(0).StoreDate.Should().Be(Clock.Current.Now);
+            records.ElementAt(0).StoreDate.Should().Be(Clock.Current.UtcNow);
             records.ElementAt(0).StreamSequenceNumber.Should().Be(3);
         }
         

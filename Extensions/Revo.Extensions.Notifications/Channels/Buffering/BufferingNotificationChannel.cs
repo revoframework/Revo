@@ -53,7 +53,7 @@ namespace Revo.Extensions.Notifications.Channels.Buffering
 
             var bufferId = await bufferSelector.SelectBufferIdAsync(tNotification);
             
-            await bufferedNotificationStore.Add(serialized, bufferId, Clock.Current.Now,
+            await bufferedNotificationStore.Add(serialized, bufferId, Clock.Current.UtcNow,
                 bufferGovernor.Name, notificationPipeline.Name);
         }
     }

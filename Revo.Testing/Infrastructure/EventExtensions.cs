@@ -29,8 +29,8 @@ namespace Revo.Testing.Infrastructure
                 if (aggregateClassId != null)
                 {
                     message.SetMetadata(BasicEventMetadataNames.AggregateClassId, aggregateClassId.ToString());
-                    message.SetMetadata(BasicEventMetadataNames.StoreDate, Clock.Current.Now.ToString(CultureInfo.InvariantCulture));
-                    message.SetMetadata(BasicEventMetadataNames.PublishDate, Clock.Current.Now.ToString(CultureInfo.InvariantCulture));
+                    message.SetMetadata(BasicEventMetadataNames.StoreDate, Clock.Current.UtcNow.ToString(CultureInfo.InvariantCulture));
+                    message.SetMetadata(BasicEventMetadataNames.PublishDate, Clock.Current.UtcNow.ToString(CultureInfo.InvariantCulture));
                 }
                 return message;
             }).ToList();
