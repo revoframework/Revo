@@ -76,7 +76,7 @@ namespace Revo.Extensions.Notifications.Tests.Channels.Bufferring
             bufferGovernor1.SelectNotificationsForReleaseAsync(inMemoryCrudRepository)
                 .Returns(notificationsToRelease);
 
-            var job = new ProcessBufferedNotificationsJob(Clock.Current.Now);
+            var job = new ProcessBufferedNotificationsJob(Clock.Current.UtcNow);
             await sut.HandleAsync(job, CancellationToken.None);
 
             notificationPipeline1.Received(1).ProcessNotificationsAsync(
@@ -107,7 +107,7 @@ namespace Revo.Extensions.Notifications.Tests.Channels.Bufferring
             bufferGovernor1.SelectNotificationsForReleaseAsync(inMemoryCrudRepository)
                 .Returns(notificationsToRelease);
 
-            var job = new ProcessBufferedNotificationsJob(Clock.Current.Now);
+            var job = new ProcessBufferedNotificationsJob(Clock.Current.UtcNow);
             await sut.HandleAsync(job, CancellationToken.None);
 
             Assert.DoesNotContain(notification1, inMemoryCrudRepository.FindAll<BufferedNotification>());

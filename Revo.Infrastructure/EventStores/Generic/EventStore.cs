@@ -102,7 +102,7 @@ namespace Revo.Infrastructure.EventStores.Generic
         {
             var streamBuffer = await GetStreamBufferAsync(streamId);
             long version = streamBuffer.StreamVersion.Value + streamBuffer.UncommitedRows.Count;
-            DateTimeOffset storeDate = Clock.Current.Now;
+            DateTimeOffset storeDate = Clock.Current.UtcNow;
 
             var rows = events.Select(x =>
             {

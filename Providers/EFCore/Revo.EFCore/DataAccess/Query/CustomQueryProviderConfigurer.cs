@@ -18,8 +18,7 @@ namespace Revo.EFCore.DataAccess.Query
         {
             this.serviceLocator = serviceLocator;
         }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "EF1001:Internal EF Core API usage.", Justification = "<Pending>")]
+        
         public void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var builder = (IDbContextOptionsBuilderInfrastructure)optionsBuilder;

@@ -4,20 +4,20 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>
+    <TargetFrameworks>net6.0</TargetFrameworks>
     <Configurations>Debug;Release</Configurations>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>revo-dbmigrate</ToolCommandName>
     <Description>Event Sourcing, CQRS and DDD framework for modern C#/.NET applications.
-.NET Core global tool for database migrations.</Description> 
+.NET Core global tool for database migrations.</Description>
   </PropertyGroup>
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="CommandLineParser" Version="2.8.0" />
     <PackageReference Include="McMaster.NETCore.Plugins" Version="1.4.0" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="5.0.11" />
-    <PackageReference Include="Npgsql" Version="5.0.10" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.5" />
+    <PackageReference Include="Npgsql" Version="6.0.4" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
   </ItemGroup>
 
@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.0.0" />
+    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.1.1" />
   </ItemGroup>
 
 </Project>

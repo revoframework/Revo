@@ -19,7 +19,7 @@ namespace Revo.EFCore.DataAccess.Conventions
                 
                 foreach (var property in entity.GetProperties())
                 {
-                    property.SetColumnName(property.GetColumnName().ToLowerInvariant());
+                    property.SetColumnName(property.GetColumnBaseName().ToLowerInvariant());
                 }
 
                 foreach (var key in entity.GetKeys())
@@ -34,7 +34,7 @@ namespace Revo.EFCore.DataAccess.Conventions
 
                 foreach (var index in entity.GetIndexes())
                 {
-                    index.SetName(index.GetName().ToLowerInvariant());
+                    index.SetDatabaseName(index.GetDatabaseName().ToLowerInvariant());
                 }
             }
         }

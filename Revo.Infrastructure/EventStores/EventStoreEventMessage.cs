@@ -29,7 +29,7 @@ namespace Revo.Infrastructure.EventStores
                     { BasicEventMetadataNames.EventId, () => record.EventId.ToString() },
                     { BasicEventMetadataNames.StreamSequenceNumber, () => record.StreamSequenceNumber.ToString() },
                     { BasicEventMetadataNames.StoreDate, () => record.StoreDate.ToString(CultureInfo.InvariantCulture) },
-                    { BasicEventMetadataNames.PublishDate, () => Clock.Current.Now.ToString(CultureInfo.InvariantCulture) },
+                    { BasicEventMetadataNames.PublishDate, () => Clock.Current.UtcNow.ToString(CultureInfo.InvariantCulture) },
                 });
         }
 

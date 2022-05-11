@@ -15,7 +15,7 @@ namespace Revo.EFCore.DataAccess.Conventions
             {
                 foreach (var property in entity.GetProperties())
                 {
-                    property.SetColumnName(ToSnakeCase(property.GetColumnName()));
+                    property.SetColumnName(ToSnakeCase(property.GetColumnBaseName()));
                 }
 
                 foreach (var key in entity.GetKeys())
@@ -30,7 +30,7 @@ namespace Revo.EFCore.DataAccess.Conventions
 
                 foreach (var index in entity.GetIndexes())
                 {
-                    index.SetName(ToSnakeCase(index.GetName()));
+                    index.SetDatabaseName(ToSnakeCase(index.GetDatabaseName()));
                 }
             }
         }

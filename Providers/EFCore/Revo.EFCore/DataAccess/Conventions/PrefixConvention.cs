@@ -73,12 +73,12 @@ namespace Revo.EFCore.DataAccess.Conventions
 
                 if (propertyColumnPrefix?.Length > 0)
                 {
-                    property.SetColumnName($"{propertyColumnPrefix}_{property.GetColumnName()}");
+                    property.SetColumnName($"{propertyColumnPrefix}_{property.GetColumnBaseName()}");
                 }
 
                 if (propertyNamespacePrefix?.Length > 0)
                 {
-                    property.SetColumnName($"{propertyNamespacePrefix}_{property.GetColumnName()}");
+                    property.SetColumnName($"{propertyNamespacePrefix}_{property.GetColumnBaseName()}");
                 }
             }
         }

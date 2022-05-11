@@ -74,9 +74,9 @@ namespace Revo.Extensions.Notifications.Channels.Buffering
             }
 
             DateTimeOffset scheduledTime = job.ScheduledTime + TimeSpan.FromMinutes(1);
-            if (scheduledTime <= Clock.Current.Now)
+            if (scheduledTime <= Clock.Current.UtcNow)
             {
-                await inMemoryJobScheduler.EnqeueJobAsync(new ProcessBufferedNotificationsJob(Clock.Current.Now), null);
+                await inMemoryJobScheduler.EnqeueJobAsync(new ProcessBufferedNotificationsJob(Clock.Current.UtcNow), null);
             }
             else
             {

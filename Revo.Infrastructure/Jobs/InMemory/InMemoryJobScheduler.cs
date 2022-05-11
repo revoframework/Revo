@@ -33,7 +33,7 @@ namespace Revo.Infrastructure.Jobs.InMemory
             }
             else
             {
-                var enqueueAt = Clock.Current.Now + timeDelay.Value;
+                var enqueueAt = Clock.Current.UtcNow + timeDelay.Value;
                 schedulerProcess.ScheduleJob(job, enqueueAt, (_, exception) => HandleError(jobInfo, exception));
             }
 
@@ -81,7 +81,7 @@ namespace Revo.Infrastructure.Jobs.InMemory
                 long maxDelay = schedulerConfiguration.MaxHandleRetryTimeoutStep.Ticks * delayMultiplier;
                 TimeSpan delay = TimeSpan.FromTicks(minDelay + retryRandom.Next(0, (int) (maxDelay - minDelay)));
 
-                DateTimeOffset enqueueAt = Clock.Current.Now + delay;
+                DateTimeOffset enqueueAt = Clock.Current.UtcNow + delay;
 
                 jobInfo.AttemptNumber++;
 
