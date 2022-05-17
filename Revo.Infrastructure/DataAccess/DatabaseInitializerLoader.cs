@@ -12,18 +12,18 @@ namespace Revo.Infrastructure.DataAccess
     public class DatabaseInitializerLoader : IDatabaseInitializerLoader, IApplicationStartedListener
     {
         private readonly IDatabaseInitializerDiscovery databaseInitializerDiscovery;
-        private readonly IDatabaseInitializerComparer comparer;
+        private readonly IDatabaseInitializerSorter sorter;
         private readonly Func<IRepository> repositoryFunc; // using func factories for late resolving in the scope of different tasks
         private readonly Func<IUnitOfWorkFactory> unitOfWorkFactoryFunc;
         private readonly Func<CommandContextStack> commandContextStackFunc;
         private bool isInitialized = false;
 
         public DatabaseInitializerLoader(IDatabaseInitializerDiscovery databaseInitializerDiscovery,
-            IDatabaseInitializerComparer comparer, Func<IRepository> repositoryFunc,
+            IDatabaseInitializerSorter sorter, Func<IRepository> repositoryFunc,
             Func<IUnitOfWorkFactory> unitOfWorkFactoryFunc, Func<CommandContextStack> commandContextStackFunc)
         {
             this.databaseInitializerDiscovery = databaseInitializerDiscovery;
-            this.comparer = comparer;
+            this.sorter = sorter;
             this.repositoryFunc = repositoryFunc;
             this.unitOfWorkFactoryFunc = unitOfWorkFactoryFunc;
             this.commandContextStackFunc = commandContextStackFunc;
@@ -41,8 +41,7 @@ namespace Revo.Infrastructure.DataAccess
                 isInitialized = true;
 
                 var initializers = databaseInitializerDiscovery.DiscoverDatabaseInitializers();
-                var sortedInitializers = initializers.ToList();
-                sortedInitializers.Sort(comparer);
+                var sortedInitializers = sorter.GetSorted(initializers.ToArray());
 
                 foreach (var initializer in sortedInitializers)
                 {

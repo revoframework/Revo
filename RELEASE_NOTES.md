@@ -2,6 +2,9 @@
 
 ## [1.30.0] - 2022-05-10
 
+### Fixed
+- fixed IDatabaseInitializer sorting with InitializeAfterAttribute (was only comparing neighbors) & added support for transitive dependencies
+
 ### Changed
 - Now targeting .NET 6.0 and .NET Standard 2.0 (dropping support for .NET Framework, .NET 3.1 and .NET Standard 2.0)
 - Upgraded to ASP.NET Core 6.0, Entity Framework Core 6.0, AutoMapper 11

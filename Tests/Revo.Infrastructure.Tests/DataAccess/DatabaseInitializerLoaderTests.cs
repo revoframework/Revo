@@ -43,7 +43,7 @@ namespace Revo.Infrastructure.Tests.DataAccess
             repository = Substitute.For<IRepository>();
             commandContextStack = new CommandContextStack();
             
-            sut = new DatabaseInitializerLoader(databaseInitializerDiscovery, new DatabaseInitializerDependencyComparer(),
+            sut = new DatabaseInitializerLoader(databaseInitializerDiscovery, new DatabaseInitializerDependencySorter(),
                 () => repository, () => unitOfWorkFactory, () => commandContextStack);
         }
 
