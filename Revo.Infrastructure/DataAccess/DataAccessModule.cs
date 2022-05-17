@@ -15,8 +15,8 @@ namespace Revo.Infrastructure.DataAccess
                 .To<DatabaseInitializerDiscovery>()
                 .InSingletonScope();
 
-            Bind<IDatabaseInitializerComparer>()
-                .To<DatabaseInitializerDependencyComparer>()
+            Bind<IDatabaseInitializerSorter>()
+                .To<DatabaseInitializerDependencySorter>()
                 .InSingletonScope();
         }
     }
