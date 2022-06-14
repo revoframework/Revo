@@ -18,7 +18,7 @@
 
 Revo is an application framework for modern server C\#/.NET applications built with _event sourcing_, _CQRS_ and _DDD_.
 
-_Development of this framework is supported by company <a href="https://olify.io">Olify IO s.r.o.</a>_
+_Development of this framework is supported by <a href="https://olify.io">OLIFY - smarter solution for facility management & maintenance.</a>_
 
 ## Contents
 
@@ -32,7 +32,7 @@ _Development of this framework is supported by company <a href="https://olify.io
 
 ## ⚡️ Features
 
-The framework combines the concepts of event sourcing, CQRS and DDD to provide support for building applications that are scalable, maintainable, can work in distributed environments and are easy to integrate with outside world. As such, it takes some rather opinionated approaches on the design of certain parts of its architecture. Revo also offers other common features and infrastructure that is often necessary for building complete applications – for example, authorizations, validations, messaging, integrations, multi-tenancy or testing.
+The project combines the concepts of event sourcing, CQRS and DDD to provide framework for building applications that are scalable, maintainable, can work in distributed environments and are easy to integrate with outside world. As such, it takes some rather opinionated approaches on the design of certain parts of its architecture. Revo also offers other common features and infrastructure that is often necessary for building complete applications – for example, authorizations, validations, messaging, integrations, multi-tenancy or testing.
 Furthermore, its extensions implement other useful features like entity history change-tracking, auditing or user notifications.
 
 [**Domain-Driven Design**](https://revoframework.gitbook.io/revo/reference-guide/domain-building-blocks)  
