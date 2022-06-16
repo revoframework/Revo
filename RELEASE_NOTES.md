@@ -2,6 +2,9 @@
 
 ## [1.30.1] - 2022-06-16
 
+### Added
+- added StoreDate metadata to events published by CRUD aggregates
+
 ### Fixed
 - CRUD aggregate store now throws exception / returns null for Get*/Find* methods when the aggregate is pending deletion
 

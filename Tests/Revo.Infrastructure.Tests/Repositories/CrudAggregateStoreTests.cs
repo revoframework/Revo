@@ -124,6 +124,8 @@ namespace Revo.Infrastructure.Tests.Repositories
                                                                 && int.Parse(x.Value) == 1);
             publishedMessages[0].Metadata.Should().Contain(x => x.Key == BasicEventMetadataNames.AggregateClassId
                                                                 && Guid.Parse(x.Value) == Guid.Parse(TestAggregateClassIdString));
+            publishedMessages[0].Metadata.Should().Contain(x => x.Key == BasicEventMetadataNames.StoreDate
+                                                                && DateTimeOffset.Parse(x.Value) == FakeClock.Now);
             // TODO TenantId
         }
         
