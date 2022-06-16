@@ -1,6 +1,11 @@
 # RELEASE NOTES
 
-## [1.30.0] - 2022-05-10
+## [1.30.1] - 2022-06-16
+
+### Fixed
+- CRUD aggregate store now throws exception / returns null for Get*/Find* methods when the aggregate is pending deletion
+
+## [1.30.0] - 2022-05-17
 
 ### Fixed
 - fixed IDatabaseInitializer sorting with InitializeAfterAttribute (was only comparing neighbors) & added support for transitive dependencies
