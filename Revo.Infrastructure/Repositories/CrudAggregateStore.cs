@@ -233,6 +233,7 @@ namespace Revo.Infrastructure.Repositories
                 }
 
                 message.SetMetadata(BasicEventMetadataNames.AggregateVersion, (aggregate.Version + 1).ToString());
+                message.SetMetadata(BasicEventMetadataNames.StoreDate, utcNow.ToString(CultureInfo.InvariantCulture));
                 
                 messages.Add(message);
             }
