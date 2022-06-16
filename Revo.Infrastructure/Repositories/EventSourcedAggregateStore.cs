@@ -208,7 +208,6 @@ namespace Revo.Infrastructure.Repositories
             return typedAggregate;
         }
 
-
         protected virtual void CommitAggregates()
         {
             foreach (var aggregate in aggregates.Values)

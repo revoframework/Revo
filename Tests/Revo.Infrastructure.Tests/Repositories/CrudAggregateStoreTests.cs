@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NSubstitute;
+using Revo.Core.Core;
 using Revo.Core.Events;
 using Revo.DataAccess.Entities;
 using Revo.DataAccess.InMemory;
@@ -12,7 +13,9 @@ using Revo.Domain.Entities.Attributes;
 using Revo.Domain.Entities.Basic;
 using Revo.Domain.Events;
 using Revo.Infrastructure.Events;
+using Revo.Infrastructure.EventSourcing;
 using Revo.Infrastructure.Repositories;
+using Revo.Testing.Core;
 using Xunit;
 
 namespace Revo.Infrastructure.Tests.Repositories
@@ -57,6 +60,7 @@ namespace Revo.Infrastructure.Tests.Repositories
                 return messageDraft;
             }); // TODO something more lightweight?
 
+            FakeClock.Setup();
 
             sut = new CrudAggregateStore(crudRepository, entityTypeManager, publishEventBuffer, eventMessageFactory);
         }
@@ -99,6 +103,8 @@ namespace Revo.Infrastructure.Tests.Repositories
         [Fact]
         public async Task SaveChanges_PublishedEventsHaveMetadata()
         {
+            FakeClock.Now = new DateTimeOffset(2022, 1, 1, 0, 0, 0, TimeSpan.Zero);
+            
             TestAggregate testAggregate = new TestAggregate(Guid.NewGuid());
             sut.Add(testAggregate);
             testAggregate.Do();
@@ -158,7 +164,7 @@ namespace Revo.Infrastructure.Tests.Repositories
             testAggregate = await sut.GetAsync<TestAggregate>(testAggregate.Id);
             testAggregate.Do();
             var event1 = testAggregate.UncommittedEvents.First();
-            testAggregate.Remove();
+            testAggregate.Delete();
 
             await sut.SaveChangesAsync();
 
@@ -171,6 +177,58 @@ namespace Revo.Infrastructure.Tests.Repositories
 
             publishEventBuffer.Received(1).PushEvent(Arg.Is<IEventMessage>(x => x.Event == event1));
             crudRepository.GetEntityState(testAggregate).Should().Be(EntityState.Detached);
+        }
+
+        [Fact]
+        public async Task SaveChanges_FindAsyncDeleted()
+        {
+            TestAggregate testAggregate = new TestAggregate(Guid.NewGuid());
+            crudRepository.Add(testAggregate);
+            await crudRepository.SaveChangesAsync();
+
+            testAggregate = await sut.GetAsync<TestAggregate>(testAggregate.Id);
+            testAggregate.Delete();
+            var testAggregate2 = await sut.FindAsync<TestAggregate>(testAggregate.Id);
+            testAggregate2.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task SaveChanges_FindManyAsyncDeleted()
+        {
+            TestAggregate testAggregate1 = new TestAggregate(Guid.NewGuid());
+            TestAggregate testAggregate2 = new TestAggregate(Guid.NewGuid());
+            crudRepository.AddRange(new[] { testAggregate1, testAggregate2 });
+            await crudRepository.SaveChangesAsync();
+
+            (await sut.GetAsync<TestAggregate>(testAggregate2.Id)).Delete();
+            var result = await sut.FindManyAsync<TestAggregate>(testAggregate1.Id, testAggregate2.Id);
+            result.Should().BeEquivalentTo(new[] {testAggregate1});
+        }
+
+        [Fact]
+        public async Task SaveChanges_GetAsyncDeleted()
+        {
+            TestAggregate testAggregate = new TestAggregate(Guid.NewGuid());
+            crudRepository.Add(testAggregate);
+            await crudRepository.SaveChangesAsync();
+
+            testAggregate = await sut.GetAsync<TestAggregate>(testAggregate.Id);
+            testAggregate.Delete();
+            Func<Task> act = async () => await sut.GetAsync<TestAggregate>(testAggregate.Id);
+            await act.Should().ThrowAsync<EntityDeletedException>();
+        }
+
+        [Fact]
+        public async Task SaveChanges_GetManyAsyncDeleted()
+        {
+            TestAggregate testAggregate1 = new TestAggregate(Guid.NewGuid());
+            TestAggregate testAggregate2 = new TestAggregate(Guid.NewGuid());
+            crudRepository.AddRange(new[] { testAggregate1, testAggregate2 });
+            await crudRepository.SaveChangesAsync();
+            
+            (await sut.GetAsync<TestAggregate>(testAggregate2.Id)).Delete();
+            Func<Task> act = async () => await sut.GetManyAsync<TestAggregate>(testAggregate1.Id, testAggregate2.Id);
+            await act.Should().ThrowAsync<EntityDeletedException>();
         }
 
         [DomainClassId(TestAggregateClassIdString)]
@@ -189,7 +247,7 @@ namespace Revo.Infrastructure.Tests.Repositories
                 Publish(new Event1());
             }
 
-            public void Remove()
+            public void Delete()
             {
                 MarkDeleted();
             }

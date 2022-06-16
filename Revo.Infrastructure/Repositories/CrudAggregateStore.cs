@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Revo.Core.Core;
 using Revo.Core.Events;
 using Revo.DataAccess.Entities;
 using Revo.Domain.Entities;
@@ -10,6 +12,7 @@ using Revo.Domain.Entities.Basic;
 using Revo.Domain.Events;
 using Revo.Domain.Tenancy;
 using Revo.Infrastructure.Events;
+using Revo.Infrastructure.EventSourcing;
 
 namespace Revo.Infrastructure.Repositories
 {
@@ -45,19 +48,19 @@ namespace Revo.Infrastructure.Repositories
             return aggregateType.GetCustomAttributes(typeof(DatabaseEntityAttribute), true).Any();
         }
 
-        public Task<T> FindAsync<T>(Guid id) where T : class, IAggregateRoot
+        public async Task<T> FindAsync<T>(Guid id) where T : class, IAggregateRoot
         {
-            return crudRepository.FindAsync<T>(id);
+            return CheckAggregate(await crudRepository.FindAsync<T>(id), false);
         }
         
-        public Task<T> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
+        public async Task<T> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
         {
-            return crudRepository.FirstOrDefaultAsync(predicate);
+            return CheckAggregate(await crudRepository.FirstOrDefaultAsync(predicate), false);
         }
 
-        public Task<T> FirstAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
+        public async Task<T> FirstAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
         {
-            return crudRepository.FirstAsync(predicate);
+            return CheckAggregate(await crudRepository.FirstAsync(predicate), true);
         }
 
         public IQueryable<T> FindAll<T>() where T : class, IAggregateRoot, IQueryableEntity
@@ -75,19 +78,27 @@ namespace Revo.Infrastructure.Repositories
             return await crudRepository.Where<T>(predicate).ToArrayAsync(crudRepository);
         }
 
-        public Task<T[]> FindManyAsync<T>(params Guid[] ids) where T : class, IAggregateRoot
+        public async Task<T[]> FindManyAsync<T>(params Guid[] ids) where T : class, IAggregateRoot
         {
-            return crudRepository.FindManyAsync<T, Guid>(ids);
+            return (await crudRepository.FindManyAsync<T, Guid>(ids))
+                .Where(x => CheckAggregate(x, false) != null)
+                .ToArray();
         }
 
-        public Task<T> GetAsync<T>(Guid id) where T : class, IAggregateRoot
+        public async Task<T> GetAsync<T>(Guid id) where T : class, IAggregateRoot
         {
-            return crudRepository.GetAsync<T>(id);
+            return CheckAggregate(await crudRepository.GetAsync<T>(id), true);
         }
 
-        public Task<T[]> GetManyAsync<T>(params Guid[] ids) where T : class, IAggregateRoot
+        public async Task<T[]> GetManyAsync<T>(params Guid[] ids) where T : class, IAggregateRoot
         {
-            return crudRepository.GetManyAsync<T, Guid>(ids);
+            var result = await crudRepository.GetManyAsync<T, Guid>(ids);
+            foreach (var aggregate in result)
+            {
+                CheckAggregate(aggregate, true);
+            }
+
+            return result;
         }
 
         public IEnumerable<IAggregateRoot> GetTrackedAggregates()
@@ -158,11 +169,13 @@ namespace Revo.Infrastructure.Repositories
                 return;
             }
 
+            var utcNow = Clock.Current.UtcNow;
+
             foreach (var aggregate in GetAttachedAggregates())
             {
                 if (aggregate.IsChanged)
                 {
-                    var eventMessages = await CreateEventMessagesAsync(aggregate, aggregate.UncommittedEvents); 
+                    var eventMessages = await CreateEventMessagesAsync(aggregate, aggregate.UncommittedEvents, utcNow); 
                     eventMessages.ForEach(publishEventBuffer.PushEvent);
                 }
             }
@@ -179,7 +192,24 @@ namespace Revo.Infrastructure.Repositories
             }
         }
 
-        private async Task<List<IEventMessageDraft>> CreateEventMessagesAsync(IAggregateRoot aggregate, IReadOnlyCollection<DomainAggregateEvent> events)
+        private T CheckAggregate<T>(T aggregate, bool throwOnError) where T : class, IAggregateRoot
+        {
+            if (aggregate.IsDeleted)
+            {
+                if (throwOnError)
+                {
+                    throw new EntityDeletedException(
+                        $"Cannot get {aggregate} because it has been previously deleted");
+                }
+
+                return null;
+            }
+
+            return aggregate;
+        }
+
+        private async Task<List<IEventMessageDraft>> CreateEventMessagesAsync(IAggregateRoot aggregate,
+            IReadOnlyCollection<DomainAggregateEvent> events, DateTimeOffset utcNow)
         {
             var messages = new List<IEventMessageDraft>();
             Guid? aggregateClassId = entityTypeManager.TryGetClassInfoByClrType(aggregate.GetType())?.Id;
@@ -203,7 +233,7 @@ namespace Revo.Infrastructure.Repositories
                 }
 
                 message.SetMetadata(BasicEventMetadataNames.AggregateVersion, (aggregate.Version + 1).ToString());
-
+                
                 messages.Add(message);
             }
 
