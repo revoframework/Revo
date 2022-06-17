@@ -39,10 +39,12 @@ namespace Revo.DataAccess.InMemory
             throw new NotImplementedException();
         }
 
-        public Task<T> GetAsync<T>(object id) where T : class
+        public async Task<T> GetAsync<T>(object id) where T : class
         {
-            return Task.FromResult(EntityEntries.Select(x => x.Instance)
-                .OfType<T>().First(x => HasEntityId(x, id)));
+            var result = EntityEntries.Select(x => x.Instance)
+                .OfType<T>().FirstOrDefault(x => HasEntityId(x, id));
+            RepositoryHelpers.ThrowIfGetFailed(result, id);
+            return result;
         }
 
         public Task<T> GetAsync<T>(CancellationToken cancellationToken, object id) where T : class

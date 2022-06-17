@@ -182,6 +182,20 @@ namespace Revo.Infrastructure.Tests.Repositories
         }
 
         [Fact]
+        public async Task SaveChanges_FindNull()
+        {
+            var result = await sut.FindAsync<TestAggregate>(Guid.NewGuid());
+            result.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task SaveChanges_GetThrows()
+        {
+            var result = await sut.Awaiting(x => x.GetAsync<TestAggregate>(Guid.NewGuid()))
+                .Should().ThrowAsync<EntityNotFoundException>();
+        }
+
+        [Fact]
         public async Task SaveChanges_FindAsyncDeleted()
         {
             TestAggregate testAggregate = new TestAggregate(Guid.NewGuid());

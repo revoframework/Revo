@@ -194,7 +194,7 @@ namespace Revo.Infrastructure.Repositories
 
         private T CheckAggregate<T>(T aggregate, bool throwOnError) where T : class, IAggregateRoot
         {
-            if (aggregate.IsDeleted)
+            if (aggregate != null && aggregate.IsDeleted)
             {
                 if (throwOnError)
                 {
