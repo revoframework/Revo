@@ -1,5 +1,10 @@
 # RELEASE NOTES
 
+## [1.30.2] - 2022-10-12
+
+### Fixed
+- CRUD aggregate store now correctly deletes aggregates when the action also triggers the removal of other related entities
+
 ## [1.30.1] - 2022-06-16
 
 ### Added
