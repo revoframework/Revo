@@ -153,8 +153,7 @@ namespace Revo.Infrastructure.Repositories
 
         protected void RemoveDeletedEntities()
         {
-            var aggregates = GetAttachedAggregates().ToList();
-            foreach (var aggregate in aggregates)
+            foreach (var aggregate in GetAttachedAggregates().ToArray())
             {
                 if (aggregate.IsDeleted)
                 {

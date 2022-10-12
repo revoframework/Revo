@@ -182,6 +182,35 @@ namespace Revo.Infrastructure.Tests.Repositories
         }
 
         [Fact]
+        public async Task SaveChanges_RemovesDeletedAndDependencies()
+        {
+            // some providers like EF Core might remove other related entities (e.g. owned collections) when removing an aggregate,
+            // modifying the internal collection - RemoveDeletedEntities needs to materialize the iterated collection of to-be-deleted aggregates first
+
+            var testAggregate = new TestAggregate(Guid.NewGuid());
+            crudRepository.Add(testAggregate);
+
+            var testEntity = new TestEntity(Guid.NewGuid());
+            crudRepository.Add(testEntity);
+            await crudRepository.SaveChangesAsync();
+
+            crudRepository.When(x => x.Remove(testAggregate))
+                .Do(ci =>
+                {
+                    crudRepository.Remove(testEntity);
+                    crudRepository.SaveChanges();
+                });
+
+            testAggregate = await sut.GetAsync<TestAggregate>(testAggregate.Id);
+            testAggregate.Delete();
+
+            await sut.SaveChangesAsync();
+            
+            crudRepository.GetEntityState(testAggregate).Should().Be(EntityState.Detached);
+            crudRepository.GetEntityState(testEntity).Should().Be(EntityState.Detached);
+        }
+
+        [Fact]
         public async Task SaveChanges_FindNull()
         {
             var result = await sut.FindAsync<TestAggregate>(Guid.NewGuid());
@@ -266,6 +295,17 @@ namespace Revo.Infrastructure.Tests.Repositories
             public void Delete()
             {
                 MarkDeleted();
+            }
+        }
+
+        public class TestEntity : BasicEntity
+        {
+            public TestEntity(Guid id) : base(id)
+            {
+            }
+
+            protected TestEntity()
+            {
             }
         }
 
