@@ -1,5 +1,10 @@
 # RELEASE NOTES
 
+## [1.30.3] - 2022-11-10
+
+### Fixed
+- in EF Core, when synchronously projecting multiple times in a single tx (e.g. because projector itself publishes events), do not project the already projected events again
+
 ## [1.30.2] - 2022-10-12
 
 ### Fixed

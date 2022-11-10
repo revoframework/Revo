@@ -34,7 +34,7 @@ namespace Revo.EFCore.Projections
                     projectedEvents.AddRange(newEvents);
 
                     await projectionSubSystem.ExecuteProjectionsAsync(
-                        commandContext.UnitOfWork.EventBuffer.Events
+                        newEvents
                             .OfType<IEventMessage<DomainAggregateEvent>>()
                             .ToArray(),
                         commandContext.UnitOfWork,
