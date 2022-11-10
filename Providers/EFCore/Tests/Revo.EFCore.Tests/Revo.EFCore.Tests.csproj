@@ -25,5 +25,9 @@
     <ProjectReference Include="..\..\Revo.EFCore\Revo.EFCore.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Projections\" />
+  </ItemGroup>
+
 
 </Project>

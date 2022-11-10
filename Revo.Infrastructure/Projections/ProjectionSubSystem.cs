@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Revo.Core.Events;
+﻿using Revo.Core.Events;
 using Revo.Core.Transactions;
 using Revo.Domain.Entities;
 using Revo.Domain.Events;
 using Revo.Infrastructure.Events;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Revo.Infrastructure.Projections
 {
