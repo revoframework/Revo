@@ -10,9 +10,9 @@ Entity Framework (EF) Core data-access layer implementation.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Hangfire" Version="1.7.28" />
+    <PackageReference Include="Hangfire" Version="1.7.31" />
     <PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />
-    <PackageReference Include="NLog.Web.AspNetCore" Version="4.14.0" />
+    <PackageReference Include="NLog.Web.AspNetCore" Version="5.1.5" />
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.1.1" />
   </ItemGroup>
