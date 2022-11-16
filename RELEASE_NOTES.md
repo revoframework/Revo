@@ -1,5 +1,13 @@
 # RELEASE NOTES
 
+## [1.31.0] - 2022-11-??
+
+### Added
+- added build targets for .NET 7 with ASP.NET Core 7
+
+### Changed
+- upgraded optional AutoMapper extension to v12.0
+
 ## [1.30.3] - 2022-11-10
 
 ### Fixed
