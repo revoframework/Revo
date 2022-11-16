@@ -7,6 +7,7 @@
 
 ### Changed
 - upgraded optional AutoMapper extension to v12.0
+- upgraded to Entity Framework Core 7.0
 
 ## [1.30.3] - 2022-11-10
 

@@ -10,7 +10,7 @@ Framework infrastruture package - event stores, projections, jobs, etc.</Descrip
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LinqKit.Core" Version="1.2.2" />
+    <PackageReference Include="LinqKit.Core" Version="1.2.3" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="morelinq" Version="3.3.2" />
     <PackageReference Include="Nito.AsyncEx" Version="5.1.2" />

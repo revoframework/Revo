@@ -135,8 +135,8 @@ namespace Revo.Infrastructure.Tests.EventStores.Generic
 
         [Theory]
         [InlineData(1, null, null, 2, new int[] { 3, 2 })]
-        [InlineData(1, 2, 5, 2, new int[] { 3, 2 })]
-        [InlineData(1, 3, 4, null, new int[] { 2, 4 })]
+        [InlineData(1, 2L, 5L, 2, new int[] { 3, 2 })]
+        [InlineData(1, 3L, 4L, null, new int[] { 2, 4 })]
         public async Task GetEventRangeAsync_ReturnsInRange(int eventStreamIndex, long? minSequenceNumber,
             long? maxSequenceNumber, int? maxCount, int[] rowsIndices)
         {

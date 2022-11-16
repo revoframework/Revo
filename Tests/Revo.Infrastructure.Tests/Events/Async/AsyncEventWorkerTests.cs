@@ -48,7 +48,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
 
         [Theory]
         [InlineData(null)]
-        [InlineData(0)]
+        [InlineData(0L)]
         public async Task RunQueueBacklogAsync_InvokesListenersDequeuesAndCommits(long? lastSequenceNumberProcessed)
         {
             events.Add(new FakeAsyncEventQueueRecord() { EventId = Guid.NewGuid(),
@@ -153,8 +153,8 @@ namespace Revo.Infrastructure.Tests.Events.Async
         }
 
         [Theory]
-        [InlineData(0, 1, 3)]
-        [InlineData(0, 2, 3)]
+        [InlineData(0L, 1L, 3L)]
+        [InlineData(0L, 2L, 3L)]
         public async Task RunQueueBacklogAsync_SequenceMissingEvents(long? lastSequenceNumberProcessed, long? event1SequenceNumber,
             long? event2SequenceNumber)
         {
@@ -178,8 +178,8 @@ namespace Revo.Infrastructure.Tests.Events.Async
         }
 
         [Theory]
-        [InlineData(0, 2, null, 3, 1)]
-        [InlineData(0, 1, null, 3, 1)]
+        [InlineData(0L, 2L, null, 3L, 1L)]
+        [InlineData(0L, 1L, null, 3L, 1L)]
         public async Task RunQueueBacklogAsync_SequenceMissingEventsProcessesNonsequentialEvents(long? lastSequenceNumberProcessed,
             long? event1SequenceNumber, long? event2SequenceNumber, long? event3SequenceNumber,
             int nonseqEventIndex)
