@@ -20,8 +20,8 @@ History-tracking extension package.</Description>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="11.0.1" />
-    <PackageReference Include="AutoMapper.Extensions.ExpressionMapping" Version="5.0.2" />
+    <PackageReference Include="AutoMapper" Version="12.0.0" />
+    <PackageReference Include="AutoMapper.Extensions.ExpressionMapping" Version="6.0.1" />
   </ItemGroup>
 
   <ItemGroup>

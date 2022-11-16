@@ -4,7 +4,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net6.0</TargetFrameworks>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
     <Configurations>Debug;Release</Configurations>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>revo-dbmigrate</ToolCommandName>
