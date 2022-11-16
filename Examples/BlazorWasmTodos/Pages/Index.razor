@@ -1,0 +1,65 @@
+﻿@page "/"
+@using Revo.Core.Commands
+@using System.ComponentModel.DataAnnotations
+@using Revo.Examples.BlazorWasmTodos.Messages.Commands
+@using Revo.Examples.BlazorWasmTodos.Messages.Queries
+@using Revo.Examples.BlazorWasmTodos.Reads.Model
+
+<PageTitle>Todos</PageTitle>
+
+@if (todoLists == null)
+{
+	<p><em>Loading...</em></p>
+}
+else
+{
+	<table class="table">
+		<thead>
+		<tr>
+			<th>Name</th>
+			<th>Todo count</th>
+		</tr>
+		</thead>
+		<tbody>
+		@foreach (var todoList in todoLists)
+		{
+			<tr>
+				<td>@todoList.Name</td>
+				<td>@todoList.Todos.Count</td>
+			</tr>
+		}
+		</tbody>
+	</table>
+
+	<EditForm Model="@newListModel" OnValidSubmit="@SubmitAddList">
+		New list: <InputText id="name" @bind-Value="newListModel.Name" />
+
+		<button type="submit">Add</button>
+	</EditForm>
+}
+
+@code {
+	private TodoListReadModel[] todoLists;
+	private NewListModel newListModel = new();
+	
+	[Ninject.Inject]
+	public ICommandBus CommandBus { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		todoLists = await CommandBus.SendAsync(new GetTodoListsQuery());
+	}
+
+	public async Task SubmitAddList()
+	{
+		await CommandBus.SendAsync(new CreateTodoListCommand(Guid.NewGuid(), newListModel.Name));
+		newListModel.Name = "";
+		todoLists = await CommandBus.SendAsync(new GetTodoListsQuery());
+	}
+
+	public class NewListModel
+	{
+		[Required]
+		public string Name { get; set; }
+	}
+}

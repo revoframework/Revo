@@ -1,0 +1,49 @@
+﻿using Revo.Core.Commands;
+using Revo.Examples.BlazorWasmTodos.Domain;
+using Revo.Examples.BlazorWasmTodos.Messages.Commands;
+using Revo.Infrastructure.Repositories;
+
+namespace Revo.Examples.BlazorWasmTodos.Handlers
+{
+    public class TodoListCommandHandler :
+        ICommandHandler<AddTodoCommand>,
+        ICommandHandler<CreateTodoListCommand>,
+        ICommandHandler<UpdateTodoListCommand>,
+        ICommandHandler<UpdateTodoCommand>
+    {
+        private readonly IRepository repository;
+
+        public TodoListCommandHandler(IRepository repository)
+        {
+            this.repository = repository;
+        }
+
+        public async Task HandleAsync(AddTodoCommand command, CancellationToken cancellationToken)
+        {
+            var todoList = await repository.GetAsync<TodoList>(command.TodoListId);
+            todoList.AddTodo(command.Text);
+        }
+
+        public Task HandleAsync(CreateTodoListCommand command, CancellationToken cancellationToken)
+        {
+            var todoList = new TodoList(command.Id, command.Name);
+            repository.Add(todoList);
+
+            return Task.CompletedTask;
+        }
+
+        public async Task HandleAsync(UpdateTodoListCommand command, CancellationToken cancellationToken)
+        {
+            var todoList = await repository.GetAsync<TodoList>(command.Id);
+            todoList.Rename(command.Name);
+        }
+
+        public async Task HandleAsync(UpdateTodoCommand command, CancellationToken cancellationToken)
+        {
+            var todoList = await repository.GetAsync<TodoList>(command.TodoListId);
+            var todo = todoList.Todos.First(x => x.Id == command.TodoId);
+            todo.UpdateText(command.Text);
+            todo.MarkComplete(command.IsComplete);
+        }
+    }
+}

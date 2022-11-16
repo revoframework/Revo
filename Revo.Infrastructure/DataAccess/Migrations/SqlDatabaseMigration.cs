@@ -22,7 +22,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
             {
                 string input = string.Join("\n\n", SqlCommands);
 
-                using (MD5 md5 = MD5.Create())
+                using (SHA1 md5 = SHA1.Create())
                 {
                     byte[] inputBytes = Encoding.ASCII.GetBytes(input);
                     byte[] hashBytes = md5.ComputeHash(inputBytes);
