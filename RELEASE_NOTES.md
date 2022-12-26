@@ -1,6 +1,6 @@
 # RELEASE NOTES
 
-## [1.31.0] - 2022-11-??
+## [1.31.0] - 2022-12-26
 
 ### Added
 - added build targets for .NET 7 with ASP.NET Core 7
