@@ -3,7 +3,7 @@
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), Common.props))\Common.props" />
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
     <Configurations>Debug;Release</Configurations>
     <Description>Event Sourcing, CQRS and DDD framework for modern C#/.NET applications.
 Framework infrastruture package - event stores, projections, jobs, etc.</Description>
