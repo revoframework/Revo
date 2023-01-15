@@ -1,5 +1,14 @@
 # RELEASE NOTES
 
+## [1.32.0] - 2023-01-15
+
+### Added
+- added configuration options for Hangfire processing server
+
+### Changed
+- Hangfire dashboard is now disabled by default
+- updated NuGet metadata to use new preferred format (package icon, license expression, packaged README), added EmbedUntrackedSources
+
 ## [1.31.0] - 2022-12-26
 
 ### Added
