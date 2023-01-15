@@ -8,6 +8,7 @@
 ### Changed
 - Hangfire dashboard is now disabled by default
 - updated NuGet metadata to use new preferred format (package icon, license expression, packaged README), added EmbedUntrackedSources
+- breaking: all core packages now target .NET 6.0/7.0
 
 ## [1.31.0] - 2022-12-26
 
