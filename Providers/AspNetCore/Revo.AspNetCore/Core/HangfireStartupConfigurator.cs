@@ -22,10 +22,12 @@ namespace Revo.AspNetCore.Core
 
         public void ConfigureServices(IServiceCollection services)
         {
+            var storage = hangfireConfigurationSection.JobStorage();
+
             services
                 .AddHangfire(globalCfg =>
                 {
-                    globalCfg.UseStorage(hangfireConfigurationSection.JobStorage());
+                    globalCfg.UseStorage(storage);
 
                     foreach (var action in hangfireConfigurationSection.ConfigurationActions)
                     {
@@ -35,6 +37,13 @@ namespace Revo.AspNetCore.Core
                     globalCfg.UseNLogLogProvider();
                     globalCfg.UseActivator(new HangfireJobActivator(kernel));
                 });
+
+            if (hangfireConfigurationSection.AddHangfireServer)
+            {
+                services
+                    .AddHangfireServer(hangfireConfigurationSection.BackgroundJobServerOptionsAction,
+                        storage, hangfireConfigurationSection.AdditionalProcesses.ToArray());
+            }
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
@@ -43,8 +52,6 @@ namespace Revo.AspNetCore.Core
             {
                 app.UseHangfireDashboard();
             }
-
-            app.UseHangfireServer();
         }
     }
 }
