@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using NLog;
+using Microsoft.Extensions.Logging;
 
 namespace Revo.Core.Commands
 {
     public class CommandRouter : ICommandRouter
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private readonly ILogger logger;
 
         private readonly Dictionary<Type, Func<ICommandBus>> routes = new Dictionary<Type, Func<ICommandBus>>();
+
+        public CommandRouter(ILogger logger)
+        {
+            this.logger = logger;
+        }
 
         public void AddRoute(Type commandType, Func<ICommandBus> commandBus)
         {
@@ -23,7 +28,7 @@ namespace Revo.Core.Commands
             }
 
             routes[commandType] = commandBus;
-            Logger.Info($"Registered route for command type {commandType}");
+            logger.LogInformation($"Registered route for command type {commandType}");
         }
 
         public ICommandBus FindRoute(Type commandType)
@@ -59,7 +64,7 @@ namespace Revo.Core.Commands
                 throw new ArgumentException($"Command type {commandType} has no existing route");
             }
 
-            Logger.Info($"Unregistered route for command type {commandType}");
+            logger.LogInformation($"Unregistered route for command type {commandType}");
         }
     }
 }

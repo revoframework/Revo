@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using Revo.Infrastructure.Jobs;
@@ -23,7 +22,8 @@ namespace Revo.Infrastructure.Tests.Jobs.InMemory
             jobRunner = Substitute.For<IJobRunner>();
             schedulerConfiguration = new InMemoryJobSchedulerConfiguration();
 
-            sut = new InMemoryJobWorkerProcess(jobRunner, schedulerConfiguration);
+            sut = new InMemoryJobWorkerProcess(jobRunner, schedulerConfiguration,
+                new NullLogger<InMemoryJobWorkerProcess>());
         }
 
         [Fact]

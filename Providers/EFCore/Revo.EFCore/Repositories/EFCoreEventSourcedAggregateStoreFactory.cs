@@ -1,7 +1,6 @@
 ﻿using System;
 using Revo.Core.Events;
 using Revo.Core.Transactions;
-using Revo.Infrastructure.EventSourcing;
 using Revo.Infrastructure.Repositories;
 
 namespace Revo.EFCore.Repositories

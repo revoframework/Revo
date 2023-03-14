@@ -1,24 +1,14 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
-using MoreLinq;
 using Revo.Core.Commands;
-using Revo.Core.Core;
-using Revo.Core.Events;
-using Revo.DataAccess.Entities;
-using Revo.Infrastructure.Events;
-using Revo.Infrastructure.EventSourcing;
 using Revo.Infrastructure.Sagas;
 using NSubstitute;
 using Revo.Core.Transactions;
 using Revo.Domain.Entities;
 using Revo.Domain.Sagas;
-using Revo.Infrastructure.Repositories;
 using Revo.Testing.Infrastructure.Repositories;
 using Xunit;
 

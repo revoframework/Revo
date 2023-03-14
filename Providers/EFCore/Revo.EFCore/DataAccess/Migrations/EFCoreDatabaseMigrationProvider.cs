@@ -4,6 +4,7 @@ using System.Data;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Logging;
 using Revo.Core.Events;
 using Revo.EFCore.DataAccess.Entities;
 using Revo.Infrastructure.DataAccess.Migrations.Providers;
@@ -16,7 +17,7 @@ namespace Revo.EFCore.DataAccess.Migrations
 
         public EFCoreDatabaseMigrationProvider(IEFCoreDatabaseAccess databaseAccess,
             IMigrationScripterFactory scripterFactory,
-            IEventBus eventBus) : base(eventBus)
+            IEventBus eventBus, ILogger logger) : base(eventBus, logger)
         {
             this.databaseAccess = databaseAccess;
             

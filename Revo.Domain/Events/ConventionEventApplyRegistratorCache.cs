@@ -1,18 +1,19 @@
-﻿using System;
+﻿using Revo.Core.Lifecycle;
+using Revo.Core.Types;
+using Revo.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Revo.Core.Lifecycle;
-using Revo.Core.Types;
-using Revo.Domain.Entities;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Revo.Domain.Events
 {
     public class ConventionEventApplyRegistratorCache : IApplicationStartedListener
     {
         private static Lazy<Dictionary<Type, EventTypeApplyDelegates>> componentTypeDelegates;
-        private static ITypeExplorer typeExplorer = new TypeExplorer();
+        private static ITypeExplorer typeExplorer = new TypeExplorer(new NullLogger<ConventionEventApplyRegistratorCache>());
 
         static ConventionEventApplyRegistratorCache()
         {

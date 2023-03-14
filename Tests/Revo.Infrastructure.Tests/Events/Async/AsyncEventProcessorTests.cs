@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.Logging.Abstractions;
 using Revo.Core.Core;
 using Revo.Core.Events;
 using Revo.DataAccess.Entities;
@@ -85,7 +85,8 @@ namespace Revo.Infrastructure.Tests.Events.Async
             }
 
             sut = new AsyncEventProcessor(AsyncEventQueueBacklogWorkerFunc,
-                asyncEventQueueManager, jobScheduler, asyncEventPipelineConfiguration);
+                asyncEventQueueManager, jobScheduler, asyncEventPipelineConfiguration,
+                new NullLogger<AsyncEventProcessor>());
 
             var sleep = Substitute.For<ISleep>();
             Sleep.SetSleep(() => sleep); // TODO use a thread var

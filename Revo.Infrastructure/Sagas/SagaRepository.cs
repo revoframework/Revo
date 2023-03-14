@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Revo.Core.Commands;
-using Revo.Core.Events;
 using Revo.Core.Transactions;
-using Revo.DataAccess.Entities;
 using Revo.Domain.Entities;
 using Revo.Domain.Sagas;
-using Revo.Infrastructure.Events;
-using Revo.Infrastructure.EventSourcing;
 using Revo.Infrastructure.Repositories;
 
 namespace Revo.Infrastructure.Sagas

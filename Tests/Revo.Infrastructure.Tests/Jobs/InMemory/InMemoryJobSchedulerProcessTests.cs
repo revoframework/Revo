@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using FluentAssertions;
 using NSubstitute;
-using Revo.Core.Core;
 using Revo.Infrastructure.Jobs;
 using Revo.Infrastructure.Jobs.InMemory;
 using Revo.Testing.Core;

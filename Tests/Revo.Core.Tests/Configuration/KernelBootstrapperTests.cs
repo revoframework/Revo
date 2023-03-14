@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 using FluentAssertions;
+using Microsoft.Extensions.Logging.Abstractions;
 using Ninject;
 using Ninject.Activation;
 using Ninject.Modules;
@@ -37,7 +36,7 @@ namespace Revo.Core.Tests.Configuration
             revoConfiguration = Substitute.For<IRevoConfiguration>();
             revoConfiguration.GetSection<KernelConfigurationSection>().Returns(kernelConfigurationSection);
 
-            sut = new KernelBootstrapper(kernel, revoConfiguration);
+            sut = new KernelBootstrapper(kernel, revoConfiguration, new NullLogger<KernelBootstrapper>());
         }
 
         [Fact]

@@ -2,8 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using Microsoft.EntityFrameworkCore;
 using Revo.Core.Commands;
 using Revo.DataAccess.Entities;
 using Revo.Examples.Todos.Dto;

@@ -1,14 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using FluentAssertions;
 using NSubstitute;
 using Revo.Core.Commands;
 using Revo.Core.Events;
 using Revo.Core.Transactions;
 using Revo.Domain.Events;
 using Revo.EFCore.Projections;
-using Revo.Infrastructure.Projections;
 using Revo.Testing.Infrastructure;
 using Xunit;
 

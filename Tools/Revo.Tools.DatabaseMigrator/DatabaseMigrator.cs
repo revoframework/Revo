@@ -2,7 +2,6 @@
 using Microsoft.Data.Sqlite;
 using Ninject;
 using Ninject.Modules;
-using NLog;
 using Npgsql;
 using Revo.Infrastructure.DataAccess.Migrations;
 using Revo.Infrastructure.DataAccess.Migrations.Providers;
@@ -14,6 +13,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Revo.Core.Core;
 using Revo.Core.Events;
 
@@ -21,19 +21,19 @@ namespace Revo.Tools.DatabaseMigrator
 {
     public class DatabaseMigrator : IDisposable
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
         private readonly StandardKernel kernel = new StandardKernel();
         private readonly IDatabaseMigrationRegistry migrationRegistry = new DatabaseMigrationRegistry();
-        private readonly DatabaseMigrationExecutionOptions executionOptions = new DatabaseMigrationExecutionOptions();
+        private readonly ILogger logger;
+        private readonly DatabaseMigrationExecutionOptions executionOptions = new();
         private IDatabaseMigrationExecutor executor;
         private IDatabaseMigrationSelector migrationSelector;
         private AdoNetDatabaseMigrationProvider migrationProvider;
         private IDatabaseMigrationDiscovery[] migrationDiscoveries;
 
-        public DatabaseMigrator(ICommonOptions options)
+        public DatabaseMigrator(ICommonOptions options, ILogger logger)
         {
             this.Options = options;
+            this.logger = logger;
         }
 
         public ICommonOptions Options { get; }
@@ -46,7 +46,7 @@ namespace Revo.Tools.DatabaseMigrator
 
             if (appliedMigrations.Count == 0)
             {
-                Logger.Info("There are no pending migrations. No changes have been made.");
+                logger.LogInformation("There are no pending migrations. No changes have been made.");
             }
         }
 
@@ -58,7 +58,7 @@ namespace Revo.Tools.DatabaseMigrator
 
             if (appliedMigrations.Count == 0)
             {
-                Logger.Info("There are no pending migrations to be applied.");
+                logger.LogInformation("There are no pending migrations to be applied.");
             }
             else
             {
@@ -71,7 +71,7 @@ namespace Revo.Tools.DatabaseMigrator
 
                 var moduleInfos = appliedMigrations.Select(x => $"{x.Specifier.ModuleName}{(x.Migrations.Any(y => y.Version != null) ? $" to version {x.Migrations.OrderByDescending(y => y.Version).First().Version}" : "")} ({x.Migrations.Count()} migration(s)):\n{GetMigrationLines(x)}");
                 string moduleInfosLines = string.Join("\n\n", moduleInfos);
-                Logger.Info($"There are {appliedMigrations.Count} modules to be migrated:\n\n{moduleInfosLines}");
+                logger.LogInformation($"There are {appliedMigrations.Count} modules to be migrated:\n\n{moduleInfosLines}");
             }
         }
 
@@ -117,7 +117,7 @@ namespace Revo.Tools.DatabaseMigrator
 
             if (!Options.DirectoryPaths.Any() && !Options.Assemblies.Any())
             {
-                Logger.Error("You have not passed any --directoryPaths nor --assemblies to load the migrations from. No migrations will be performed.");
+                logger.LogError("You have not passed any --directoryPaths nor --assemblies to load the migrations from. No migrations will be performed.");
             }
 
             migrationDiscoveries = new IDatabaseMigrationDiscovery[]
@@ -130,7 +130,7 @@ namespace Revo.Tools.DatabaseMigrator
             };
 
             executor = new DatabaseMigrationExecutor(new[] { migrationProvider }, migrationRegistry,
-                migrationDiscoveries, migrationSelector, executionOptions);
+                migrationDiscoveries, migrationSelector, executionOptions, logger);
         }
 
         private void LoadModules()
@@ -192,7 +192,7 @@ namespace Revo.Tools.DatabaseMigrator
                 }
                 catch (Exception e)
                 {
-                    Logger.Warn(e, $"Failed to load referenced assembly");
+                    logger.LogWarning(e, $"Failed to load referenced assembly");
                     throw;
                 }
             }
@@ -225,19 +225,19 @@ namespace Revo.Tools.DatabaseMigrator
                 case DatabaseProvider.Npgsql:
                     dbConnection = new NpgsqlConnection(Options.ConnectionString);
                     scripter = new PgsqlMigrationScripter();
-                    Logger.Info("Using Npgsql database provider with PostgreSQL scripter");
+                    logger.LogInformation("Using Npgsql database provider with PostgreSQL scripter");
                     break;
 
                 case DatabaseProvider.SqlServer:
                     dbConnection = new SqlConnection(Options.ConnectionString);
                     scripter = new MssqlMigrationScripter();
-                    Logger.Info("Using SQL Server database provider with MSSQL scripter");
+                    logger.LogInformation("Using SQL Server database provider with MSSQL scripter");
                     break;
                 
                 case DatabaseProvider.SQLite:
                     dbConnection = new SqliteConnection(Options.ConnectionString);
                     scripter = new SqliteMigrationScripter();
-                    Logger.Info("Using SQLite file database provider with SQLite scripter");
+                    logger.LogInformation("Using SQLite file database provider with SQLite scripter");
                     break;
 
                 default:
@@ -247,7 +247,7 @@ namespace Revo.Tools.DatabaseMigrator
             var serviceLocator = new NinjectServiceLocator(kernel);
             var eventBus = new EventBus(serviceLocator);
 
-            migrationProvider = new AdoNetDatabaseMigrationProvider(dbConnection, scripter, eventBus);
+            migrationProvider = new AdoNetDatabaseMigrationProvider(dbConnection, scripter, eventBus, logger);
         }
 
         public void Dispose()

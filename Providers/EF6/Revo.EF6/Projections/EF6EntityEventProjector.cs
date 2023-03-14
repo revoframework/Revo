@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Revo.Domain.Entities;
+﻿using Revo.Domain.Entities;
 using Revo.EF6.DataAccess.Entities;
 using Revo.Infrastructure.Projections;
 

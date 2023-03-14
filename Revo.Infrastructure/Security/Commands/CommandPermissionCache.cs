@@ -4,7 +4,6 @@ using System.Linq;
 using Revo.Core.Commands;
 using Revo.Core.Lifecycle;
 using Revo.Core.Security;
-using Revo.Core.Types;
 
 namespace Revo.Infrastructure.Security.Commands
 {

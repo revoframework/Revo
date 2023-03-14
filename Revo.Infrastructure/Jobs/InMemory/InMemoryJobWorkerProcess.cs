@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using NLog;
+using Microsoft.Extensions.Logging;
 using Revo.Core.Core;
 using Revo.Core.Lifecycle;
 
@@ -11,17 +11,18 @@ namespace Revo.Infrastructure.Jobs.InMemory
 {
     public class InMemoryJobWorkerProcess : IApplicationStartedListener, IApplicationStoppingListener, IInMemoryJobWorkerProcess
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
         private readonly BlockingCollection<EnqueuedJob> enqueuedJobs = new BlockingCollection<EnqueuedJob>();
         private readonly IJobRunner jobRunner;
         private readonly IInMemoryJobSchedulerConfiguration schedulerConfiguration;
+        private readonly ILogger logger;
+
         private Task workerTask;
 
-        public InMemoryJobWorkerProcess(IJobRunner jobRunner, IInMemoryJobSchedulerConfiguration schedulerConfiguration)
+        public InMemoryJobWorkerProcess(IJobRunner jobRunner, IInMemoryJobSchedulerConfiguration schedulerConfiguration, ILogger logger)
         {
             this.jobRunner = jobRunner;
             this.schedulerConfiguration = schedulerConfiguration;
+            this.logger = logger;
         }
 
         public void OnApplicationStarted()
@@ -43,7 +44,7 @@ namespace Revo.Infrastructure.Jobs.InMemory
             }
             catch (InvalidOperationException)
             {
-                Logger.Debug($"Not enqueuing job(s) because scheduler worker process is already stopped");
+                logger.LogDebug($"Not enqueuing job(s) because scheduler worker process is already stopped");
             }
         }
 

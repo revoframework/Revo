@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging.Abstractions;
 using Revo.Core.Core;
 using Revo.Core.Events;
 using Revo.Infrastructure.Events.Async;
@@ -16,15 +15,15 @@ namespace Revo.Infrastructure.Tests.Events.Async
         private AsyncEventWorker sut;
         private IAsyncEventQueueManager asyncEventQueueManager;
         private IServiceLocator serviceLocator;
-        private List<IAsyncEventQueueRecord> events = new List<IAsyncEventQueueRecord>();
-        private FakeAsyncEventQueueState queueState = new FakeAsyncEventQueueState();
-        private List<IAsyncEventListener> listeners = new List<IAsyncEventListener>();
+        private List<IAsyncEventQueueRecord> events = new();
+        private FakeAsyncEventQueueState queueState = new();
+        private List<IAsyncEventListener> listeners = new();
 
         public AsyncEventWorkerTests()
         {
             asyncEventQueueManager = Substitute.For<IAsyncEventQueueManager>();
             serviceLocator = Substitute.For<IServiceLocator>();
-            sut = new AsyncEventWorker(asyncEventQueueManager, serviceLocator);
+            sut = new AsyncEventWorker(asyncEventQueueManager, serviceLocator, new NullLogger<AsyncEventWorker>());
 
             asyncEventQueueManager.GetQueueStateAsync("queue").Returns(ci => queueState);
             asyncEventQueueManager.GetQueueEventsAsync("queue").Returns(ci => events);
@@ -37,12 +36,12 @@ namespace Revo.Infrastructure.Tests.Events.Async
 
             listeners[0].EventSequencer.GetEventSequencing(null).ReturnsForAnyArgs(new List<EventSequencing>()
             {
-                new EventSequencing() {EventSequenceNumber = 0 /* shouldn't be important now */, SequenceName = "queue"}
+                new() {EventSequenceNumber = 0 /* shouldn't be important now */, SequenceName = "queue"}
             });
 
             listeners[1].EventSequencer.GetEventSequencing(null).ReturnsForAnyArgs(new List<EventSequencing>()
             {
-                new EventSequencing() {EventSequenceNumber = 0 /* shouldn't be important now */, SequenceName = "queue"}
+                new() {EventSequenceNumber = 0 /* shouldn't be important now */, SequenceName = "queue"}
             });
         }
 

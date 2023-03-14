@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using Revo.Domain.Tenancy;
 using Revo.Infrastructure.Tenancy;
 using NSubstitute;
 using Revo.Core.Tenancy;

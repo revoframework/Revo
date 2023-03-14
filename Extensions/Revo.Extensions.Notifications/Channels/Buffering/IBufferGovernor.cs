@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Revo.Core.Collections;
 using Revo.DataAccess.Entities;
 using Revo.Extensions.Notifications.Model;

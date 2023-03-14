@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Revo.Infrastructure.EventStores;
+﻿using Revo.Infrastructure.EventStores;
 
 namespace Revo.EFCore.EventStores
 {

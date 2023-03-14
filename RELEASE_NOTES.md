@@ -1,6 +1,11 @@
 # RELEASE NOTES
 
-## [1.32.0] - 2023-01-15
+## [1.34.0] - 2023-03-?
+
+### Changed
+- removed NLog dependency, replaced with standard Microsoft.Extensions.Logging; if you want to keep using NLog, you have to install it in your projects and set-up the adapters on your own
+
+## [1.33.0] - 2023-01-15
 
 ### Added
 - added configuration options for Hangfire processing server
@@ -9,6 +14,8 @@
 - Hangfire dashboard is now disabled by default
 - updated NuGet metadata to use new preferred format (package icon, license expression, packaged README), added EmbedUntrackedSources
 - breaking: all core packages now target .NET 6.0/7.0
+
+## [1.32.0] - skipped
 
 ## [1.31.0] - 2022-12-26
 

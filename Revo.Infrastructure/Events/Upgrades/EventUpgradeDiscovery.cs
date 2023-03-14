@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Ninject;
-using NLog;
 using Revo.Core.Lifecycle;
 using Revo.Core.Types;
 
@@ -10,15 +10,15 @@ namespace Revo.Infrastructure.Events.Upgrades
 {
     public class EventUpgradeDiscovery : IApplicationConfigurer
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
         private readonly ITypeExplorer typeExplorer;
         private readonly StandardKernel kernel;
+        private readonly ILogger logger;
 
-        public EventUpgradeDiscovery(ITypeExplorer typeExplorer, StandardKernel kernel)
+        public EventUpgradeDiscovery(ITypeExplorer typeExplorer, StandardKernel kernel, ILogger logger)
         {
             this.typeExplorer = typeExplorer;
             this.kernel = kernel;
+            this.logger = logger;
         }
 
         public void Configure()
@@ -34,7 +34,7 @@ namespace Revo.Infrastructure.Events.Upgrades
                 .ToArray();
 
             RegisterUpgrades(upgradeTypes);
-            Logger.Debug($"Discovered {upgradeTypes.Length} event upgrades: {string.Join(", ", upgradeTypes.Select(x => x.FullName))}");
+            logger.LogDebug($"Discovered {upgradeTypes.Length} event upgrades: {string.Join(", ", upgradeTypes.Select(x => x.FullName))}");
         }
 
         private void RegisterUpgrades(IEnumerable<Type> upgradeTypes)

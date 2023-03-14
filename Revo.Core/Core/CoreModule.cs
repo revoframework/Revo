@@ -5,7 +5,6 @@ using Ninject.Planning.Bindings.Resolvers;
 using Revo.Core.Commands;
 using Revo.Core.Configuration;
 using Revo.Core.Events;
-using Revo.Core.IO;
 using Revo.Core.Lifecycle;
 using Revo.Core.Security;
 using Revo.Core.Transactions;

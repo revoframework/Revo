@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Ninject;
-using NLog;
 using Revo.Core.Core;
 using Revo.Core.Lifecycle;
 using Revo.Core.Types;
@@ -11,17 +11,18 @@ namespace Revo.Infrastructure.Projections
 {
     public class ProjectorDiscovery : IApplicationConfigurer
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
         private readonly Type[] genericProjectorInterfaces;
         private readonly ITypeExplorer typeExplorer;
         private readonly StandardKernel kernel;
+        private readonly ILogger logger;
 
-        public ProjectorDiscovery(ITypeExplorer typeExplorer, StandardKernel kernel, Type[] genericProjectorInterfaces)
+        public ProjectorDiscovery(ITypeExplorer typeExplorer, StandardKernel kernel, Type[] genericProjectorInterfaces,
+            ILogger logger)
         {
             this.typeExplorer = typeExplorer;
             this.kernel = kernel;
             this.genericProjectorInterfaces = genericProjectorInterfaces;
+            this.logger = logger;
         }
 
         public void Configure()
@@ -42,7 +43,7 @@ namespace Revo.Infrastructure.Projections
                 .ToArray();
 
             RegisterProjectors(projectorTypes);
-            Logger.Debug($"Discovered {projectorTypes.Length} projectors: {string.Join(", ", projectorTypes.Select(x => x.FullName))}");
+            logger.LogDebug($"Discovered {projectorTypes.Length} projectors: {string.Join(", ", projectorTypes.Select(x => x.FullName))}");
         }
         
         private Type[] GetProjectorInterfaces(Type requestHandlerType)

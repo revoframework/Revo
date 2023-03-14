@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using Ninject;
 using Ninject.Activation;
 using Ninject.Extensions.ContextPreservation;
 using Revo.Core.Configuration;

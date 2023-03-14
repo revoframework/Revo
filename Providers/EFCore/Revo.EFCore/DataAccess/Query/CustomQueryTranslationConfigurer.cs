@@ -10,6 +10,11 @@ namespace Revo.EFCore.DataAccess.Query
     {
         private readonly IServiceLocator serviceLocator;
 
+        public CustomQueryTranslationConfigurer(IServiceLocator serviceLocator)
+        {
+            this.serviceLocator = serviceLocator;
+        }
+
         public void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var builder = (IDbContextOptionsBuilderInfrastructure)optionsBuilder;

@@ -1,5 +1,4 @@
 ﻿using Revo.Domain.Entities;
-using Revo.Domain.Entities.EventSourcing;
 using Revo.EF6.DataAccess.Entities;
 using Revo.Infrastructure.Projections;
 

@@ -1,6 +1,5 @@
 ﻿using Ninject.Modules;
 using Revo.AspNetCore.Core;
-using Revo.AspNetCore.Ninject;
 using Revo.Core.Core;
 using Revo.Hangfire;
 

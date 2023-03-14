@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using NLog;
+using Microsoft.Extensions.Logging;
 using Revo.DataAccess.Entities;
 using Revo.Infrastructure.Jobs;
 using Revo.Infrastructure.Jobs.InMemory;
@@ -10,24 +10,24 @@ namespace Revo.Infrastructure.Events.Async
 {
     public class ProcessAsyncEventsJobHandler : IJobHandler<ProcessAsyncEventsJob>
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
         private readonly IAsyncEventWorker asyncEventWorker;
         private readonly IAsyncEventPipelineConfiguration asyncEventPipelineConfiguration;
         private readonly IInMemoryJobScheduler jobScheduler;
+        private readonly ILogger logger;
 
         public ProcessAsyncEventsJobHandler(IAsyncEventWorker asyncEventWorker,
             IAsyncEventPipelineConfiguration asyncEventPipelineConfiguration,
-            IInMemoryJobScheduler jobScheduler)
+            IInMemoryJobScheduler jobScheduler, ILogger logger)
         {
             this.asyncEventWorker = asyncEventWorker;
             this.asyncEventPipelineConfiguration = asyncEventPipelineConfiguration;
             this.jobScheduler = jobScheduler;
+            this.logger = logger;
         }
 
         public async Task HandleAsync(ProcessAsyncEventsJob job, CancellationToken cancellationToken)
         {
-            Logger.Trace($"Starting to process async event queue '{job.QueueName}' with {job.AttemptsLeft} attempts left");
+            logger.LogTrace($"Starting to process async event queue '{job.QueueName}' with {job.AttemptsLeft} attempts left");
 
             try
             {
@@ -35,22 +35,22 @@ namespace Revo.Infrastructure.Events.Async
             }
             catch (AsyncEventProcessingSequenceException e)
             {
-                Logger.Debug(e, $"AsyncEventProcessingSequenceException occurred during asynchronous queue processing");
+                logger.LogDebug(e, $"AsyncEventProcessingSequenceException occurred during asynchronous queue processing");
                 await ScheduleRetryAsync(job);
             }
             catch (OptimisticConcurrencyException e)
             {
-                Logger.Warn(e, $"Optimistic concurrency exception occurred while processing '{job.QueueName}' async event queue");
+                logger.LogWarning(e, $"Optimistic concurrency exception occurred while processing '{job.QueueName}' async event queue");
                 await ScheduleRetryAsync(job);
             }
             catch (Exception e)
             {
-                Logger.Error(e, $"Unhandled exception occurred while processing '{job.QueueName}' async event queue");
+                logger.LogError(e, $"Unhandled exception occurred while processing '{job.QueueName}' async event queue");
                 throw;
             }
 
             // TODO handle transient I/O errors with retries
-            Logger.Trace($"Finished processing async event queue '{job.QueueName}'");
+            logger.LogTrace($"Finished processing async event queue '{job.QueueName}'");
         }
 
         private async Task ScheduleRetryAsync(ProcessAsyncEventsJob job)
@@ -60,14 +60,14 @@ namespace Revo.Infrastructure.Events.Async
 
                 TimeSpan timeout = TimeSpan.FromTicks(job.RetryTimeout.Ticks *
                                                       asyncEventPipelineConfiguration.AsyncProcessRetryTimeoutMultiplier);
-                Logger.Debug($"Scheduling '{job.QueueName}' async event queue processing retry in {timeout.TotalSeconds} seconds");
+                logger.LogDebug($"Scheduling '{job.QueueName}' async event queue processing retry in {timeout.TotalSeconds} seconds");
 
                 ProcessAsyncEventsJob newJob = new ProcessAsyncEventsJob(job.QueueName, job.AttemptsLeft - 1, timeout);
                 await jobScheduler.EnqeueJobAsync(newJob, job.RetryTimeout);
             }
             else
             {
-                Logger.Error($"Unable to finish '{job.QueueName}' async event queue even after {asyncEventPipelineConfiguration.AsyncProcessAttemptCount} attempts, giving up");
+                logger.LogError($"Unable to finish '{job.QueueName}' async event queue even after {asyncEventPipelineConfiguration.AsyncProcessAttemptCount} attempts, giving up");
             }
         }
     }

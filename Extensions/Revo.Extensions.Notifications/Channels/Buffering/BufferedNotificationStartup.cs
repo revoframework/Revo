@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Revo.Core.Core;
 using Revo.Core.Lifecycle;
-using Revo.Infrastructure.Jobs;
 using Revo.Infrastructure.Jobs.InMemory;
 
 namespace Revo.Extensions.Notifications.Channels.Buffering
