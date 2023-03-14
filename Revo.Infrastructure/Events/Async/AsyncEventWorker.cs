@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using NLog;
+using Microsoft.Extensions.Logging;
 using Revo.Core.Core;
 using Revo.Core.Events;
 
@@ -10,16 +10,16 @@ namespace Revo.Infrastructure.Events.Async
 {
     public class AsyncEventWorker : IAsyncEventWorker
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
         private readonly IAsyncEventQueueManager asyncEventQueueManager;
         private readonly IServiceLocator serviceLocator;
+        private readonly ILogger logger;
 
         public AsyncEventWorker(IAsyncEventQueueManager asyncEventQueueManager,
-            IServiceLocator serviceLocator)
+            IServiceLocator serviceLocator, ILogger logger)
         {
             this.asyncEventQueueManager = asyncEventQueueManager;
             this.serviceLocator = serviceLocator;
+            this.logger = logger;
         }
 
         public async Task RunQueueBacklogAsync(string queueName)
@@ -45,7 +45,7 @@ namespace Revo.Infrastructure.Events.Async
             long? firstSequenceNumber = sequential.FirstOrDefault()?.SequenceNumber; //records should always arrive in order, but possibly with gaps in sequence
             long? lastSequenceNumber = sequential.LastOrDefault()?.SequenceNumber;
 
-            Logger.Trace($"Read {records.Count} async events from queue '{queueName}', last sequence number {lastSequenceNumber}");
+            logger.LogTrace($"Read {records.Count} async events from queue '{queueName}', last sequence number {lastSequenceNumber}");
 
             if (firstSequenceNumber != null
                 && queue.LastSequenceNumberProcessed != null
@@ -55,13 +55,13 @@ namespace Revo.Infrastructure.Events.Async
                 bool anyNonsequential = nonSequential.Any();
                 if (anyNonsequential)
                 {
-                    Logger.Debug($"Processing only non-sequential async events in '{queueName}' queue: missing some events in sequence at #{queue.LastSequenceNumberProcessed.Value + 1}");
+                    logger.LogDebug($"Processing only non-sequential async events in '{queueName}' queue: missing some events in sequence at #{queue.LastSequenceNumberProcessed.Value + 1}");
                     processOnlyNonsequential = true;
                 }
                 else
                 {
                     string error = $"Skipping processing of '{queueName}' async event queue: missing events in sequence at #{queue.LastSequenceNumberProcessed.Value + 1}";
-                    Logger.Warn(error);
+                    logger.LogWarning(error);
                     throw new AsyncEventProcessingSequenceException(error, queue.LastSequenceNumberProcessed.Value + 1);
                 }
             }
@@ -112,7 +112,7 @@ namespace Revo.Infrastructure.Events.Async
                         catch (Exception e)
                         {
                             string error = $"Failed processing of an async event {record.EventMessage.GetType().FullName} (ID: {record.EventId}) in queue '{queueName}' with listener {listener.GetType().FullName}";
-                            Logger.Error(e, error);
+                            logger.LogError(e, error);
                             throw new AsyncEventProcessingException(error, e);
                         }
                     }
@@ -130,7 +130,7 @@ namespace Revo.Infrastructure.Events.Async
                 catch (Exception e)
                 {
                     string error = $"Failed to finish processing of an async event queue '{queueName}' with listener {listener.GetType().FullName}";
-                    Logger.Error(e, error);
+                    logger.LogError(e, error);
                     throw new AsyncEventProcessingException(error, e);
                 }
             }

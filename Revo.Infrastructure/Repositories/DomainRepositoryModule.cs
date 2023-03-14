@@ -1,5 +1,4 @@
-﻿using Ninject.Extensions.ContextPreservation;
-using Ninject.Modules;
+﻿using Ninject.Modules;
 using Revo.Core.Core;
 
 namespace Revo.Infrastructure.Repositories

@@ -13,16 +13,20 @@ Core package of the framework.</Description>
     <PackageReference Include="Castle.Core" Version="5.1.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="Ninject" Version="3.3.6" />
     <PackageReference Include="Ninject.Extensions.ContextPreservation" Version="3.3.1" />
     <PackageReference Include="Ninject.Extensions.Factory" Version="3.3.3" />
-    <PackageReference Include="NLog" Version="5.0.5" />
     <PackageReference Include="System.Collections.Immutable" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Logging\" />
   </ItemGroup>
 
 </Project>

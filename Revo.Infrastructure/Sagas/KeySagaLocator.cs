@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
-using MoreLinq;
 using Revo.Core.Events;
 using Revo.Domain.Entities;
 using Revo.Domain.Events;
-using Revo.Domain.Sagas;
-using Revo.Infrastructure.EventSourcing;
 
 namespace Revo.Infrastructure.Sagas
 {

@@ -1,39 +1,28 @@
 ﻿using System.Reflection;
 using System.Threading.Tasks;
 using CommandLine;
-using NLog;
-using NLog.Config;
-using NLog.Targets;
+using Microsoft.Extensions.Logging;
 
 namespace Revo.Tools.DatabaseMigrator
 {
     class Program
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private static ILogger logger;
+
         static Task<int> Main(string[] args)
         {
-            var config = new LoggingConfiguration();
-            var consoleTarget = new ColoredConsoleTarget("target1")
+            using var loggerFactory = LoggerFactory.Create(builder =>
             {
-                Layout = @"${message} ${exception}"
-            };
-            config.AddTarget(consoleTarget);
+                builder
+                    .AddFilter("Default", LogLevel.Information)
+                    .AddConsole();
+            });
 
-            var fileTarget = new FileTarget("target2")
-            {
-                FileName = "${basedir}/migration.log",
-                Layout = "${longdate} ${level} ${message} ${exception}"
-            };
-            config.AddTarget(fileTarget);
+            ILogger logger = loggerFactory.CreateLogger<Program>();
 
-            config.AddRule(LogLevel.Info, LogLevel.Fatal, consoleTarget);
-            config.AddRule(LogLevel.Trace, LogLevel.Fatal, fileTarget);
+            logger.LogInformation($"Revo Database Migrator (v. {Assembly.GetEntryAssembly()?.GetName().Version}) tool running in standalone mode");
 
-            LogManager.Configuration = config;
-
-            Logger.Info($"Revo Database Migrator (v. {Assembly.GetEntryAssembly()?.GetName().Version}) tool running in standalone mode");
-
-            return CommandLine.Parser.Default.ParseArguments<UpgradeVerb, PreviewVerb>(args)
+            return Parser.Default.ParseArguments<UpgradeVerb, PreviewVerb>(args)
                 .MapResult(
                     (UpgradeVerb opts) => Upgrade(opts),
                     (PreviewVerb opts) => Preview(opts),
@@ -42,9 +31,9 @@ namespace Revo.Tools.DatabaseMigrator
 
         private static async Task<int> Upgrade(UpgradeVerb verb)
         {
-            Logger.Info("Running command: upgrade");
+            logger.LogInformation("Running command: upgrade");
 
-            DatabaseMigrator migrator = new DatabaseMigrator(verb);
+            DatabaseMigrator migrator = new DatabaseMigrator(verb, logger);
             await migrator.UpgradeAsync(verb);
 
             return 0;
@@ -52,9 +41,9 @@ namespace Revo.Tools.DatabaseMigrator
 
         private static async Task<int> Preview(PreviewVerb verb)
         {
-            Logger.Info("Running command: preview (showing only preview of migrations to be applied)");
+            logger.LogInformation("Running command: preview (showing only preview of migrations to be applied)");
 
-            DatabaseMigrator migrator = new DatabaseMigrator(verb);
+            DatabaseMigrator migrator = new DatabaseMigrator(verb, logger);
             await migrator.PreviewAsync(verb);
 
             return 0;

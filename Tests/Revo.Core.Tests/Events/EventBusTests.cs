@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using FluentAssertions;
-using Revo.Core.Commands;
 using Revo.Core.Core;
 using Revo.Core.Events;
 using NSubstitute;

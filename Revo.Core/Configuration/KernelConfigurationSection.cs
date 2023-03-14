@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Ninject;
 using Ninject.Modules;
 
 namespace Revo.Core.Configuration

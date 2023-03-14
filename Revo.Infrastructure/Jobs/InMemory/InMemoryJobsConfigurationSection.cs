@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Revo.Core.Configuration;
+﻿using Revo.Core.Configuration;
 
 namespace Revo.Infrastructure.Jobs.InMemory
 {

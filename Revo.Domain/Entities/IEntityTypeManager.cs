@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Revo.Domain.Entities.Attributes;
 
 namespace Revo.Domain.Entities
 {

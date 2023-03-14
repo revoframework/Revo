@@ -5,7 +5,7 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
-using NLog;
+using Microsoft.Extensions.Logging;
 using Revo.Core.Core;
 using Revo.Core.Events;
 using Revo.Infrastructure.DataAccess.Migrations.Events;
@@ -14,16 +14,18 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
 {
     public abstract class AdoNetStubDatabaseMigrationProvider : IDatabaseMigrationProvider
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
         private readonly IEventBus eventBus;
+        private readonly ILogger logger;
+
         private readonly List<IDatabaseMigration> uncommittedMigrations = new List<IDatabaseMigration>();
+        
         private IDbTransaction dbTransaction;
         private bool isInitialized = false;
 
-        protected AdoNetStubDatabaseMigrationProvider(IEventBus eventBus)
+        protected AdoNetStubDatabaseMigrationProvider(IEventBus eventBus, ILogger logger)
         {
             this.eventBus = eventBus;
+            this.logger = logger;
         }
         
         protected abstract IDatabaseMigrationScripter Scripter { get; }
@@ -107,7 +109,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
 
                     try
                     {
-                        Logger.Info($"Executing database migration using ADO.NET provider: {migration}");
+                        logger.LogInformation($"Executing database migration using ADO.NET provider: {migration}");
 
                         await OnMigrationBeforeAppliedAsync(migration);
 
@@ -134,7 +136,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
 
                         await InsertMigrationRecordAsync(migration);
 
-                        Logger.Info($"Applied database migration using ADO.NET provider: {migration}");
+                        logger.LogInformation($"Applied database migration using ADO.NET provider: {migration}");
 
                         await OnMigrationAppliedAsync(migration);
 
@@ -170,7 +172,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
         {
             try
             {
-                Logger.Debug($"Commiting {uncommittedMigrations.Count} database migrations using ADO.NET provider");
+                logger.LogDebug($"Commiting {uncommittedMigrations.Count} database migrations using ADO.NET provider");
                 await CommitDbTransactionAsync(dbTransaction);
                 dbTransaction = null;
             }
@@ -284,7 +286,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
             
             if (!exists)
             {
-                Logger.Debug($"Creating database migration history schema using ADO.NET provider");
+                logger.LogDebug($"Creating database migration history schema using ADO.NET provider");
 
                 using (var createDbCommand = dbConnection.CreateCommand())
                 {
@@ -300,7 +302,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
                     }
                 }
 
-                Logger.Debug($"Successfully created database migration history schema using ADO.NET provider");
+                logger.LogDebug($"Successfully created database migration history schema using ADO.NET provider");
             }
         }
 
@@ -357,7 +359,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
                 param.Value = Clock.Current.UtcNow.UtcDateTime;
                 dbCommand.Parameters.Add(param);
 
-                Logger.Debug($"Inserting {migration} database migration record");
+                logger.LogDebug($"Inserting {migration} database migration record");
 
                 if (dbCommand is DbCommand dbCommandAsync)
                 {

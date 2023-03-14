@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Threading.Tasks;
 using NSubstitute;
 using Revo.Domain.Entities.EventSourcing;
 using Revo.EF6.DataAccess.Entities;
 using Revo.EF6.DataAccess.InMemory;
 using Revo.EF6.Projections;
-using Xunit;
 
 namespace Revo.EF6.Tests.Projections
 {

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NSubstitute;
-using Revo.Core.Core;
 using Revo.Core.Events;
 using Revo.DataAccess.Entities;
 using Revo.DataAccess.InMemory;

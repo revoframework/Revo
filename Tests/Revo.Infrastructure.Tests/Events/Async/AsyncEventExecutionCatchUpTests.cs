@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.Logging.Abstractions;
 using Revo.Infrastructure.Events.Async;
 using NSubstitute;
 using Xunit;
@@ -63,7 +63,8 @@ namespace Revo.Infrastructure.Tests.Events.Async
                     }
 
                     return worker;
-                });
+                },
+                new NullLogger<AsyncEventExecutionCatchUp>());
         }
 
         [Fact]
@@ -117,7 +118,8 @@ namespace Revo.Infrastructure.Tests.Events.Async
                     worker.RunQueueBacklogAsync("throwing")
                         .Returns(Task.FromException(new AsyncEventProcessingException()));
                     return worker;
-                });
+                },
+                new NullLogger<AsyncEventExecutionCatchUp>());
 
             sut.OnApplicationStarted();
 

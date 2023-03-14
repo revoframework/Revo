@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29324.140
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2_Providers", "2_Providers", "{25A48354-8863-4FC8-B85D-EDE6E2974EE5}"
 EndProject
@@ -105,6 +105,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.Tools.DatabaseMigrator", "Tools\Revo.Tools.DatabaseMigrator\Revo.Tools.DatabaseMigrator.csproj", "{DD6B984E-3F40-4735-A030-1331F56EBACC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revo.Extensions.AutoMapper", "Extensions\Revo.Extensions.AutoMapper\Revo.Extensions.AutoMapper.csproj", "{E3A99A37-EF26-4EE9-BE72-F869AC8EC3CD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "6_IntegrationTests", "6_IntegrationTests", "{4B3444F3-30D5-4347-AD6B-DACC118685B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

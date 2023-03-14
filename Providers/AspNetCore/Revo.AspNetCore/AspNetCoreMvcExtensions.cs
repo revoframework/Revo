@@ -48,9 +48,8 @@ namespace Revo.AspNetCore
             return feature.Controllers.Select(t => t.AsType()).ToArray();
         }
 
-        public static Type[] GetHubTypes(this IApplicationBuilder builder)
+        public static Type[] GetHubTypes(this IApplicationBuilder builder, ITypeExplorer typeExplorer)
         {
-            var typeExplorer = new TypeExplorer();
             return typeExplorer.GetAllTypes()
                 .Where(x => x.IsClass && !x.IsAbstract && typeof(Hub).IsAssignableFrom(x))
                 .ToArray();

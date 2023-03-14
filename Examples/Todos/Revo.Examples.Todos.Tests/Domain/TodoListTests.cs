@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using FluentAssertions;
-using Revo.Domain.Tenancy.Events;
 using Revo.Examples.Todos.Domain;
 using Revo.Examples.Todos.Domain.Events;
 using Revo.Testing.Infrastructure;

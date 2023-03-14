@@ -1,7 +1,6 @@
 ﻿using System;
 using Hangfire;
 using Revo.Core.Configuration;
-using Revo.Infrastructure.Jobs;
 using Revo.Infrastructure.Jobs.InMemory;
 
 namespace Revo.Hangfire

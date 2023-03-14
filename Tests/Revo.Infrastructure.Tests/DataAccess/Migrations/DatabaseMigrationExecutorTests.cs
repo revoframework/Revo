@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using Revo.Infrastructure.DataAccess.Migrations;
 using Xunit;
@@ -37,7 +38,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
 
             sut = new DatabaseMigrationExecutor(migrationProviders,
                 migrationRegistry, migrationDiscoveries, migrationSelector,
-                migrationExecutionOptions);
+                migrationExecutionOptions, new NullLogger<DatabaseMigrationExecutor>());
         }
 
         [Fact]

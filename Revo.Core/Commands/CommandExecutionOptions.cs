@@ -1,6 +1,4 @@
-﻿using Revo.Core.Tenancy;
-
-namespace Revo.Core.Commands
+﻿namespace Revo.Core.Commands
 {
     /// <summary>
     /// Defines options for an execution of a command.

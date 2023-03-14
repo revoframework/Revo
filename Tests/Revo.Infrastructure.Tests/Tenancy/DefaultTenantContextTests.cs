@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
-using Revo.Domain.Tenancy;
 using Revo.Infrastructure.Tenancy;
 using NSubstitute;
 using Revo.Core.Tenancy;

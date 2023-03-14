@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Ninject;
+﻿using Ninject;
 using Ninject.Modules;
 using NSubstitute;
 using Revo.Core.Configuration;

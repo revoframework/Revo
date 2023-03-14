@@ -29,4 +29,8 @@
     <ProjectReference Include="..\..\Revo.Testing\Revo.Testing.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Logging\" />
+  </ItemGroup>
+
 </Project>

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using NLog;
+using Microsoft.Extensions.Logging;
 using Revo.Core.Core;
 using Revo.DataAccess.Entities;
 using Revo.Infrastructure.Jobs.InMemory;
@@ -12,22 +12,23 @@ namespace Revo.Infrastructure.Events.Async
 {
     public class AsyncEventProcessor : IAsyncEventProcessor
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
         private readonly Func<IAsyncEventWorker> asyncEventWorkerFunc;
         private readonly IAsyncEventQueueManager asyncEventQueueManager;
         private readonly IInMemoryJobScheduler jobScheduler;
         private readonly IAsyncEventPipelineConfiguration asyncEventPipelineConfiguration;
+        private readonly ILogger logger;
 
         public AsyncEventProcessor(Func<IAsyncEventWorker> asyncEventWorkerFunc,
             IAsyncEventQueueManager asyncEventQueueManager,
             IInMemoryJobScheduler jobScheduler,
-            IAsyncEventPipelineConfiguration asyncEventPipelineConfiguration)
+            IAsyncEventPipelineConfiguration asyncEventPipelineConfiguration,
+            ILogger logger)
         {
             this.asyncEventWorkerFunc = asyncEventWorkerFunc;
             this.asyncEventQueueManager = asyncEventQueueManager;
             this.jobScheduler = jobScheduler;
             this.asyncEventPipelineConfiguration = asyncEventPipelineConfiguration;
+            this.logger = logger;
         }
 
         public async Task ProcessSynchronously(IReadOnlyCollection<IAsyncEventQueueRecord> eventsToProcess)
@@ -61,7 +62,7 @@ namespace Revo.Infrastructure.Events.Async
 
             if (queues.Length > 0 && remainingEvents.Count > 0)
             {
-                Logger.Error(
+                logger.LogError(
                     $"Not able to synchronously process all event queues, about to reschedule {remainingEvents.Count} events for later async processing in {asyncEventPipelineConfiguration.AsyncRescheduleDelayAfterSyncProcessFailure.TotalSeconds:0.##} seconds");
                 await EnqueueForAsyncProcessingAsync(remainingEvents, asyncEventPipelineConfiguration.AsyncRescheduleDelayAfterSyncProcessFailure);
             }
@@ -98,13 +99,13 @@ namespace Revo.Infrastructure.Events.Async
                         }
                         catch (AsyncEventProcessingSequenceException e)
                         {
-                            Logger.Debug(e,
+                            logger.LogDebug(e,
                                 $"AsyncEventProcessingSequenceException occurred during synchronous queue processing");
                             return null; //can retry
                         }
                         catch (OptimisticConcurrencyException e)
                         {
-                            Logger.Debug(e,
+                            logger.LogDebug(e,
                                 $"OptimisticConcurrencyException occurred during synchronous queue processing");
                             return null; //can retry
                         }

@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Revo.Domain.Entities;
 using Revo.Domain.Sagas;
-using Revo.Infrastructure.EventSourcing;
 
 namespace Revo.Infrastructure.Sagas
 {

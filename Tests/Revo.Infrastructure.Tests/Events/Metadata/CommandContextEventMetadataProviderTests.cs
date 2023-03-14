@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using FluentAssertions;
 using Revo.Core.Commands;
 using Revo.Core.Events;
 using Revo.Infrastructure.Events.Metadata;
 using NSubstitute;
-using Revo.Domain.Events;
 using Xunit;
 
 namespace Revo.Infrastructure.Tests.Events.Metadata

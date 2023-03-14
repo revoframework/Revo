@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,7 +6,6 @@ using FluentAssertions;
 using NSubstitute;
 using Revo.Core.Events;
 using Revo.Core.Types;
-using Revo.DataAccess.Entities;
 using Revo.DataAccess.InMemory;
 using Revo.Domain.Events;
 using Revo.Infrastructure.Events;

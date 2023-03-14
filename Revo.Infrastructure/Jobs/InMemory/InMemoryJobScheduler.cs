@@ -1,26 +1,27 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using NLog;
+using Microsoft.Extensions.Logging;
 using Revo.Core.Core;
 
 namespace Revo.Infrastructure.Jobs.InMemory
 {
     public class InMemoryJobScheduler : IInMemoryJobScheduler
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
         private readonly IInMemoryJobSchedulerConfiguration schedulerConfiguration;
         private readonly IInMemoryJobWorkerProcess workerProcess;
         private readonly IInMemoryJobSchedulerProcess schedulerProcess;
-        private readonly Random retryRandom = new Random();
+        private readonly Random retryRandom = new();
+        private readonly ILogger logger;
 
         public InMemoryJobScheduler(IInMemoryJobSchedulerConfiguration schedulerConfiguration,
-            IInMemoryJobWorkerProcess workerProcess, IInMemoryJobSchedulerProcess schedulerProcess)
+            IInMemoryJobWorkerProcess workerProcess, IInMemoryJobSchedulerProcess schedulerProcess,
+            ILogger logger)
         {
             this.schedulerConfiguration = schedulerConfiguration;
             this.workerProcess = workerProcess;
             this.schedulerProcess = schedulerProcess;
+            this.logger = logger;
         }
 
         public Task<string> EnqeueJobAsync(IJob job, TimeSpan? timeDelay)
@@ -65,7 +66,7 @@ namespace Revo.Infrastructure.Jobs.InMemory
 
         private void HandleError(JobInfo jobInfo, Exception exception)
         {
-            Logger.Error(exception, $"Error processing job: {jobInfo.Job.ToString()} (attempt #{jobInfo.AttemptNumber})");
+            logger.LogError(exception, $"Error processing job: {jobInfo.Job.ToString()} (attempt #{jobInfo.AttemptNumber})");
 
             int Pow(int bas, int exp)
             {
@@ -85,7 +86,7 @@ namespace Revo.Infrastructure.Jobs.InMemory
 
                 jobInfo.AttemptNumber++;
 
-                Logger.Info($"Scheduling job retry for {jobInfo.Job.ToString()} in {Math.Ceiling(delay.TotalSeconds)} seconds (attempt #{jobInfo.AttemptNumber})");
+                logger.LogInformation($"Scheduling job retry for {jobInfo.Job.ToString()} in {Math.Ceiling(delay.TotalSeconds)} seconds (attempt #{jobInfo.AttemptNumber})");
                 schedulerProcess.ScheduleJob(jobInfo.Job, enqueueAt, (_, newException) => HandleError(jobInfo, newException));
             }
         }

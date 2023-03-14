@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Revo.Core.Events;
 using Revo.EF6.DataAccess.Entities;
 using Revo.EF6.DataAccess.Model;
@@ -15,7 +16,7 @@ namespace Revo.EF6.DataAccess.Migrations
 
         public EF6DatabaseMigrationProvider(EF6ConnectionConfiguration connectionConfiguration,
             IMigrationScripterFactory scripterFactory,
-            IEventBus eventBus, IEF6DatabaseAccess databaseAccess) : base(eventBus)
+            IEventBus eventBus, IEF6DatabaseAccess databaseAccess, ILogger logger) : base(eventBus, logger)
         {
             this.databaseAccess = databaseAccess;
 

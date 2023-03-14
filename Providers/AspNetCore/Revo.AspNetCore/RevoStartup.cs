@@ -4,7 +4,6 @@ using System.Threading;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures.Buffers;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +17,7 @@ using Revo.AspNetCore.Core;
 using Revo.AspNetCore.Ninject;
 using Revo.Core.Configuration;
 using Revo.Core.Core;
+using Revo.Core.Logging;
 using Revo.Core.Types;
 using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 
@@ -25,19 +25,21 @@ namespace Revo.AspNetCore
 {
     public abstract class RevoStartup
     {
-        private static readonly AsyncLocal<Scope> scopeProvider = new AsyncLocal<Scope>();
+        private static readonly AsyncLocal<Scope> scopeProvider = new();
         public static object RequestScope(IContext context) => scopeProvider.Value;
         
         private KernelBootstrapper kernelBootstrapper;
+        private ITypeExplorer typeExplorer;
 
-        public RevoStartup(IConfiguration configuration)
+        public RevoStartup(IConfiguration configuration, ILoggerFactory loggerFactory)
         {
             Configuration = configuration;
+            LoggerFactory = loggerFactory;
         }
 
         public IConfiguration Configuration { get; }
+        public ILoggerFactory LoggerFactory { get; }
         public IKernel Kernel { get; private set; }
-        private object Resolve(Type type) => Kernel.Get(type);
 
         public virtual void ConfigureServices(IServiceCollection services)
         {
@@ -67,10 +69,11 @@ namespace Revo.AspNetCore
             services.AddCustomControllerActivation();
             services.AddCustomHubActivation();
             services.AddCustomViewComponentActivation();
-
-            kernelBootstrapper = new KernelBootstrapper(Kernel, revoConfiguration);
             
-            var typeExplorer = new TypeExplorer();
+            kernelBootstrapper = new KernelBootstrapper(Kernel, revoConfiguration,
+                LoggerFactory.CreateLogger<KernelBootstrapper>());
+            
+            this.typeExplorer = new TypeExplorer(LoggerFactory.CreateLogger<TypeExplorer>());
 
             kernelBootstrapper.Configure();
 
@@ -88,15 +91,15 @@ namespace Revo.AspNetCore
             }
         }
         
-        public virtual void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
+        public virtual void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            RegisterAspNetCoreService(app, loggerFactory);
+            RegisterAspNetCoreService(app);
             kernelBootstrapper.RunAppConfigurers();
 
             var aspNetCoreConfigurers = Kernel.GetAll<IAspNetCoreStartupConfigurer>();
             foreach (var aspNetCoreConfigurer in aspNetCoreConfigurers)
             {
-                aspNetCoreConfigurer.Configure(app, env, loggerFactory);
+                aspNetCoreConfigurer.Configure(app, env);
             }
             
             kernelBootstrapper.RunAppStartListeners();
@@ -117,21 +120,31 @@ namespace Revo.AspNetCore
             NinjectBindingExtensions.Current = new AspNetCoreNinjectBindingExtension();
         }
 
-        private void RegisterAspNetCoreService(IApplicationBuilder app, ILoggerFactory loggerFactory)
+        private void RegisterAspNetCoreService(IApplicationBuilder app)
         {
             foreach (var ctrlType in app.GetControllerTypes())
             {
                 Kernel.Bind(ctrlType).ToSelf().InScope(RequestScope);
             }
 
-            foreach (var hubType in app.GetHubTypes())
+            foreach (var hubType in app.GetHubTypes(typeExplorer))
             {
                 Kernel.Bind(hubType).ToSelf().InScope(RequestScope);
             }
 
             Kernel.Bind<IViewBufferScope>().ToMethod(ctx => app.GetRequestService<IViewBufferScope>());
             Kernel.Bind(typeof(IHubContext<>), typeof(IHubContext<,>)).ToMethod(ctx => app.GetRequestService(ctx.Request.Service));
-            Kernel.Bind<ILoggerFactory>().ToConstant(loggerFactory);
+
+            Kernel.Bind<ILoggerFactory>().ToConstant(LoggerFactory);
+
+            Kernel.Bind(typeof(ILogger<>)).ToMethod(context =>
+                LoggerFactory.CreateGenericLogger(context.GenericArguments[0]));
+
+            Kernel.Bind<ILogger>().ToMethod(context => LoggerFactory.CreateLogger(
+                context.Request.Target?.Member.ReflectedType
+                ?? throw new InvalidOperationException(
+                    "Non-generic ILogger can only be injected into other classes and can not be resolved on its own")));
+
             Kernel.Bind<IServiceProvider>().ToMethod(ctx => app.ApplicationServices);
             Kernel.Bind<IWebHostEnvironment>().ToMethod(ctx => app.ApplicationServices.GetRequiredService<IWebHostEnvironment>());
             Kernel.Bind<IHttpContextAccessor>()

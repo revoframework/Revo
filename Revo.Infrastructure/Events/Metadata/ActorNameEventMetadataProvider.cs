@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Revo.Core.Core;
 using Revo.Core.Events;
-using Revo.Domain.Events;
 
 namespace Revo.Infrastructure.Events.Metadata
 {

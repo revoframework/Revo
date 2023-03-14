@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using NSubstitute;
 using Revo.Extensions.Notifications.Channels.Buffering;
 using Revo.Testing.Core;

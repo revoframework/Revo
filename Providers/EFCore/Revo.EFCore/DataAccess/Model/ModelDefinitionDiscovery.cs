@@ -1,23 +1,23 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Ninject;
-using NLog;
 using Revo.Core.Types;
 
 namespace Revo.EFCore.DataAccess.Model
 {
     public class ModelDefinitionDiscovery
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
         private readonly ITypeExplorer typeExplorer;
         private readonly StandardKernel kernel;
+        private readonly ILogger logger;
 
-        public ModelDefinitionDiscovery(ITypeExplorer typeExplorer, StandardKernel kernel)
+        public ModelDefinitionDiscovery(ITypeExplorer typeExplorer, StandardKernel kernel, ILogger logger)
         {
             this.typeExplorer = typeExplorer;
             this.kernel = kernel;
+            this.logger = logger;
         }
         
         public IEnumerable<IEFCoreModelDefinition> DiscoverModelDefinitions()
@@ -29,7 +29,7 @@ namespace Revo.EFCore.DataAccess.Model
             RegisterModelDefinitions(modelDefinitionTypes);
 
             List<IEFCoreModelDefinition> modelDefinitions = GetModelDefinitions();
-            Logger.Debug($"Found {modelDefinitions.Count} EF Core model definitions: {string.Join(", ", modelDefinitions.Select(x => x.GetType().FullName))}");
+            logger.LogDebug($"Found {modelDefinitions.Count} EF Core model definitions: {string.Join(", ", modelDefinitions.Select(x => x.GetType().FullName))}");
             return modelDefinitions;
         }
 

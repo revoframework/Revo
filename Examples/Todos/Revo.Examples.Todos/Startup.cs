@@ -17,7 +17,7 @@ namespace Revo.Examples.Todos
 {
     public class Startup : RevoStartup
     {
-        public Startup(IConfiguration configuration) : base(configuration)
+        public Startup(IConfiguration configuration, ILoggerFactory loggerFactory) : base(configuration, loggerFactory)
         {
         }
 
@@ -29,9 +29,9 @@ namespace Revo.Examples.Todos
             services.AddRazorPages();
         }
 
-        public override void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
+        public override void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            base.Configure(app, env, loggerFactory);
+            base.Configure(app, env);
 
             if (env.IsDevelopment())
             {

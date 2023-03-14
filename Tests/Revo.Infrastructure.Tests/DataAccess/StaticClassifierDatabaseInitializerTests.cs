@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Revo.Infrastructure.DataAccess;
-using Revo.Infrastructure.Repositories;
 using Revo.Testing.Infrastructure.Repositories;
-using NSubstitute;
 using Revo.Domain.Entities.Basic;
 using Xunit;
 

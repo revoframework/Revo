@@ -2,32 +2,34 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using NLog;
+using Microsoft.Extensions.Logging;
 
 namespace Revo.Infrastructure.DataAccess.Migrations
 {
     public class DatabaseMigrationExecutor : IDatabaseMigrationExecutor
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
         private readonly IDatabaseMigrationProvider[] migrationProviders;
         private readonly IDatabaseMigrationRegistry migrationRegistry;
         private readonly IDatabaseMigrationDiscovery[] migrationDiscoveries;
         private readonly IDatabaseMigrationSelector migrationSelector;
         private readonly IDatabaseMigrationExecutionOptions options;
+        private readonly ILogger logger;
+
         private bool hasDiscoveryRun = false;
 
         public DatabaseMigrationExecutor(IDatabaseMigrationProvider[] migrationProviders,
             IDatabaseMigrationRegistry migrationRegistry,
             IDatabaseMigrationDiscovery[] migrationDiscoveries,
             IDatabaseMigrationSelector migrationSelector,
-            IDatabaseMigrationExecutionOptions options)
+            IDatabaseMigrationExecutionOptions options,
+            ILogger logger)
         {
             this.migrationProviders = migrationProviders;
             this.migrationRegistry = migrationRegistry;
             this.migrationDiscoveries = migrationDiscoveries;
             this.migrationSelector = migrationSelector;
             this.options = options;
+            this.logger = logger;
         }
 
         public async Task<IReadOnlyCollection<PendingModuleMigration>> ExecuteAsync()
@@ -65,7 +67,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
 
             migrationRegistry.ValidateMigrations();
 
-            Logger.Debug($"Discovered {migrationCount} database migrations");
+            logger.LogDebug($"Discovered {migrationCount} database migrations");
             hasDiscoveryRun = true;
         }
 
@@ -151,11 +153,11 @@ namespace Revo.Infrastructure.DataAccess.Migrations
                 .OrderByDescending(x => x.Version)
                 .FirstOrDefault();
 
-            Logger.Info($"About to apply {migration.Migrations.Count} migrations to database for module {migration.Specifier.ModuleName} (up to version {highestVersion?.Version})");
+            logger.LogInformation($"About to apply {migration.Migrations.Count} migrations to database for module {migration.Specifier.ModuleName} (up to version {highestVersion?.Version})");
 
             await migration.Provider.ApplyMigrationsAsync(migration.Migrations);
 
-            Logger.Info($"Successfully migrated {migration.Specifier.ModuleName} module database to version {highestVersion?.Version}");
+            logger.LogInformation($"Successfully migrated {migration.Specifier.ModuleName} module database to version {highestVersion?.Version}");
         }
     }
 }

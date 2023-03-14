@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using FluentAssertions;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using Revo.Core.Commands;
-using Revo.Core.Core;
 using Xunit;
 
 namespace Revo.Core.Tests.Commands

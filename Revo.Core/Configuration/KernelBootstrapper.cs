@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
+using Microsoft.Extensions.Logging;
 using Ninject;
 using Ninject.Modules;
-using NLog;
 using Revo.Core.Core;
 using Revo.Core.Lifecycle;
 
@@ -13,16 +12,16 @@ namespace Revo.Core.Configuration
 {
     public class KernelBootstrapper
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
         private readonly IKernel kernel;
         private readonly IRevoConfiguration configuration;
         private readonly HashSet<Assembly> loadedAssemblies = new HashSet<Assembly>();
+        private readonly ILogger logger;
 
-        public KernelBootstrapper(IKernel kernel, IRevoConfiguration configuration)
+        public KernelBootstrapper(IKernel kernel, IRevoConfiguration configuration, ILogger logger)
         {
             this.kernel = kernel;
             this.configuration = configuration;
+            this.logger = logger;
         }
 
         public void Configure()
@@ -48,7 +47,7 @@ namespace Revo.Core.Configuration
                 var modules = GetNinjectModules(assembly).Where(x => !kernel.HasModule(x.Name)).ToArray();
                 if (modules.Length > 0)
                 {
-                    Logger.Info($"Loading {modules.Length} dependency modules from assembly {assembly.FullName}: {string.Join(",", modules.Select(x => x.Name))}");
+                    logger.LogInformation($"Loading {modules.Length} dependency modules from assembly {assembly.FullName}: {string.Join(",", modules.Select(x => x.Name))}");
                     kernel.Load(modules);
                 }
 

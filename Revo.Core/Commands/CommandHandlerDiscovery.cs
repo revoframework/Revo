@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Ninject;
-using NLog;
 using Revo.Core.Collections;
 using Revo.Core.Lifecycle;
 using Revo.Core.Types;
@@ -11,18 +11,18 @@ namespace Revo.Core.Commands
 {
     public class CommandHandlerDiscovery : IApplicationConfigurer
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
         private readonly ITypeExplorer typeExplorer;
         private readonly StandardKernel kernel;
         private readonly ICommandRouter commandRouter;
+        private readonly ILogger logger;
 
         public CommandHandlerDiscovery(ITypeExplorer typeExplorer, StandardKernel kernel,
-            ICommandRouter commandRouter)
+            ICommandRouter commandRouter, ILogger logger)
         {
             this.typeExplorer = typeExplorer;
             this.kernel = kernel;
             this.commandRouter = commandRouter;
+            this.logger = logger;
         }
 
         public void Configure()
@@ -46,7 +46,7 @@ namespace Revo.Core.Commands
             }
 
             RegisterCommandHandlers(handlersToInterfaces);
-            Logger.Debug($"Discovered {handlersToInterfaces.Count} command handlers: {string.Join(", ", commandHandlerTypes.Select(x => x.FullName))}");
+            logger.LogDebug($"Discovered {handlersToInterfaces.Count} command handlers: {string.Join(", ", commandHandlerTypes.Select(x => x.FullName))}");
         }
 
         private void RegisterCommandHandlers(IReadOnlyDictionary<Type, IReadOnlyCollection<Type>> handlersToInterfaces)

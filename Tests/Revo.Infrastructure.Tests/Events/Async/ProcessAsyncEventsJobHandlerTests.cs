@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging.Abstractions;
 using Revo.DataAccess.Entities;
 using Revo.Infrastructure.Events.Async;
-using Revo.Infrastructure.Jobs;
 using NSubstitute;
 using Revo.Infrastructure.Jobs.InMemory;
 using Xunit;
@@ -23,7 +23,8 @@ namespace Revo.Infrastructure.Tests.Events.Async
             jobScheduler = Substitute.For<IInMemoryJobScheduler>();
             asyncEventPipelineConfiguration = new AsyncEventPipelineConfiguration();
 
-            sut = new ProcessAsyncEventsJobHandler(asyncEventWorker, asyncEventPipelineConfiguration, jobScheduler);
+            sut = new ProcessAsyncEventsJobHandler(asyncEventWorker, asyncEventPipelineConfiguration,
+                jobScheduler, new NullLogger<ProcessAsyncEventsJobHandler>());
         }
 
         [Fact]

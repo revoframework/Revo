@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using NLog;
+using Microsoft.Extensions.Logging;
 using Revo.Core.Core;
 using Revo.Core.Lifecycle;
 
@@ -10,22 +10,23 @@ namespace Revo.Infrastructure.Events.Async
 {
     public class AsyncEventExecutionCatchUp : IApplicationStartedListener
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
         private readonly IEventSourceCatchUp[] eventSourceCatchUps;
         private readonly IAsyncEventQueueManager asyncEventQueueManager;
         private readonly IAsyncEventPipelineConfiguration asyncEventPipelineConfiguration;
         private readonly Func<IAsyncEventWorker> asyncEventWorkerFunc;
+        private readonly ILogger logger;
 
         public AsyncEventExecutionCatchUp(IEventSourceCatchUp[] eventSourceCatchUps,
             IAsyncEventQueueManager asyncEventQueueManager,
             IAsyncEventPipelineConfiguration asyncEventPipelineConfiguration,
-            Func<IAsyncEventWorker> asyncEventWorkerFunc)
+            Func<IAsyncEventWorker> asyncEventWorkerFunc,
+            ILogger logger)
         {
             this.eventSourceCatchUps = eventSourceCatchUps;
             this.asyncEventQueueManager = asyncEventQueueManager;
             this.asyncEventPipelineConfiguration = asyncEventPipelineConfiguration;
             this.asyncEventWorkerFunc = asyncEventWorkerFunc;
+            this.logger = logger;
         }
 
         public void OnApplicationStarted()
@@ -55,7 +56,7 @@ namespace Revo.Infrastructure.Events.Async
                 catch (Exception e)
                 {
                     // TODO reschedule?
-                    Logger.Error(e, $"Failed to catch-up an event source {eventSourceCatchUp} during startup");
+                    logger.LogError(e, $"Failed to catch-up an event source {eventSourceCatchUp} during startup");
                 }
             }
         }
@@ -81,7 +82,7 @@ namespace Revo.Infrastructure.Events.Async
                         catch (AsyncEventProcessingException e)
                         {
                             // TODO reschedule?
-                            Logger.Error(e,
+                            logger.LogError(e,
                                 $"AsyncEventProcessingException occurred while processing async event queue {queueName} during startup");
                         }
                         finally

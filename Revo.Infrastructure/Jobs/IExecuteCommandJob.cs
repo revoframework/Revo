@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Revo.Core.Commands;
+﻿using Revo.Core.Commands;
 
 namespace Revo.Infrastructure.Jobs
 {

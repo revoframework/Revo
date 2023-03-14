@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.Entity.ModelConfiguration.Conventions;
 using Revo.Core.Configuration;
 using Revo.EF6.DataAccess.Migrations;
 

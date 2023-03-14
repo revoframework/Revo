@@ -11,7 +11,6 @@ using Revo.Core.Events;
 using Revo.Core.Types;
 using Revo.DataAccess.Entities;
 using Revo.DataAccess.InMemory;
-using Revo.Domain.Events;
 using Revo.Infrastructure.Events;
 using Revo.Infrastructure.EventStores;
 using Revo.Infrastructure.EventStores.Generic;

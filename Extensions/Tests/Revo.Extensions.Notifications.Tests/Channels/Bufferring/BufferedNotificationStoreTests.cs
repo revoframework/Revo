@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using MoreLinq;
 using NSubstitute;
 using Revo.DataAccess.InMemory;
 using Revo.Extensions.Notifications.Channels.Buffering;
