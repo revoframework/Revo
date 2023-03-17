@@ -1,9 +1,9 @@
 # RELEASE NOTES
 
-## [1.34.0] - 2023-03-?
+## [1.34.0] - 2023-03-17
 
 ### Changed
-- removed NLog dependency, replaced with standard Microsoft.Extensions.Logging; if you want to keep using NLog, you have to install it in your projects and set-up the adapters on your own
+- removed NLog dependency, logging replaced with standard Microsoft.Extensions.Logging; if you want to keep using NLog, you have to install it in your projects and set-up the adapters on your own
 
 ## [1.33.0] - 2023-01-15
 
