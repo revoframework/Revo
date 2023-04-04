@@ -23,18 +23,19 @@ namespace Revo.AspNetCore.Core
         {
             var storage = hangfireConfigurationSection.JobStorage();
 
+            // this needs to be set here, otherwise Hangfire throws error when enqueuing a job
+            // before IGlobalConfiguration has been first requested by the DI container
+            GlobalConfiguration.Configuration.UseStorage(storage);
+            
             services
-                .AddHangfire(globalCfg =>
+                .AddHangfire(configuration =>
                 {
-                    globalCfg.UseStorage(storage);
-
+                    configuration.UseActivator(new HangfireJobActivator(kernel));
+                    
                     foreach (var action in hangfireConfigurationSection.ConfigurationActions)
                     {
-                        action(globalCfg);
+                        action(configuration);
                     }
-
-                    globalCfg.UseNLogLogProvider();
-                    globalCfg.UseActivator(new HangfireJobActivator(kernel));
                 });
 
             if (hangfireConfigurationSection.AddHangfireServer)
