@@ -1,12 +1,11 @@
 ﻿using System;
 
-namespace Revo.Domain.Tenancy
+namespace Revo.Domain.Tenancy;
+
+/// <summary>
+/// A resource (possibly) owned by a tenant.
+/// </summary>
+public interface ITenantOwned
 {
-    /// <summary>
-    /// A resource (possibly) owned by a tenant.
-    /// </summary>
-    public interface ITenantOwned
-    {
-        Guid? TenantId { get; }
-    }
+    Guid? TenantId { get; }
 }

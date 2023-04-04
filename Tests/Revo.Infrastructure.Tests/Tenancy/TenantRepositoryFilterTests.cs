@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
+using Revo.Core.Services;
 using Revo.Domain.ReadModel;
 using Revo.Domain.Tenancy;
 using Revo.Infrastructure.Tenancy;
@@ -39,7 +40,9 @@ namespace Revo.Infrastructure.Tests.Tenancy
 
             tenant = Substitute.For<ITenant>();
 
-            sut = new TenantRepositoryFilter(new Lazy<ITenantContext>(() => tenantContext));
+            var tenantContextFactory = Substitute.For<IServiceFactory<ITenantContext>>();
+            tenantContextFactory.GetRequiredService().Returns(tenantContext);
+            sut = new TenantRepositoryFilter(tenantContextFactory);
         }
 
         [Fact]

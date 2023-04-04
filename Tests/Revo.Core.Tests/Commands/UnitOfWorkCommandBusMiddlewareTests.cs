@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -37,7 +37,7 @@ namespace Revo.Core.Tests.Commands
             var expectedResult = new object();
 
             int invokedNext = 0;
-            CommandBusMiddlewareDelegate next = async paramCommand =>
+            CommandBusMiddlewareDelegate next = async (paramCommand, ct) =>
             {
                 paramCommand.Should().Be(command);
                 commandContextStack.CurrentCommand.Should().Be(command);
@@ -60,7 +60,7 @@ namespace Revo.Core.Tests.Commands
         public async Task HandleAsync_ReturnsResult()
         {
             var query = new Query1();
-            CommandBusMiddlewareDelegate next = async paramCommand => 42;
+            CommandBusMiddlewareDelegate next = async (paramCommand, ct) => 42;
 
             var result = await sut.HandleAsync(query, CommandExecutionOptions.Default,
                 next, CancellationToken.None);
@@ -72,7 +72,7 @@ namespace Revo.Core.Tests.Commands
         public async Task HandleAsync_CommitsForCommands()
         {
             var command = new Command1();
-            CommandBusMiddlewareDelegate next = async paramCommand =>
+            CommandBusMiddlewareDelegate next = async (paramCommand, ct) =>
             {
                 commandContextStack.UnitOfWork.Should().Be(unitOfWork);
                 return null;
@@ -89,7 +89,7 @@ namespace Revo.Core.Tests.Commands
         public async Task HandleAsync_CommitsWhenConfigured()
         {
             var query = new Query1();
-            CommandBusMiddlewareDelegate next = async paramCommand =>
+            CommandBusMiddlewareDelegate next = async (paramCommand, ct) =>
             {
                 commandContextStack.UnitOfWork.Should().Be(unitOfWork);
                 return null;
@@ -106,7 +106,7 @@ namespace Revo.Core.Tests.Commands
         public async Task HandleAsync_DoesNotCommitForQueries()
         {
             var query = new Query1();
-            CommandBusMiddlewareDelegate next = async paramCommand =>
+            CommandBusMiddlewareDelegate next = async (paramCommand, ct) =>
             {
                 commandContextStack.UnitOfWork.Should().BeNull();
                 return null;
@@ -122,7 +122,7 @@ namespace Revo.Core.Tests.Commands
         public async Task HandleAsync_DoesNotCommitWhenConfigured()
         {
             var command = new Command1();
-            CommandBusMiddlewareDelegate next = async paramCommand =>
+            CommandBusMiddlewareDelegate next = async (paramCommand, ct) =>
             {
                 commandContextStack.UnitOfWork.Should().BeNull();
                 return null;
@@ -138,7 +138,7 @@ namespace Revo.Core.Tests.Commands
         public async Task HandleAsync_PopsCommandContextOnException()
         {
             var command = new Command1();
-            CommandBusMiddlewareDelegate next = async paramCommand => { throw new Exception(); };
+            CommandBusMiddlewareDelegate next = async (paramCommand, ct) => { throw new Exception(); };
 
             await sut.Awaiting(x => x.HandleAsync(command, CommandExecutionOptions.Default,
                 next, CancellationToken.None)).Should().ThrowExactlyAsync<Exception>();
@@ -155,4 +155,3 @@ namespace Revo.Core.Tests.Commands
         }
     }
 }
-

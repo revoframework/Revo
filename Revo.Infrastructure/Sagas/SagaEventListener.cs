@@ -1,8 +1,8 @@
-﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Revo.Core.Commands;
 using Revo.Core.Events;
+using Revo.Core.Services;
 using Revo.Core.Transactions;
 using Revo.Domain.Events;
 using Revo.Infrastructure.Events.Async;
@@ -12,16 +12,16 @@ namespace Revo.Infrastructure.Sagas
     public class SagaEventListener :
         IAsyncEventListener<DomainEvent>
     {
-        private readonly Func<ISagaEventDispatcher> sagaEventDispatcherFunc;
+        private readonly IServiceFactory<ISagaEventDispatcher> sagaEventDispatcherFactory;
         private readonly CommandContextStack commandContextStack;
         private readonly IUnitOfWorkFactory unitOfWorkFactory;
         private readonly List<IEventMessage<DomainEvent>> bufferedEvents = new List<IEventMessage<DomainEvent>>();
 
         public SagaEventListener(SagaEventSequencer sagaEventSequencer,
-            Func<ISagaEventDispatcher> sagaEventDispatcherFunc, CommandContextStack commandContextStack,
+            IServiceFactory<ISagaEventDispatcher> sagaEventDispatcherFactory, CommandContextStack commandContextStack,
             IUnitOfWorkFactory unitOfWorkFactory)
         {
-            this.sagaEventDispatcherFunc = sagaEventDispatcherFunc;
+            this.sagaEventDispatcherFactory = sagaEventDispatcherFactory;
             this.commandContextStack = commandContextStack;
             this.unitOfWorkFactory = unitOfWorkFactory;
             EventSequencer = sagaEventSequencer;
@@ -50,7 +50,7 @@ namespace Revo.Infrastructure.Sagas
                 {
                     uow.Begin();
 
-                    var sagaEventDispatcher = sagaEventDispatcherFunc();
+                    var sagaEventDispatcher = sagaEventDispatcherFactory.GetRequiredService();
                     await sagaEventDispatcher.DispatchEventsToSagas(bufferedEvents);
 
                     await uow.CommitAsync();

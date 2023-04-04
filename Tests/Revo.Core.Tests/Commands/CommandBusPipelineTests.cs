@@ -1,10 +1,9 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Revo.Core.Commands;
 using NSubstitute;
-using Revo.Core.Core;
 using Xunit;
 
 namespace Revo.Core.Tests.Commands
@@ -47,10 +46,10 @@ namespace Revo.Core.Tests.Commands
                 .Do(ci =>
                 {
                     middlewares[1].DidNotReceiveWithAnyArgs().HandleAsync(null, null, null, CancellationToken.None);
-                    executionHandler.DidNotReceiveWithAnyArgs().Invoke(null);
+                    executionHandler.DidNotReceiveWithAnyArgs().Invoke(null, CancellationToken.None);
 
                     var next = ci.ArgAt<CommandBusMiddlewareDelegate>(2);
-                    next(command2);
+                    next(command2, cancellationToken);
                 });
             
             middlewares[1].Order = 2;
@@ -61,10 +60,10 @@ namespace Revo.Core.Tests.Commands
                 {
                     middlewares[0].Received(1).HandleAsync(command, executionOptions,
                         Arg.Any<CommandBusMiddlewareDelegate>(), cancellationToken);
-                    executionHandler.DidNotReceiveWithAnyArgs().Invoke(null);
+                    executionHandler.DidNotReceiveWithAnyArgs().Invoke(null, CancellationToken.None);
 
                     var next = ci.ArgAt<CommandBusMiddlewareDelegate>(2);
-                    next(command3);
+                    next(command3, cancellationToken);
                 });
 
             middlewareFactory.CreateMiddlewares<MyCommand>(commandBus)
@@ -77,7 +76,7 @@ namespace Revo.Core.Tests.Commands
                 Arg.Any<CommandBusMiddlewareDelegate>(), cancellationToken);
             middlewares[1].Received(1).HandleAsync(command2, executionOptions,
                 Arg.Any<CommandBusMiddlewareDelegate>(), cancellationToken);
-            executionHandler.Received(1).Invoke(command3);
+            executionHandler.Received(1).Invoke(command3, cancellationToken);
         }
         
         [Fact]
@@ -96,40 +95,7 @@ namespace Revo.Core.Tests.Commands
             await sut.ProcessAsync(command, executionHandler, commandBus, executionOptions,
                 cancellationToken);
 
-            executionHandler.Received(1).Invoke(command);
-        }
-        
-        [Fact]
-        public async Task Handle_RunsInNewTaskScope()
-        {
-            TaskContext middlewareContext = null;
-
-            var middlewares = new[]
-            {
-                Substitute.For<ICommandBusMiddleware<MyCommand>>()
-            };
-
-            var command = new MyCommand();
-            var cancellationToken = new CancellationToken();
-            var executionOptions = new CommandExecutionOptions();
-            var executionHandler = Substitute.For<CommandBusMiddlewareDelegate>();
-
-            middlewareFactory.CreateMiddlewares<MyCommand>(commandBus)
-                .Returns(middlewares);
-
-            middlewares[0]
-                .When(x => x.HandleAsync(command, executionOptions,
-                    Arg.Any<CommandBusMiddlewareDelegate>(), cancellationToken))
-                .Do(ci => middlewareContext = TaskContext.Current);
-
-            var beforeContext = TaskContext.Current;
-            await sut.ProcessAsync(command, executionHandler,
-                commandBus, executionOptions, cancellationToken);
-            var afterContext = TaskContext.Current;
-
-            beforeContext.Should().BeSameAs(afterContext);
-            beforeContext.Should().NotBeSameAs(middlewareContext);
-            middlewareContext.Should().NotBeNull();
+            executionHandler.Received(1).Invoke(command, cancellationToken);
         }
 
         public class MyCommand : ICommand

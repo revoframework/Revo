@@ -1,8 +1,4 @@
-﻿using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using AutoMapper;
-using Revo.Core.Commands;
+﻿using Revo.Core.Commands;
 using Revo.DataAccess.Entities;
 using Revo.Examples.Todos.Dto;
 using Revo.Examples.Todos.Messages.Queries;
@@ -10,24 +6,25 @@ using Revo.Examples.Todos.Reads.Model;
 
 namespace Revo.Examples.Todos.Reads.Handlers
 {
-    public class TaskListQueryHandler :
+    public class TaskListQueryHandler(IReadRepository readRepository) :
         IQueryHandler<GetTodoListsQuery, IQueryable<TodoListDto>>
     {
-        private readonly IReadRepository readRepository;
-        private readonly IMapper mapper;
-
-        public TaskListQueryHandler(IReadRepository readRepository, IMapper mapper)
-        {
-            this.readRepository = readRepository;
-            this.mapper = mapper;
-        }
-
         public Task<IQueryable<TodoListDto>> HandleAsync(GetTodoListsQuery query, CancellationToken cancellationToken)
         {
-            var taskLists = mapper.ProjectTo<TodoListDto>(
-                readRepository
-                    .FindAll<TodoListReadModel>());
-            return Task.FromResult(taskLists);
+            return Task.FromResult(readRepository
+                .FindAll<TodoListReadModel>()
+                .Select(x => new TodoListDto
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Todos = x.Todos.Select(t => new TodoDto()
+                    {
+                        Id = t.Id,
+                        Text = t.Text,
+                        IsComplete = t.IsComplete,
+                        TodoListId = x.Id
+                    }).ToList()
+                }));
         }
     }
 }

@@ -1,9 +1,8 @@
 ﻿using System.Threading.Tasks;
 
-namespace Revo.Infrastructure.Events.Async
+namespace Revo.Infrastructure.Events.Async;
+
+public interface IEventSourceCatchUp
 {
-    public interface IEventSourceCatchUp
-    {
-        Task CatchUpAsync();
-    }
+    Task CatchUpAsync();
 }

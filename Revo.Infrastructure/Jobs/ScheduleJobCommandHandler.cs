@@ -2,25 +2,24 @@
 using System.Threading.Tasks;
 using Revo.Core.Commands;
 
-namespace Revo.Infrastructure.Jobs
+namespace Revo.Infrastructure.Jobs;
+
+public class ScheduleJobCommandHandler : ICommandHandler<ScheduleJobCommand>
 {
-    public class ScheduleJobCommandHandler : ICommandHandler<ScheduleJobCommand>
+    private readonly IJobScheduler jobScheduler;
+
+    public ScheduleJobCommandHandler(IJobScheduler jobScheduler)
     {
-        private readonly IJobScheduler jobScheduler;
+        this.jobScheduler = jobScheduler;
+    }
 
-        public ScheduleJobCommandHandler(IJobScheduler jobScheduler)
-        {
-            this.jobScheduler = jobScheduler;
-        }
+    public Task HandleAsync(ScheduleJobCommand command, CancellationToken cancellationToken)
+    {
+        return jobScheduler.ScheduleJobAsync(GetCommandJob((dynamic)command.Command), command.EnqueueAt);
+    }
 
-        public Task HandleAsync(ScheduleJobCommand command, CancellationToken cancellationToken)
-        {
-            return jobScheduler.ScheduleJobAsync(GetCommandJob((dynamic)command.Command), command.EnqueueAt);
-        }
-
-        protected IExecuteCommandJob GetCommandJob<T>(T command) where T : ICommandBase
-        {
-            return new ExecuteCommandJob<T>(command);
-        }
+    protected IExecuteCommandJob GetCommandJob<T>(T command) where T : ICommandBase
+    {
+        return new ExecuteCommandJob<T>(command);
     }
 }

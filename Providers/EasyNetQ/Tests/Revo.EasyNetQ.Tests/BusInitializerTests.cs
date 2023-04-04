@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -39,13 +39,13 @@ namespace Revo.EasyNetQ.Tests
         }
 
         [Fact]
-        public void OnApplicationStarted_Subscribes()
+        public void StartedAsync_Subscribes()
         {
             configurationSection.Subscriptions
                 .AddType<Event1>("sub1", null)
                 .AddType<Event2>("sub2", null);
 
-            sut.OnApplicationStarted();
+            sut.StartedAsync(CancellationToken.None).GetAwaiter().GetResult();
 
             pubSub.Received(1).SubscribeAsync("sub1", Arg.Any<Func<IEventMessage<Event1>, CancellationToken, Task>>(),
                 Arg.Any<Action<ISubscriptionConfiguration>>(), Arg.Any<CancellationToken>());
@@ -54,13 +54,13 @@ namespace Revo.EasyNetQ.Tests
         }
 
         [Fact]
-        public async Task OnApplicationStarted_SubscribesBlocking()
+        public async Task StartedAsync_SubscribesBlocking()
         {
             configurationSection.Subscriptions
                 .AddType<Event1>("sub1", null, true)
                 .AddType<Event2>("sub2", null, true);
 
-            sut.OnApplicationStarted();
+            await sut.StartedAsync(CancellationToken.None);
             
             pubSub.Received(1).SubscribeAsync("sub1", Arg.Any<Func<IEventMessage<Event1>, CancellationToken, Task>>(),
                 Arg.Any<Action<ISubscriptionConfiguration>>(), Arg.Any<CancellationToken>());
@@ -69,7 +69,7 @@ namespace Revo.EasyNetQ.Tests
         }
 
         [Fact]
-        public void OnApplicationStarted_HandleMessage()
+        public void StartedAsync_HandleMessage()
         {
             configurationSection.Subscriptions
                 .AddType<Event1>("sub1", null);
@@ -78,7 +78,7 @@ namespace Revo.EasyNetQ.Tests
             pubSub.WhenForAnyArgs(x => x.SubscribeAsync<IEventMessage<Event1>>(null, null, null))
                 .Do(ci => handleActions[ci.ArgAt<string>(0)] = ci.ArgAt<Func<IEventMessage<Event1>, CancellationToken, Task>>(1));
             
-            sut.OnApplicationStarted();
+            sut.StartedAsync(CancellationToken.None).GetAwaiter().GetResult();
             
             var message = Substitute.For<IEventMessage<Event1>>();
             handleActions["sub1"](message, CancellationToken.None);
@@ -86,7 +86,7 @@ namespace Revo.EasyNetQ.Tests
         }
 
         [Fact]
-        public void OnApplicationStarted_ConfigurationAction()
+        public void StartedAsync_ConfigurationAction()
         {
             var cfgAction1 = Substitute.For<Action<ISubscriptionConfiguration>>();
             configurationSection.Subscriptions
@@ -96,7 +96,7 @@ namespace Revo.EasyNetQ.Tests
             pubSub.WhenForAnyArgs(x => x.SubscribeAsync<IEventMessage<Event1>>(null, null, null))
                 .Do(ci => configActions[ci.ArgAt<string>(0)] = ci.ArgAt<Action<ISubscriptionConfiguration>>(2));
             
-            sut.OnApplicationStarted();
+            sut.StartedAsync(CancellationToken.None).GetAwaiter().GetResult();
 
             var subCfg1 = Substitute.For<ISubscriptionConfiguration>();
             configActions["sub1"](subCfg1);
@@ -104,7 +104,7 @@ namespace Revo.EasyNetQ.Tests
         }
 
         [Fact]
-        public void OnApplicationStarted_ConfigurationAction_Null()
+        public void StartedAsync_ConfigurationAction_Null()
         {
             configurationSection.Subscriptions
                 .AddType<Event1>("sub1", null);
@@ -113,7 +113,7 @@ namespace Revo.EasyNetQ.Tests
             pubSub.WhenForAnyArgs(x => x.SubscribeAsync<IEventMessage<Event1>>(null, null, null))
                 .Do(ci => configActions[ci.ArgAt<string>(0)] = ci.ArgAt<Action<ISubscriptionConfiguration>>(2));
             
-            sut.OnApplicationStarted();
+            sut.StartedAsync(CancellationToken.None).GetAwaiter().GetResult();
             
             configActions["sub1"].Should().NotBeNull();
         }

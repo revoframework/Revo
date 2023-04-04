@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace Revo.Domain.Entities.Basic
+namespace Revo.Domain.Entities.Basic;
+
+public interface IBasicClassIdEntity
 {
-    public interface IBasicClassIdEntity
-    {
-        Guid ClassId { get; set; }
-    }
+    Guid ClassId { get; set; }
 }

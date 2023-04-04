@@ -1,7 +1,6 @@
-﻿namespace Revo.Core.Transactions
+﻿namespace Revo.Core.Transactions;
+
+public interface ITransactionCoordinator
 {
-    public interface ITransactionCoordinator
-    {
-        void AddTransactionParticipant(ITransactionParticipant participant);
-    }
+    void AddTransactionParticipant(ITransactionParticipant participant);
 }

@@ -1,51 +1,44 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Revo.Core.Core;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Revo.Core.Commands.Lambda
+namespace Revo.Core.Commands.Lambda;
+
+public class LambdaCommandHandler(IServiceProvider serviceProvider) :
+    ICommandHandler<LambdaCommand>,
+    ICommandHandler<LambdaResultCommand, object>
 {
-    public class LambdaCommandHandler :
-        ICommandHandler<LambdaCommand>,
-        ICommandHandler<LambdaResultCommand, object>
+    public async Task HandleAsync(LambdaCommand command, CancellationToken cancellationToken)
     {
-        private readonly IServiceLocator serviceLocator;
-
-        public LambdaCommandHandler(IServiceLocator serviceLocator)
-        {
-            this.serviceLocator = serviceLocator;
-        }
-
-        public async Task HandleAsync(LambdaCommand command, CancellationToken cancellationToken)
-        {
-            var lambdaParams = command.Delegate.Method.GetParameters()
-                .Select(x => serviceLocator.Get(x.ParameterType))
-                .ToArray();
+        var lambdaParams = command.Delegate.Method.GetParameters()
+            .Select(x => serviceProvider.GetRequiredService(x.ParameterType))
+            .ToArray();
             
-            var result = command.Delegate.DynamicInvoke(lambdaParams);
-            if (result is Task resultTask)
-            {
-                await resultTask;
-            }
-        }
-
-        public async Task<object> HandleAsync(LambdaResultCommand query, CancellationToken cancellationToken)
+        var result = command.Delegate.DynamicInvoke(lambdaParams);
+        if (result is Task resultTask)
         {
-            var lambdaParams = query.Delegate.Method.GetParameters()
-                .Select(x => serviceLocator.Get(x.ParameterType))
-                .ToArray();
+            await resultTask;
+        }
+    }
 
-            var result = query.Delegate.DynamicInvoke(lambdaParams);
-            if (result is Task resultTask)
-            {
-                await resultTask;
-                var resultValue = resultTask.GetType().GetProperty(nameof(Task<object>.Result)).GetValue(resultTask);
-                return resultValue;
-            }
-            else
-            {
-                return result;
-            }
+    public async Task<object> HandleAsync(LambdaResultCommand query, CancellationToken cancellationToken)
+    {
+        var lambdaParams = query.Delegate.Method.GetParameters()
+            .Select(x => serviceProvider.GetRequiredService(x.ParameterType))
+            .ToArray();
+
+        var result = query.Delegate.DynamicInvoke(lambdaParams);
+        if (result is Task resultTask)
+        {
+            await resultTask;
+            var resultValue = resultTask.GetType().GetProperty(nameof(Task<object>.Result)).GetValue(resultTask);
+            return resultValue;
+        }
+        else
+        {
+            return result;
         }
     }
 }

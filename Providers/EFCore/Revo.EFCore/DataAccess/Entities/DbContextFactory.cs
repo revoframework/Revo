@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using MoreLinq;
@@ -15,14 +16,14 @@ namespace Revo.EFCore.DataAccess.Entities
         private readonly IEFCoreConvention[] conventions;
 
         public DbContextFactory(ModelDefinitionDiscovery modelDefinitionDiscovery,
-            IEFCoreConfigurer[] configurers,
-            IEFCoreConvention[] conventions)
+            IEnumerable<IEFCoreConfigurer> configurers,
+            IEnumerable<IEFCoreConvention> conventions)
         {
             this.modelDefinitionDiscovery = modelDefinitionDiscovery;
-            this.configurers = configurers;
-            this.conventions = conventions;
+            this.configurers = configurers.ToArray();
+            this.conventions = conventions.ToArray();
 
-            Array.Sort(conventions);
+            Array.Sort(this.conventions);
         }
 
         public DbContext CreateContext(string schemaSpace)

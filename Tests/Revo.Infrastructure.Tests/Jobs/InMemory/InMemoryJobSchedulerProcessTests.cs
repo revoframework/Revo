@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using NSubstitute;
 using Revo.Infrastructure.Jobs;
@@ -22,7 +23,7 @@ namespace Revo.Infrastructure.Tests.Jobs.InMemory
         }
 
         [Fact]
-        public void EnqueuesAtScheduledTime()
+        public async Task EnqueuesAtScheduledTime()
         {
             var job = new Job1();
 
@@ -32,7 +33,7 @@ namespace Revo.Infrastructure.Tests.Jobs.InMemory
 
             Action<IJob, Exception> errorHandler = (j, e) => { };
 
-            sut.OnApplicationStarted();
+            await sut.StartAsync(CancellationToken.None);
             sut.ScheduleJob(job, enqueueAt, errorHandler);
 
             bool enqueued = false;
@@ -48,7 +49,7 @@ namespace Revo.Infrastructure.Tests.Jobs.InMemory
             }
 
             enqueued.Should().BeTrue();
-            sut.OnApplicationStopping();
+            await sut.StopAsync(CancellationToken.None);
         }
 
         private class Job1 : IJob

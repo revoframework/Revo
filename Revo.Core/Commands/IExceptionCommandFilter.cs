@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Revo.Core.Commands
+namespace Revo.Core.Commands;
+
+public interface IExceptionCommandFilter<in T>
+    where T : ICommandBase
 {
-    public interface IExceptionCommandFilter<in T>
-        where T : ICommandBase
-    {
-        Task FilterExceptionAsync(T command, Exception e);
-    }
+    Task FilterExceptionAsync(T command, Exception e);
 }

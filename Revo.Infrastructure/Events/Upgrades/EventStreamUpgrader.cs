@@ -1,37 +1,37 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 using Revo.Core.Events;
 using Revo.Domain.Events;
 
-namespace Revo.Infrastructure.Events.Upgrades
+namespace Revo.Infrastructure.Events.Upgrades;
+
+public class EventStreamUpgrader : IEventStreamUpgrader
 {
-    public class EventStreamUpgrader : IEventStreamUpgrader
+    private readonly IServiceProvider serviceProvider;
+    private readonly IEventStreamSequenceNumbersUpgrade sequenceNumbersUpgrade;
+
+    public EventStreamUpgrader(IServiceProvider serviceProvider,
+        IEventStreamSequenceNumbersUpgrade sequenceNumbersUpgrade)
     {
-        private readonly Func<IEventUpgrade[]> eventUpgradesFunc;
-        private readonly IEventStreamSequenceNumbersUpgrade sequenceNumbersUpgrade;
+        this.serviceProvider = serviceProvider;
+        this.sequenceNumbersUpgrade = sequenceNumbersUpgrade;
+    }
 
-        public EventStreamUpgrader(Func<IEventUpgrade[]> eventUpgradesFunc,
-            IEventStreamSequenceNumbersUpgrade sequenceNumbersUpgrade)
+    public IEnumerable<IEventMessage<DomainAggregateEvent>> UpgradeStream(
+        IEnumerable<IEventMessage<DomainAggregateEvent>> eventStream,
+        IReadOnlyDictionary<string, string> eventStreamMetadata)
+    {
+        var eventUpgrades = serviceProvider.GetServices<IEventUpgrade>();
+
+        var result = eventStream;
+        foreach (var eventUpgrade in eventUpgrades)
         {
-            this.eventUpgradesFunc = eventUpgradesFunc;
-            this.sequenceNumbersUpgrade = sequenceNumbersUpgrade;
+            result = eventUpgrade.UpgradeStream(result, eventStreamMetadata);
         }
 
-        public IEnumerable<IEventMessage<DomainAggregateEvent>> UpgradeStream(
-            IEnumerable<IEventMessage<DomainAggregateEvent>> eventStream,
-            IReadOnlyDictionary<string, string> eventStreamMetadata)
-        {
-            var eventUpgrades = eventUpgradesFunc();
+        result = sequenceNumbersUpgrade.UpgradeSequenceNumbers(result);
 
-            var result = eventStream;
-            foreach (var eventUpgrade in eventUpgrades)
-            {
-                result = eventUpgrade.UpgradeStream(result, eventStreamMetadata);
-            }
-
-            result = sequenceNumbersUpgrade.UpgradeSequenceNumbers(result);
-
-            return result;
-        }
+        return result;
     }
 }

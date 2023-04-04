@@ -1,11 +1,10 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace Revo.Core.Commands
+namespace Revo.Core.Commands;
+
+public interface ICommandBusPipeline
 {
-    public interface ICommandBusPipeline
-    {
-        Task<object> ProcessAsync(ICommandBase command, CommandBusMiddlewareDelegate executionHandler,
-            ICommandBus commandBus, CommandExecutionOptions executionOptions, CancellationToken cancellationToken);
-    }
+    Task<object> ProcessAsync(ICommandBase command, CommandBusMiddlewareDelegate executionHandler,
+        ICommandBus commandBus, CommandExecutionOptions executionOptions, CancellationToken cancellationToken);
 }

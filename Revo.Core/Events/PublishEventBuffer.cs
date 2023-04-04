@@ -2,33 +2,32 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Revo.Core.Events
+namespace Revo.Core.Events;
+
+public class PublishEventBuffer : IPublishEventBuffer
 {
-    public class PublishEventBuffer : IPublishEventBuffer
+    private readonly IEventBus eventBus;
+    private readonly List<IEventMessage> messages = new List<IEventMessage>();
+
+    public PublishEventBuffer(IEventBus eventBus)
     {
-        private readonly IEventBus eventBus;
-        private readonly List<IEventMessage> messages = new List<IEventMessage>();
+        this.eventBus = eventBus;
+    }
 
-        public PublishEventBuffer(IEventBus eventBus)
-        {
-            this.eventBus = eventBus;
-        }
-
-        public IReadOnlyCollection<IEventMessage> Events => messages;
+    public IReadOnlyCollection<IEventMessage> Events => messages;
         
-        public async Task FlushAsync(CancellationToken cancellationToken)
+    public async Task FlushAsync(CancellationToken cancellationToken)
+    {
+        foreach (IEventMessage message in messages) // TODO exception handling (i.e. throw away the remaining events as well?)
         {
-            foreach (IEventMessage message in messages) // TODO exception handling (i.e. throw away the remaining events as well?)
-            {
-                await eventBus.PublishAsync(message, cancellationToken);
-            }
-
-            messages.Clear();
+            await eventBus.PublishAsync(message, cancellationToken);
         }
 
-        public void PushEvent(IEventMessage message)
-        {
-            messages.Add(message);
-        }
+        messages.Clear();
+    }
+
+    public void PushEvent(IEventMessage message)
+    {
+        messages.Add(message);
     }
 }

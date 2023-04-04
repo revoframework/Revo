@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Revo.Core.Security
+namespace Revo.Core.Security;
+
+public interface IUserPermissionResolver
 {
-    public interface IUserPermissionResolver
-    {
-        Task<IReadOnlyCollection<Permission>> GetUserPermissionsAsync(IUser user);
-    }
+    Task<IReadOnlyCollection<Permission>> GetUserPermissionsAsync(IUser user);
 }

@@ -1,6 +1,5 @@
-﻿namespace Revo.Infrastructure.Jobs
+﻿namespace Revo.Infrastructure.Jobs;
+
+public interface IJob
 {
-    public interface IJob
-    {
-    }
 }

@@ -1,5 +1,6 @@
-﻿using System;
+using Revo.Core.Services;
 using Revo.Core.Transactions;
+using Revo.DataAccess.Entities;
 using Revo.Domain.Entities;
 using Revo.EFCore.DataAccess.Entities;
 using Revo.Infrastructure.Events;
@@ -9,17 +10,18 @@ namespace Revo.EFCore.Repositories
 {
     public class EFCoreCrudAggregateStoreFactory : CrudAggregateStoreFactory
     {
-        private readonly Func<IEFCoreCrudRepository> crudRepositoryFunc;
+        private readonly IServiceFactory<IEFCoreCrudRepository> efCoreCrudRepositoryFactory;
         private readonly IEntityTypeManager entityTypeManager;
         private readonly IEventMessageFactory eventMessageFactory;
         private readonly IEFCoreTransactionCoordinator transactionCoordinator;
 
-        public EFCoreCrudAggregateStoreFactory(Func<IEFCoreCrudRepository> crudRepositoryFunc,
+        public EFCoreCrudAggregateStoreFactory(IServiceFactory<IEFCoreCrudRepository> efCoreCrudRepositoryFactory,
+            IServiceFactory<ICrudRepository> crudRepositoryFactory,
             IEntityTypeManager entityTypeManager, IEventMessageFactory eventMessageFactory,
             IEFCoreTransactionCoordinator transactionCoordinator)
-            : base(crudRepositoryFunc, entityTypeManager, eventMessageFactory)
+            : base(crudRepositoryFactory, entityTypeManager, eventMessageFactory)
         {
-            this.crudRepositoryFunc = crudRepositoryFunc;
+            this.efCoreCrudRepositoryFactory = efCoreCrudRepositoryFactory;
             this.entityTypeManager = entityTypeManager;
             this.eventMessageFactory = eventMessageFactory;
             this.transactionCoordinator = transactionCoordinator;
@@ -27,7 +29,7 @@ namespace Revo.EFCore.Repositories
 
         public override IAggregateStore CreateAggregateStore(IUnitOfWork unitOfWork)
         {
-            return new EFCoreCrudAggregateStore(crudRepositoryFunc(), entityTypeManager,
+            return new EFCoreCrudAggregateStore(efCoreCrudRepositoryFactory.GetRequiredService(), entityTypeManager,
                 unitOfWork?.EventBuffer, eventMessageFactory, transactionCoordinator);
         }
     }

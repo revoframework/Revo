@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using Revo.Core.Events;
 
-namespace Revo.Infrastructure.EventStores
+namespace Revo.Infrastructure.EventStores;
+
+public interface IEventStoreRecord
 {
-    public interface IEventStoreRecord
-    {
-        IEvent Event { get; }
-        IReadOnlyDictionary<string, string> AdditionalMetadata { get; }
-        Guid EventId { get; }
-        long StreamSequenceNumber { get; }
-        DateTimeOffset StoreDate { get; }
-    }
+    IEvent Event { get; }
+    IReadOnlyDictionary<string, string> AdditionalMetadata { get; }
+    Guid EventId { get; }
+    long StreamSequenceNumber { get; }
+    DateTimeOffset StoreDate { get; }
 }

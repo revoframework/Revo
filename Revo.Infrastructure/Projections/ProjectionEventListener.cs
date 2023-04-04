@@ -1,33 +1,29 @@
-﻿using Revo.Core.Commands;
-using Revo.Core.Core;
+using Revo.Core.Commands;
 using Revo.Core.Events;
 using Revo.Core.Transactions;
 using Revo.Domain.Events;
 using Revo.Infrastructure.Events.Async;
 using Revo.Infrastructure.Tenancy;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Revo.Infrastructure.Projections
 {
     public abstract class ProjectionEventListener :
         IAsyncEventListener<DomainAggregateEvent>
     {
-        private readonly Func<IProjectionSubSystem> projectionSubSystemFunc;
+        private readonly IServiceScopeFactory serviceScopeFactory;
         private readonly IUnitOfWorkFactory unitOfWorkFactory;
-        private readonly Func<CommandContextStack> commandContextStackFunc;
         private readonly ITenantProvider tenantProvider;
         private readonly List<IEventMessage<DomainAggregateEvent>> events = new List<IEventMessage<DomainAggregateEvent>>();
 
-        public ProjectionEventListener(Func<IProjectionSubSystem> projectionSubSystemFunc,
-            IUnitOfWorkFactory unitOfWorkFactory, Func<CommandContextStack> commandContextStackFunc,
-            ITenantProvider tenantProvider)
+        public ProjectionEventListener(IServiceScopeFactory serviceScopeFactory,
+            IUnitOfWorkFactory unitOfWorkFactory, ITenantProvider tenantProvider)
         {
-            this.projectionSubSystemFunc = projectionSubSystemFunc;
+            this.serviceScopeFactory = serviceScopeFactory;
             this.unitOfWorkFactory = unitOfWorkFactory;
-            this.commandContextStackFunc = commandContextStackFunc;
             this.tenantProvider = tenantProvider;
         }
 
@@ -51,17 +47,17 @@ namespace Revo.Infrastructure.Projections
             {
                 var tenant = tenantProvider.GetTenant(tenantEvents.Key);
                 using (TenantContextOverride.Push(tenant))
-                using (TaskContext.Enter())
+                using (var scope = serviceScopeFactory.CreateScope())
                 using (IUnitOfWork uow = unitOfWorkFactory.CreateUnitOfWork())
                 {
-                    var commandContextStack = commandContextStackFunc();
+                    var commandContextStack = scope.ServiceProvider.GetRequiredService<CommandContextStack>();
                     commandContextStack.Push(new CommandContext(null, uow));
 
                     try
                     {
                         uow.Begin();
 
-                        var projectionSubSystem = projectionSubSystemFunc();
+                        var projectionSubSystem = scope.ServiceProvider.GetRequiredService<IProjectionSubSystem>();
                         await projectionSubSystem.ExecuteProjectionsAsync(tenantEvents.ToArray(), uow, GetEventProjectionOptions());
 
                         await uow.CommitAsync();

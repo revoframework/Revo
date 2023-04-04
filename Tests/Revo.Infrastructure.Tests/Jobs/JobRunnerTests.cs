@@ -1,7 +1,8 @@
-﻿using System.Threading;
+using System;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
-using Revo.Core.Core;
 using Revo.Infrastructure.Jobs;
 using Xunit;
 
@@ -9,13 +10,24 @@ namespace Revo.Infrastructure.Tests.Jobs
 {
     public class JobRunnerTests
     {
-        private IServiceLocator serviceLocator;
+        private IServiceProvider serviceProvider;
+        private IServiceProvider scopedServiceProvider;
         private JobRunner sut;
 
         public JobRunnerTests()
         {
-            serviceLocator = Substitute.For<IServiceLocator>();
-            sut = new JobRunner(serviceLocator);
+            scopedServiceProvider = Substitute.For<IServiceProvider>();
+
+            var scope = Substitute.For<IServiceScope>();
+            scope.ServiceProvider.Returns(scopedServiceProvider);
+
+            var serviceScopeFactory = Substitute.For<IServiceScopeFactory>();
+            serviceScopeFactory.CreateScope().Returns(scope);
+
+            serviceProvider = Substitute.For<IServiceProvider>();
+            serviceProvider.GetService(typeof(IServiceScopeFactory)).Returns(serviceScopeFactory);
+
+            sut = new JobRunner(serviceProvider);
         }
         
         [Fact]
@@ -23,7 +35,7 @@ namespace Revo.Infrastructure.Tests.Jobs
         {
             var job = new TestJob();
             var jobHandler = Substitute.For<IJobHandler<TestJob>>();
-            serviceLocator.Get(typeof(IJobHandler<TestJob>)).Returns(jobHandler);
+            scopedServiceProvider.GetService(typeof(IJobHandler<TestJob>)).Returns(jobHandler);
 
             var cancellationToken = new CancellationToken();
             await sut.RunJobAsync(job, cancellationToken);
@@ -36,7 +48,7 @@ namespace Revo.Infrastructure.Tests.Jobs
         {
             var job = new TestJob();
             var jobHandler = Substitute.ForPartsOf<MultiJobHandler>();
-            serviceLocator.Get(typeof(IJobHandler<TestJob>)).Returns(jobHandler);
+            scopedServiceProvider.GetService(typeof(IJobHandler<TestJob>)).Returns(jobHandler);
 
             var cancellationToken = new CancellationToken();
             await sut.RunJobAsync(job, cancellationToken);

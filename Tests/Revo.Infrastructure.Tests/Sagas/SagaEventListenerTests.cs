@@ -1,14 +1,15 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Revo.Core.Commands;
 using Revo.Core.Events;
+using Revo.Core.Services;
 using Revo.Core.Transactions;
+using Revo.Domain.Events;
 using Revo.Infrastructure.Sagas;
 using Revo.Testing.Infrastructure;
 using NSubstitute;
-using Revo.Core.Commands;
-using Revo.Domain.Events;
 using Xunit;
 
 namespace Revo.Infrastructure.Tests.Sagas
@@ -22,7 +23,9 @@ namespace Revo.Infrastructure.Tests.Sagas
         {
             sagaEventDispatcher = Substitute.For<ISagaEventDispatcher>();
 
-            sut = new SagaEventListener(new SagaEventListener.SagaEventSequencer(), () => sagaEventDispatcher,
+            var sagaEventDispatcherFactory = Substitute.For<IServiceFactory<ISagaEventDispatcher>>();
+            sagaEventDispatcherFactory.GetRequiredService().Returns(sagaEventDispatcher);
+            sut = new SagaEventListener(new SagaEventListener.SagaEventSequencer(), sagaEventDispatcherFactory,
                 new CommandContextStack(), Substitute.For<IUnitOfWorkFactory>());
         }
 

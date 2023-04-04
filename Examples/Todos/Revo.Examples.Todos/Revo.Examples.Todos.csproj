@@ -1,7 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFrameworks>net10.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>7b56d8f9-dff4-4c46-a824-b2d13b604ad4</UserSecretsId>
   </PropertyGroup>
 
@@ -12,11 +13,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentAssertions" Version="8.8.0" />
     <PackageReference Include="Hangfire.PostgreSql" Version="1.20.12" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0" />
     <PackageReference Include="Npgsql" Version="10.0.0" />
@@ -24,7 +25,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Extensions\Revo.Extensions.AutoMapper\Revo.Extensions.AutoMapper.csproj" />
     <ProjectReference Include="..\..\..\Providers\AspNetCore\Revo.AspNetCore\Revo.AspNetCore.csproj" />
     <ProjectReference Include="..\..\..\Providers\EFCore\Revo.EFCore\Revo.EFCore.csproj" />
     <ProjectReference Include="..\..\..\Providers\Hangfire\Revo.Hangfire\Revo.Hangfire.csproj" />

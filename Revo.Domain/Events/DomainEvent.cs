@@ -1,13 +1,12 @@
 ﻿using Newtonsoft.Json;
 using Revo.Core.Events;
 
-namespace Revo.Domain.Events
+namespace Revo.Domain.Events;
+
+public abstract class DomainEvent : IEvent
 {
-    public abstract class DomainEvent : IEvent
+    public override string ToString()
     {
-        public override string ToString()
-        {
-            return $"{this.GetType().FullName} : {JsonConvert.SerializeObject(this)}";
-        }
+        return $"{this.GetType().FullName} : {JsonConvert.SerializeObject(this)}";
     }
 }

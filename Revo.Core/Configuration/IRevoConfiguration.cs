@@ -1,7 +1,9 @@
-﻿namespace Revo.Core.Configuration
+﻿using System;
+
+namespace Revo.Core.Configuration;
+
+public interface IRevoConfiguration
 {
-    public interface IRevoConfiguration
-    {
-        T GetSection<T>() where T : class, IRevoConfigurationSection, new();
-    }
+    T GetSection<T>() where T : class, IRevoConfigurationSection;
+    T GetOrAddSection<T>(Func<IRevoConfiguration, T> factory) where T : class, IRevoConfigurationSection;
 }

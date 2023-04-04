@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace Revo.Infrastructure.Jobs.InMemory
+namespace Revo.Infrastructure.Jobs.InMemory;
+
+public interface IInMemoryJobSchedulerProcess
 {
-    public interface IInMemoryJobSchedulerProcess
-    {
-        void ScheduleJob(IJob job, DateTimeOffset enqueueAt, Action<IJob, Exception> errorHandler);
-    }
+    void ScheduleJob(IJob job, DateTimeOffset enqueueAt, Action<IJob, Exception> errorHandler);
 }

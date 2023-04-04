@@ -1,7 +1,6 @@
-﻿namespace Revo.Core.Core
+﻿namespace Revo.Core.Core;
+
+public interface IEnvironmentProvider
 {
-    public interface IEnvironmentProvider
-    {
-        bool? IsDevelopment { get; }
-    }
+    bool? IsDevelopment { get; }
 }

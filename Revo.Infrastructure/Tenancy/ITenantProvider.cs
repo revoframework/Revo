@@ -1,10 +1,9 @@
 ﻿using System;
 using Revo.Core.Tenancy;
 
-namespace Revo.Infrastructure.Tenancy
+namespace Revo.Infrastructure.Tenancy;
+
+public interface ITenantProvider
 {
-    public interface ITenantProvider
-    {
-        ITenant GetTenant(Guid? id);
-    }
+    ITenant GetTenant(Guid? id);
 }

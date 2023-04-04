@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using Ninject.Activation;
-using Ninject.Extensions.ContextPreservation;
+using Microsoft.Extensions.DependencyInjection;
 using Revo.Core.Configuration;
 using Revo.EFCore.DataAccess.Conventions;
 using Revo.EFCore.Domain;
@@ -11,8 +10,8 @@ namespace Revo.EFCore.DataAccess.Configuration
 {
     public class EFCoreDataAccessConfigurationSection : IRevoConfigurationSection
     {
-        private readonly List<Func<IContext, IEFCoreConvention>> conventions =
-            new List<Func<IContext, IEFCoreConvention>>();
+        private readonly List<Func<IServiceProvider, IEFCoreConvention>> conventions =
+            new List<Func<IServiceProvider, IEFCoreConvention>>();
 
         public EFCoreDataAccessConfigurationSection()
         {
@@ -37,12 +36,12 @@ namespace Revo.EFCore.DataAccess.Configuration
         /// </summary>
         public bool EnableCustomQueryTranslationPreprocessor { get; set; } = true;
 
-        public IReadOnlyCollection<Func<IContext, IEFCoreConvention>> Conventions => conventions;
+        public IReadOnlyCollection<Func<IServiceProvider, IEFCoreConvention>> Conventions => conventions;
         public Action<DbContextOptionsBuilder> Configurer { get; set; }
 
         public EFCoreDataAccessConfigurationSection AddConvention(IEFCoreConvention convention, int? order = null)
         {
-            conventions.Add(context =>
+            conventions.Add(sp =>
             {
                 if (order.HasValue)
                 {
@@ -57,9 +56,10 @@ namespace Revo.EFCore.DataAccess.Configuration
 
         public EFCoreDataAccessConfigurationSection AddConvention<T>(int? order = null) where T : IEFCoreConvention
         {
-            conventions.Add(context =>
+            conventions.Add(sp =>
             {
-                var convention = context.ContextPreservingGet<T>();
+                var convention = sp.GetService(typeof(T)) as IEFCoreConvention
+                    ?? (IEFCoreConvention)ActivatorUtilities.CreateInstance(sp, typeof(T));
                 if (order.HasValue)
                 {
                    convention.Order = order.Value;
@@ -71,7 +71,7 @@ namespace Revo.EFCore.DataAccess.Configuration
             return this;
         }
 
-        public EFCoreDataAccessConfigurationSection AddConvention(Func<IContext, IEFCoreConvention> conventionFunc)
+        public EFCoreDataAccessConfigurationSection AddConvention(Func<IServiceProvider, IEFCoreConvention> conventionFunc)
         {
             conventions.Add(conventionFunc);
             return this;

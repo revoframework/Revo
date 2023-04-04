@@ -4,47 +4,43 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
 
-namespace Revo.Core.Types
+namespace Revo.Core.Types;
+
+public class TypeExplorer(ITypesConfiguration configuration, ILogger<TypeExplorer> logger) : ITypeExplorer
 {
-    public class TypeExplorer : ITypeExplorer
+    private readonly HashSet<Assembly> assemblies = configuration.Assemblies.ToHashSet();
+
+    public virtual IEnumerable<Assembly> GetAllAssemblies()
     {
-        private readonly ILogger logger;
+        return configuration.IsAppDomainTypeDiscoveryEnabled
+            ? AppDomain.CurrentDomain.GetAssemblies()
+            : assemblies;
+    }
 
-        public TypeExplorer(ILogger logger)
+    public IEnumerable<Type> GetAllTypes()
+    {
+        var assemblies = GetAllAssemblies();
+        return assemblies.SelectMany(x =>
         {
-            this.logger = logger;
-        }
-
-        public virtual IEnumerable<Assembly> GetAllReferencedAssemblies()
-        {
-            return AppDomain.CurrentDomain.GetAssemblies();
-        }
-
-        public IEnumerable<Type> GetAllTypes()
-        {
-            var assemblies = GetAllReferencedAssemblies();
-            return assemblies.SelectMany(x =>
+            try
             {
-                try
-                {
-                    return x.GetTypes();
-                }
-                catch (ReflectionTypeLoadException e)
-                {
-                    logger.LogWarning(e, $"Could not load types from assembly {x}, loader exceptions: {string.Join("\n", e.LoaderExceptions.Select(x => x.ToString()))}");
-                    return new Type[0];
-                }
-            });
-        }
-
-        public Type FindType(string typeName)
-        {
-            foreach (var type in GetAllTypes())
-            {
-                if (type.FullName == typeName)
-                    return type;
+                return x.GetTypes();
             }
-            return null;
+            catch (ReflectionTypeLoadException e)
+            {
+                logger.LogWarning(e, $"Could not load types from assembly {x}, loader exceptions: {string.Join("\n", e.LoaderExceptions.Select(x => x.ToString()))}");
+                return new Type[0];
+            }
+        });
+    }
+
+    public Type FindType(string typeName)
+    {
+        foreach (var type in GetAllTypes())
+        {
+            if (type.FullName == typeName)
+                return type;
         }
+        return null;
     }
 }

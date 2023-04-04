@@ -3,59 +3,58 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
-namespace Revo.Core.ValueObjects
+namespace Revo.Core.ValueObjects;
+
+public class ListAsValue<T> : ValueObject<ListAsValue<T>>, IEnumerable<T>
 {
-    public class ListAsValue<T> : ValueObject<ListAsValue<T>>, IEnumerable<T>
+    public ListAsValue(ImmutableArray<T> list)
     {
-        public ListAsValue(ImmutableArray<T> list)
+        List = list;
+    }
+
+    public ListAsValue(IImmutableList<T> list)
+    {
+        List = list;
+    }
+
+    public IReadOnlyList<T> List { get; }
+
+    public IEnumerator<T> GetEnumerator() => List.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)List).GetEnumerator();
+
+    protected override int CalculateHashCode()
+    {
+        int newHashCode = 0;
+        for (int i = 0; i < List.Count; i++)
         {
-            List = list;
+            newHashCode = (newHashCode * 397) ^ (List[i]?.GetHashCode() ?? 0);
         }
 
-        public ListAsValue(IImmutableList<T> list)
+        return newHashCode;
+    }
+
+    protected override bool EqualsInternal(ListAsValue<T> other)
+    {
+        var y = other.List;
+
+        if (List.Count != y.Count)
         {
-            List = list;
+            return false;
         }
 
-        public IReadOnlyList<T> List { get; }
-
-        public IEnumerator<T> GetEnumerator() => List.GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)List).GetEnumerator();
-
-        protected override int CalculateHashCode()
+        for (int i = 0; i < List.Count; i++)
         {
-            int newHashCode = 0;
-            for (int i = 0; i < List.Count; i++)
-            {
-                newHashCode = (newHashCode * 397) ^ (List[i]?.GetHashCode() ?? 0);
-            }
-
-            return newHashCode;
-        }
-
-        protected override bool EqualsInternal(ListAsValue<T> other)
-        {
-            var y = other.List;
-
-            if (List.Count != y.Count)
+            if (!Equals(List[i], y[i]))
             {
                 return false;
             }
-
-            for (int i = 0; i < List.Count; i++)
-            {
-                if (!Equals(List[i], y[i]))
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
 
-        protected override IEnumerable<(string Name, object Value)> GetValueComponents()
-        {
-            return List.Select((x, i) => (i.ToString(), (object)x));
-        }
+        return true;
+    }
+
+    protected override IEnumerable<(string Name, object Value)> GetValueComponents()
+    {
+        return List.Select((x, i) => (i.ToString(), (object)x));
     }
 }

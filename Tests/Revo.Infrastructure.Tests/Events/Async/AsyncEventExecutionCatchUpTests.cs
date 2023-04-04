@@ -1,8 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Revo.Infrastructure.Events.Async;
 using NSubstitute;
@@ -18,6 +20,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
         private readonly List<IAsyncEventWorker> asyncEventQueueBacklogWorkers = new List<IAsyncEventWorker>();
         private readonly List<(IAsyncEventWorker, string)> processedQueues = new List<(IAsyncEventWorker, string)>();
         private readonly AsyncEventPipelineConfiguration asyncEventPipelineConfiguration;
+        private readonly IServiceScopeFactory serviceScopeFactory;
 
         public AsyncEventExecutionCatchUpTests()
         {
@@ -30,7 +33,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
             asyncEventQueueManager = Substitute.For<IAsyncEventQueueManager>();
             asyncEventPipelineConfiguration = new AsyncEventPipelineConfiguration()
             {
-                CatchUpProcessingParallelism = 80, // TODO test this
+                CatchUpProcessingParallelism = 80,
                 SyncQueueProcessingParallelism = 5,
                 AsyncProcessAttemptCount = 3,
                 SyncProcessAttemptCount = 3,
@@ -42,33 +45,41 @@ namespace Revo.Infrastructure.Tests.Events.Async
                 WaitForEventCatchUpsUponStartup = true
             };
 
+            serviceScopeFactory = Substitute.For<IServiceScopeFactory>();
+            serviceScopeFactory.CreateScope().Returns(ci =>
+            {
+                var worker = Substitute.For<IAsyncEventWorker>();
+                worker.WhenForAnyArgs(x => x.RunQueueBacklogAsync(null)).Do(innerCi =>
+                {
+                    lock (processedQueues)
+                    {
+                        processedQueues.Add((worker, innerCi.ArgAt<string>(0)));
+                    }
+                });
+
+                lock (asyncEventQueueBacklogWorkers)
+                {
+                    asyncEventQueueBacklogWorkers.Add(worker);
+                }
+
+                var scopedProvider = Substitute.For<IServiceProvider>();
+                scopedProvider.GetService(typeof(IAsyncEventWorker)).Returns(worker);
+
+                var scope = Substitute.For<IServiceScope>();
+                scope.ServiceProvider.Returns(scopedProvider);
+                return scope;
+            });
+
             sut = new AsyncEventExecutionCatchUp(
                 eventSourceCatchUps,
                 asyncEventQueueManager,
                 asyncEventPipelineConfiguration,
-                () =>
-                {
-                    var worker = Substitute.For<IAsyncEventWorker>();
-                    worker.WhenForAnyArgs(x => x.RunQueueBacklogAsync(null)).Do(ci =>
-                    {
-                        lock (processedQueues)
-                        {
-                            processedQueues.Add((worker, ci.ArgAt<string>(0)));
-                        }
-                    });
-
-                    lock (asyncEventQueueBacklogWorkers)
-                    {
-                        asyncEventQueueBacklogWorkers.Add(worker);
-                    }
-
-                    return worker;
-                },
+                serviceScopeFactory,
                 new NullLogger<AsyncEventExecutionCatchUp>());
         }
 
         [Fact]
-        public void OnApplicationStarted_InvokesCatchups()
+        public async Task StartAsync_InvokesCatchups()
         {
             List<string> nonEmptyQueueNames = new List<string>();
 
@@ -86,7 +97,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
 
             asyncEventQueueManager.GetNonemptyQueueNamesAsync().Returns(nonEmptyQueueNames);
 
-            sut.OnApplicationStarted();
+            await sut.StartAsync(CancellationToken.None);
             
             processedQueues.Should().HaveCount(2);
             processedQueues.Select(x => x.Item1).Should().BeEquivalentTo(asyncEventQueueBacklogWorkers, cfg => cfg.ComparingByValue<IAsyncEventWorker>());
@@ -94,34 +105,41 @@ namespace Revo.Infrastructure.Tests.Events.Async
         }
 
         [Fact]
-        public void OnApplicationStarted_RunsQueues()
+        public async Task StartAsync_RunsQueues()
         {
             asyncEventQueueManager.GetNonemptyQueueNamesAsync().Returns(
                 new List<string>() { "throwing", "okay" });
+
+            var worker = Substitute.For<IAsyncEventWorker>();
+            worker.When(x => x.RunQueueBacklogAsync("okay")).Do(innerCi =>
+            {
+                lock (processedQueues)
+                {
+                    processedQueues.Add((worker, innerCi.ArgAt<string>(0)));
+                }
+            });
+            worker.RunQueueBacklogAsync("throwing")
+                .Returns(Task.FromException(new AsyncEventProcessingException()));
+
+            var testScopeFactory = Substitute.For<IServiceScopeFactory>();
+            testScopeFactory.CreateScope().Returns(ci =>
+            {
+                var scopedProvider = Substitute.For<IServiceProvider>();
+                scopedProvider.GetService(typeof(IAsyncEventWorker)).Returns(worker);
+
+                var scope = Substitute.For<IServiceScope>();
+                scope.ServiceProvider.Returns(scopedProvider);
+                return scope;
+            });
 
             sut = new AsyncEventExecutionCatchUp(
                 eventSourceCatchUps,
                 asyncEventQueueManager,
                 asyncEventPipelineConfiguration,
-                () =>
-                {
-                    var worker = Substitute.For<IAsyncEventWorker>();
-
-                    worker.When(x => x.RunQueueBacklogAsync("okay")).Do(ci =>
-                    {
-                        lock (processedQueues)
-                        {
-                            processedQueues.Add((worker, ci.ArgAt<string>(0)));
-                        }
-                    });
-
-                    worker.RunQueueBacklogAsync("throwing")
-                        .Returns(Task.FromException(new AsyncEventProcessingException()));
-                    return worker;
-                },
+                testScopeFactory,
                 new NullLogger<AsyncEventExecutionCatchUp>());
 
-            sut.OnApplicationStarted();
+            await sut.StartAsync(CancellationToken.None);
 
             processedQueues.Should().HaveCount(1);
             processedQueues.Select(x => x.Item2).Should().BeEquivalentTo("okay");

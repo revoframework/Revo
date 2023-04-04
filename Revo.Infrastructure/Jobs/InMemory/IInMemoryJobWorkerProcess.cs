@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace Revo.Infrastructure.Jobs.InMemory
+namespace Revo.Infrastructure.Jobs.InMemory;
+
+public interface IInMemoryJobWorkerProcess
 {
-    public interface IInMemoryJobWorkerProcess
-    {
-        void EnqueueJob(IJob job, Action<IJob, Exception> errorHandler);
-    }
+    void EnqueueJob(IJob job, Action<IJob, Exception> errorHandler);
 }

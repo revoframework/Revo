@@ -1,23 +1,20 @@
 ﻿using Revo.Core.Events;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using Revo.Core.Services;
 
-namespace Revo.Core.Transactions
+namespace Revo.Core.Transactions;
+
+public class UnitOfWorkFactory(
+    IServiceFactory<IUnitOfWorkListener> unitOfWorkListenersLazyFunc,
+    IPublishEventBufferFactory publishEventBufferFactory)
+    : IUnitOfWorkFactory
 {
-    public class UnitOfWorkFactory : IUnitOfWorkFactory
+    public IUnitOfWork CreateUnitOfWork()
     {
-        private readonly Func<Lazy<IUnitOfWorkListener[]>> unitOfWorkListenersLazyFunc;
-        private readonly IPublishEventBufferFactory publishEventBufferFactory;
-
-        public UnitOfWorkFactory(Func<Lazy<IUnitOfWorkListener[]>> unitOfWorkListenersLazyFunc, IPublishEventBufferFactory publishEventBufferFactory)
-        {
-            this.unitOfWorkListenersLazyFunc = unitOfWorkListenersLazyFunc;
-            this.publishEventBufferFactory = publishEventBufferFactory;
-        }
-
-        public IUnitOfWork CreateUnitOfWork()
-        {
-            var tx = new UnitOfWork(unitOfWorkListenersLazyFunc(), publishEventBufferFactory.CreateEventBuffer());
-            return tx;
-        }
+        var unitOfWorkListeners = new Lazy<IEnumerable<IUnitOfWorkListener>>(unitOfWorkListenersLazyFunc.GetServices);
+        var tx = new UnitOfWork(unitOfWorkListeners, publishEventBufferFactory.CreateEventBuffer());
+        return tx;
     }
 }

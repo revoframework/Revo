@@ -1,99 +1,99 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 using Revo.Core.Core;
-using Revo.Core.Lifecycle;
 
-namespace Revo.Infrastructure.Jobs.InMemory
+namespace Revo.Infrastructure.Jobs.InMemory;
+
+public class InMemoryJobSchedulerProcess(IInMemoryJobWorkerProcess workerProcess)
+    : IInMemoryJobSchedulerProcess, IHostedService
 {
-    public class InMemoryJobSchedulerProcess : IApplicationStartedListener, IApplicationStoppingListener, IInMemoryJobSchedulerProcess
+    private readonly BlockingCollection<ScheduledJob> unscheduledJobs = new();
+    private readonly SortedList<DateTimeOffset, ScheduledJob> scheduledJobs = new();
+    private Task workerTask;
+
+    public Task StartAsync(CancellationToken cancellationToken)
     {
-        private readonly IInMemoryJobWorkerProcess workerProcess;
-        private readonly BlockingCollection<ScheduledJob> unscheduledJobs = new BlockingCollection<ScheduledJob>();
-        private readonly SortedList<DateTimeOffset, ScheduledJob> scheduledJobs = new SortedList<DateTimeOffset, ScheduledJob>();
-        private Task workerTask;
+        workerTask = Task.Run(() => Run(), cancellationToken);
+        return Task.CompletedTask;
+    }
 
-        public InMemoryJobSchedulerProcess(IInMemoryJobWorkerProcess workerProcess)
+    public async Task StopAsync(CancellationToken cancellationToken)
+    {
+        unscheduledJobs.CompleteAdding();
+
+        if (workerTask != null)
         {
-            this.workerProcess = workerProcess;
+            await workerTask.WaitAsync(cancellationToken);
         }
+    }
 
-        public void OnApplicationStarted()
-        {
-            workerTask = Task.Run(() => Run());
-        }
+    public void ScheduleJob(IJob job, DateTimeOffset enqueueAt, Action<IJob, Exception> errorHandler)
+    {
+        unscheduledJobs.Add(new ScheduledJob(job, enqueueAt, errorHandler));
+    }
 
-        public void OnApplicationStopping()
+    private void Run()
+    {
+        while (!unscheduledJobs.IsCompleted)
         {
-            unscheduledJobs.CompleteAdding();
-            workerTask?.Wait();
-        }
+            var now = Clock.Current.UtcNow;
+            EnqueueJobs(now);
 
-        public void ScheduleJob(IJob job, DateTimeOffset enqueueAt, Action<IJob, Exception> errorHandler)
-        {
-            unscheduledJobs.Add(new ScheduledJob(job, enqueueAt, errorHandler));
-        }
-
-        private void Run()
-        {
-            while (!unscheduledJobs.IsCompleted)
+            ScheduledJob scheduledJob;
+            try
             {
-                var now = Clock.Current.UtcNow;
-                EnqueueJobs(now);
-
-                ScheduledJob scheduledJob;
-                try
+                if (scheduledJobs.Count > 0)
                 {
-                    if (scheduledJobs.Count > 0)
+                    var delta = scheduledJobs.Values[0].EnqueueAt - now;
+                    delta = delta > TimeSpan.FromSeconds(30) ? TimeSpan.FromSeconds(30) : delta;
+                    if (!unscheduledJobs.TryTake(out scheduledJob, delta))
                     {
-                        var delta = scheduledJobs.Values[0].EnqueueAt - now;
-                        delta = delta > TimeSpan.FromSeconds(30) ? TimeSpan.FromSeconds(30) : delta;
-                        if (!unscheduledJobs.TryTake(out scheduledJob, delta))
-                        {
-                            continue;
-                        }
-                    }
-                    else
-                    {
-                        scheduledJob = unscheduledJobs.Take();
+                        continue;
                     }
                 }
-                catch (InvalidOperationException)
+                else
                 {
-                    continue;
+                    scheduledJob = unscheduledJobs.Take();
                 }
-
-                scheduledJobs.Add(scheduledJob.EnqueueAt, scheduledJob);
-                EnqueueJobs(now); // enqueue new jobs if needed
             }
-        }
-
-        private void EnqueueJobs(DateTimeOffset now)
-        {
-            var enqueued = new List<ScheduledJob>();
-            for (int i = 0; i < scheduledJobs.Count && scheduledJobs.Values[i].EnqueueAt <= now; i++)
+            catch (InvalidOperationException)
             {
-                enqueued.Add(scheduledJobs.Values[i]);
-                scheduledJobs.RemoveAt(i);
-                i--;
+                continue;
             }
 
-            enqueued.ForEach(x => workerProcess.EnqueueJob(x.Job, x.ErrorHandler));
+            scheduledJobs.Add(scheduledJob.EnqueueAt, scheduledJob);
+            EnqueueJobs(now); // enqueue new jobs if needed
         }
+    }
 
-        private class ScheduledJob
+    private void EnqueueJobs(DateTimeOffset now)
+    {
+        var enqueued = new List<ScheduledJob>();
+        for (int i = 0; i < scheduledJobs.Count && scheduledJobs.Values[i].EnqueueAt <= now; i++)
         {
-            public ScheduledJob(IJob job, DateTimeOffset enqueueAt, Action<IJob, Exception> errorHandler)
-            {
-                Job = job;
-                EnqueueAt = enqueueAt;
-                ErrorHandler = errorHandler;
-            }
-
-            public IJob Job { get; }
-            public DateTimeOffset EnqueueAt { get; }
-            public Action<IJob, Exception> ErrorHandler { get; }
+            enqueued.Add(scheduledJobs.Values[i]);
+            scheduledJobs.RemoveAt(i);
+            i--;
         }
+
+        enqueued.ForEach(x => workerProcess.EnqueueJob(x.Job, x.ErrorHandler));
+    }
+
+    private class ScheduledJob
+    {
+        public ScheduledJob(IJob job, DateTimeOffset enqueueAt, Action<IJob, Exception> errorHandler)
+        {
+            Job = job;
+            EnqueueAt = enqueueAt;
+            ErrorHandler = errorHandler;
+        }
+
+        public IJob Job { get; }
+        public DateTimeOffset EnqueueAt { get; }
+        public Action<IJob, Exception> ErrorHandler { get; }
     }
 }

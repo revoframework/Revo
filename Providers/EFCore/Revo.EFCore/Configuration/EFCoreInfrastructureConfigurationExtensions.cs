@@ -1,130 +1,145 @@
-﻿using System;
+using System;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Revo.Core.Configuration;
+using Revo.Core.Transactions;
+using Revo.Core.Types;
+using Revo.DataAccess.Entities;
+using Revo.Domain.Events;
 using Revo.EFCore.DataAccess.Configuration;
+using Revo.EFCore.DataAccess.Entities;
 using Revo.EFCore.Events;
 using Revo.EFCore.EventStores;
 using Revo.EFCore.Projections;
 using Revo.EFCore.Repositories;
-using Revo.EFCore.Sagas;
 using Revo.Infrastructure;
+using Revo.Infrastructure.DataAccess.Migrations;
+using Revo.Infrastructure.Events;
+using Revo.Infrastructure.Events.Async;
+using Revo.Infrastructure.Events.Async.Generic;
+using Revo.Infrastructure.Events.Configuration;
+using Revo.Infrastructure.EventStores;
+using Revo.Infrastructure.EventStores.Generic;
+using Revo.Infrastructure.Repositories;
+using Revo.Infrastructure.Sagas;
+using Revo.Infrastructure.Sagas.Generic;
 
 namespace Revo.EFCore.Configuration
 {
     public static class EFCoreInfrastructureConfigurationExtensions
     {
-        public static IRevoConfiguration UseAllEFCoreInfrastructure(this IRevoConfiguration configuration,
-            Action<EFCoreInfrastructureConfigurationSection> advancedAction = null)
+        /// <summary>
+        /// Registers EF Core infrastructure (repositories, async events, event store, projections, sagas).
+        /// When <paramref name="useDefaults"/> is true, all subparts are enabled; set to false to opt in explicitly via the callback.
+        /// </summary>
+        public static IRevoConfiguration UseEFCoreInfrastructure(this IRevoConfiguration configuration,
+            Action<EFCoreInfrastructureConfigurationSection> advancedAction = null,
+            bool useDefaults = true)
         {
             configuration
-                .UseEFCoreDataAccess(null)
-                .UseEFCoreRepositories()
-                .UseEFCoreAsyncEvents()
-                .UseEFCoreEventStore()
-                .UseEFCoreProjections()
-                .UseEFCoreSagas();
+                .ConfigureInfrastructure()
+                .UseEFCoreDataAccess(null);
 
-            var section = configuration.GetSection<EFCoreInfrastructureConfigurationSection>();
-            advancedAction?.Invoke(section);
+            configuration.ConfigureEvents();
 
-            return configuration;
-        }
-
-        public static IRevoConfiguration UseEFCoreEventStore(this IRevoConfiguration configuration,
-            Action<EFCoreInfrastructureConfigurationSection> advancedAction = null)
-        {
-            var section = configuration.GetSection<EFCoreInfrastructureConfigurationSection>();
-            section.UseEventStore = true;
-
-            advancedAction?.Invoke(section);
-
-            configuration.ConfigureKernel(c =>
+            var section = configuration.GetOrAddSection<EFCoreInfrastructureConfigurationSection>(cfg =>
             {
-                if (section.UseEventStore)
+                var s = new EFCoreInfrastructureConfigurationSection(useDefaults);
+                cfg.ConfigureServices(services =>
                 {
-                    c.LoadModule<EFCoreEventStoreModule>();
-                }
-            });
+                    if (s.UseCrudAggregateStore || s.UseEventSourcedAggregateStore || s.UseProjectionsEnabled)
+                    {
+                        RegisterRepositoriesAndCoordinator(services, s);
+                    }
 
-            return configuration;
-        }
+                    if (s.UseEventStoreEnabled)
+                    {
+                        RegisterEventStore(services);
+                    }
 
-        public static IRevoConfiguration UseEFCoreRepositories(this IRevoConfiguration configuration,
-            bool useCrudAggregateStore = true, bool useEventSourcedAggregateStore = true,
-            Action<EFCoreInfrastructureConfigurationSection> advancedAction = null)
-        {
-            var section = configuration.GetSection<EFCoreInfrastructureConfigurationSection>();
-            section.UseCrudAggregateStore = useCrudAggregateStore;
-            section.UseEventSourcedAggregateStore = useEventSourcedAggregateStore;
+                    if (s.UseAsyncEventsEnabled)
+                    {
+                        RegisterAsyncEvents(services, s);
+                    }
 
-            advancedAction?.Invoke(section);
+                    if (s.UseProjectionsEnabled)
+                    {
+                        RegisterProjections(services, s);
+                    }
 
-            configuration.ConfigureKernel(c =>
-            {
-                c.LoadModule(new EFCoreRepositoriesModule(section));
-            });
-
-            return configuration;
-        }
-
-        public static IRevoConfiguration UseEFCoreSagas(this IRevoConfiguration configuration,
-            Action<EFCoreInfrastructureConfigurationSection> advancedAction = null)
-        {
-            var section = configuration.GetSection<EFCoreInfrastructureConfigurationSection>();
-            section.UseSagas = true;
-
-            advancedAction?.Invoke(section);
-
-            configuration.ConfigureKernel(c =>
-            {
-                if (section.UseSagas)
+                    if (s.UseSagasEnabled)
+                    {
+                        RegisterSagas(services);
+                    }
+                });
+                cfg.AddAfterConfigureServicesAction(services =>
                 {
-                    c.LoadModule<EFCoreSagasModule>();
-                }
+                    if (s.UseProjectionsEnabled && s.AutoDiscoverProjectors)
+                    {
+                        EFCoreProjectorDiscovery.DiscoverProjectors(cfg, services);
+                    }
+                });
+                return s;
             });
+
+            advancedAction?.Invoke(section);
 
             return configuration;
         }
 
-        public static IRevoConfiguration UseEFCoreProjections(this IRevoConfiguration configuration,
-            bool autoDiscoverProjectors = true,
-            Action<EFCoreInfrastructureConfigurationSection> advancedAction = null)
+        private static void RegisterRepositoriesAndCoordinator(IServiceCollection services,
+            EFCoreInfrastructureConfigurationSection section)
         {
-            var section = configuration.GetSection<EFCoreInfrastructureConfigurationSection>();
-            section.UseProjections = true;
-            section.AutoDiscoverProjectors = autoDiscoverProjectors;
-
-            advancedAction?.Invoke(section);
-
-            configuration.ConfigureKernel(c =>
+            if (section.UseCrudAggregateStore)
             {
-                if (section.UseProjections)
-                {
-                    c.LoadModule(new EFCoreProjectionsModule(section));
-                }
-            });
+                services.AddTransient<IAggregateStoreFactory, EFCoreCrudAggregateStoreFactory>();
+            }
 
-            return configuration;
+            if (section.UseEventSourcedAggregateStore)
+            {
+                services.AddTransient<IAggregateStoreFactory, EFCoreEventSourcedAggregateStoreFactory>();
+            }
+
+            services.AddScoped<EFCoreCoordinatedTransaction>();
+            services.AddScoped<IEFCoreTransactionCoordinator>(sp => sp.GetRequiredService<EFCoreCoordinatedTransaction>());
+            services.AddScoped<IUnitOfWorkListener>(sp => sp.GetRequiredService<EFCoreCoordinatedTransaction>());
         }
 
-        public static IRevoConfiguration UseEFCoreAsyncEvents(this IRevoConfiguration configuration,
-            Action<EFCoreInfrastructureConfigurationSection> advancedAction = null)
+        private static void RegisterEventStore(IServiceCollection services)
         {
-            configuration.ConfigureInfrastructure();
+            services.AddScoped<IEventStore, EFCoreEventStore>();
+            services.AddScoped<IExternalEventStore, EFCoreExternalEventStore>();
+            services.AddTransient<IEventSourceCatchUp, EventSourceCatchUp>();
+            services.AddTransient<IEventSourceCatchUp, ExternalEventSourceCatchUp>();
+            services.AddSingleton(new ResourceDatabaseMigrationDiscoveryAssembly(
+                typeof(InfrastructureConfigurationSection).Assembly, "Sql"));
+        }
 
-            var section = configuration.GetSection<EFCoreInfrastructureConfigurationSection>();
-            section.UseAsyncEvents = true;
+        private static void RegisterAsyncEvents(IServiceCollection services, EFCoreInfrastructureConfigurationSection section)
+        {
+            services.AddScoped<IAsyncEventQueueManager, EFCoreAsyncEventQueueManager>();
+            services.TryAddScoped<IAsyncEventQueueDispatcher, AsyncEventQueueDispatcher>();
+            services.AddSingleton<IEventSerializer>(sp =>
+                new EventSerializer(sp.GetRequiredService<IVersionedTypeRegistry>(), section.CustomizeEventJsonSerializer));
+            services.AddSingleton<IQueuedAsyncEventMessageFactory, QueuedAsyncEventMessageFactory>();
+            services.AddSingleton(new ResourceDatabaseMigrationDiscoveryAssembly(
+                typeof(InfrastructureConfigurationSection).Assembly, "Sql"));
+        }
 
-            advancedAction?.Invoke(section);
+        private static void RegisterProjections(IServiceCollection services, EFCoreInfrastructureConfigurationSection section)
+        {
+            services.BindAsyncEventListener<EFCoreProjectionEventListener, EFCoreProjectionEventListener.EFCoreProjectionEventSequencer>();
+            services.AddScoped<IEFCoreProjectionSubSystem, EFCoreProjectionSubSystem>();
+            services.AddTransient<IEFCoreProjectorResolver, EFCoreProjectorResolver>();
+            services.AddScoped<EFCoreSyncProjectionHook>();
 
-            configuration.ConfigureKernel(c =>
-            {
-                if (section.UseAsyncEvents)
-                {
-                    c.LoadModule(new EFCoreAsyncEventsModule(section.CustomizeEventJsonSerializer));
-                }
-            });
+        }
 
-            return configuration;
+        private static void RegisterSagas(IServiceCollection services)
+        {
+            services.AddScoped<ISagaMetadataRepository, SagaMetadataRepository>();
+            services.AddSingleton(new ResourceDatabaseMigrationDiscoveryAssembly(
+                typeof(InfrastructureConfigurationSection).Assembly, "Sql"));
         }
     }
 }

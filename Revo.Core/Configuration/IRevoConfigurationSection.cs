@@ -1,6 +1,5 @@
-﻿namespace Revo.Core.Configuration
+﻿namespace Revo.Core.Configuration;
+
+public interface IRevoConfigurationSection
 {
-    public interface IRevoConfigurationSection
-    {
-    }
 }

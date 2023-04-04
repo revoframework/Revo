@@ -1,12 +1,11 @@
 ﻿using Revo.Core.Tenancy;
 
-namespace Revo.Infrastructure.Tenancy
+namespace Revo.Infrastructure.Tenancy;
+
+public class NullTenantContextResolver : ITenantContextResolver
 {
-    public class NullTenantContextResolver : ITenantContextResolver
+    public ITenant ResolveTenant()
     {
-        public ITenant ResolveTenant()
-        {
-            return null;
-        }
+        return null;
     }
 }

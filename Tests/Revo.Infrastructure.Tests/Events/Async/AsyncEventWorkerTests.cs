@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
-using Revo.Core.Core;
 using Revo.Core.Events;
 using Revo.Infrastructure.Events.Async;
 using NSubstitute;
@@ -14,7 +14,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
     {
         private AsyncEventWorker sut;
         private IAsyncEventQueueManager asyncEventQueueManager;
-        private IServiceLocator serviceLocator;
+        private IServiceProvider serviceProvider;
         private List<IAsyncEventQueueRecord> events = new();
         private FakeAsyncEventQueueState queueState = new();
         private List<IAsyncEventListener> listeners = new();
@@ -22,12 +22,13 @@ namespace Revo.Infrastructure.Tests.Events.Async
         public AsyncEventWorkerTests()
         {
             asyncEventQueueManager = Substitute.For<IAsyncEventQueueManager>();
-            serviceLocator = Substitute.For<IServiceLocator>();
-            sut = new AsyncEventWorker(asyncEventQueueManager, serviceLocator, new NullLogger<AsyncEventWorker>());
+            serviceProvider = Substitute.For<IServiceProvider>();
+            sut = new AsyncEventWorker(asyncEventQueueManager, serviceProvider, new NullLogger<AsyncEventWorker>());
 
             asyncEventQueueManager.GetQueueStateAsync("queue").Returns(ci => queueState);
             asyncEventQueueManager.GetQueueEventsAsync("queue").Returns(ci => events);
-            serviceLocator.GetAll(typeof(IAsyncEventListener<Event1>)).Returns(ci => listeners);
+            serviceProvider.GetService(typeof(IEnumerable<IAsyncEventListener<Event1>>))
+                .Returns(ci => listeners);
 
             listeners.Add(Substitute.For<IAsyncEventListener<Event1>>());
             listeners.Add(Substitute.For<IAsyncEventListener<Event1>>());
@@ -36,12 +37,12 @@ namespace Revo.Infrastructure.Tests.Events.Async
 
             listeners[0].EventSequencer.GetEventSequencing(null).ReturnsForAnyArgs(new List<EventSequencing>()
             {
-                new() {EventSequenceNumber = 0 /* shouldn't be important now */, SequenceName = "queue"}
+                new() {EventSequenceNumber = 0, SequenceName = "queue"}
             });
 
             listeners[1].EventSequencer.GetEventSequencing(null).ReturnsForAnyArgs(new List<EventSequencing>()
             {
-                new() {EventSequenceNumber = 0 /* shouldn't be important now */, SequenceName = "queue"}
+                new() {EventSequenceNumber = 0, SequenceName = "queue"}
             });
         }
 
