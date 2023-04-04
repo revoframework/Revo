@@ -1,5 +1,10 @@
 # RELEASE NOTES
 
+## [1.34.1] - 2023-04-04
+
+### Fixed
+- set Hangfire JobStorage early to prevent errors when calling it before its server starts
+
 ## [1.34.0] - 2023-03-17
 
 ### Changed
