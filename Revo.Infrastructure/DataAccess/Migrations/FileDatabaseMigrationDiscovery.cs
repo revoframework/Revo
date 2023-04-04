@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -8,7 +8,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
     {
         private readonly FileDatabaseMigrationDiscoveryPath[] paths;
 
-        public FileDatabaseMigrationDiscovery(FileDatabaseMigrationDiscoveryPath[] paths)
+        public FileDatabaseMigrationDiscovery(IEnumerable<FileDatabaseMigrationDiscoveryPath> paths)
         {
             this.paths = paths.Distinct().ToArray();
         }

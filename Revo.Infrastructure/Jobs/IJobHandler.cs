@@ -1,11 +1,10 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace Revo.Infrastructure.Jobs
+namespace Revo.Infrastructure.Jobs;
+
+public interface IJobHandler<in T>
+    where T : IJob
 {
-    public interface IJobHandler<in T>
-        where T : IJob
-    {
-        Task HandleAsync(T job, CancellationToken cancellationToken);
-    }
+    Task HandleAsync(T job, CancellationToken cancellationToken);
 }

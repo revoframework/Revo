@@ -1,10 +1,9 @@
-﻿namespace Revo.Infrastructure.Events.Async
+﻿namespace Revo.Infrastructure.Events.Async;
+
+public class PerTenantAsyncEventSequencer<TListener> : PerTenantAsyncEventSequencer
+    where TListener : IAsyncEventListener
 {
-    public class PerTenantAsyncEventSequencer<TListener> : PerTenantAsyncEventSequencer
-        where TListener : IAsyncEventListener
+    protected PerTenantAsyncEventSequencer() : base(typeof(TListener).Name)
     {
-        protected PerTenantAsyncEventSequencer() : base(typeof(TListener).Name)
-        {
-        }
     }
 }

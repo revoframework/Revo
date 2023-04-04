@@ -2,11 +2,10 @@
 using Revo.Core.Events;
 using Revo.Domain.Events;
 
-namespace Revo.Infrastructure.Events.Upgrades
+namespace Revo.Infrastructure.Events.Upgrades;
+
+public interface IEventUpgrade
 {
-    public interface IEventUpgrade
-    {
-        IEnumerable<IEventMessage<DomainAggregateEvent>> UpgradeStream(IEnumerable<IEventMessage<DomainAggregateEvent>> events,
-            IReadOnlyDictionary<string, string> eventStreamMetadata);
-    }
+    IEnumerable<IEventMessage<DomainAggregateEvent>> UpgradeStream(IEnumerable<IEventMessage<DomainAggregateEvent>> events,
+        IReadOnlyDictionary<string, string> eventStreamMetadata);
 }

@@ -1,20 +1,20 @@
-﻿using System.Collections.Generic;
-using Revo.Core.Core;
+using System;
+using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Revo.Infrastructure.Security.Commands
+namespace Revo.Infrastructure.Security.Commands;
+
+public class EntityQueryFilterFactory : IEntityQueryFilterFactory
 {
-    public class EntityQueryFilterFactory : IEntityQueryFilterFactory
+    private readonly IServiceProvider serviceProvider;
+
+    public EntityQueryFilterFactory(IServiceProvider serviceProvider)
     {
-        private readonly IServiceLocator serviceLocator;
+        this.serviceProvider = serviceProvider;
+    }
 
-        public EntityQueryFilterFactory(IServiceLocator serviceLocator)
-        {
-            this.serviceLocator = serviceLocator;
-        }
-
-        public IEnumerable<IEntityQueryFilter<T>> GetEntityQueryFilters<T>()
-        {
-            return serviceLocator.GetAll<IEntityQueryFilter<T>>();
-        }
+    public IEnumerable<IEntityQueryFilter<T>> GetEntityQueryFilters<T>()
+    {
+        return serviceProvider.GetServices<IEntityQueryFilter<T>>();
     }
 }

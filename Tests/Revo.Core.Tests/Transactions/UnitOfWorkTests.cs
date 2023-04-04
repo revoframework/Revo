@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Revo.Core.Events;
@@ -21,7 +22,7 @@ namespace Revo.Core.Tests.Transactions
             unitOfWorkListeners = new[] { Substitute.For<IUnitOfWorkListener>(), Substitute.For<IUnitOfWorkListener>() };
             publishEventBuffer = Substitute.For<IPublishEventBuffer>();
 
-            sut = new UnitOfWork(new Lazy<IUnitOfWorkListener[]>(unitOfWorkListeners), publishEventBuffer);
+            sut = new UnitOfWork(new Lazy<IEnumerable<IUnitOfWorkListener>>(() => unitOfWorkListeners), publishEventBuffer);
         }
 
         [Fact]

@@ -1,8 +1,9 @@
-﻿using System.Threading;
+using System;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
 using Revo.Core.Commands;
-using Revo.Core.Core;
 using NSubstitute;
 using Xunit;
 
@@ -11,21 +12,21 @@ namespace Revo.Core.Tests.Commands
     public class LocalCommandBusTests
     {
         private readonly LocalCommandBus sut;
-        private readonly IServiceLocator serviceLocator;
+        private readonly IServiceProvider serviceProvider;
         private readonly ICommandBusPipeline commandBusPipeline;
 
         public LocalCommandBusTests()
         {
-            serviceLocator = Substitute.For<IServiceLocator>();
+            serviceProvider = Substitute.For<IServiceProvider>();
             commandBusPipeline = Substitute.For<ICommandBusPipeline>();
-            sut = new LocalCommandBus(serviceLocator, commandBusPipeline);
+            sut = new LocalCommandBus(serviceProvider, commandBusPipeline);
         }
 
         [Fact]
         public async Task SendAsync_SelectsCorrectHandler()
         {
             var commandHandler = Substitute.For<ICommandHandler<TestCommand>>();
-            serviceLocator.Get(typeof(ICommandHandler<TestCommand>)).Returns(commandHandler);
+            serviceProvider.GetService(typeof(ICommandHandler<TestCommand>)).Returns(commandHandler);
 
             var command = new TestCommand();
             var cancellationToken = new CancellationToken();
@@ -34,7 +35,7 @@ namespace Revo.Core.Tests.Commands
             commandBusPipeline
                 .ProcessAsync(command, Arg.Any<CommandBusMiddlewareDelegate>(),
                     sut, executionOptions, cancellationToken)
-                .Returns(ci => ci.ArgAt<CommandBusMiddlewareDelegate>(1)(command));
+                .Returns(ci => ci.ArgAt<CommandBusMiddlewareDelegate>(1)(command, cancellationToken));
 
             await sut.SendAsync(command, executionOptions, cancellationToken);
 
@@ -45,7 +46,7 @@ namespace Revo.Core.Tests.Commands
         public async Task SendAsync_ReturnsFromQuery()
         {
             var commandHandler = Substitute.For<ICommandHandler<TestQuery, int>>();
-            serviceLocator.Get(typeof(ICommandHandler<TestQuery, int>)).Returns(commandHandler);
+            serviceProvider.GetService(typeof(ICommandHandler<TestQuery, int>)).Returns(commandHandler);
 
             var command = new TestQuery();
             var cancellationToken = new CancellationToken();
@@ -55,7 +56,7 @@ namespace Revo.Core.Tests.Commands
             commandBusPipeline
                 .ProcessAsync(command, Arg.Any<CommandBusMiddlewareDelegate>(),
                     sut, executionOptions, cancellationToken)
-                .Returns(ci => ci.ArgAt<CommandBusMiddlewareDelegate>(1)(command));
+                .Returns(ci => ci.ArgAt<CommandBusMiddlewareDelegate>(1)(command, cancellationToken));
 
             int result = await sut.SendAsync(command, executionOptions, cancellationToken);
 
@@ -66,7 +67,7 @@ namespace Revo.Core.Tests.Commands
         public async Task SendAsync_QueryAsICommandBase()
         {
             var commandHandler = Substitute.For<ICommandHandler<TestQuery, int>>();
-            serviceLocator.Get(typeof(ICommandHandler<TestQuery, int>)).Returns(commandHandler);
+            serviceProvider.GetService(typeof(ICommandHandler<TestQuery, int>)).Returns(commandHandler);
 
             var command = new TestQuery();
             var cancellationToken = new CancellationToken();
@@ -76,7 +77,7 @@ namespace Revo.Core.Tests.Commands
             commandBusPipeline
                 .ProcessAsync(command, Arg.Any<CommandBusMiddlewareDelegate>(),
                     sut, executionOptions, cancellationToken)
-                .Returns(ci => ci.ArgAt<CommandBusMiddlewareDelegate>(1)(command));
+                .Returns(ci => ci.ArgAt<CommandBusMiddlewareDelegate>(1)(command, cancellationToken));
 
             await sut.SendAsync((ICommandBase) command, executionOptions, cancellationToken);
 
@@ -87,7 +88,7 @@ namespace Revo.Core.Tests.Commands
         public async Task CommandHandlerIsResolvedOnlyInsideExecutionHandler()
         {
             var commandHandler = Substitute.For<ICommandHandler<TestCommand>>();
-            serviceLocator.Get(typeof(ICommandHandler<TestCommand>)).Returns(commandHandler);
+            serviceProvider.GetService(typeof(ICommandHandler<TestCommand>)).Returns(commandHandler);
 
             var command = new TestCommand();
             var cancellationToken = new CancellationToken();
@@ -98,9 +99,9 @@ namespace Revo.Core.Tests.Commands
                     sut, executionOptions, cancellationToken)
                 .Returns(ci =>
                 {
-                    serviceLocator.DidNotReceive().Get(typeof(ICommandHandler<TestCommand>));
-                    var result = ci.ArgAt<CommandBusMiddlewareDelegate>(1)(command);
-                    serviceLocator.Received(1).Get(typeof(ICommandHandler<TestCommand>));
+                    serviceProvider.DidNotReceive().GetService(typeof(ICommandHandler<TestCommand>));
+                    var result = ci.ArgAt<CommandBusMiddlewareDelegate>(1)(command, cancellationToken);
+                    serviceProvider.Received(1).GetService(typeof(ICommandHandler<TestCommand>));
                     return result;
                 });
 

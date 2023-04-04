@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Revo.Domain.Sagas
+namespace Revo.Domain.Sagas;
+
+public interface ISagaConventionConfigurationCache
 {
-    public interface ISagaConventionConfigurationCache
-    {
-        IReadOnlyDictionary<Type, SagaConfigurationInfo> ConfigurationInfos { get; }
-    }
+    IReadOnlyDictionary<Type, SagaConfigurationInfo> ConfigurationInfos { get; }
 }

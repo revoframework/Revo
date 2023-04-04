@@ -1,31 +1,30 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NSubstitute;
 using Revo.Core.Commands.Lambda;
-using Revo.Core.Core;
 using Xunit;
 
 namespace Revo.Core.Tests.Commands.Lambda
 {
     public class LambdaCommandHandlerTests
     {
-        private IServiceLocator serviceLocator;
+        private IServiceProvider serviceProvider;
         private IDummyService1 dummyService1;
         private IDummyService2 dummyService2;
         private LambdaCommandHandler sut;
 
         public LambdaCommandHandlerTests()
         {
-            serviceLocator = Substitute.For<IServiceLocator>();
-            sut = new LambdaCommandHandler(serviceLocator);
+            serviceProvider = Substitute.For<IServiceProvider>();
+            sut = new LambdaCommandHandler(serviceProvider);
 
             dummyService1 = Substitute.For<IDummyService1>();
-            serviceLocator.Get(typeof(IDummyService1)).Returns(dummyService1);
+            serviceProvider.GetService(typeof(IDummyService1)).Returns(dummyService1);
             
             dummyService2 = Substitute.For<IDummyService2>();
-            serviceLocator.Get(typeof(IDummyService2)).Returns(dummyService2);
+            serviceProvider.GetService(typeof(IDummyService2)).Returns(dummyService2);
         }
 
         [Fact]

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Revo.Core.Events;
 using Revo.Core.Transactions;
 using Revo.DataAccess.Entities;
@@ -14,7 +15,7 @@ namespace Revo.EFCore.Repositories
         private readonly IEFCoreTransactionCoordinator transactionCoordinator;
 
         public EFCoreEventSourcedAggregateStore(IEventStore eventStore, IEntityTypeManager entityTypeManager,
-            IPublishEventBuffer publishEventBuffer, IRepositoryFilter[] repositoryFilters,
+            IPublishEventBuffer publishEventBuffer, IEnumerable<IRepositoryFilter> repositoryFilters,
             IEventMessageFactory eventMessageFactory, IEventSourcedAggregateFactory eventSourcedAggregateFactory,
             IEFCoreTransactionCoordinator transactionCoordinator)
             : base(eventStore, entityTypeManager, publishEventBuffer, repositoryFilters, eventMessageFactory,

@@ -2,29 +2,28 @@
 using Revo.Core.Events;
 using Revo.Domain.Events;
 
-namespace Revo.Infrastructure.Events.Async
+namespace Revo.Infrastructure.Events.Async;
+
+public class PerAggregateAsyncEventSequencer : IAsyncEventSequencer
 {
-    public class PerAggregateAsyncEventSequencer : IAsyncEventSequencer
+    public PerAggregateAsyncEventSequencer(string queueNamePrefix)
     {
-        public PerAggregateAsyncEventSequencer(string queueNamePrefix)
-        {
-            QueueNamePrefix = queueNamePrefix;
-        }
+        QueueNamePrefix = queueNamePrefix;
+    }
 
-        public string QueueNamePrefix { get; }
+    public string QueueNamePrefix { get; }
 
-        public IEnumerable<EventSequencing> GetEventSequencing(IEventMessage message)
+    public IEnumerable<EventSequencing> GetEventSequencing(IEventMessage message)
+    {
+        yield return new EventSequencing()
         {
-            yield return new EventSequencing()
-            {
-                SequenceName = QueueNamePrefix + ":" + (message.Event as DomainAggregateEvent)?.AggregateId.ToString(),
-                EventSequenceNumber = message.Metadata.GetStreamSequenceNumber()
-            };
-        }
+            SequenceName = QueueNamePrefix + ":" + (message.Event as DomainAggregateEvent)?.AggregateId.ToString(),
+            EventSequenceNumber = message.Metadata.GetStreamSequenceNumber()
+        };
+    }
 
-        public virtual bool ShouldAttemptSynchronousDispatch(IEventMessage message)
-        {
-            return false;
-        }
+    public virtual bool ShouldAttemptSynchronousDispatch(IEventMessage message)
+    {
+        return false;
     }
 }

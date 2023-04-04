@@ -1,9 +1,8 @@
 ﻿using Revo.Core.Commands;
 
-namespace Revo.Infrastructure.Jobs
+namespace Revo.Infrastructure.Jobs;
+
+public interface IExecuteCommandJob : IJob
 {
-    public interface IExecuteCommandJob : IJob
-    {
-        ICommandBase Command { get; }
-    }
+    ICommandBase Command { get; }
 }

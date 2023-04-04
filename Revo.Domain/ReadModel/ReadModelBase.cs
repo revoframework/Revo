@@ -1,9 +1,8 @@
 ﻿using Revo.DataAccess.Entities;
 
-namespace Revo.Domain.ReadModel
+namespace Revo.Domain.ReadModel;
+
+[DatabaseEntity]
+public abstract class ReadModelBase
 {
-    [DatabaseEntity]
-    public abstract class ReadModelBase
-    {
-    }
 }

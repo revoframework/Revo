@@ -1,14 +1,13 @@
 ﻿using System;
 
-namespace Revo.Core.Security
-{
-    public class PermissionTypeCatalogAttribute : Attribute
-    {
-        public PermissionTypeCatalogAttribute(string catalogName)
-        {
-            CatalogName = catalogName;
-        }
+namespace Revo.Core.Security;
 
-        public string CatalogName { get; }
+public class PermissionTypeCatalogAttribute : Attribute
+{
+    public PermissionTypeCatalogAttribute(string catalogName)
+    {
+        CatalogName = catalogName;
     }
+
+    public string CatalogName { get; }
 }

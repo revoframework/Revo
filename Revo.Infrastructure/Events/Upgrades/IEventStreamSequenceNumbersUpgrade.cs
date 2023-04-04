@@ -2,11 +2,10 @@
 using Revo.Core.Events;
 using Revo.Domain.Events;
 
-namespace Revo.Infrastructure.Events.Upgrades
+namespace Revo.Infrastructure.Events.Upgrades;
+
+public interface IEventStreamSequenceNumbersUpgrade
 {
-    public interface IEventStreamSequenceNumbersUpgrade
-    {
-        IEnumerable<IEventMessage<DomainAggregateEvent>> UpgradeSequenceNumbers(
-            IEnumerable<IEventMessage<DomainAggregateEvent>> eventStream);
-    }
+    IEnumerable<IEventMessage<DomainAggregateEvent>> UpgradeSequenceNumbers(
+        IEnumerable<IEventMessage<DomainAggregateEvent>> eventStream);
 }

@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace Revo.Domain.ReadModel
+namespace Revo.Domain.ReadModel;
+
+public interface IClassEntityReadModel : IEntityReadModel
 {
-    public interface IClassEntityReadModel : IEntityReadModel
-    {
-        Guid ClassId { get; set; }
-    }
+    Guid ClassId { get; set; }
 }

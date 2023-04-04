@@ -1,33 +1,31 @@
-﻿using System.Threading.Tasks;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 using Revo.Core.Commands;
 using Revo.Core.Core;
-using Revo.Core.Lifecycle;
+namespace Revo.Infrastructure.DataAccess.Migrations;
 
-namespace Revo.Infrastructure.DataAccess.Migrations
+public class DatabaseMigrationExecutionHook(
+    ILocalCommandBus localCommandBus,
+    IDatabaseMigrationsConfiguration configuration,
+    IEnvironment environment) : IHostedLifecycleService
 {
-    public class DatabaseMigrationExecutionHook : IApplicationStartingListener
+    public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public async Task StartingAsync(CancellationToken cancellationToken)
     {
-        private readonly ILocalCommandBus localCommandBus;
-        private readonly IDatabaseMigrationsConfiguration configuration;
-        private readonly IEnvironment environment;
-
-        public DatabaseMigrationExecutionHook(ILocalCommandBus localCommandBus,
-            IDatabaseMigrationsConfiguration configuration,
-            IEnvironment environment)
+        if (configuration.ApplyMigrationsUponStartup == true
+            || (environment.IsDevelopment && configuration.ApplyMigrationsUponStartup != false))
         {
-            this.localCommandBus = localCommandBus;
-            this.configuration = configuration;
-            this.environment = environment;
-        }
-
-        public void OnApplicationStarting()
-        {
-            if (configuration.ApplyMigrationsUponStartup == true
-                || (environment.IsDevelopment && configuration.ApplyMigrationsUponStartup != false))
-            {
-                Task.Run(async () => await localCommandBus
-                    .SendAsync(new ExecuteDatabaseMigrationsCommand())).Wait();
-            }
+            await localCommandBus.SendAsync(new ExecuteDatabaseMigrationsCommand(), cancellationToken);
         }
     }
+
+    public Task StartedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public Task StoppingAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public Task StoppedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }

@@ -1,9 +1,8 @@
 ﻿using Revo.Core.Events;
 
-namespace Revo.Infrastructure.Events.Async.Generic
+namespace Revo.Infrastructure.Events.Async.Generic;
+
+public interface IQueuedAsyncEventMessageFactory
 {
-    public interface IQueuedAsyncEventMessageFactory
-    {
-        IEventMessage CreateEventMessage(QueuedAsyncEvent queuedEvent);
-    }
+    IEventMessage CreateEventMessage(QueuedAsyncEvent queuedEvent);
 }

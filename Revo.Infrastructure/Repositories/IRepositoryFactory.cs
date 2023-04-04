@@ -1,9 +1,8 @@
 ﻿using Revo.Core.Transactions;
 
-namespace Revo.Infrastructure.Repositories
+namespace Revo.Infrastructure.Repositories;
+
+public interface IRepositoryFactory
 {
-    public interface IRepositoryFactory
-    {
-        IRepository CreateRepository(IUnitOfWorkAccessor unitOfWorkAccessor);
-    }
+    IRepository CreateRepository(IUnitOfWorkAccessor unitOfWorkAccessor);
 }

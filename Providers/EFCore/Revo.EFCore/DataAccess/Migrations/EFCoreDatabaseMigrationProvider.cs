@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
@@ -17,7 +17,7 @@ namespace Revo.EFCore.DataAccess.Migrations
 
         public EFCoreDatabaseMigrationProvider(IEFCoreDatabaseAccess databaseAccess,
             IMigrationScripterFactory scripterFactory,
-            IEventBus eventBus, ILogger logger) : base(eventBus, logger)
+            IEventBus eventBus, ILogger<EFCoreDatabaseMigrationProvider> logger) : base(eventBus, logger)
         {
             this.databaseAccess = databaseAccess;
             

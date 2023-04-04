@@ -4,71 +4,70 @@ using System.Threading;
 using System.Threading.Tasks;
 using Revo.Core.Events;
 
-namespace Revo.Core.Transactions
+namespace Revo.Core.Transactions;
+
+public class UnitOfWork : IUnitOfWork
 {
-    public class UnitOfWork : IUnitOfWork
+    private readonly List<ITransaction> innerTransactions = new();
+    private readonly Lazy<IEnumerable<IUnitOfWorkListener>> unitOfWorkListeners;
+        
+    public UnitOfWork(Lazy<IEnumerable<IUnitOfWorkListener>> unitOfWorkListeners,
+        IPublishEventBuffer publishEventBuffer)
     {
-        private readonly List<ITransaction> innerTransactions = new List<ITransaction>();
-        private readonly Lazy<IUnitOfWorkListener[]> unitOfWorkListeners;
+        this.unitOfWorkListeners = unitOfWorkListeners;
+        EventBuffer = publishEventBuffer;
+    }
         
-        public UnitOfWork(Lazy<IUnitOfWorkListener[]> unitOfWorkListeners,
-            IPublishEventBuffer publishEventBuffer)
-        {
-            this.unitOfWorkListeners = unitOfWorkListeners;
+    public IPublishEventBuffer EventBuffer { get; }
+    public bool IsWorkBegun { get; private set; }
 
-            EventBuffer = publishEventBuffer;
+    public void Begin()
+    {
+        if (IsWorkBegun)
+        {
+            throw new InvalidOperationException($"This {this} has already been started");
+        }
+
+        foreach (var listener in unitOfWorkListeners.Value)
+        {
+            listener.OnWorkBegin(this);
+        }
+
+        IsWorkBegun = true;
+    }
+
+    public void AddInnerTransaction(ITransaction innerTransaction)
+    {
+        innerTransactions.Add(innerTransaction);
+    }
+
+    public async Task CommitAsync()
+    {
+        if (!IsWorkBegun)
+        {
+            throw new InvalidOperationException($"This {this} has not been started yet");
+        }
+            
+        foreach (var listener in unitOfWorkListeners.Value)
+        {
+            await listener.OnBeforeWorkCommitAsync(this);
+        }
+
+        foreach (ITransaction transaction in innerTransactions)
+        {
+            await transaction.CommitAsync();
         }
         
-        public IPublishEventBuffer EventBuffer { get; }
-        public bool IsWorkBegun { get; private set; }
+        // TODO pass cancel token    
+        await EventBuffer.FlushAsync(new CancellationToken());
 
-        public void Begin()
+        foreach (var listener in unitOfWorkListeners.Value)
         {
-            if (IsWorkBegun)
-            {
-                throw new InvalidOperationException($"This {this} has already been started");
-            }
-
-            foreach (var listener in unitOfWorkListeners.Value)
-            {
-                listener.OnWorkBegin(this);
-            }
-
-            IsWorkBegun = true;
+            await listener.OnWorkSucceededAsync(this);
         }
+    }
 
-        public void AddInnerTransaction(ITransaction innerTransaction)
-        {
-            innerTransactions.Add(innerTransaction);
-        }
-
-        public async Task CommitAsync()
-        {
-            if (!IsWorkBegun)
-            {
-                throw new InvalidOperationException($"This {this} has not been started yet");
-            }
-            
-            foreach (var listener in unitOfWorkListeners.Value)
-            {
-                await listener.OnBeforeWorkCommitAsync(this);
-            }
-
-            foreach (ITransaction transaction in innerTransactions)
-            {
-                await transaction.CommitAsync();
-            }
-            
-            await EventBuffer.FlushAsync(new CancellationToken());
-
-            foreach (var listener in unitOfWorkListeners.Value)
-            {
-                await listener.OnWorkSucceededAsync(this);
-            }
-        }
-
-        public void Dispose()
-        {
-        }
+    public void Dispose()
+    {
     }
 }

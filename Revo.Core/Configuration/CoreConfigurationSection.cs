@@ -1,17 +1,36 @@
-﻿using Revo.Core.Commands;
-using Revo.Core.Security;
+using System.Collections.Generic;
+using System.Reflection;
+using Revo.Core.Types;
 
-namespace Revo.Core.Configuration
+namespace Revo.Core.Configuration;
+
+public class CoreConfigurationSection : IRevoConfigurationSection, ITypesConfiguration
 {
-    public class CoreConfigurationSection : IRevoConfigurationSection
-    {
-        /// <summary>
-        /// Can override if the current environment is treated as a development environment (contrary to production environment).
-        /// This may affect logging, database migration, etc.
-        /// </summary>
-        public bool? IsDevelopmentEnvironment { get; set; }
+    private readonly HashSet<Assembly> assemblies = new();
 
-        public CommandsConfiguration Commands { get; } = new CommandsConfiguration();
-        public SecurityConfiguration Security { get; } = new SecurityConfiguration();
+    public bool IsAppDomainTypeDiscoveryEnabled { get; private set; }
+
+    /// <summary>
+    /// Can override if the current environment is treated as a development environment (contrary to production environment).
+    /// This may affect logging, database migration, etc.
+    /// </summary>
+    public bool? IsDevelopmentEnvironment { get; set; }
+
+    public IReadOnlyCollection<Assembly> Assemblies => assemblies;
+
+    public CoreConfigurationSection AddAssembly(params Assembly[] addedAssemblies)
+    {
+        foreach (var assembly in addedAssemblies)
+        {
+            assemblies.Add(assembly);
+        }
+            
+        return this;
+    }
+    
+    public CoreConfigurationSection UseAllAppDomainAssembliesForTypeDiscovery(bool useAll = true)
+    {
+        IsAppDomainTypeDiscoveryEnabled = useAll;
+        return this;
     }
 }

@@ -1,22 +1,22 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
-using Revo.Core.Core;
 
 namespace Revo.EFCore.DataAccess.Query
 {
     public class CustomQueryDbContextOptionsExtension : IDbContextOptionsExtension
     {
-        private readonly IServiceLocator serviceLocator;
+        private readonly IServiceProvider serviceProvider;
 
-        public CustomQueryDbContextOptionsExtension(IServiceLocator serviceLocator)
+        public CustomQueryDbContextOptionsExtension(IServiceProvider serviceProvider)
         {
-            this.serviceLocator = serviceLocator;
+            this.serviceProvider = serviceProvider;
         }
 
         public void ApplyServices(IServiceCollection services)
         {
-            services.AddSingleton(serviceLocator);
+            services.AddSingleton(serviceProvider);
         }
 
         public void Validate(IDbContextOptions options)

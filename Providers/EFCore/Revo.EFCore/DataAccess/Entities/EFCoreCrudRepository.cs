@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -16,10 +16,10 @@ namespace Revo.EFCore.DataAccess.Entities
     {
         private readonly IRepositoryFilter[] repositoryFilters;
 
-        public EFCoreCrudRepository(IRepositoryFilter[] repositoryFilters,
+        public EFCoreCrudRepository(IEnumerable<IRepositoryFilter> repositoryFilters,
             IEFCoreDatabaseAccess databaseAccess)
         {
-            this.repositoryFilters = repositoryFilters;
+            this.repositoryFilters = repositoryFilters.ToArray();
             DatabaseAccess = databaseAccess;
         }
 

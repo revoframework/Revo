@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Revo.Core.Types
+namespace Revo.Core.Types;
+
+public interface ITypeExplorer
 {
-    public interface ITypeExplorer
-    {
-        IEnumerable<Type> GetAllTypes();
-        IEnumerable<Assembly> GetAllReferencedAssemblies();
-        Type FindType(string typeName);
-    }
+    IEnumerable<Type> GetAllTypes();
+    IEnumerable<Assembly> GetAllAssemblies();
+    Type FindType(string typeName);
 }

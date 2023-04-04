@@ -1,77 +1,81 @@
-using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Revo.Core.Commands;
-using Revo.Core.Core;
-using Revo.Core.Lifecycle;
 using Revo.Core.Transactions;
 using Revo.Infrastructure.Repositories;
 
-namespace Revo.Infrastructure.DataAccess
+namespace Revo.Infrastructure.DataAccess;
+
+public class DatabaseInitializerLoader(
+    IDatabaseInitializerDiscovery databaseInitializerDiscovery,
+    IDatabaseInitializerSorter sorter,
+    IServiceScopeFactory serviceScopeFactory) : IDatabaseInitializerLoader, IHostedLifecycleService
 {
-    public class DatabaseInitializerLoader : IDatabaseInitializerLoader, IApplicationStartedListener
+    private readonly SemaphoreSlim initSemaphore = new(1, 1);
+    private bool isInitialized;
+
+    public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public Task StartingAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public async Task StartedAsync(CancellationToken cancellationToken)
     {
-        private readonly IDatabaseInitializerDiscovery databaseInitializerDiscovery;
-        private readonly IDatabaseInitializerSorter sorter;
-        private readonly Func<IRepository> repositoryFunc; // using func factories for late resolving in the scope of different tasks
-        private readonly Func<IUnitOfWorkFactory> unitOfWorkFactoryFunc;
-        private readonly Func<CommandContextStack> commandContextStackFunc;
-        private readonly object initLock = new object();
-        private bool isInitialized = false;
+        await EnsureDatabaseInitializedAsync(cancellationToken).ConfigureAwait(false);
+    }
 
-        public DatabaseInitializerLoader(IDatabaseInitializerDiscovery databaseInitializerDiscovery,
-            IDatabaseInitializerSorter sorter, Func<IRepository> repositoryFunc,
-            Func<IUnitOfWorkFactory> unitOfWorkFactoryFunc, Func<CommandContextStack> commandContextStackFunc)
-        {
-            this.databaseInitializerDiscovery = databaseInitializerDiscovery;
-            this.sorter = sorter;
-            this.repositoryFunc = repositoryFunc;
-            this.unitOfWorkFactoryFunc = unitOfWorkFactoryFunc;
-            this.commandContextStackFunc = commandContextStackFunc;
-        }
+    public Task StoppingAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
-        public void OnApplicationStarted()
-        {
-            EnsureDatabaseInitialized();
-        }
+    public Task StoppedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
-        public void EnsureDatabaseInitialized()
+    public void EnsureDatabaseInitialized()
+    {
+        EnsureDatabaseInitializedAsync(CancellationToken.None).GetAwaiter().GetResult();
+    }
+
+    public async Task EnsureDatabaseInitializedAsync(CancellationToken cancellationToken = default)
+    {
+        await initSemaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
         {
-            lock (initLock)
+            if (isInitialized)
             {
-                if (isInitialized)
+                return;
+            }
+
+            isInitialized = true;
+
+            var initializers = databaseInitializerDiscovery.DiscoverDatabaseInitializers();
+            var sortedInitializers = sorter.GetSorted(initializers.ToArray());
+
+            foreach (var initializer in sortedInitializers)
+            {
+                using var scope = serviceScopeFactory.CreateScope();
+                var unitOfWorkFactory = scope.ServiceProvider.GetRequiredService<IUnitOfWorkFactory>();
+                var commandContextStack = scope.ServiceProvider.GetRequiredService<CommandContextStack>();
+                var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
+
+                using IUnitOfWork uow = unitOfWorkFactory.CreateUnitOfWork();
+                commandContextStack.Push(new CommandContext(null, uow));
+                try
                 {
-                    return;
+                    uow.Begin();
+                    await initializer.InitializeAsync(repository).ConfigureAwait(false);
+                    await uow.CommitAsync().ConfigureAwait(false);
                 }
-
-                isInitialized = true;
-
-                var initializers = databaseInitializerDiscovery.DiscoverDatabaseInitializers();
-                var sortedInitializers = sorter.GetSorted(initializers.ToArray());
-
-                foreach (var initializer in sortedInitializers)
+                finally
                 {
-                    Task.Factory.StartNewWithContext(async () =>
-                    {
-                        using var uow = unitOfWorkFactoryFunc().CreateUnitOfWork();
-                        
-                        var commandContextStack = commandContextStackFunc();
-                        commandContextStack.Push(new CommandContext(null, uow));
-                        
-                        try
-                        {
-                            uow.Begin();
-                            await initializer.InitializeAsync(repositoryFunc());
-                            await uow.CommitAsync();
-                        }
-                        finally
-                        {
-                            commandContextStack.Pop();
-                        }
-                    }).GetAwaiter().GetResult();
+                    commandContextStack.Pop();
                 }
             }
+        }
+        finally
+        {
+            initSemaphore.Release();
         }
     }
 }

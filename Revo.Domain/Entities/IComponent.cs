@@ -1,6 +1,5 @@
-﻿namespace Revo.Domain.Entities
+﻿namespace Revo.Domain.Entities;
+
+public interface IComponent
 {
-    public interface IComponent
-    {
-    }
 }

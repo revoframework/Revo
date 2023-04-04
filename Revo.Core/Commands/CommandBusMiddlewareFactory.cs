@@ -1,22 +1,15 @@
-﻿using System.Linq;
-using Revo.Core.Core;
+﻿using System;
+using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Revo.Core.Commands
+namespace Revo.Core.Commands;
+
+public class CommandBusMiddlewareFactory(IServiceProvider serviceProvider) : ICommandBusMiddlewareFactory
 {
-    public class CommandBusMiddlewareFactory : ICommandBusMiddlewareFactory
+    public ICommandBusMiddleware<TCommand>[] CreateMiddlewares<TCommand>(ICommandBus commandBus)
+        where TCommand : class, ICommandBase
     {
-        private readonly IServiceLocator serviceLocator;
-
-        public CommandBusMiddlewareFactory(IServiceLocator serviceLocator)
-        {
-            this.serviceLocator = serviceLocator;
-        }
-
-        public ICommandBusMiddleware<TCommand>[] CreateMiddlewares<TCommand>(ICommandBus commandBus)
-            where TCommand : class, ICommandBase
-        {
-            return serviceLocator.GetAll<ICommandBusMiddleware<TCommand>>()
-                .ToArray();
-        }
+        return serviceProvider.GetServices<ICommandBusMiddleware<TCommand>>()
+            .ToArray();
     }
 }

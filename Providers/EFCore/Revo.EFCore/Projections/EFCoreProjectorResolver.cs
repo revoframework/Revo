@@ -1,37 +1,37 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Ninject;
+using Microsoft.Extensions.DependencyInjection;
 using Revo.Infrastructure.Projections;
 
 namespace Revo.EFCore.Projections
 {
     public class EFCoreProjectorResolver : IEFCoreProjectorResolver
     {
-        private readonly IKernel kernel;
+        private readonly IServiceProvider serviceProvider;
 
-        public EFCoreProjectorResolver(IKernel kernel)
+        public EFCoreProjectorResolver(IServiceProvider serviceProvider)
         {
-            this.kernel = kernel;
+            this.serviceProvider = serviceProvider;
         }
 
         public bool HasAnyProjectors(Type aggregateType)
         {
-            var bindings = kernel.GetBindings(
-                typeof(IEFCoreEntityEventProjector<>).MakeGenericType(aggregateType));
-            return bindings.Any();
+            return serviceProvider.GetServices(
+                    typeof(IEFCoreEntityEventProjector<>).MakeGenericType(aggregateType))
+                .Any();
         }
 
         public bool HasAnySyncProjectors(Type aggregateType)
         {
-            var bindings = kernel.GetBindings(
-                typeof(IEFCoreSyncEntityEventProjector<>).MakeGenericType(aggregateType));
-            return bindings.Any();
+            return serviceProvider.GetServices(
+                    typeof(IEFCoreSyncEntityEventProjector<>).MakeGenericType(aggregateType))
+                .Any();
         }
 
         public IReadOnlyCollection<IEntityEventProjector> GetProjectors(Type aggregateType)
         {
-            return kernel.GetAll(
+            return serviceProvider.GetServices(
                     typeof(IEFCoreEntityEventProjector<>).MakeGenericType(aggregateType))
                 .Cast<IEntityEventProjector>()
                 .ToArray();
@@ -39,7 +39,7 @@ namespace Revo.EFCore.Projections
 
         public IReadOnlyCollection<IEntityEventProjector> GetSyncProjectors(Type aggregateType)
         {
-            return kernel.GetAll(
+            return serviceProvider.GetServices(
                     typeof(IEFCoreSyncEntityEventProjector<>).MakeGenericType(aggregateType))
                 .Cast<IEntityEventProjector>()
                 .ToArray();
