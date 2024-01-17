@@ -1,5 +1,14 @@
 # RELEASE NOTES
 
+## [1.35.0] - 2024-01-17
+
+### Changed
+
+- added .NET 8.0 support with extra build targets
+
+### Fixed
+- set Hangfire JobStorage early to prevent errors when calling it before its server starts
+
 ## [1.34.1] - 2023-04-04
 
 ### Fixed

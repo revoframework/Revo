@@ -17,7 +17,7 @@ steps:
 - task: UseDotNet@2
   inputs:
     packageType: 'sdk'
-    version: '7.0.x'
+    version: '8.0.x'
 - task: DotNetCoreCLI@2
   inputs:
     command: 'custom'

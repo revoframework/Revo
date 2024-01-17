@@ -77,7 +77,7 @@ Basic permission/role-based ACL for commands and queries, fine-grained row filte
 * [**Database migrations**](https://revoframework.gitbook.io/revo/reference-guide/database-migrations)
 * **History and change-tracking**
 * **User notifications:** event-based, with different output channels (mail, etc.), aggregation, buffering, etc.
-* **.NET Core 3.0+, .NET Standard 2.0+ support (with integration for ASP.NET Core)**
+* **.NET 6.0+ support (with integration for ASP.NET Core)**
 
 ## 👓 Show me how it looks!
 
@@ -396,8 +396,8 @@ Most applications will require at least **Revo.Core**, **Revo.DataAccess**, **Re
 
 > MIT License
 > 
-> Copyright (c) 2017-2020 Martin Zima<br>
-> Copyright (c) 2017-2020 Olify IO s.r.o.
+> Copyright (c) 2017-2024 Martisn Zima<br>
+> Copyright (c) 2017-2024 Olify IO s.r.o.
 > 
 > Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 > 

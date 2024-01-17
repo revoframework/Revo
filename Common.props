@@ -1,12 +1,12 @@
 <Project>
 
   <PropertyGroup>
-    <VersionPrefix>1.34.1</VersionPrefix>
+    <VersionPrefix>1.35.0</VersionPrefix>
   </PropertyGroup>
 
   <PropertyGroup>
     <Authors>Revo Framework</Authors>
-    <Copyright>Copyright (c) 2017-2023 Martin Zima</Copyright>
+    <Copyright>Copyright (c) 2017-2024 Martin Zima</Copyright>
 	<EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <LangVersion>11</LangVersion>
