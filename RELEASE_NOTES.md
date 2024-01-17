@@ -5,9 +5,7 @@
 ### Changed
 
 - added .NET 8.0 support with extra build targets
-
-### Fixed
-- set Hangfire JobStorage early to prevent errors when calling it before its server starts
+- EF Core 8.x for .NET 8.0 build variants
 
 ## [1.34.1] - 2023-04-04
 
