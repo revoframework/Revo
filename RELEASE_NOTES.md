@@ -1,5 +1,11 @@
 # RELEASE NOTES
 
+## [1.35.1] - 2024-01-18
+
+### Changed
+
+- just bumped the version (to work around NuGet push error)
+
 ## [1.35.0] - 2024-01-17
 
 ### Changed
