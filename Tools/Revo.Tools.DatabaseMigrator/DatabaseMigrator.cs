@@ -102,7 +102,7 @@ namespace Revo.Tools.DatabaseMigrator
                 }).ToArray()
                 : null;
 
-            migrationSelector = new DatabaseMigrationSelector(migrationRegistry, migrationProvider,
+            migrationSelector = new DatabaseMigrationSelector(migrationRegistry,
                 executionOptions.MigrationSelectorOptions);
 
             Regex fileNameRegex = Options.FileNameRegex != null

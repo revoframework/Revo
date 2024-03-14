@@ -61,6 +61,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             migrationExecutionOptions.MigrateOnlySpecifiedModules.Returns((IReadOnlyCollection<DatabaseMigrationSearchSpecifier>) null);
 
             migrationSelector.SelectMigrationsAsync(
+                migrationProviders[0],
                 Arg.Is<DatabaseMigrationSpecifier[]>(x =>
                     x.SequenceEqual(new[] {new DatabaseMigrationSpecifier("appModule1", null)})),
                 Arg.Is<string[]>(x => x.Length == 2 && x.Contains("providerTag") && x.Contains("optionsTag")))
@@ -85,9 +86,10 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             migrationSelector.SelectMigrationsAsync(
-                    Arg.Is<DatabaseMigrationSpecifier[]>(x =>
-                        x.SequenceEqual(new[] { new DatabaseMigrationSpecifier("appmodule-foo", null) })),
-                    Arg.Any<string[]>())
+                migrationProviders[0],
+                Arg.Is<DatabaseMigrationSpecifier[]>(x =>
+                    x.SequenceEqual(new[] { new DatabaseMigrationSpecifier("appmodule-foo", null) })),
+                Arg.Any<string[]>())
                 .Returns(migrations.Select(x => new SelectedModuleMigrations(new DatabaseMigrationSpecifier("appmodule-foo", null), migrations)).ToArray());
 
             migrationProviders[0].SupportsMigration(migrations[0]).Returns(true);
@@ -111,9 +113,10 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             migrationSelector.SelectMigrationsAsync(
-                    Arg.Is<DatabaseMigrationSpecifier[]>(x =>
-                        x.SequenceEqual(new[] { new DatabaseMigrationSpecifier("appmodule-foo", null) })),
-                    Arg.Any<string[]>())
+                migrationProviders[0],
+                Arg.Is<DatabaseMigrationSpecifier[]>(x =>
+                    x.SequenceEqual(new[] { new DatabaseMigrationSpecifier("appmodule-foo", null) })),
+                Arg.Any<string[]>())
                 .Returns(migrations.Select(x => new SelectedModuleMigrations(new DatabaseMigrationSpecifier("appmodule-foo", null), migrations)).ToArray());
 
             migrationProviders[0].SupportsMigration(migrations[0]).Returns(true);
@@ -133,7 +136,8 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             Received.InOrder(() =>
             {
                 migrationRegistry.ValidateMigrations();
-                migrationSelector.SelectMigrationsAsync(Arg.Any<DatabaseMigrationSpecifier[]>(), Arg.Any<string[]>());
+                migrationSelector.SelectMigrationsAsync(migrationProviders[0],
+                    Arg.Any<DatabaseMigrationSpecifier[]>(), Arg.Any<string[]>());
             });
         }
     }

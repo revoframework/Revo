@@ -1,5 +1,11 @@
 # RELEASE NOTES
 
+## [1.35.2] - 2024-03-14
+
+### Fixed
+
+- fixed support for multiple registered IDatabaseMigrationProvider(s)
+
 ## [1.35.1] - 2024-01-18
 
 ### Changed

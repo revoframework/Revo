@@ -13,7 +13,7 @@ Infrastructure for testing framework apps.</Description>
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="6.12.0" />
     <PackageReference Include="NSubstitute" Version="5.1.0" />
-    <PackageReference Include="xunit" Version="2.6.6" />
+    <PackageReference Include="xunit" Version="2.7.0" />
   </ItemGroup>
 
   <ItemGroup>

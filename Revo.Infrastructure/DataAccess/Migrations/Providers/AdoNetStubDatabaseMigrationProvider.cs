@@ -17,7 +17,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
         private readonly IEventBus eventBus;
         private readonly ILogger logger;
 
-        private readonly List<IDatabaseMigration> uncommittedMigrations = new List<IDatabaseMigration>();
+        private readonly List<IDatabaseMigration> uncommittedMigrations = new();
         
         private IDbTransaction dbTransaction;
         private bool isInitialized = false;
@@ -38,7 +38,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
             {
                 dbCommand.CommandText = Scripter.SelectMigrationRecordsSql;
 
-                List<IDatabaseMigrationRecord> result = new List<IDatabaseMigrationRecord>();
+                var result = new List<IDatabaseMigrationRecord>();
 
                 if (dbCommand is DbCommand dbCommandAsync)
                 {
@@ -89,6 +89,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
                                 dbTransaction = await BeginDbTransactionAsync(dbConnection);
                             }
                             break;
+                        
                         case DatabaseMigrationTransactionMode.Isolated:
                             if (dbTransaction != null)
                             {
@@ -97,12 +98,14 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
 
                             dbTransaction = await BeginDbTransactionAsync(dbConnection);
                             break;
+                        
                         case DatabaseMigrationTransactionMode.WithoutTransaction:
                             if (dbTransaction != null)
                             {
                                 await CommitTransactionAsync();
                             }
                             break;
+                        
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
@@ -115,7 +118,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
 
                         uncommittedMigrations.Add(migration);
 
-                        foreach (string sqlCommand in sqlMigration.SqlCommands)
+                        foreach (string sqlCommand in GetSqlMigrationCommands(sqlMigration))
                         {
                             using (var dbCommand = dbConnection.CreateCommand())
                             {
@@ -125,7 +128,6 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
                                 if (dbCommand is DbCommand dbCommandAsync)
                                 {
                                     await dbCommandAsync.ExecuteNonQueryAsync();
-
                                 }
                                 else
                                 {
@@ -168,23 +170,6 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
             }
         }
 
-        private async Task CommitTransactionAsync()
-        {
-            try
-            {
-                logger.LogDebug($"Commiting {uncommittedMigrations.Count} database migrations using ADO.NET provider");
-                await CommitDbTransactionAsync(dbTransaction);
-                dbTransaction = null;
-            }
-            catch (Exception e)
-            {
-                throw new DatabaseMigrationException($"Failed to commit {uncommittedMigrations.Count} applied migrations to database", e);
-            }
-
-            await OnMigrationsCommittedAsync(uncommittedMigrations);
-            uncommittedMigrations.Clear();
-        }
-
         public bool SupportsMigration(IDatabaseMigration migration)
         {
             return migration is SqlDatabaseMigration;
@@ -206,21 +191,43 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
 
         protected abstract Task<IDbConnection> GetDbConnectionAsync();
 
-        protected virtual Task<IDbTransaction> BeginDbTransactionAsync(IDbConnection dbConnection)
+        protected virtual Task<IDbTransaction?> BeginDbTransactionAsync(IDbConnection dbConnection)
         {
             return Task.FromResult(dbConnection.BeginTransaction());
         }
 
         protected virtual Task CommitDbTransactionAsync(IDbTransaction dbTransaction)
         {
-            dbTransaction.Commit();
+            dbTransaction?.Commit();
             return Task.CompletedTask;
         }
 
         protected virtual Task RollbackDbTransactionAsync(IDbTransaction dbTransaction)
         {
-            dbTransaction.Rollback();
+            dbTransaction?.Rollback();
             return Task.CompletedTask;
+        }
+        
+        protected virtual IEnumerable<string> GetSqlMigrationCommands(SqlDatabaseMigration sqlMigration)
+        {
+            return sqlMigration.SqlCommands;
+        }
+
+        private async Task CommitTransactionAsync()
+        {
+            try
+            {
+                logger.LogDebug($"Commiting {uncommittedMigrations.Count} database migrations using ADO.NET provider");
+                await CommitDbTransactionAsync(dbTransaction);
+                dbTransaction = null;
+            }
+            catch (Exception e)
+            {
+                throw new DatabaseMigrationException($"Failed to commit {uncommittedMigrations.Count} applied migrations to database", e);
+            }
+
+            await OnMigrationsCommittedAsync(uncommittedMigrations);
+            uncommittedMigrations.Clear();
         }
 
         private async Task OnMigrationBeforeAppliedAsync(IDatabaseMigration migration)
@@ -277,11 +284,21 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
                     existsResult = selectDbCommand.ExecuteScalar();
                 }
 
-                exists = existsResult is Boolean
-                    ? (bool) existsResult
-                    : (existsResult is Int64
-                        ? ((Int64) existsResult) > 0
-                        : ((Int32) existsResult) > 0);
+                // different providers tend to return different types
+                exists = existsResult switch
+                {
+                    bool b => b,
+                    byte b => b > 0,
+                    sbyte b => b > 0,
+                    short i => i > 0,
+                    ushort i => i > 0,
+                    int i => i > 0,
+                    uint i => i > 0,
+                    long l => l > 0,
+                    ulong l => l > 0,
+                    _ => throw new DatabaseMigrationException(
+                        $"Unexpected result from DB migration scripter for {nameof(Scripter.SelectMigrationSchemaExistsSql)}: {existsResult}")
+                };
             }
             
             if (!exists)
@@ -319,7 +336,9 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
 
         private async Task InsertMigrationRecordAsync(IDatabaseMigration migration)
         {
-            using (var dbCommand = dbTransaction.Connection.CreateCommand())
+            var dbConnection = await GetInitializedDbConnectionAsync();
+            
+            using (var dbCommand = dbConnection.CreateCommand())
             {
                 dbCommand.CommandText = Scripter.InsertMigrationRecordSql;
                 dbCommand.Transaction = dbTransaction;
@@ -359,7 +378,8 @@ namespace Revo.Infrastructure.DataAccess.Migrations.Providers
                 param.Value = Clock.Current.UtcNow.UtcDateTime;
                 dbCommand.Parameters.Add(param);
 
-                logger.LogDebug($"Inserting {migration} database migration record");
+                logger.LogDebug("Inserting {MigrationNameAndVersion} database migration record",
+                    migration.ToString(false));
 
                 if (dbCommand is DbCommand dbCommandAsync)
                 {

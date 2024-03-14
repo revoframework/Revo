@@ -1,7 +1,9 @@
-﻿namespace Revo.Infrastructure.DataAccess.Migrations
+﻿using System.Collections.Generic;
+
+namespace Revo.Infrastructure.DataAccess.Migrations
 {
     public interface ISqlDatabaseMigration : IDatabaseMigration
     {
-        string[] SqlCommands { get; }
+        IReadOnlyCollection<string> SqlCommands { get; }
     }
 }

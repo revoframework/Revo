@@ -132,7 +132,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
                     .Distinct()
                     .ToArray();
 
-                var selectedMigrations = await migrationSelector.SelectMigrationsAsync(migratedModules, environmentTags);
+                var selectedMigrations = await migrationSelector.SelectMigrationsAsync(provider, migratedModules, environmentTags);
 
                 if (selectedMigrations.Count > 0 && selectedMigrations.SelectMany(x => x.Migrations)
                         .All(provider.SupportsMigration))

@@ -37,7 +37,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
             }
         }
 
-        public abstract string[] SqlCommands { get; }
+        public abstract IReadOnlyCollection<string> SqlCommands { get; }
 
         public virtual string ToString(bool includeClassName)
         {
@@ -47,7 +47,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
             }
             else
             {
-                return $"{nameof(SqlDatabaseMigration)} {{{ToString(false)}}}";
+                return $"{GetType().Name} {{{ToString(false)}}}";
             }
         }
 
