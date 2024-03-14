@@ -8,19 +8,18 @@ namespace Revo.Infrastructure.DataAccess.Migrations
     public class DatabaseMigrationSelector : IDatabaseMigrationSelector
     {
         private readonly IDatabaseMigrationRegistry migrationRegistry;
-        private readonly IDatabaseMigrationProvider migrationProvider;
         private readonly IDatabaseMigrationSelectorOptions selectorOptions;
         private IReadOnlyCollection<IDatabaseMigrationRecord> history;
 
-        public DatabaseMigrationSelector(IDatabaseMigrationRegistry migrationRegistry, IDatabaseMigrationProvider migrationProvider,
+        public DatabaseMigrationSelector(IDatabaseMigrationRegistry migrationRegistry,
             IDatabaseMigrationSelectorOptions selectorOptions)
         {
             this.migrationRegistry = migrationRegistry;
-            this.migrationProvider = migrationProvider;
             this.selectorOptions = selectorOptions;
         }
         
-        public async Task<IReadOnlyCollection<SelectedModuleMigrations>> SelectMigrationsAsync(DatabaseMigrationSpecifier[] modules, string[] tags)
+        public async Task<IReadOnlyCollection<SelectedModuleMigrations>> SelectMigrationsAsync(IDatabaseMigrationProvider migrationProvider,
+            DatabaseMigrationSpecifier[] modules, string[] tags)
         {
             try
             {
@@ -33,7 +32,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
 
                 foreach (var module in sortedModules)
                 {
-                    var migrations = await DoSelectMigrationsAsync(module, tags, queuedMigrations);
+                    var migrations = await DoSelectMigrationsAsync(module, tags, queuedMigrations, false);
 
                     if (migrations.Count > 0)
                     {
@@ -58,10 +57,10 @@ namespace Revo.Infrastructure.DataAccess.Migrations
         }
 
         private async Task<IReadOnlyCollection<IDatabaseMigration>> DoSelectMigrationsAsync(DatabaseMigrationSpecifier specifier, string[] tags,
-            List<DatabaseMigrationSpecifier> queuedMigrations)
+            List<DatabaseMigrationSpecifier> queuedMigrations, bool required)
         {
-            var result = await SelectModuleMigrationsNoDependenciesAsync(specifier, tags, queuedMigrations);
-
+            var result = await SelectModuleMigrationsNoDependenciesAsync(specifier, tags, queuedMigrations, required);
+            
             foreach (var migration in result)
             {
                 queuedMigrations.Add(new DatabaseMigrationSpecifier(migration.ModuleName, migration.Version));
@@ -81,7 +80,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
                 var dependencySpecs = await GetRequiredMigrationDependenciesAsync(migration, queuedMigrations, tags);
                 foreach (var dependencySpec in dependencySpecs)
                 {
-                    var dependencyMigrations = await DoSelectMigrationsAsync(dependencySpec, tags, queuedMigrations);
+                    var dependencyMigrations = await DoSelectMigrationsAsync(dependencySpec, tags, queuedMigrations, true);
                     migrations.InsertRange(i, dependencyMigrations);
                     queuedMigrations.AddRange(dependencyMigrations.Select(x => new DatabaseMigrationSpecifier(x.ModuleName, x.Version)));
                     i += dependencyMigrations.Count;
@@ -96,7 +95,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
             
             foreach (var dependency in migration.Dependencies)
             {
-                var dependencyMigrations = await SelectModuleMigrationsNoDependenciesAsync(dependency, tags, queuedMigrations);
+                var dependencyMigrations = await SelectModuleMigrationsNoDependenciesAsync(dependency, tags, queuedMigrations, true);
                 if (dependencyMigrations.Count > 0)
                 {
                     dependencies.Add(new DatabaseMigrationSpecifier(
@@ -109,18 +108,19 @@ namespace Revo.Infrastructure.DataAccess.Migrations
         }
 
         private async Task<List<IDatabaseMigration>> SelectModuleMigrationsNoDependenciesAsync(DatabaseMigrationSpecifier specifier,
-            string[] tags, List<DatabaseMigrationSpecifier> queuedMigrations)
+            string[] tags, List<DatabaseMigrationSpecifier> queuedMigrations, bool required)
         {
             var moduleMigrations = migrationRegistry.Migrations
-                .Where(x => string.Equals(x.ModuleName, specifier.ModuleName, StringComparison.InvariantCultureIgnoreCase))
+                .Where(x => string.Equals(x.ModuleName, specifier.ModuleName, StringComparison.InvariantCultureIgnoreCase));
+            var providerModuleMigrations = moduleMigrations
                 .Where(x => x.Tags.All(tagGroup => tags.Any(tagGroup.Contains)));
 
             if (specifier.Version != null)
             {
-                moduleMigrations = moduleMigrations.Where(x => x.Version.CompareTo(specifier.Version) <= 0);
+                providerModuleMigrations = providerModuleMigrations.Where(x => x.Version.CompareTo(specifier.Version) <= 0);
             }
 
-            moduleMigrations = moduleMigrations
+            providerModuleMigrations = providerModuleMigrations
                 .OrderBy(x => x.Version)
                 .ToArray();
 
@@ -131,14 +131,14 @@ namespace Revo.Infrastructure.DataAccess.Migrations
 
             if (specifier.Version != null)
             {
-                if (moduleMigrations.Any() && moduleMigrations.Last().IsRepeatable)
+                if (providerModuleMigrations.Any() && providerModuleMigrations.Last().IsRepeatable)
                 {
                     throw new DatabaseMigrationException($"Cannot select database migrations for module {specifier} because it is a repeatable migration module, which means it is versioned only by checksums");
                 }
             }
-            else if (!moduleMigrations.Any())
+            else if (!providerModuleMigrations.Any())
             {
-                if (!historyMigrations.Any())
+                if (!historyMigrations.Any() && (required || !moduleMigrations.Any()))
                 {
                     // TODO maybe return without errors if there are migrations for this module with different tags?
                     throw new DatabaseMigrationException($"Cannot select database migrations for module {specifier}: no migrations for specified module were found");
@@ -147,10 +147,10 @@ namespace Revo.Infrastructure.DataAccess.Migrations
                 return new List<IDatabaseMigration>();
             }
 
-            if (historyMigrations.Any() && moduleMigrations.Any())
+            if (historyMigrations.Any() && providerModuleMigrations.Any())
             {
                 bool wasRepeatable = historyMigrations.First().Version == null;
-                bool isRepeatable = moduleMigrations.First().IsRepeatable;
+                bool isRepeatable = providerModuleMigrations.First().IsRepeatable;
 
                 if (wasRepeatable != isRepeatable)
                 {
@@ -166,7 +166,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
             }
 
             // repeatable-migration modules
-            if (moduleMigrations.Any() && moduleMigrations.First().IsRepeatable)
+            if (providerModuleMigrations.Any() && providerModuleMigrations.First().IsRepeatable)
             {
                 if (moduleQueuedMigrations.Any())
                 {
@@ -177,7 +177,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
                     .OrderByDescending(x => x.TimeApplied)
                     .FirstOrDefault();
 
-                var migration = moduleMigrations.SingleOrDefault()
+                var migration = providerModuleMigrations.SingleOrDefault()
                     ?? throw new DatabaseMigrationException($"Cannot select database migrations for repeatable module {specifier}: multiple migrations found");
 
                 // return if same and no dependencies got updated
@@ -214,21 +214,21 @@ namespace Revo.Infrastructure.DataAccess.Migrations
 
                 if (version == null)
                 {
-                    var baseline = moduleMigrations.FirstOrDefault(x => x.IsBaseline);
+                    var baseline = providerModuleMigrations.FirstOrDefault(x => x.IsBaseline);
                     if (baseline != null)
                     {
                         result.Add(baseline);
-                        result.AddRange(moduleMigrations
+                        result.AddRange(providerModuleMigrations
                             .Where(x => x.Version.CompareTo(baseline.Version) > 0));
                     }
                     else
                     {
-                        result.AddRange(moduleMigrations);
+                        result.AddRange(providerModuleMigrations);
                     }
                 }
                 else
                 {
-                    result.AddRange(moduleMigrations
+                    result.AddRange(providerModuleMigrations
                         .Where(x => !x.IsBaseline && x.Version.CompareTo(version) > 0));
                 }
 
@@ -242,7 +242,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
                 }
                 else
                 {
-                    var maxVersion = moduleMigrations.Select(x => x.Version).Max();
+                    var maxVersion = providerModuleMigrations.Select(x => x.Version).Max();
 
                     if ((!result.Any() && (version == null || version.CompareTo(maxVersion) < 0))
                         || (result.Any() && !result.Last().Version.Equals(maxVersion)))

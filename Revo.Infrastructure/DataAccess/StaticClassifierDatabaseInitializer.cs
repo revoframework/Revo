@@ -14,9 +14,10 @@ namespace Revo.Infrastructure.DataAccess
         {
             get
             {
-                return this.GetType().GetFields(BindingFlags.Public | BindingFlags.Static)
+                return GetType().GetFields(BindingFlags.Public | BindingFlags.Static)
                     .Where(x => (x.IsLiteral || x.IsInitOnly)
-                                && x.FieldType == typeof(T)).Select(x => (T)x.GetValue(null));
+                                && typeof(T).IsAssignableFrom(x.FieldType))
+                    .Select(x => (T)x.GetValue(null));
             }
         }
 

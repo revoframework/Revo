@@ -5,6 +5,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
 {
     public interface IDatabaseMigrationSelector
     {
-        Task<IReadOnlyCollection<SelectedModuleMigrations>> SelectMigrationsAsync(DatabaseMigrationSpecifier[] modules, string[] tags);
+        Task<IReadOnlyCollection<SelectedModuleMigrations>> SelectMigrationsAsync(IDatabaseMigrationProvider migrationProvider,
+            DatabaseMigrationSpecifier[] modules, string[] tags);
     }
 }

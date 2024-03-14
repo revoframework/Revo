@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup>
-    <VersionPrefix>1.35.1</VersionPrefix>
+    <VersionPrefix>1.35.2</VersionPrefix>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -9,7 +9,7 @@
     <Copyright>Copyright (c) 2017-2024 Martin Zima</Copyright>
 	<EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
-    <LangVersion>11</LangVersion>
+    <LangVersion>12</LangVersion>
     <PackageIcon>icon-128.png</PackageIcon>
     <PackageIconUrl>https://raw.githubusercontent.com/revoframework/Revo/develop/res/icon-128.png</PackageIconUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

@@ -7,7 +7,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
 {
     public abstract class FileSqlDatabaseMigration : SqlDatabaseMigration
     {
-        public static readonly Regex DefaultFileNameRegex = new Regex(@"^(?<module>[a-z0-9\-]+)(?:_(?<baseline>baseline))?(?:_(?<repeatable>repeatable))?(?:_(?<version>\d+(?:\.\d+)*))?(?:_(?<tag>[a-z0-9\-]+)(?:,(?<tag>[a-z0-9\-]+))*)?\.sql$",
+        public static readonly Regex DefaultFileNameRegex = new(@"^(?<module>[a-z0-9\-]+)(?:_(?<baseline>baseline))?(?:_(?<repeatable>repeatable))?(?:_(?<version>\d+(?:\.\d+)*))?(?:_(?<tag>[a-z0-9\-]+)(?:,(?<tag>[a-z0-9\-]+))*)?\.sql$",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private string moduleName;
@@ -16,9 +16,9 @@ namespace Revo.Infrastructure.DataAccess.Migrations
         public DatabaseMigrationTransactionMode transactionMode = DatabaseMigrationTransactionMode.Default;
         private bool isBaseline;
         private bool isRepeatable;
-        private string[] sqlCommands;
+        private List<string> sqlCommands;
         private string description;
-        private List<DatabaseMigrationSpecifier> dependencies = new List<DatabaseMigrationSpecifier>();
+        private List<DatabaseMigrationSpecifier> dependencies = new();
         private bool hasParsedFile;
         
         protected FileSqlDatabaseMigration(string fileName, Regex fileNameRegex = null)
@@ -82,7 +82,6 @@ namespace Revo.Infrastructure.DataAccess.Migrations
         public override bool IsRepeatable => isRepeatable;
 
         public override string Description
-
         {
             get
             {
@@ -123,7 +122,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
         }
 
 
-        public override string[] SqlCommands
+        public override IReadOnlyCollection<string> SqlCommands
         {
             get
             {
@@ -153,7 +152,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
         protected void ParseFile()
         {
             string contents = ReadSqlFileContents();
-            sqlCommands = new[] {contents};
+            sqlCommands = new() { contents };
 
             int i = 0;
             while (i < contents.Length)

@@ -23,7 +23,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             selectorOptions = Substitute.For<IDatabaseMigrationSelectorOptions>();
             selectorOptions.RerunRepeatableMigrationsOnDependencyUpdate.Returns(true);
 
-            sut = new DatabaseMigrationSelector(migrationRegistry, migrationProvider, selectorOptions);
+            sut = new DatabaseMigrationSelector(migrationRegistry, selectorOptions);
         }
 
         [Fact]
@@ -49,6 +49,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
                 new[] { new DatabaseMigrationSpecifier("appModule1", null) },
                 new string[0]);
 
@@ -82,6 +83,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
                 new[]
                 {
                     new DatabaseMigrationSpecifier("appModule1", null),
@@ -128,6 +130,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
                 new[]
                 {
                     new DatabaseMigrationSpecifier("appModule1", null),
@@ -192,6 +195,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
                 new[] { new DatabaseMigrationSpecifier("appModule1", null) },
                 new string[0]);
 
@@ -224,6 +228,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
                 new[] { new DatabaseMigrationSpecifier("appModule1", null) },
                 new string[0]);
             migrations.Should().BeEmpty();
@@ -276,6 +281,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
                 new[] { new DatabaseMigrationSpecifier("appModule1", null) },
                 new[]
                 {
@@ -312,6 +318,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
                 new[] { new DatabaseMigrationSpecifier("appModule1", DatabaseVersion.Parse("1.0.1")) },
                 new string[0]);
 
@@ -340,7 +347,46 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             await sut.Awaiting(x => sut.SelectMigrationsAsync(
+                    migrationProvider,
                     new[] { new DatabaseMigrationSpecifier("appModule1", DatabaseVersion.Parse("1.0.1")) },
+                    new string[0]))
+                .Should()
+                .ThrowAsync<DatabaseMigrationException>();
+        }
+        
+        [Fact]
+        public async Task SelectMigrationsAsync_ThrowsIfNoSuchModuleMigrationsFound()
+        {
+            migrationRegistry.Migrations.Returns(new List<IDatabaseMigration>()
+            {
+                new FakeDatabaseMigration()
+                {
+                    ModuleName = "appModule1",
+                    Version = DatabaseVersion.Parse("1.0.0"),
+                    Tags = new []{ new [] { "pgsql" } }
+                }
+            });
+
+            var result = await sut.SelectMigrationsAsync(
+                migrationProvider,
+                new[] {new DatabaseMigrationSpecifier("appModule1", null)},
+                new[]
+                {
+                    "mssql"
+                });
+            result.Should().BeEmpty();
+        }
+         
+        [Fact]
+        public async Task SelectMigrationsAsync_DoesNotThrowIfModuleMigrationsForOtherProviderFound()
+        {
+            migrationRegistry.Migrations.Returns(new List<IDatabaseMigration>()
+            {
+            });
+
+            await sut.Awaiting(x => sut.SelectMigrationsAsync(
+                    migrationProvider,
+                    new[] { new DatabaseMigrationSpecifier("appModule1", null) },
                     new string[0]))
                 .Should()
                 .ThrowAsync<DatabaseMigrationException>();
@@ -364,6 +410,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
                 new[] { new DatabaseMigrationSpecifier("appModule1", null) },
                 new string[0]);
 
@@ -392,6 +439,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
                 new[] { new DatabaseMigrationSpecifier("appModule1", DatabaseVersion.Parse("1.0.0")) },
                 new string[0]);
 
@@ -422,6 +470,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
                 new[] { new DatabaseMigrationSpecifier("appModule1", DatabaseVersion.Parse("1.0.0")) },
                 new string[0]);
 
@@ -457,6 +506,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
                 new[] { new DatabaseMigrationSpecifier("appModule1", null) },
                 new string[0]);
 
@@ -501,6 +551,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
                 new[] { new DatabaseMigrationSpecifier("appModule1", null) },
                 new string[0]);
 
@@ -534,6 +585,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             await sut.Awaiting(x => sut.SelectMigrationsAsync(
+                    migrationProvider,
                     new[] { new DatabaseMigrationSpecifier("appModule1", null) },
                     new string[0]))
                 .Should()
@@ -554,6 +606,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
                 new[] { new DatabaseMigrationSpecifier("appModule1", null) },
                 new string[0]);
 
@@ -588,6 +641,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
                 new[] { new DatabaseMigrationSpecifier("appModule1", null) },
                 new string[0]);
             migrations.Should().BeEmpty();
@@ -618,6 +672,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
                 new[] { new DatabaseMigrationSpecifier("appModule1", null) },
                 new string[0]);
 
@@ -661,6 +716,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
                 new[]
                 {
                     new DatabaseMigrationSpecifier("data", null),
@@ -706,6 +762,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
                 new[]
                 {
                     new DatabaseMigrationSpecifier("a", null),
@@ -748,6 +805,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
                 new[] { new DatabaseMigrationSpecifier("data", null) },
                 new string[0]);
 
@@ -783,6 +841,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
                 new[] { new DatabaseMigrationSpecifier("appModule1", null) },
                 new string[0]);
 
@@ -830,6 +889,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
                 new[] { new DatabaseMigrationSpecifier("appModule1", null) },
                 new string[0]);
 
@@ -896,6 +956,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
                 new[] { new DatabaseMigrationSpecifier("appModule1", null) },
                 new string[0]);
 
@@ -937,6 +998,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
                 new[] { new DatabaseMigrationSpecifier("appModule1", null) },
                 new string[0]);
 
@@ -973,6 +1035,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
                 new[] { new DatabaseMigrationSpecifier("appModule1", null) },
                 new string[0]);
 
@@ -1024,6 +1087,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
                 new[] { new DatabaseMigrationSpecifier("appModule1", null) },
                 new string[0]);
 
@@ -1073,6 +1137,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
                 new[]
                 {
                     new DatabaseMigrationSpecifier("appModule1", null),
@@ -1125,6 +1190,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
                 new[]
                 {
                     new DatabaseMigrationSpecifier("appModule1", null),
@@ -1190,6 +1256,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
                 new[] { new DatabaseMigrationSpecifier("appModule1", null) },
                 new string[0]);
 
@@ -1242,6 +1309,7 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             });
 
             var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
                 new[] { new DatabaseMigrationSpecifier("appModule1", null) },
                 new[] { "DEV" });
 
