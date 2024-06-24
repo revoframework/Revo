@@ -4,6 +4,7 @@
 
 ### Fixed
 - fixed LambdaCommandBusExtensions return values
+- fixed: FakeClock value changes must be atomic
 
 ### Changed
 

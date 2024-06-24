@@ -6,13 +6,13 @@ namespace Revo.Testing.Core
 {
     public static class FakeClock
     {
-        private static readonly AsyncLocal<FakeClockImpl> ClockLocal = new AsyncLocal<FakeClockImpl>();
-        private static readonly object SetupLock = new object();
+        private static readonly AsyncLocal<FakeClockImpl> ClockLocal = new();
+        private static readonly object SetupLock = new();
 
         public static DateTimeOffset Now
         {
-            get { return Clock.Now; }
-            set { Clock.Now = value; }
+            get => Clock.Now;
+            set => Clock.Now = value;
         }
 
         private static FakeClockImpl Clock
@@ -30,6 +30,8 @@ namespace Revo.Testing.Core
         
         public static void Setup()
         {
+            Now = DateTimeOffset.Now;
+            
             lock (SetupLock)
             {
                 if (!(Revo.Core.Core.Clock.Current is FakeClockImpl))
@@ -37,14 +39,24 @@ namespace Revo.Testing.Core
                     Revo.Core.Core.Clock.SetClock(() => Clock);
                 }
             }
-
-            Now = DateTimeOffset.Now;
         }
 
         public class FakeClockImpl : IClock
         {
-            public DateTimeOffset Now { get; set; }
+            private DateTimeOffsetBoxed boxed = new(DateTimeOffset.Now);
+
+            public DateTimeOffset Now
+            {
+                get => boxed.Value;
+                set => boxed = new DateTimeOffsetBoxed(value);
+            }
+            
             public DateTimeOffset UtcNow => Now.ToUniversalTime();
+        }
+
+        private class DateTimeOffsetBoxed(DateTimeOffset value)
+        {
+            public DateTimeOffset Value { get; } = value;
         }
     }
 }
