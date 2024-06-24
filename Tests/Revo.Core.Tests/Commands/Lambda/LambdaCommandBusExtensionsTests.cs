@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using NSubstitute;
 using Revo.Core.Commands;
@@ -28,6 +29,8 @@ namespace Revo.Core.Tests.Commands.Lambda
         public async Task SendResultCommand()
         {
             Func<object, Task<int>> lambda = async param1 => 1;
+            commandBus.SendAsync(Arg.Is<LambdaResultCommand>(x => x.Delegate == lambda), Arg.Any<CancellationToken>())
+                .Returns(1);
             await commandBus.SendLambdaCommandAsync(lambda);
             commandBus.Received(1).SendAsync(Arg.Is<LambdaResultCommand>(x => x.Delegate == lambda));
         }

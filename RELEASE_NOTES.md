@@ -2,6 +2,9 @@
 
 ## [1.36.0] - 2024-06-24
 
+### Fixed
+- fixed LambdaCommandBusExtensions return values
+
 ### Changed
 
 - upgraded to EasyNetQ 7.8.0
