@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using EasyNetQ;
+using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using Revo.Core.Events;
 using Revo.Infrastructure.Events;
@@ -22,7 +23,7 @@ namespace Revo.EasyNetQ.Tests
             bus.PubSub.Returns(pubSub);
             eventMessageFactory = Substitute.For<IEventMessageFactory>();
 
-            sut = new EasyNetQBus(bus, eventMessageFactory);
+            sut = new EasyNetQBus(bus, eventMessageFactory, NullLogger<EasyNetQBus>.Instance);
         }
 
         [Fact]

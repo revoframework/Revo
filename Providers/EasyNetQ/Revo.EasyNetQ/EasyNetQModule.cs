@@ -1,4 +1,4 @@
-﻿using EasyNetQ;
+﻿using Ninject;
 using Ninject.Modules;
 using Revo.Core.Core;
 using Revo.Core.Events;
@@ -24,16 +24,14 @@ namespace Revo.EasyNetQ
 
             if (configurationSection.IsActive)
             {
+                Kernel.RegisterEasyNetQ(configurationSection.Connection.ConnectionString,
+                    serviceRegister =>
+                    {
+                        configurationSection.RegisterServices?.Invoke(serviceRegister);
+                    });
+                
                 Bind<IApplicationStartedListener, IApplicationStoppingListener>()
                     .To<BusInitializer>()
-                    .InSingletonScope();
-
-                Bind<IBus>()
-                    .ToMethod(ctx => RabbitHutch.CreateBus(configurationSection.Connection.ConnectionString,
-                        serviceRegister =>
-                        {
-                            configurationSection.RegisterServices?.Invoke(serviceRegister);
-                        }))
                     .InSingletonScope();
 
                 Bind<IEasyNetQBus>()

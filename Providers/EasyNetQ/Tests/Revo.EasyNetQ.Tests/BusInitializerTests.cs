@@ -27,9 +27,9 @@ namespace Revo.EasyNetQ.Tests
             bus = Substitute.For<IBus>();
             pubSub = Substitute.For<IPubSub>();
             pubSub.SubscribeAsync<IEventMessage<Event1>>(null, null, null, CancellationToken.None)
-                .ReturnsForAnyArgs(new AwaitableDisposable<ISubscriptionResult>(Task.FromResult<ISubscriptionResult>(null)));
+                .ReturnsForAnyArgs(new AwaitableDisposable<SubscriptionResult>(Task.FromResult<SubscriptionResult>(default)));
             pubSub.SubscribeAsync<IEventMessage<Event2>>(null, null, null, CancellationToken.None)
-                .ReturnsForAnyArgs(new AwaitableDisposable<ISubscriptionResult>(Task.FromResult<ISubscriptionResult>(null)));
+                .ReturnsForAnyArgs(new AwaitableDisposable<SubscriptionResult>(Task.FromResult<SubscriptionResult>(default)));
             bus.PubSub.Returns(pubSub);
             subscriptionHandler = Substitute.For<IEasyNetQSubscriptionHandler>();
             blockingSubscriptionHandler = Substitute.For<IEasyNetQBlockingSubscriptionHandler>();
