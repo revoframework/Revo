@@ -76,7 +76,7 @@ namespace Revo.AspNetCore
             this.typeExplorer = new TypeExplorer(LoggerFactory.CreateLogger<TypeExplorer>());
 
             kernelBootstrapper.Configure();
-
+            
             var assemblies = typeExplorer
                 .GetAllReferencedAssemblies()
                 .Where(a => !a.GetName().Name.StartsWith("System."))

@@ -1,22 +1,17 @@
 ﻿using System;
 using System.Threading.Tasks;
 using EasyNetQ;
+using Microsoft.Extensions.Logging;
 using Revo.Core.Events;
 using Revo.Infrastructure.Events;
 
 namespace Revo.EasyNetQ
 {
-    public class EasyNetQBus : IEasyNetQBus
+    public class EasyNetQBus(IBus bus,
+        IEventMessageFactory eventMessageFactory,
+        ILogger<EasyNetQBus> logger)
+        : IEasyNetQBus
     {
-        private readonly IBus bus;
-        private readonly IEventMessageFactory eventMessageFactory;
-
-        public EasyNetQBus(IBus bus, IEventMessageFactory eventMessageFactory)
-        {
-            this.bus = bus;
-            this.eventMessageFactory = eventMessageFactory;
-        }
-
         public async Task PublishAsync<TEvent>(TEvent @event) where TEvent : IEvent
         {
             var message = (IEventMessage<TEvent>) await eventMessageFactory.CreateMessageAsync(@event);
@@ -43,6 +38,7 @@ namespace Revo.EasyNetQ
                 message = (IEventMessage<TEvent>) EventMessage.FromEvent(message.Event, message.Metadata);
             }
             
+            logger.LogDebug("Publishing event {EventName}", message.Event.GetType().Name);
             await bus.PubSub.PublishAsync(message);
         }
 
@@ -54,6 +50,7 @@ namespace Revo.EasyNetQ
                 message = (IEventMessage<TEvent>) EventMessage.FromEvent(message.Event, message.Metadata);
             }
             
+            logger.LogDebug("Publishing event {EventName} in topic {TOpic}", message.Event.GetType().Name, topic);
             await bus.PubSub.PublishAsync(message, topic);
         }
 
@@ -65,6 +62,7 @@ namespace Revo.EasyNetQ
                 message = (IEventMessage<TEvent>) EventMessage.FromEvent(message.Event, message.Metadata);
             }
             
+            logger.LogDebug("Publishing event {EventName} with custom configuration", message.Event.GetType().Name);
             await bus.PubSub.PublishAsync(message, publishConfiguration);
         }
     }

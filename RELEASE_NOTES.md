@@ -1,5 +1,11 @@
 # RELEASE NOTES
 
+## [1.36.0] - 2024-06-24
+
+### Changed
+
+- upgraded to EasyNetQ 7.8.0
+
 ## [1.35.2] - 2024-03-14
 
 ### Fixed
