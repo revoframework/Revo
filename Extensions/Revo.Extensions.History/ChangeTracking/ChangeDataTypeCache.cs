@@ -6,9 +6,15 @@ using Revo.Core.Types;
 
 namespace Revo.Extensions.History.ChangeTracking
 {
-    public class ChangeDataTypeCache(ITypeExplorer typeExplorer) : IApplicationStartedListener, IChangeDataTypeCache
+    public class ChangeDataTypeCache : IApplicationStartedListener, IChangeDataTypeCache
     {
+        private readonly ITypeExplorer typeExplorer;
         private Dictionary<string, Type> namesToTypes;
+
+        public ChangeDataTypeCache(ITypeExplorer typeExplorer)
+        {
+            this.typeExplorer = typeExplorer;
+        }
 
         public void OnApplicationStarted()
         {
@@ -31,7 +37,7 @@ namespace Revo.Extensions.History.ChangeTracking
             {
                 throw new ArgumentException($"Could not find a channge data type named '{changeDataTypeName}'");
             }
-
+            
             return changeDataType;
         }
 

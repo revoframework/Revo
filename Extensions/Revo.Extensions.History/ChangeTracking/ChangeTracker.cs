@@ -11,14 +11,29 @@ using Revo.Extensions.History.ChangeTracking.Model;
 
 namespace Revo.Extensions.History.ChangeTracking
 {
-    public class ChangeTracker(
+    public class ChangeTracker : IChangeTracker
+    {
+        private readonly ICrudRepository crudRepository;
+        private readonly IActorContext actorContext;
+        private readonly ITrackedChangeRecordConverter trackedChangeRecordConverter;
+        private readonly IEventBus eventBus;
+        private readonly List<TrackedChangeRecord> unsavedChangeRecords = new List<TrackedChangeRecord>();
+        private readonly IMapper mapper;
+
+        public ChangeTracker(
             ICrudRepository crudRepository,
             IActorContext actorContext,
             ITrackedChangeRecordConverter trackedChangeRecordConverter,
             IEventBus eventBus,
-            IMapper mapper) : IChangeTracker
-    {
-        private readonly List<TrackedChangeRecord> unsavedChangeRecords = new List<TrackedChangeRecord>();
+            IMapper mapper)
+        {
+            this.crudRepository = crudRepository;
+            this.actorContext = actorContext;
+            this.trackedChangeRecordConverter = trackedChangeRecordConverter;
+            this.eventBus = eventBus;
+            this.mapper = mapper;
+        }
+
         public TrackedChange AddChange<T>(T changeData, Guid? aggregateId = null, Guid? aggregateClassId = null,
             Guid? entityId = null, Guid? entityClassId = null, Guid? userId = null) where T : ChangeData
         {
