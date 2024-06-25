@@ -12,20 +12,13 @@ using Revo.EF6.DataAccess.Model;
 namespace Revo.EF6.DataAccess
 {
     [AutoLoadModule(false)]
-    public class EF6DataAccessModule : NinjectModule
+    public class EF6DataAccessModule(EF6DataAccessConfigurationSection configurationSection) : NinjectModule
     {
-        private readonly EF6DataAccessConfigurationSection configurationSection;
-
-        public EF6DataAccessModule(EF6DataAccessConfigurationSection configurationSection)
-        {
-            this.configurationSection = configurationSection;
-        }
-
         public override void Load()
         {
             Bind<EF6ConnectionConfiguration>()
                 .ToConstant(configurationSection.Connection);
-            
+
             List<Type> repositoryTypes = new List<Type>()
             {
                 typeof(IEF6CrudRepository),

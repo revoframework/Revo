@@ -7,13 +7,8 @@ using Revo.EF6.DataAccess.Entities;
 
 namespace Revo.EF6.DataAccess.InMemory
 {
-    public class InMemoryDbEntityEntry : IDbEntityEntry
+    public class InMemoryDbEntityEntry(InMemoryCrudRepository.EntityEntry entityEntry) : IDbEntityEntry
     {
-        public InMemoryDbEntityEntry(InMemoryCrudRepository.EntityEntry entityEntry)
-        {
-            this.EntityEntry = entityEntry;
-        }
-
         public System.Data.Entity.EntityState State
         {
             get
@@ -61,7 +56,7 @@ namespace Revo.EF6.DataAccess.InMemory
         }
 
         public object Entity => EntityEntry.Instance;
-        
+
         protected InMemoryCrudRepository.EntityEntry EntityEntry { get; }
 
         public Task ReloadAsync(CancellationToken cancellationToken)

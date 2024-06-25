@@ -10,16 +10,11 @@ namespace Revo.EF6.Projections
     /// and also supports sub-projectors.
     /// </summary>
     /// <typeparam name="TSource">Aggregate type.</typeparam>
-    public class EF6EntityEventProjector<TSource> :
+    public class EF6EntityEventProjector<TSource>(IEF6CrudRepository repository) :
         EntityEventProjector,
         IEF6EntityEventProjector<TSource>
         where TSource : class, IAggregateRoot
     {
-        public EF6EntityEventProjector(IEF6CrudRepository repository)
-        {
-            Repository = repository;
-        }
-
-        protected IEF6CrudRepository Repository { get; }
+        protected IEF6CrudRepository Repository { get; } = repository;
     }
 }

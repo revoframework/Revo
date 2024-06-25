@@ -11,25 +11,14 @@ using Revo.EF6.DataAccess.Model;
 
 namespace Revo.EF6.DataAccess.Entities
 {
-    public class DbContextFactory : IDbContextFactory, IApplicationStartedListener
-    {
-        private readonly ModelDefinitionDiscovery modelDefinitionDiscovery;
-        private readonly EntityTypeDiscovery entityTypeDiscovery;
-        private readonly IConvention[] conventions;
-        private readonly EF6ConnectionConfiguration connectionConfiguration;
-        private Dictionary<string, DbCompiledModel> dbModels;
-        private MultiValueDictionary<string, Type> schemaSpacesToEntities;
-
-        public DbContextFactory(ModelDefinitionDiscovery modelDefinitionDiscovery,
+    public class DbContextFactory(ModelDefinitionDiscovery modelDefinitionDiscovery,
             IConvention[] conventions,
             EntityTypeDiscovery entityTypeDiscovery,
-            EF6ConnectionConfiguration connectionConfiguration)
-        {
-            this.modelDefinitionDiscovery = modelDefinitionDiscovery;
-            this.conventions = conventions;
-            this.entityTypeDiscovery = entityTypeDiscovery;
-            this.connectionConfiguration = connectionConfiguration;
-        }
+            EF6ConnectionConfiguration connectionConfiguration) : IDbContextFactory, IApplicationStartedListener
+    {
+
+        private Dictionary<string, DbCompiledModel> dbModels;
+        private MultiValueDictionary<string, Type> schemaSpacesToEntities;
 
         public DbContext CreateContext(string schemaSpace)
         {

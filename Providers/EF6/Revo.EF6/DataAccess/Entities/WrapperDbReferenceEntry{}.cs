@@ -5,17 +5,10 @@ using System.Threading.Tasks;
 
 namespace Revo.EF6.DataAccess.Entities
 {
-    public class WrapperDbReferenceEntry<TEntity, TProperty> : IDbReferenceEntry<TEntity, TProperty>
+    public class WrapperDbReferenceEntry<TEntity, TProperty>(DbReferenceEntry<TEntity, TProperty> inner) : IDbReferenceEntry<TEntity, TProperty>
         where TEntity : class
         where TProperty : class
     {
-        private readonly DbReferenceEntry<TEntity, TProperty> inner;
-
-        public WrapperDbReferenceEntry(DbReferenceEntry<TEntity, TProperty> inner)
-        {
-            this.inner = inner;
-        }
-
         public string Name => inner.Name;
 
         public TProperty CurrentValue

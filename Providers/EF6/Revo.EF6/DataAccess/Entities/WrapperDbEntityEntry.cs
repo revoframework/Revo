@@ -5,15 +5,8 @@ using System.Threading.Tasks;
 
 namespace Revo.EF6.DataAccess.Entities
 {
-    public class WrapperDbEntityEntry : IDbEntityEntry
+    public class WrapperDbEntityEntry(DbEntityEntry inner) : IDbEntityEntry
     {
-        private readonly DbEntityEntry inner;
-
-        public WrapperDbEntityEntry(DbEntityEntry inner)
-        {
-            this.inner = inner;
-        }
-
         public EntityState State
         {
             get => inner.State;

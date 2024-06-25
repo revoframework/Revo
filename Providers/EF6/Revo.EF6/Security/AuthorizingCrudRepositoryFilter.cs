@@ -4,15 +4,8 @@ using Revo.Infrastructure.Security.Commands;
 
 namespace Revo.EF6.Security
 {
-    public class AuthorizingCrudRepositoryFilter : IRepositoryFilter
+    public class AuthorizingCrudRepositoryFilter(IEntityQueryAuthorizer entityQueryAuthorizer) : IRepositoryFilter
     {
-        private readonly IEntityQueryAuthorizer entityQueryAuthorizer;
-
-        public AuthorizingCrudRepositoryFilter(IEntityQueryAuthorizer entityQueryAuthorizer)
-        {
-            this.entityQueryAuthorizer = entityQueryAuthorizer;
-        }
-
         public IQueryable<T> FilterResults<T>(IQueryable<T> results) where T : class
         {
             return InjectQueryable(results);

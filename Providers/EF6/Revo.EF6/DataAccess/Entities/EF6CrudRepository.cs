@@ -12,17 +12,10 @@ using EntityState = System.Data.Entity.EntityState;
 
 namespace Revo.EF6.DataAccess.Entities
 {
-    public class EF6CrudRepository : IEF6CrudRepository, IFilteringRepository<IEF6CrudRepository>, ITransactionProvider
+    public class EF6CrudRepository(IEF6DatabaseAccess databaseAccess, IRepositoryFilter[] repositoryFilters) : IEF6CrudRepository, IFilteringRepository<IEF6CrudRepository>, ITransactionProvider
     {
-        private readonly IRepositoryFilter[] repositoryFilters;
 
-        public EF6CrudRepository(IEF6DatabaseAccess databaseAccess, IRepositoryFilter[] repositoryFilters)
-        {
-            this.repositoryFilters = repositoryFilters;
-            DatabaseAccess = databaseAccess;
-        }
-
-        public IEF6DatabaseAccess DatabaseAccess { get; }
+        public IEF6DatabaseAccess DatabaseAccess { get; } = databaseAccess;
         public IEnumerable<IRepositoryFilter> DefaultFilters => repositoryFilters;
 
         public void Attach<T>(T entity) where T : class
@@ -192,7 +185,7 @@ namespace Revo.EF6.DataAccess.Entities
         {
             return FilterResults(DatabaseAccess.GetDbContext(typeof(T)).Set<T>());
         }
-        
+
         public async Task<T[]> FindAllAsync<T>(CancellationToken cancellationToken) where T : class
         {
             return await FilterResults(DatabaseAccess.GetDbContext(typeof(T)).Set<T>()).ToArrayAsync(cancellationToken);
@@ -207,7 +200,7 @@ namespace Revo.EF6.DataAccess.Entities
             return FilterResults(DatabaseAccess.GetDbContext(typeof(T)).Set<T>())
                 .Union(addedEntities);
         }
-        
+
         public Task<T[]> FindManyAsync<T, TId>(params TId[] ids) where T : class, IHasId<TId>
         {
             return FindManyAsync<T, TId>(default(CancellationToken), ids);
@@ -516,7 +509,7 @@ namespace Revo.EF6.DataAccess.Entities
         public void Dispose()
         {
         }
-        
+
         private IQueryable<T> FilterResults<T>(IQueryable<T> results) where T : class
         {
             var intermed = results;
