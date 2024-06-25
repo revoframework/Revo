@@ -13,17 +13,9 @@ using Revo.RavenDB.DataAccess;
 namespace Revo.RavenDB
 {
     [AutoLoadModule(false)]
-    public class RavenModule : NinjectModule
+    public class RavenModule(RavenConnectionConfiguration connectionConfiguration,
+        bool useAsPrimaryRepository) : NinjectModule
     {
-        private readonly RavenConnectionConfiguration connectionConfiguration;
-        private readonly bool useAsPrimaryRepository;
-
-        public RavenModule(RavenConnectionConfiguration connectionConfiguration, bool useAsPrimaryRepository)
-        {
-            this.connectionConfiguration = connectionConfiguration;
-            this.useAsPrimaryRepository = useAsPrimaryRepository;
-        }
-
         public override void Load()
         {
             Bind<IDocumentStore>()
@@ -35,7 +27,7 @@ namespace Revo.RavenDB
 
                     var store = new DocumentStore()
                     {
-                        Urls = new []
+                        Urls = new[]
                         {
                             connectionParams != null && connectionParams.TryGetValue("Url", out string url) ? url : "http://localhost:8998"
                         },
@@ -69,7 +61,7 @@ namespace Revo.RavenDB
                     typeof(ICrudRepository), typeof(IReadRepository)
                 });
             }
-            
+
             Bind(repositoryTypes.ToArray())
                 .To<RavenCrudRepository>()
                 .InTaskScope();

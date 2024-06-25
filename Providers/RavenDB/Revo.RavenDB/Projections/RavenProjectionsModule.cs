@@ -8,15 +8,8 @@ using Revo.RavenDB.Configuration;
 namespace Revo.RavenDB.Projections
 {
     [AutoLoadModule(false)]
-    public class RavenProjectionsModule : NinjectModule
+    public class RavenProjectionsModule(RavenConfigurationSection configurationSection) : NinjectModule
     {
-        private readonly RavenConfigurationSection configurationSection;
-
-        public RavenProjectionsModule(RavenConfigurationSection configurationSection)
-        {
-            this.configurationSection = configurationSection;
-        }
-
         public override void Load()
         {
             Bind<IAsyncEventSequencer<DomainAggregateEvent>, RavenProjectionEventListener.RavenProjectionEventSequencer>()
