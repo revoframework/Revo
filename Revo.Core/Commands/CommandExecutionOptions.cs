@@ -16,6 +16,7 @@
         /// </summary>
         public bool? AutoCommitUnitOfWork { get; } = autoCommitUnitOfWork;
         public CommandTenantContextOverride TenantContext { get; } = tenantContext;
+        public static readonly CommandExecutionOptions Default = new CommandExecutionOptions();
 
         public CommandExecutionOptions WithTenantContext(CommandTenantContextOverride tenantContextOverride)
         {
