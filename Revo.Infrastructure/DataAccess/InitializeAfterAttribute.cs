@@ -6,13 +6,8 @@ namespace Revo.Infrastructure.DataAccess
     /// This attribute can be used for modelling dependencies between initializers.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public class InitializeAfterAttribute: Attribute
+    public class InitializeAfterAttribute(Type initializerType) : Attribute
     {
-        public InitializeAfterAttribute(Type initializerType)
-        {
-            InitializerType = initializerType;
-        }
-
-        public Type InitializerType { get; }
+        public Type InitializerType { get; } = initializerType;
     }
 }

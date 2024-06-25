@@ -6,17 +6,8 @@ using Revo.Core.Types;
 
 namespace Revo.Infrastructure.DataAccess
 {
-    public class DatabaseInitializerDiscovery : IDatabaseInitializerDiscovery
+    public class DatabaseInitializerDiscovery(ITypeExplorer typeExplorer, StandardKernel kernel) : IDatabaseInitializerDiscovery
     {
-        private readonly ITypeExplorer typeExplorer;
-        private readonly StandardKernel kernel;
-
-        public DatabaseInitializerDiscovery(ITypeExplorer typeExplorer, StandardKernel kernel)
-        {
-            this.typeExplorer = typeExplorer;
-            this.kernel = kernel;
-        }
-
         public IEnumerable<IDatabaseInitializer> DiscoverDatabaseInitializers()
         {
             var databaseInitializerTypes = typeExplorer.GetAllTypes()

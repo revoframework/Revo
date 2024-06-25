@@ -10,17 +10,9 @@ using System.Threading.Tasks;
 
 namespace Revo.Infrastructure.Projections
 {
-    public abstract class ProjectionSubSystem : IProjectionSubSystem
+    public abstract class ProjectionSubSystem(IEntityTypeManager entityTypeManager,
+        IEventMessageFactory eventMessageFactory) : IProjectionSubSystem
     {
-        private readonly IEntityTypeManager entityTypeManager;
-        private readonly IEventMessageFactory eventMessageFactory;
-
-        protected ProjectionSubSystem(IEntityTypeManager entityTypeManager, IEventMessageFactory eventMessageFactory)
-        {
-            this.entityTypeManager = entityTypeManager;
-            this.eventMessageFactory = eventMessageFactory;
-        }
-
         public virtual async Task ExecuteProjectionsAsync(IReadOnlyCollection<IEventMessage<DomainAggregateEvent>> events,
             IUnitOfWork unitOfWork, EventProjectionOptions options)
         {

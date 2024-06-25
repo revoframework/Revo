@@ -2,15 +2,9 @@
 
 namespace Revo.Infrastructure.EventStores
 {
-    public class EventStreamSlice
+    public class EventStreamSlice(IEnumerable<IEventStoreRecord> events, IStreamPosition nextPosition)
     {
-        public EventStreamSlice(IEnumerable<IEventStoreRecord> events, IStreamPosition nextPosition)
-        {
-            Events = events;
-            NextPosition = nextPosition;
-        }
-
-        public IEnumerable<IEventStoreRecord> Events { get; }
-        public IStreamPosition NextPosition { get; }
+        public IEnumerable<IEventStoreRecord> Events { get; } = events;
+        public IStreamPosition NextPosition { get; } = nextPosition;
     }
 }

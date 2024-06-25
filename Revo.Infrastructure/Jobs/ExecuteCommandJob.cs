@@ -2,15 +2,12 @@
 
 namespace Revo.Infrastructure.Jobs
 {
-    public class ExecuteCommandJob<T> : IExecuteCommandJob
+    public class ExecuteCommandJob<T>(T command) : IExecuteCommandJob
         where T : ICommandBase
     {
-        public ExecuteCommandJob(T command)
-        {
-            Command = command;
-        }
 
-        public T Command { get; }
+
+        public T Command { get; } = command;
 
         //public Guid ExecutionParameters...
         //tenant context

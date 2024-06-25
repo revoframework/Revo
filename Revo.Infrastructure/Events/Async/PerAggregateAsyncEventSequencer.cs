@@ -4,14 +4,9 @@ using Revo.Domain.Events;
 
 namespace Revo.Infrastructure.Events.Async
 {
-    public class PerAggregateAsyncEventSequencer : IAsyncEventSequencer
+    public class PerAggregateAsyncEventSequencer(string queueNamePrefix) : IAsyncEventSequencer
     {
-        public PerAggregateAsyncEventSequencer(string queueNamePrefix)
-        {
-            QueueNamePrefix = queueNamePrefix;
-        }
-
-        public string QueueNamePrefix { get; }
+        public string QueueNamePrefix { get; } = queueNamePrefix;
 
         public IEnumerable<EventSequencing> GetEventSequencing(IEventMessage message)
         {

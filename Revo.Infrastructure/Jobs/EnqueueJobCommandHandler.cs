@@ -4,15 +4,8 @@ using Revo.Core.Commands;
 
 namespace Revo.Infrastructure.Jobs
 {
-    public class EnqueueJobCommandHandler : ICommandHandler<IEnqueueJobCommand>
+    public class EnqueueJobCommandHandler(IJobScheduler jobScheduler) : ICommandHandler<IEnqueueJobCommand>
     {
-        private readonly IJobScheduler jobScheduler;
-
-        public EnqueueJobCommandHandler(IJobScheduler jobScheduler)
-        {
-            this.jobScheduler = jobScheduler;
-        }
-
         public Task HandleAsync(IEnqueueJobCommand command, CancellationToken cancellationToken)
         {
             return jobScheduler.EnqeueJobAsync(GetCommandJob((dynamic)command.Command), command.TimeDelay);

@@ -1,12 +1,7 @@
 ﻿namespace Revo.Infrastructure.EventStores.Generic
 {
-    public class GlobalEventStreamPosition : IStreamPosition
+    public class GlobalEventStreamPosition(long lastGlobalSequenceNumberRead) : IStreamPosition
     {
-        public GlobalEventStreamPosition(long lastGlobalSequenceNumberRead)
-        {
-            LastGlobalSequenceNumberRead = lastGlobalSequenceNumberRead;
-        }
-
-        public long LastGlobalSequenceNumberRead { get; }
+        public long LastGlobalSequenceNumberRead { get; } = lastGlobalSequenceNumberRead;
     }
 }

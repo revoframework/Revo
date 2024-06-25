@@ -11,17 +11,9 @@ using Revo.Infrastructure.Events.Async.Generic;
 
 namespace Revo.Infrastructure.EventStores.Generic
 {
-    public class ExternalEventStore : IExternalEventStore
+    public class ExternalEventStore(ICrudRepository crudRepository, IEventSerializer eventSerializer) : IExternalEventStore
     {
-        private readonly ICrudRepository crudRepository;
-        private readonly IEventSerializer eventSerializer;
         private readonly Dictionary<Guid, ExternalEventRecord> externalEvents = new Dictionary<Guid, ExternalEventRecord>();
-
-        public ExternalEventStore(ICrudRepository crudRepository, IEventSerializer eventSerializer)
-        {
-            this.crudRepository = crudRepository;
-            this.eventSerializer = eventSerializer;
-        }
 
         public void TryPushEvent(IEventMessage eventMessage)
         {

@@ -10,27 +10,12 @@ using Revo.Infrastructure.Jobs.InMemory;
 
 namespace Revo.Infrastructure.Events.Async
 {
-    public class AsyncEventProcessor : IAsyncEventProcessor
-    {
-        private readonly Func<IAsyncEventWorker> asyncEventWorkerFunc;
-        private readonly IAsyncEventQueueManager asyncEventQueueManager;
-        private readonly IInMemoryJobScheduler jobScheduler;
-        private readonly IAsyncEventPipelineConfiguration asyncEventPipelineConfiguration;
-        private readonly ILogger logger;
-
-        public AsyncEventProcessor(Func<IAsyncEventWorker> asyncEventWorkerFunc,
+    public class AsyncEventProcessor(Func<IAsyncEventWorker> asyncEventWorkerFunc,
             IAsyncEventQueueManager asyncEventQueueManager,
             IInMemoryJobScheduler jobScheduler,
             IAsyncEventPipelineConfiguration asyncEventPipelineConfiguration,
-            ILogger logger)
-        {
-            this.asyncEventWorkerFunc = asyncEventWorkerFunc;
-            this.asyncEventQueueManager = asyncEventQueueManager;
-            this.jobScheduler = jobScheduler;
-            this.asyncEventPipelineConfiguration = asyncEventPipelineConfiguration;
-            this.logger = logger;
-        }
-
+            ILogger logger) : IAsyncEventProcessor
+    {
         public async Task ProcessSynchronously(IReadOnlyCollection<IAsyncEventQueueRecord> eventsToProcess)
         {
             string[] queues = eventsToProcess.Select(x => x.QueueName).Distinct().ToArray();

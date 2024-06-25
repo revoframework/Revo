@@ -9,21 +9,13 @@ using Revo.Core.Lifecycle;
 
 namespace Revo.Infrastructure.Jobs.InMemory
 {
-    public class InMemoryJobWorkerProcess : IApplicationStartedListener, IApplicationStoppingListener, IInMemoryJobWorkerProcess
+    public class InMemoryJobWorkerProcess(IJobRunner jobRunner, IInMemoryJobSchedulerConfiguration schedulerConfiguration, 
+        ILogger logger)
+        : IApplicationStartedListener, IApplicationStoppingListener, IInMemoryJobWorkerProcess
     {
         private readonly BlockingCollection<EnqueuedJob> enqueuedJobs = new BlockingCollection<EnqueuedJob>();
-        private readonly IJobRunner jobRunner;
-        private readonly IInMemoryJobSchedulerConfiguration schedulerConfiguration;
-        private readonly ILogger logger;
 
         private Task workerTask;
-
-        public InMemoryJobWorkerProcess(IJobRunner jobRunner, IInMemoryJobSchedulerConfiguration schedulerConfiguration, ILogger logger)
-        {
-            this.jobRunner = jobRunner;
-            this.schedulerConfiguration = schedulerConfiguration;
-            this.logger = logger;
-        }
 
         public void OnApplicationStarted()
         {

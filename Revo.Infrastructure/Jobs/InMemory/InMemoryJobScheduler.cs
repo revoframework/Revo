@@ -6,23 +6,11 @@ using Revo.Core.Core;
 
 namespace Revo.Infrastructure.Jobs.InMemory
 {
-    public class InMemoryJobScheduler : IInMemoryJobScheduler
-    {
-        private readonly IInMemoryJobSchedulerConfiguration schedulerConfiguration;
-        private readonly IInMemoryJobWorkerProcess workerProcess;
-        private readonly IInMemoryJobSchedulerProcess schedulerProcess;
-        private readonly Random retryRandom = new();
-        private readonly ILogger logger;
-
-        public InMemoryJobScheduler(IInMemoryJobSchedulerConfiguration schedulerConfiguration,
+    public class InMemoryJobScheduler(IInMemoryJobSchedulerConfiguration schedulerConfiguration,
             IInMemoryJobWorkerProcess workerProcess, IInMemoryJobSchedulerProcess schedulerProcess,
-            ILogger logger)
-        {
-            this.schedulerConfiguration = schedulerConfiguration;
-            this.workerProcess = workerProcess;
-            this.schedulerProcess = schedulerProcess;
-            this.logger = logger;
-        }
+            ILogger logger) : IInMemoryJobScheduler
+    {
+        private readonly Random retryRandom = new();
 
         public Task<string> EnqeueJobAsync(IJob job, TimeSpan? timeDelay)
         {
@@ -44,7 +32,7 @@ namespace Revo.Infrastructure.Jobs.InMemory
         public Task<string> ScheduleJobAsync(IJob job, DateTimeOffset enqueueAt)
         {
             JobInfo jobInfo = new JobInfo(job);
-            
+
             schedulerProcess.ScheduleJob(job, enqueueAt, (_, exception) => HandleError(jobInfo, exception));
             return Task.FromResult<string>(null);
         }
@@ -80,7 +68,7 @@ namespace Revo.Infrastructure.Jobs.InMemory
                 int delayMultiplier = Pow(schedulerConfiguration.HandleRetryTimeoutMultiplier, jobInfo.AttemptNumber - 1);
                 long minDelay = schedulerConfiguration.MinHandleRetryTimeoutStep.Ticks * delayMultiplier;
                 long maxDelay = schedulerConfiguration.MaxHandleRetryTimeoutStep.Ticks * delayMultiplier;
-                TimeSpan delay = TimeSpan.FromTicks(minDelay + retryRandom.Next(0, (int) (maxDelay - minDelay)));
+                TimeSpan delay = TimeSpan.FromTicks(minDelay + retryRandom.Next(0, (int)(maxDelay - minDelay)));
 
                 DateTimeOffset enqueueAt = Clock.Current.UtcNow + delay;
 

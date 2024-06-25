@@ -8,23 +8,10 @@ using Revo.Infrastructure.Jobs.InMemory;
 
 namespace Revo.Infrastructure.Events.Async
 {
-    public class ProcessAsyncEventsJobHandler : IJobHandler<ProcessAsyncEventsJob>
-    {
-        private readonly IAsyncEventWorker asyncEventWorker;
-        private readonly IAsyncEventPipelineConfiguration asyncEventPipelineConfiguration;
-        private readonly IInMemoryJobScheduler jobScheduler;
-        private readonly ILogger logger;
-
-        public ProcessAsyncEventsJobHandler(IAsyncEventWorker asyncEventWorker,
+    public class ProcessAsyncEventsJobHandler(IAsyncEventWorker asyncEventWorker,
             IAsyncEventPipelineConfiguration asyncEventPipelineConfiguration,
-            IInMemoryJobScheduler jobScheduler, ILogger logger)
-        {
-            this.asyncEventWorker = asyncEventWorker;
-            this.asyncEventPipelineConfiguration = asyncEventPipelineConfiguration;
-            this.jobScheduler = jobScheduler;
-            this.logger = logger;
-        }
-
+            IInMemoryJobScheduler jobScheduler, ILogger logger) : IJobHandler<ProcessAsyncEventsJob>
+    {
         public async Task HandleAsync(ProcessAsyncEventsJob job, CancellationToken cancellationToken)
         {
             logger.LogTrace($"Starting to process async event queue '{job.QueueName}' with {job.AttemptsLeft} attempts left");

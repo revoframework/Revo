@@ -8,27 +8,12 @@ using Revo.Core.Lifecycle;
 
 namespace Revo.Infrastructure.Events.Async
 {
-    public class AsyncEventExecutionCatchUp : IApplicationStartedListener
-    {
-        private readonly IEventSourceCatchUp[] eventSourceCatchUps;
-        private readonly IAsyncEventQueueManager asyncEventQueueManager;
-        private readonly IAsyncEventPipelineConfiguration asyncEventPipelineConfiguration;
-        private readonly Func<IAsyncEventWorker> asyncEventWorkerFunc;
-        private readonly ILogger logger;
-
-        public AsyncEventExecutionCatchUp(IEventSourceCatchUp[] eventSourceCatchUps,
+    public class AsyncEventExecutionCatchUp(IEventSourceCatchUp[] eventSourceCatchUps,
             IAsyncEventQueueManager asyncEventQueueManager,
             IAsyncEventPipelineConfiguration asyncEventPipelineConfiguration,
             Func<IAsyncEventWorker> asyncEventWorkerFunc,
-            ILogger logger)
-        {
-            this.eventSourceCatchUps = eventSourceCatchUps;
-            this.asyncEventQueueManager = asyncEventQueueManager;
-            this.asyncEventPipelineConfiguration = asyncEventPipelineConfiguration;
-            this.asyncEventWorkerFunc = asyncEventWorkerFunc;
-            this.logger = logger;
-        }
-
+            ILogger logger) : IApplicationStartedListener
+    {
         public void OnApplicationStarted()
         {
             var task = Task.Run(InitializeAsync);

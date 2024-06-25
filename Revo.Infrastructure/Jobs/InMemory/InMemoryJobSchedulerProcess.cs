@@ -7,17 +7,13 @@ using Revo.Core.Lifecycle;
 
 namespace Revo.Infrastructure.Jobs.InMemory
 {
-    public class InMemoryJobSchedulerProcess : IApplicationStartedListener, IApplicationStoppingListener, IInMemoryJobSchedulerProcess
+    public class InMemoryJobSchedulerProcess(IInMemoryJobWorkerProcess workerProcess)
+        : IApplicationStartedListener, IApplicationStoppingListener, IInMemoryJobSchedulerProcess
     {
-        private readonly IInMemoryJobWorkerProcess workerProcess;
+
         private readonly BlockingCollection<ScheduledJob> unscheduledJobs = new BlockingCollection<ScheduledJob>();
         private readonly SortedList<DateTimeOffset, ScheduledJob> scheduledJobs = new SortedList<DateTimeOffset, ScheduledJob>();
         private Task workerTask;
-
-        public InMemoryJobSchedulerProcess(IInMemoryJobWorkerProcess workerProcess)
-        {
-            this.workerProcess = workerProcess;
-        }
 
         public void OnApplicationStarted()
         {

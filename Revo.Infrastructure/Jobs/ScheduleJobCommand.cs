@@ -3,15 +3,9 @@ using Revo.Core.Commands;
 
 namespace Revo.Infrastructure.Jobs
 {
-    public class ScheduleJobCommand : ICommand
+    public class ScheduleJobCommand(ICommandBase command, DateTimeOffset enqueueAt) : ICommand
     {
-        public ScheduleJobCommand(ICommandBase command, DateTimeOffset enqueueAt)
-        {
-            Command = command;
-            EnqueueAt = enqueueAt;
-        }
-
-        public ICommandBase Command { get; }
-        public DateTimeOffset EnqueueAt { get; }
+        public ICommandBase Command { get; } = command;
+        public DateTimeOffset EnqueueAt { get; } = enqueueAt;
     }
 }

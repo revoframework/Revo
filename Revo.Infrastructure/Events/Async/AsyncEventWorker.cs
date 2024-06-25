@@ -8,20 +8,9 @@ using Revo.Core.Events;
 
 namespace Revo.Infrastructure.Events.Async
 {
-    public class AsyncEventWorker : IAsyncEventWorker
+    public class AsyncEventWorker(IAsyncEventQueueManager asyncEventQueueManager,
+            IServiceLocator serviceLocator, ILogger logger) : IAsyncEventWorker
     {
-        private readonly IAsyncEventQueueManager asyncEventQueueManager;
-        private readonly IServiceLocator serviceLocator;
-        private readonly ILogger logger;
-
-        public AsyncEventWorker(IAsyncEventQueueManager asyncEventQueueManager,
-            IServiceLocator serviceLocator, ILogger logger)
-        {
-            this.asyncEventQueueManager = asyncEventQueueManager;
-            this.serviceLocator = serviceLocator;
-            this.logger = logger;
-        }
-
         public async Task RunQueueBacklogAsync(string queueName)
         {
             IAsyncEventQueueState queue = await asyncEventQueueManager.GetQueueStateAsync(queueName);
@@ -41,7 +30,7 @@ namespace Revo.Infrastructure.Events.Async
 
             var nonSequential = records.Where(x => x.SequenceNumber == null).ToList();
             var sequential = records.Where(x => x.SequenceNumber != null).ToList();
-            
+
             long? firstSequenceNumber = sequential.FirstOrDefault()?.SequenceNumber; //records should always arrive in order, but possibly with gaps in sequence
             long? lastSequenceNumber = sequential.LastOrDefault()?.SequenceNumber;
 
@@ -96,7 +85,7 @@ namespace Revo.Infrastructure.Events.Async
             {
                 Type listenerType = typeof(IAsyncEventListener<>).MakeGenericType(record.EventMessage.Event.GetType());
                 var handleAsyncMethod = listenerType.GetMethod(nameof(IAsyncEventListener<IEvent>.HandleAsync));
-                
+
                 IEnumerable<IAsyncEventListener> listeners = serviceLocator.GetAll(listenerType).Cast<IAsyncEventListener>();
                 foreach (IAsyncEventListener listener in listeners)
                 {

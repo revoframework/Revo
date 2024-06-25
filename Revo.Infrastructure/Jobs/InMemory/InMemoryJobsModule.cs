@@ -5,17 +5,9 @@ using Revo.Core.Lifecycle;
 namespace Revo.Infrastructure.Jobs.InMemory
 {
     [AutoLoadModule(false)]
-    public class InMemoryJobsModule : NinjectModule
+    public class InMemoryJobsModule(IInMemoryJobSchedulerConfiguration schedulerConfiguration,
+        bool isActive) : NinjectModule
     {
-        private readonly IInMemoryJobSchedulerConfiguration schedulerConfiguration;
-        private readonly bool isActive;
-
-        public InMemoryJobsModule(IInMemoryJobSchedulerConfiguration schedulerConfiguration, bool isActive)
-        {
-            this.schedulerConfiguration = schedulerConfiguration;
-            this.isActive = isActive;
-        }
-
         public override void Load()
         {
             Bind<IInMemoryJobWorkerProcess, IApplicationStartedListener, IApplicationStoppingListener>()

@@ -12,22 +12,11 @@ using EntityState = Revo.DataAccess.Entities.EntityState;
 
 namespace Revo.Infrastructure.Events.Async.Generic
 {
-    public class AsyncEventQueueManager : IAsyncEventQueueManager
+    public class AsyncEventQueueManager(ICrudRepository crudRepository, IQueuedAsyncEventMessageFactory queuedAsyncEventMessageFactory,
+            IExternalEventStore externalEventStore) : IAsyncEventQueueManager
     {
-        private readonly ICrudRepository crudRepository;
-        private readonly IQueuedAsyncEventMessageFactory queuedAsyncEventMessageFactory;
-        private readonly IExternalEventStore externalEventStore;
-
         private readonly Dictionary<IEventMessage, List<EventSequencing>> eventsToQueues
             = new Dictionary<IEventMessage, List<EventSequencing>>();
-
-        public AsyncEventQueueManager(ICrudRepository crudRepository, IQueuedAsyncEventMessageFactory queuedAsyncEventMessageFactory,
-            IExternalEventStore externalEventStore)
-        {
-            this.crudRepository = crudRepository;
-            this.queuedAsyncEventMessageFactory = queuedAsyncEventMessageFactory;
-            this.externalEventStore = externalEventStore;
-        }
 
         public async Task<IReadOnlyCollection<IAsyncEventQueueRecord>> FindQueuedEventsAsync(Guid[] asyncEventQueueRecordIds)
         {
@@ -65,7 +54,7 @@ namespace Revo.Infrastructure.Events.Async.Generic
                 .ToListAsync(crudRepository))
                 .Select(SelectRecordFromQueuedEvent)
                 .ToList();
-            
+
             return events;
         }
 
@@ -83,7 +72,7 @@ namespace Revo.Infrastructure.Events.Async.Generic
                 crudRepository.Remove(queuedEvent);
             }
         }
-        
+
         public Task EnqueueEventAsync(IEventMessage eventMessage, IReadOnlyCollection<EventSequencing> queues)
         {
             if (!eventsToQueues.TryGetValue(eventMessage, out var queueList)
@@ -133,7 +122,7 @@ namespace Revo.Infrastructure.Events.Async.Generic
             EnqueueEventStoreEvents(queuedEvents);
             await EnqueueExternalEventsAsync(queuedEvents);
             await CreateQueuesAsync(queuedEvents);
-            
+
             return queuedEvents;
         }
 
@@ -158,7 +147,7 @@ namespace Revo.Infrastructure.Events.Async.Generic
             var eventStoreEvents = eventsToQueues
                 .Where(x => (x.Key as IEventStoreEventMessage)?.Record is IEventStreamRowEventStoreRecord)
                 .ToArray();
-            
+
             foreach (var eventToQueues in eventStoreEvents)
             {
                 var storeMessage = (IEventStoreEventMessage)eventToQueues.Key;
@@ -188,7 +177,7 @@ namespace Revo.Infrastructure.Events.Async.Generic
                     }
                 }
             }
-            
+
             eventStoreEvents.ForEach(x => eventsToQueues.Remove(x.Key));
         }
 
@@ -221,7 +210,7 @@ namespace Revo.Infrastructure.Events.Async.Generic
                     };
                 })
                 .ToArray();
-            
+
             if (externalEvents.Length > 0)
             {
                 foreach (var externalEvent in externalEvents)
@@ -268,7 +257,7 @@ namespace Revo.Infrastructure.Events.Async.Generic
         {
             return crudRepository.FindAsync<AsyncEventQueue>(queueName);
         }
-        
+
         private IQueryable<QueuedAsyncEvent> QueryQueuedEvents()
         {
             return crudRepository

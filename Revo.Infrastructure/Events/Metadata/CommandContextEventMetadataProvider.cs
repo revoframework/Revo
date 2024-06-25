@@ -4,15 +4,8 @@ using Revo.Core.Events;
 
 namespace Revo.Infrastructure.Events.Metadata
 {
-    public class CommandContextEventMetadataProvider : IEventMetadataProvider
+    public class CommandContextEventMetadataProvider(ICommandContext commandContext) : IEventMetadataProvider
     {
-        private readonly ICommandContext commandContext;
-
-        public CommandContextEventMetadataProvider(ICommandContext commandContext)
-        {
-            this.commandContext = commandContext;
-        }
-
         public Task<(string key, string value)[]> GetMetadataAsync(IEventMessage eventMessage)
         {
             if (commandContext.CurrentCommand != null)
@@ -25,7 +18,7 @@ namespace Revo.Infrastructure.Events.Metadata
             }
             else
             {
-                return Task.FromResult(new (string key, string value)[] {});
+                return Task.FromResult(new (string key, string value)[] { });
             }
         }
     }

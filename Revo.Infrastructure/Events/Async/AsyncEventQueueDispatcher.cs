@@ -7,17 +7,9 @@ using Revo.Core.Events;
 
 namespace Revo.Infrastructure.Events.Async
 {
-    public class AsyncEventQueueDispatcher : IAsyncEventQueueDispatcher
+    public class AsyncEventQueueDispatcher(IAsyncEventQueueManager asyncEventQueueManager,
+        IServiceLocator serviceLocator) : IAsyncEventQueueDispatcher
     {
-        private readonly IAsyncEventQueueManager asyncEventQueueManager;
-        private readonly IServiceLocator serviceLocator;
-
-        public AsyncEventQueueDispatcher(IAsyncEventQueueManager asyncEventQueueManager, IServiceLocator serviceLocator)
-        {
-            this.asyncEventQueueManager = asyncEventQueueManager;
-            this.serviceLocator = serviceLocator;
-        }
-
         public Task<string> GetLastEventSourceDispatchCheckpointAsync(string eventSourceName)
         {
             return asyncEventQueueManager.GetEventSourceCheckpointAsync(eventSourceName);
@@ -57,7 +49,7 @@ namespace Revo.Infrastructure.Events.Async
         {
             var eventSequencerType = typeof(IAsyncEventSequencer<>).MakeGenericType(message.Event.GetType());
             var eventSequencers = serviceLocator.GetAll(eventSequencerType).Cast<IAsyncEventSequencer>();
-            
+
             var allQueues = new Dictionary<string, (EventSequencing sequencing, bool synchronousDispatch)>();
             foreach (IAsyncEventSequencer eventSequencer in eventSequencers)
             {

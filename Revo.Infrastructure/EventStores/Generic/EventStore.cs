@@ -13,7 +13,8 @@ using Revo.Infrastructure.EventStores.Generic.Model;
 
 namespace Revo.Infrastructure.EventStores.Generic
 {
-    public class EventStore : IEventStore
+    public class EventStore(ICrudRepository crudRepository,
+            IEventSerializer eventSerializer) : IEventStore
     {
         private static readonly string[] FilteredMetadataKeys =
         {
@@ -23,16 +24,7 @@ namespace Revo.Infrastructure.EventStores.Generic
             BasicEventMetadataNames.PublishDate,
         };
 
-        private readonly ICrudRepository crudRepository;
-        private readonly IEventSerializer eventSerializer;
         private readonly Dictionary<Guid, StreamBuffer> streams = new Dictionary<Guid, StreamBuffer>();
-
-        public EventStore(ICrudRepository crudRepository,
-            IEventSerializer eventSerializer)
-        {
-            this.crudRepository = crudRepository;
-            this.eventSerializer = eventSerializer;
-        }
 
         public virtual string EventSourceName => "Generic.EventStore";
 
