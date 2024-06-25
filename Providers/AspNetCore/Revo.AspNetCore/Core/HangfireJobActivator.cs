@@ -5,15 +5,8 @@ using Ninject.Activation.Caching;
 
 namespace Revo.AspNetCore.Core
 {
-    public class HangfireJobActivator : JobActivator
+    public class HangfireJobActivator(IKernel kernel) : JobActivator
     {
-        private readonly IKernel kernel;
-        
-        public HangfireJobActivator(IKernel kernel)
-        {
-            this.kernel = kernel;
-        }
-
         /// <inheritdoc />
         public override object ActivateJob(Type jobType)
         {

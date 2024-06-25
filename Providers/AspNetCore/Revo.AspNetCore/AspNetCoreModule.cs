@@ -6,15 +6,8 @@ using Revo.Hangfire;
 namespace Revo.AspNetCore
 {
     [AutoLoadModule(false)]
-    public class AspNetCoreModule : NinjectModule
+    public class AspNetCoreModule(HangfireConfigurationSection hangfireConfigurationSection) : NinjectModule
     {
-        private readonly HangfireConfigurationSection hangfireConfigurationSection;
-
-        public AspNetCoreModule(HangfireConfigurationSection hangfireConfigurationSection)
-        {
-            this.hangfireConfigurationSection = hangfireConfigurationSection;
-        }
-
         public override void Load()
         {
             Bind<IConfiguration>()

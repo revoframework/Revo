@@ -3,15 +3,8 @@ using Revo.Core.Core;
 
 namespace Revo.AspNetCore.Ninject
 {
-    public class NinjectServiceProvider : IServiceProvider
+    public class NinjectServiceProvider(IServiceLocator serviceLocator) : IServiceProvider
     {
-        private readonly IServiceLocator serviceLocator;
-
-        public NinjectServiceProvider(IServiceLocator serviceLocator)
-        {
-            this.serviceLocator = serviceLocator;
-        }
-
         public object GetService(Type serviceType)
         {
             return serviceLocator.Get(serviceType);
