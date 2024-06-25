@@ -8,17 +8,10 @@ using Revo.Domain.Events;
 
 namespace Revo.EFCore.Projections
 {
-    public class EFCoreSyncProjectionHook : ITransactionParticipant
+    public class EFCoreSyncProjectionHook(ICommandContext commandContext,
+        IEFCoreProjectionSubSystem projectionSubSystem) : ITransactionParticipant
     {
-        private readonly ICommandContext commandContext;
-        private readonly IEFCoreProjectionSubSystem projectionSubSystem;
         private readonly List<IEventMessage> projectedEvents = new List<IEventMessage>();
-
-        public EFCoreSyncProjectionHook(ICommandContext commandContext, IEFCoreProjectionSubSystem projectionSubSystem)
-        {
-            this.commandContext = commandContext;
-            this.projectionSubSystem = projectionSubSystem;
-        }
 
         public async Task OnBeforeCommitAsync()
         {

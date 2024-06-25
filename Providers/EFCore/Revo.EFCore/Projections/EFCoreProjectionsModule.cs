@@ -8,15 +8,8 @@ using Revo.Infrastructure.Events.Async;
 namespace Revo.EFCore.Projections
 {
     [AutoLoadModule(false)]
-    public class EFCoreProjectionsModule : NinjectModule
+    public class EFCoreProjectionsModule(EFCoreInfrastructureConfigurationSection configurationSection) : NinjectModule
     {
-        private readonly EFCoreInfrastructureConfigurationSection configurationSection;
-
-        public EFCoreProjectionsModule(EFCoreInfrastructureConfigurationSection configurationSection)
-        {
-            this.configurationSection = configurationSection;
-        }
-
         public override void Load()
         {
             Bind<IAsyncEventSequencer<DomainAggregateEvent>, EFCoreProjectionEventListener.EFCoreProjectionEventSequencer>()

@@ -6,13 +6,8 @@ namespace Revo.EFCore.DataAccess.Entities
     /// Attribute that set Entity Framework Core BaseType property for the model mapping
     /// of the annotated class.
     /// </summary>
-    public class BaseTypeAttribute : Attribute
+    public class BaseTypeAttribute(Type baseType) : Attribute
     {
-        public BaseTypeAttribute(Type baseType)
-        {
-            BaseType = baseType;
-        }
-
-        public Type BaseType { get; set; }
+        public Type BaseType { get; set; } = baseType;
     }
 }

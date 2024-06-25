@@ -7,19 +7,8 @@ using Revo.Core.Types;
 
 namespace Revo.EFCore.DataAccess.Model
 {
-    public class ModelDefinitionDiscovery
+    public class ModelDefinitionDiscovery(ITypeExplorer typeExplorer, StandardKernel kernel, ILogger logger)
     {
-        private readonly ITypeExplorer typeExplorer;
-        private readonly StandardKernel kernel;
-        private readonly ILogger logger;
-
-        public ModelDefinitionDiscovery(ITypeExplorer typeExplorer, StandardKernel kernel, ILogger logger)
-        {
-            this.typeExplorer = typeExplorer;
-            this.kernel = kernel;
-            this.logger = logger;
-        }
-        
         public IEnumerable<IEFCoreModelDefinition> DiscoverModelDefinitions()
         {
             var modelDefinitionTypes = typeExplorer.GetAllTypes()

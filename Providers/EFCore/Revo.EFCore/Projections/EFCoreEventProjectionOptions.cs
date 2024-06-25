@@ -2,13 +2,8 @@
 
 namespace Revo.EFCore.Projections
 {
-    public class EFCoreEventProjectionOptions : EventProjectionOptions
+    public class EFCoreEventProjectionOptions(bool isSynchronousProjection) : EventProjectionOptions
     {
-        public EFCoreEventProjectionOptions(bool isSynchronousProjection)
-        {
-            IsSynchronousProjection = isSynchronousProjection;
-        }
-
-        public bool IsSynchronousProjection { get; private set; }
+        public bool IsSynchronousProjection { get; private set; } = isSynchronousProjection;
     }
 }

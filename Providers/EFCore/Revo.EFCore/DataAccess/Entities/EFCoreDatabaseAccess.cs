@@ -6,19 +6,12 @@ using Microsoft.EntityFrameworkCore.Query;
 
 namespace Revo.EFCore.DataAccess.Entities
 {
-    public class EFCoreDatabaseAccess : IEFCoreDatabaseAccess
+    public class EFCoreDatabaseAccess(IDbContextFactory dbContextFactory,
+        IRequestDbContextCache requestDbContextCache) : IEFCoreDatabaseAccess
     {
         public static readonly string DefaultSchemaSpace = "Default";
 
         private readonly Dictionary<string, DbContext> dbContexts = new Dictionary<string, DbContext>();
-        private readonly IDbContextFactory dbContextFactory;
-        private readonly IRequestDbContextCache requestDbContextCache;        
-
-        public EFCoreDatabaseAccess(IDbContextFactory dbContextFactory, IRequestDbContextCache requestDbContextCache)
-        {
-            this.dbContextFactory = dbContextFactory;
-            this.requestDbContextCache = requestDbContextCache;
-        }
 
         public IReadOnlyDictionary<string, DbContext> DbContexts => dbContexts;
 

@@ -8,15 +8,8 @@ using Revo.DataAccess.Entities;
 
 namespace Revo.EFCore.DataAccess.Model
 {
-    public class EntityTypeDiscovery
+    public class EntityTypeDiscovery(ITypeExplorer typeExplorer)
     {
-        private readonly ITypeExplorer typeExplorer;
-
-        public EntityTypeDiscovery(ITypeExplorer typeExplorer)
-        {
-            this.typeExplorer = typeExplorer;
-        }
-
         public static string DetectEntitySchemaSpace(Type entityType)
         {
             var attrs = (DatabaseEntityAttribute)entityType
