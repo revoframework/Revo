@@ -3,13 +3,8 @@ using Revo.Infrastructure.Jobs;
 
 namespace Revo.Extensions.Notifications.Channels.Buffering
 {
-    public class ProcessBufferedNotificationsJob : IJob
+    public class ProcessBufferedNotificationsJob(DateTimeOffset scheduledTime) : IJob
     {
-        public ProcessBufferedNotificationsJob(DateTimeOffset scheduledTime)
-        {
-            ScheduledTime = scheduledTime;
-        }
-
-        public DateTimeOffset ScheduledTime { get; }
+        public DateTimeOffset ScheduledTime { get; } = scheduledTime;
     }
 }

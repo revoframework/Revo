@@ -4,15 +4,8 @@ using Revo.Extensions.History.ChangeTracking.Model;
 
 namespace Revo.Extensions.History.ChangeTracking
 {
-    public class TrackedChangeRecordConverter : ITrackedChangeRecordConverter
+    public class TrackedChangeRecordConverter(IChangeDataTypeCache changeDataTypeCache) : ITrackedChangeRecordConverter
     {
-        private readonly IChangeDataTypeCache changeDataTypeCache;
-
-        public TrackedChangeRecordConverter(IChangeDataTypeCache changeDataTypeCache)
-        {
-            this.changeDataTypeCache = changeDataTypeCache;
-        }
-
         public TrackedChange FromRecord(TrackedChangeRecord record)
         {
             Type changeDataType = changeDataTypeCache.GetClrChangeDataType(record.ChangeDataClassName);

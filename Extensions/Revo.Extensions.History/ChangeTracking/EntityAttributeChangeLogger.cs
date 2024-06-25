@@ -7,20 +7,11 @@ using Revo.Extensions.History.ChangeTracking.Model;
 
 namespace Revo.Extensions.History.ChangeTracking
 {
-    public class EntityAttributeChangeLogger : IEntityAttributeChangeLogger
+    public class EntityAttributeChangeLogger(IChangeTracker changeTracker,
+            ICrudRepository crudRepository) : IEntityAttributeChangeLogger
     {
-        private readonly IChangeTracker changeTracker;
-        private readonly ICrudRepository crudRepository;
-
         private readonly Dictionary<TrackedEntityKey, EntityAttributeData> entityAttributes =
             new Dictionary<TrackedEntityKey, EntityAttributeData>();
-
-        public EntityAttributeChangeLogger(IChangeTracker changeTracker,
-            ICrudRepository crudRepository)
-        {
-            this.changeTracker = changeTracker;
-            this.crudRepository = crudRepository;
-        }
 
         public EntityAttributeChangeBatch Batch(Guid? aggregateId = null, Guid? aggregateClassId = null,
             Guid? entityId = null, Guid? entityClassId = null, Guid? userId = null)
@@ -67,7 +58,7 @@ namespace Revo.Extensions.History.ChangeTracking
         private async Task<Tuple<T, bool>> FindOldValueAndReplace<T>(Guid? aggregateId, Guid? entityId,
             string attributeName, T newValue)
         {
-            var entityKey = new TrackedEntityKey() {EntityId = entityId, AggregateId = aggregateId};
+            var entityKey = new TrackedEntityKey() { EntityId = entityId, AggregateId = aggregateId };
             EntityAttributeData attributes;
             if (!entityAttributes.TryGetValue(entityKey, out attributes))
             {

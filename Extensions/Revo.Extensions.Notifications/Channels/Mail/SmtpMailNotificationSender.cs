@@ -4,15 +4,8 @@ using System.Threading.Tasks;
 
 namespace Revo.Extensions.Notifications.Channels.Mail
 {
-    public class SmtpMailNotificationSender : IMailNotificationSender
+    public class SmtpMailNotificationSender(SmtpClient smtpClient) : IMailNotificationSender
     {
-        private readonly SmtpClient smtpClient;
-
-        public SmtpMailNotificationSender(SmtpClient smtpClient)
-        {
-            this.smtpClient = smtpClient;
-        }
-
         public async Task SendMessages(IReadOnlyCollection<SerializableMailMessage> messages)
         {
             foreach (var message in messages)

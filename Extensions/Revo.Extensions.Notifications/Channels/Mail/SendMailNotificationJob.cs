@@ -2,13 +2,8 @@
 
 namespace Revo.Extensions.Notifications.Channels.Mail
 {
-    public class SendMailNotificationJob : IJob
+    public class SendMailNotificationJob(SerializableMailMessage message) : IJob
     {
-        public SendMailNotificationJob(SerializableMailMessage message)
-        {
-            Message = message;
-        }
-
-        public SerializableMailMessage Message { get; }
+        public SerializableMailMessage Message { get; } = message;
     }
 }

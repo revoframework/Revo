@@ -6,16 +6,10 @@ using Revo.Core.Types;
 
 namespace Revo.Extensions.Notifications
 {
-    public class NotificationTypeCache : IApplicationConfigurer, INotificationTypeCache
+    public class NotificationTypeCache(ITypeExplorer typeExplorer) : IApplicationConfigurer, INotificationTypeCache
     {
-        private readonly ITypeExplorer typeExplorer;
         private Dictionary<string, Type> namesToTypes;
 
-        public NotificationTypeCache(ITypeExplorer typeExplorer)
-        {
-            this.typeExplorer = typeExplorer;
-        }
-        
         public void Configure()
         {
             EnsureLoaded();
