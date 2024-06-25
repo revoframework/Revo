@@ -13,15 +13,8 @@ using Revo.Rebus.Events;
 
 namespace Revo.Rebus
 {
-    public class RebusModule : NinjectModule
+    public class RebusModule(Func<RebusConfigurer, RebusConfigurer> configureFunc) : NinjectModule
     {
-        private readonly Func<RebusConfigurer, RebusConfigurer> configureFunc;
-
-        public RebusModule(Func<RebusConfigurer, RebusConfigurer> configureFunc)
-        {
-            this.configureFunc = configureFunc;
-        }
-
         public override void Load()
         {
             Bind<IAsyncEventListener<IEvent>>()
