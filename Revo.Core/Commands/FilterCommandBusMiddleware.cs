@@ -4,22 +4,11 @@ using System.Threading.Tasks;
 
 namespace Revo.Core.Commands
 {
-    public class FilterCommandBusMiddleware<T> : ICommandBusMiddleware<T>
+    public class FilterCommandBusMiddleware<T>(Func<IPreCommandFilter<T>[]> preCommandFiltersFunc,
+            Func<IPostCommandFilter<T>[]> postCommandFiltersFunc,
+            Func<IExceptionCommandFilter<T>[]> exceptionCommandFiltersFunc) : ICommandBusMiddleware<T>
         where T : class, ICommandBase
     {
-        private readonly Func<IPreCommandFilter<T>[]> preCommandFiltersFunc;
-        private readonly Func<IPostCommandFilter<T>[]> postCommandFiltersFunc;
-        private readonly Func<IExceptionCommandFilter<T>[]> exceptionCommandFiltersFunc;
-
-        public FilterCommandBusMiddleware(Func<IPreCommandFilter<T>[]> preCommandFiltersFunc,
-            Func<IPostCommandFilter<T>[]> postCommandFiltersFunc,
-            Func<IExceptionCommandFilter<T>[]> exceptionCommandFiltersFunc)
-        {
-            this.preCommandFiltersFunc = preCommandFiltersFunc;
-            this.postCommandFiltersFunc = postCommandFiltersFunc;
-            this.exceptionCommandFiltersFunc = exceptionCommandFiltersFunc;
-        }
-
         public int Order { get; set; } = -1000;
 
         public async Task<object> HandleAsync(T command, CommandExecutionOptions executionOptions,

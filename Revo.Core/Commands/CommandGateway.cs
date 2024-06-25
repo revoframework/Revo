@@ -4,15 +4,8 @@ using System.Threading.Tasks;
 
 namespace Revo.Core.Commands
 {
-    public class CommandGateway : ICommandGateway
+    public class CommandGateway(ICommandRouter commandRouter) : ICommandGateway
     {
-        private readonly ICommandRouter commandRouter;
-
-        public CommandGateway(ICommandRouter commandRouter)
-        {
-            this.commandRouter = commandRouter;
-        }
-
         public Task SendAsync(ICommandBase command, CommandExecutionOptions executionOptions,
             CancellationToken cancellationToken = default(CancellationToken))
         {

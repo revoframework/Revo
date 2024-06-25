@@ -9,22 +9,9 @@ using Revo.Core.Types;
 
 namespace Revo.Core.Commands
 {
-    public class CommandHandlerDiscovery : IApplicationConfigurer
+    public class CommandHandlerDiscovery(ITypeExplorer typeExplorer, StandardKernel kernel,
+            ICommandRouter commandRouter, ILogger logger) : IApplicationConfigurer
     {
-        private readonly ITypeExplorer typeExplorer;
-        private readonly StandardKernel kernel;
-        private readonly ICommandRouter commandRouter;
-        private readonly ILogger logger;
-
-        public CommandHandlerDiscovery(ITypeExplorer typeExplorer, StandardKernel kernel,
-            ICommandRouter commandRouter, ILogger logger)
-        {
-            this.typeExplorer = typeExplorer;
-            this.kernel = kernel;
-            this.commandRouter = commandRouter;
-            this.logger = logger;
-        }
-
         public void Configure()
         {
             DiscoverCommandHandlers();
