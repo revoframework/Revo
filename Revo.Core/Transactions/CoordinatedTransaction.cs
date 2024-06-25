@@ -4,15 +4,9 @@ using System.Threading.Tasks;
 
 namespace Revo.Core.Transactions
 {
-    public class CoordinatedTransaction : ITransactionCoordinator, ITransaction
+    public class CoordinatedTransaction(ITransaction innerTransaction) : ITransactionCoordinator, ITransaction
     {
-        private readonly ITransaction innerTransaction;
         private int transactionCounter = 0;
-
-        public CoordinatedTransaction(ITransaction innerTransaction)
-        {
-            this.innerTransaction = innerTransaction;
-        }
 
         protected List<ITransactionParticipant> Participants { get; set; } = new List<ITransactionParticipant>();
 

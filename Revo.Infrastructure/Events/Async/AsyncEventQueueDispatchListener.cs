@@ -6,18 +6,10 @@ using Revo.Core.Transactions;
 
 namespace Revo.Infrastructure.Events.Async
 {
-    public class AsyncEventQueueDispatchListener : IEventListener<IEvent>, IUnitOfWorkListener
+    public class AsyncEventQueueDispatchListener(IAsyncEventQueueDispatcher asyncEventQueueDispatcher,
+            IAsyncEventProcessor asyncEventProcessor) : IEventListener<IEvent>, IUnitOfWorkListener
     {
-        private readonly IAsyncEventQueueDispatcher asyncEventQueueDispatcher;
-        private readonly IAsyncEventProcessor asyncEventProcessor;
         private readonly List<IEventMessage<IEvent>> eventMessages = new List<IEventMessage<IEvent>>();
-
-        public AsyncEventQueueDispatchListener(IAsyncEventQueueDispatcher asyncEventQueueDispatcher,
-            IAsyncEventProcessor asyncEventProcessor)
-        {
-            this.asyncEventQueueDispatcher = asyncEventQueueDispatcher;
-            this.asyncEventProcessor = asyncEventProcessor;
-        }
 
         public Task HandleAsync(IEventMessage<IEvent> message, CancellationToken cancellationToken)
         {

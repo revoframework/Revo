@@ -7,17 +7,8 @@ using Revo.Core.Types;
 
 namespace Revo.Extensions.AutoMapper
 {
-    public class AutoMapperProfileDiscovery : IAutoMapperProfileDiscovery
+    public class AutoMapperProfileDiscovery(ITypeExplorer typeExplorer, StandardKernel kernel) : IAutoMapperProfileDiscovery
     {
-        private readonly ITypeExplorer typeExplorer;
-        private readonly StandardKernel kernel;
-
-        public AutoMapperProfileDiscovery(ITypeExplorer typeExplorer, StandardKernel kernel)
-        {
-            this.typeExplorer = typeExplorer;
-            this.kernel = kernel;
-        }
-
         public void DiscoverProfiles()
         {
             var modelDefinitionTypes = typeExplorer.GetAllTypes()

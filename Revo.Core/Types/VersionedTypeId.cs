@@ -3,17 +3,12 @@ using Revo.Core.ValueObjects;
 
 namespace Revo.Core.Types
 {
-    public class VersionedTypeId : ValueObject<VersionedTypeId>
+    public class VersionedTypeId(string name, int version) : ValueObject<VersionedTypeId>
     {
-        public VersionedTypeId(string name, int version)
-        {
-            Name = name;
-            Version = version;
-        }
 
-        public string Name { get; }
-        public int Version { get; }
-        
+        public string Name { get; } = name;
+        public int Version { get; } = version;
+
         protected override IEnumerable<(string Name, object Value)> GetValueComponents()
         {
             yield return (nameof(Name), Name);

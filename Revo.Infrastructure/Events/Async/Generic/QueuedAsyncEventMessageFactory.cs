@@ -5,15 +5,8 @@ using Revo.Infrastructure.EventStores.Generic;
 
 namespace Revo.Infrastructure.Events.Async.Generic
 {
-    public class QueuedAsyncEventMessageFactory : IQueuedAsyncEventMessageFactory
+    public class QueuedAsyncEventMessageFactory(IEventSerializer eventSerializer) : IQueuedAsyncEventMessageFactory
     {
-        private readonly IEventSerializer eventSerializer;
-
-        public QueuedAsyncEventMessageFactory(IEventSerializer eventSerializer)
-        {
-            this.eventSerializer = eventSerializer;
-        }
-
         public IEventMessage CreateEventMessage(QueuedAsyncEvent queuedEvent)
         {
             if (queuedEvent.EventStreamRow != null)

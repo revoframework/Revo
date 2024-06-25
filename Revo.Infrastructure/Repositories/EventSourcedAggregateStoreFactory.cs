@@ -5,15 +5,9 @@ using Revo.Domain.Entities.EventSourcing;
 
 namespace Revo.Infrastructure.Repositories
 {
-    public class EventSourcedAggregateStoreFactory : IAggregateStoreFactory
+    public class EventSourcedAggregateStoreFactory(Func<IPublishEventBuffer, EventSourcedAggregateStore> eventSourcedAggregateStoreFunc)
+        : IAggregateStoreFactory
     {
-        private readonly Func<IPublishEventBuffer, EventSourcedAggregateStore> eventSourcedAggregateStoreFunc;
-
-        public EventSourcedAggregateStoreFactory(Func<IPublishEventBuffer, EventSourcedAggregateStore> eventSourcedAggregateStoreFunc)
-        {
-            this.eventSourcedAggregateStoreFunc = eventSourcedAggregateStoreFunc;
-        }
-        
         public bool CanHandleAggregateType(Type aggregateType)
         {
             return typeof(IEventSourcedAggregateRoot).IsAssignableFrom(aggregateType);

@@ -6,19 +6,13 @@ using Revo.Domain.Entities;
 
 namespace Revo.Domain.Events
 {
-    public class AggregateEventRouter : IAggregateEventRouter
+    public class AggregateEventRouter(IAggregateRoot aggregate) : IAggregateEventRouter
     {
-        private readonly IAggregateRoot aggregate;
 
         private readonly MultiValueDictionary<Type, Action<DomainAggregateEvent>> handlers =
             new MultiValueDictionary<Type, Action<DomainAggregateEvent>>();
 
         private readonly List<DomainAggregateEvent> uncommittedEvents = new List<DomainAggregateEvent>();
-
-        public AggregateEventRouter(IAggregateRoot aggregate)
-        {
-            this.aggregate = aggregate;
-        }
 
         public virtual IReadOnlyCollection<DomainAggregateEvent> UncommitedEvents => uncommittedEvents;
 

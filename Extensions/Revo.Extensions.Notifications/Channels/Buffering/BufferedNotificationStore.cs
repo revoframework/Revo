@@ -7,16 +7,10 @@ using Revo.Extensions.Notifications.Model;
 
 namespace Revo.Extensions.Notifications.Channels.Buffering
 {
-    public class BufferedNotificationStore : IBufferedNotificationStore
+    public class BufferedNotificationStore(ICrudRepository crudRepository) : IBufferedNotificationStore
     {
-        private readonly ICrudRepository crudRepository;
         private readonly List<NotificationBuffer> uncommittedNewBuffers = new List<NotificationBuffer>();
 
-        public BufferedNotificationStore(ICrudRepository crudRepository)
-        {
-            this.crudRepository = crudRepository;
-        }
-        
         public async Task CommitAsync()
         {
             await crudRepository.SaveChangesAsync();

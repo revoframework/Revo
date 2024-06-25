@@ -5,16 +5,9 @@ using Revo.Infrastructure.Jobs;
 
 namespace Revo.Hangfire
 {
-    public class HangfireJobEntryPoint<TJob>
+    public class HangfireJobEntryPoint<TJob>(IJobRunner jobRunner)
         where TJob : IJob
     {
-        private readonly IJobRunner jobRunner;
-
-        public HangfireJobEntryPoint(IJobRunner jobRunner)
-        {
-            this.jobRunner = jobRunner;
-        }
-
         public async Task ExecuteAsync(TJob job)
         {
             using (TaskContext.Enter())

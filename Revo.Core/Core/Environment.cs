@@ -2,15 +2,8 @@
 
 namespace Revo.Core.Core
 {
-    public class Environment : IEnvironment
+    public class Environment(IEnvironmentProvider[] environmentProviders) : IEnvironment
     {
-        private readonly IEnvironmentProvider[] environmentProviders;
-
-        public Environment(IEnvironmentProvider[] environmentProviders)
-        {
-            this.environmentProviders = environmentProviders;
-        }
-
         public bool IsDevelopment
         {
             get

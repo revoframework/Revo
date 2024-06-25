@@ -9,15 +9,9 @@ using Revo.Rebus.Events;
 
 namespace Revo.Rebus
 {
-    public class RebusUnitOfWork
+    public class RebusUnitOfWork(Func<ICommandBus> commandBusFunc)
     {
-        private readonly Func<ICommandBus> commandBusFunc;
         private readonly Dictionary<IEvent, IEventMessage<IEvent>> messages = new Dictionary<IEvent, IEventMessage<IEvent>>();
-
-        public RebusUnitOfWork(Func<ICommandBus> commandBusFunc)
-        {
-            this.commandBusFunc = commandBusFunc;
-        }
 
         public IReadOnlyCollection<IEventMessage<IEvent>> Messages => messages.Values;
 
@@ -25,7 +19,7 @@ namespace Revo.Rebus
         {
             if (!messages.ContainsKey(message)) //we need to do this because Rebus will call the handler for every base class of the event as well
             {
-                AddMessageInternal((dynamic) message, headers);
+                AddMessageInternal((dynamic)message, headers);
             }
         }
 

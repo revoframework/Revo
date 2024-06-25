@@ -4,18 +4,9 @@ using System.Linq;
 
 namespace Revo.Core.Events
 {
-    public class FilteringMetadata : IReadOnlyDictionary<string, string>
+    public class FilteringMetadata(IReadOnlyDictionary<string, string> metadata,
+            params string[] removedKeys) : IReadOnlyDictionary<string, string>
     {
-        private readonly IReadOnlyDictionary<string, string> metadata;
-        private readonly string[] removedKeys;
-
-        public FilteringMetadata(IReadOnlyDictionary<string, string> metadata,
-            params string[] removedKeys)
-        {
-            this.metadata = metadata;
-            this.removedKeys = removedKeys;
-        }
-
         public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
         {
             foreach (var pair in metadata)

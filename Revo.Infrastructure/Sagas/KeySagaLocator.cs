@@ -8,17 +8,9 @@ using Revo.Domain.Events;
 
 namespace Revo.Infrastructure.Sagas
 {
-    public class KeySagaLocator : ISagaLocator
+    public class KeySagaLocator(ISagaRegistry sagaRegistry, ISagaMetadataRepository sagaMetadataRepository)
+        : ISagaLocator
     {
-        private readonly ISagaRegistry sagaRegistry;
-        private readonly ISagaMetadataRepository sagaMetadataRepository;
-
-        public KeySagaLocator(ISagaRegistry sagaRegistry, ISagaMetadataRepository sagaMetadataRepository)
-        {
-            this.sagaRegistry = sagaRegistry;
-            this.sagaMetadataRepository = sagaMetadataRepository;
-        }
-
         public async Task<IEnumerable<LocatedSaga>> LocateSagasAsync(IEventMessage<DomainEvent> domainEvent)
         {
             HashSet<LocatedSaga> locatedSagas = new HashSet<LocatedSaga>();
@@ -26,7 +18,7 @@ namespace Revo.Infrastructure.Sagas
             var registrations = sagaRegistry.LookupRegistrations(domainEvent.Event.GetType());
             foreach (SagaEventRegistration registration in registrations)
             {
-                SagaMatch[] sagaMatches = {};
+                SagaMatch[] sagaMatches = { };
                 if (!registration.IsAlwaysStarting)
                 {
                     Guid sagaClassId = EntityClassUtils.GetEntityClassId(registration.SagaType);

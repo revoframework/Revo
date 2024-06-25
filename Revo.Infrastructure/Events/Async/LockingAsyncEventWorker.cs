@@ -7,18 +7,9 @@ namespace Revo.Infrastructure.Events.Async
     /// Limits the amount of optimistic concurrency exceptions if there is a possibility of multiple parallel
     /// workers being spawned (or prevents them, if they are only run from one process).
     /// </summary>
-    public class LockingAsyncEventWorker : IAsyncEventWorker
+    public class LockingAsyncEventWorker(IAsyncEventWorker asyncEventWorkerImplementation,
+            IAsyncEventWorkerLockCache asyncEventWorkerLockCache) : IAsyncEventWorker
     {
-        private readonly IAsyncEventWorker asyncEventWorkerImplementation;
-        private readonly IAsyncEventWorkerLockCache asyncEventWorkerLockCache;
-
-        public LockingAsyncEventWorker(IAsyncEventWorker asyncEventWorkerImplementation,
-            IAsyncEventWorkerLockCache asyncEventWorkerLockCache)
-        {
-            this.asyncEventWorkerImplementation = asyncEventWorkerImplementation;
-            this.asyncEventWorkerLockCache = asyncEventWorkerLockCache;
-        }
-
         public async Task RunQueueBacklogAsync(string queueName)
         {
             asyncEventWorkerLockCache.EnsureInitialized();

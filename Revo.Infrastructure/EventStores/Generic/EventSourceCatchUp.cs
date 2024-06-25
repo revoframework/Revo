@@ -7,21 +7,10 @@ using Revo.Infrastructure.EventStores.Generic.Model;
 
 namespace Revo.Infrastructure.EventStores.Generic
 {
-    public class EventSourceCatchUp : IEventSourceCatchUp
-    {
-        private readonly IReadRepository readRepository;
-        private readonly IAsyncEventQueueDispatcher asyncEventQueueDispatcher;
-        private readonly IEventSerializer eventSerializer;
-
-        public EventSourceCatchUp(IReadRepository readRepository,
+    public class EventSourceCatchUp(IReadRepository readRepository,
             IAsyncEventQueueDispatcher asyncEventQueueDispatcher,
-            IEventSerializer eventSerializer)
-        {
-            this.readRepository = readRepository;
-            this.asyncEventQueueDispatcher = asyncEventQueueDispatcher;
-            this.eventSerializer = eventSerializer;
-        }
-
+            IEventSerializer eventSerializer) : IEventSourceCatchUp
+    {
         public async Task CatchUpAsync()
         {
             var nondispatchedEvents = (await readRepository

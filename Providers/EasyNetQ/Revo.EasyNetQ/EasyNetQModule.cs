@@ -8,15 +8,8 @@ using Revo.EasyNetQ.Configuration;
 namespace Revo.EasyNetQ
 {
     [AutoLoadModule(false)]
-    public class EasyNetQModule : NinjectModule
+    public class EasyNetQModule(EasyNetQConfigurationSection configurationSection) : NinjectModule
     {
-        private readonly EasyNetQConfigurationSection configurationSection;
-
-        public EasyNetQModule(EasyNetQConfigurationSection configurationSection)
-        {
-            this.configurationSection = configurationSection;
-        }
-
         public override void Load()
         {
             Bind<EasyNetQConfigurationSection>()
@@ -29,7 +22,7 @@ namespace Revo.EasyNetQ
                     {
                         configurationSection.RegisterServices?.Invoke(serviceRegister);
                     });
-                
+
                 Bind<IApplicationStartedListener, IApplicationStoppingListener>()
                     .To<BusInitializer>()
                     .InSingletonScope();

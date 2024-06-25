@@ -11,15 +11,9 @@ using Revo.DataAccess.Entities;
 
 namespace Revo.RavenDB.DataAccess
 {
-    public class RavenCrudRepository : IRavenCrudRepository
+    public class RavenCrudRepository(IAsyncDocumentSession asyncDocumentSession) : IRavenCrudRepository
     {
-        private readonly IAsyncDocumentSession asyncDocumentSession;
         private readonly HashSet<object> addedEntities = new HashSet<object>();
-
-        public RavenCrudRepository(IAsyncDocumentSession asyncDocumentSession)
-        {
-            this.asyncDocumentSession = asyncDocumentSession;
-        }
 
         public void Dispose()
         {

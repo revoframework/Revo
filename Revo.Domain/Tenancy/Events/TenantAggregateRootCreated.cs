@@ -3,13 +3,8 @@ using Revo.Domain.Events;
 
 namespace Revo.Domain.Tenancy.Events
 {
-    public class TenantAggregateRootCreated : DomainAggregateEvent
+    public class TenantAggregateRootCreated(Guid? tenantId) : DomainAggregateEvent
     {
-        public TenantAggregateRootCreated(Guid? tenantId)
-        {
-            TenantId = tenantId;
-        }
-
-        public Guid? TenantId { get; private set; }
+        public Guid? TenantId { get; private set; } = tenantId;
     }
 }

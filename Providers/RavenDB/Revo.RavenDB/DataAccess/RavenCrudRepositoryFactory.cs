@@ -3,18 +3,11 @@ using Revo.DataAccess.Entities;
 
 namespace Revo.RavenDB.DataAccess
 {
-    public class RavenCrudRepositoryFactory :
+    public class RavenCrudRepositoryFactory(IAsyncDocumentSession asyncDocumentSession) :
         ICrudRepositoryFactory<IRavenCrudRepository>,
         ICrudRepositoryFactory<ICrudRepository>,
         ICrudRepositoryFactory<IReadRepository>
     {
-        private readonly IAsyncDocumentSession asyncDocumentSession;
-
-        public RavenCrudRepositoryFactory(IAsyncDocumentSession asyncDocumentSession)
-        {
-            this.asyncDocumentSession = asyncDocumentSession;
-        }
-
         public IRavenCrudRepository Create()
         {
             return new RavenCrudRepository(asyncDocumentSession);

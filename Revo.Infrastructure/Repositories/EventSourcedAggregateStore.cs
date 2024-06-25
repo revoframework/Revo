@@ -14,28 +14,12 @@ using Revo.Infrastructure.EventStores;
 
 namespace Revo.Infrastructure.Repositories
 {
-    public class EventSourcedAggregateStore : IAggregateStore
-    {
-        private readonly Dictionary<Guid, IEventSourcedAggregateRoot> aggregates = new Dictionary<Guid, IEventSourcedAggregateRoot>();
-
-        private readonly IEventStore eventStore;
-        private readonly IEntityTypeManager entityTypeManager;
-        private readonly IPublishEventBuffer publishEventBuffer;
-        private readonly IRepositoryFilter[] repositoryFilters;
-        private readonly IEventMessageFactory eventMessageFactory;
-        private readonly IEventSourcedAggregateFactory eventSourcedAggregateFactory;
-
-        public EventSourcedAggregateStore(IEventStore eventStore, IEntityTypeManager entityTypeManager,
+    public class EventSourcedAggregateStore(IEventStore eventStore, IEntityTypeManager entityTypeManager,
             IPublishEventBuffer publishEventBuffer, IRepositoryFilter[] repositoryFilters,
             IEventMessageFactory eventMessageFactory, IEventSourcedAggregateFactory eventSourcedAggregateFactory)
-        {
-            this.eventStore = eventStore;
-            this.entityTypeManager = entityTypeManager;
-            this.publishEventBuffer = publishEventBuffer;
-            this.repositoryFilters = repositoryFilters;
-            this.eventMessageFactory = eventMessageFactory;
-            this.eventSourcedAggregateFactory = eventSourcedAggregateFactory;
-        }
+        : IAggregateStore
+    {
+        private readonly Dictionary<Guid, IEventSourcedAggregateRoot> aggregates = new Dictionary<Guid, IEventSourcedAggregateRoot>();
 
         public IReadOnlyCollection<IRepositoryFilter> DefaultFilters => repositoryFilters;
         public virtual bool NeedsSave => aggregates.Values.Any(x => x.IsChanged);
@@ -70,14 +54,14 @@ namespace Revo.Infrastructure.Repositories
             var aggregate = await DoFindAsync<T>(id, false);
             return aggregate;
         }
-        
+
         public async Task<T[]> FindManyAsync<T>(params Guid[] ids) where T : class, IAggregateRoot
         {
             CheckGenericType<T>();
             var aggregates = await DoFindManyAsync<T>(ids, false);
             return aggregates;
         }
-        
+
         public async Task<T> GetAsync<T>(Guid id) where T : class, IAggregateRoot
         {
             CheckGenericType<T>();
@@ -339,7 +323,7 @@ namespace Revo.Infrastructure.Repositories
                 repositoryFilter.FilterAdded(inserted);
             }
         }
-        
+
         private void FilterModified<T>(T updated) where T : class
         {
             foreach (var repositoryFilter in repositoryFilters)

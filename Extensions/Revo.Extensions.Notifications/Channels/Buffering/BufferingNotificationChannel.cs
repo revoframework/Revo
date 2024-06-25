@@ -5,30 +5,15 @@ using Revo.Core.Core;
 
 namespace Revo.Extensions.Notifications.Channels.Buffering
 {
-    public class BufferingNotificationChannel<T> : INotificationChannel
-        where T : class, INotification
-    {
-        private readonly IBufferGovernor bufferGovernor;
-        private readonly IBufferSelector<T> bufferSelector;
-        private readonly INotificationPipeline notificationPipeline;
-        private readonly INotificationSerializer notificationSerializer;
-        private readonly IBufferedNotificationStore bufferedNotificationStore;
-        
-        public BufferingNotificationChannel(
+    public class BufferingNotificationChannel<T>(
             IBufferGovernor bufferGovernor,
             IBufferSelector<T> bufferSelector,
             INotificationPipeline notificationPipeline,
             INotificationSerializer notificationSerializer,
-            IBufferedNotificationStore bufferedNotificationStore)
-        {
-            this.bufferGovernor = bufferGovernor;
-            this.bufferSelector = bufferSelector;
-            this.notificationPipeline = notificationPipeline;
-            this.notificationSerializer = notificationSerializer;
-            this.bufferedNotificationStore = bufferedNotificationStore;
-        }
-
-        public IEnumerable<Type> NotificationTypes { get; } = new[] {typeof(T)};
+            IBufferedNotificationStore bufferedNotificationStore) : INotificationChannel
+        where T : class, INotification
+    {
+        public IEnumerable<Type> NotificationTypes { get; } = new[] { typeof(T) };
 
         public async Task PushNotificationAsync(INotification notification)
         {
@@ -52,7 +37,7 @@ namespace Revo.Extensions.Notifications.Channels.Buffering
             SerializedNotification serialized = notificationSerializer.ToJson(notification);
 
             var bufferId = await bufferSelector.SelectBufferIdAsync(tNotification);
-            
+
             await bufferedNotificationStore.Add(serialized, bufferId, Clock.Current.UtcNow,
                 bufferGovernor.Name, notificationPipeline.Name);
         }

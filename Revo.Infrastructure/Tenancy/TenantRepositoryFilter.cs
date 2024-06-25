@@ -5,15 +5,8 @@ using Revo.Domain.Tenancy;
 
 namespace Revo.Infrastructure.Tenancy
 {
-    public class TenantRepositoryFilter : IRepositoryFilter
+    public class TenantRepositoryFilter(Lazy<ITenantContext> tenantContext) : IRepositoryFilter
     {
-        private readonly Lazy<ITenantContext> tenantContext;
-
-        public TenantRepositoryFilter(Lazy<ITenantContext> tenantContext)
-        {
-            this.tenantContext = tenantContext;
-        }
-        
         public bool NullTenantCanAccessOtherTenantsData { get; set; } = false;
 
         public IQueryable<T> FilterResults<T>(IQueryable<T> results) where T : class

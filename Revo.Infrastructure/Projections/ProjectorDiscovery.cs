@@ -9,22 +9,9 @@ using Revo.Core.Types;
 
 namespace Revo.Infrastructure.Projections
 {
-    public class ProjectorDiscovery : IApplicationConfigurer
+    public class ProjectorDiscovery(ITypeExplorer typeExplorer, StandardKernel kernel, Type[] genericProjectorInterfaces,
+            ILogger logger) : IApplicationConfigurer
     {
-        private readonly Type[] genericProjectorInterfaces;
-        private readonly ITypeExplorer typeExplorer;
-        private readonly StandardKernel kernel;
-        private readonly ILogger logger;
-
-        public ProjectorDiscovery(ITypeExplorer typeExplorer, StandardKernel kernel, Type[] genericProjectorInterfaces,
-            ILogger logger)
-        {
-            this.typeExplorer = typeExplorer;
-            this.kernel = kernel;
-            this.genericProjectorInterfaces = genericProjectorInterfaces;
-            this.logger = logger;
-        }
-
         public void Configure()
         {
             Discover();
@@ -45,7 +32,7 @@ namespace Revo.Infrastructure.Projections
             RegisterProjectors(projectorTypes);
             logger.LogDebug($"Discovered {projectorTypes.Length} projectors: {string.Join(", ", projectorTypes.Select(x => x.FullName))}");
         }
-        
+
         private Type[] GetProjectorInterfaces(Type requestHandlerType)
         {
             var intfs = GetInterfaces(requestHandlerType);

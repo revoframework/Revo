@@ -3,17 +3,10 @@ using Revo.Infrastructure.Jobs;
 
 namespace Revo.Infrastructure.Events.Async
 {
-    public class ProcessAsyncEventsJob : IJob
+    public class ProcessAsyncEventsJob(string queueName, int attemptsLeft, TimeSpan retryTimeout) : IJob
     {
-        public ProcessAsyncEventsJob(string queueName, int attemptsLeft, TimeSpan retryTimeout)
-        {
-            QueueName = queueName;
-            AttemptsLeft = attemptsLeft;
-            RetryTimeout = retryTimeout;
-        }
-
-        public string QueueName { get; }
-        public int AttemptsLeft { get; }
-        public TimeSpan RetryTimeout { get; }
+        public string QueueName { get; } = queueName;
+        public int AttemptsLeft { get; } = attemptsLeft;
+        public TimeSpan RetryTimeout { get; } = retryTimeout;
     }
 }

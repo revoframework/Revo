@@ -5,15 +5,8 @@ using Revo.Infrastructure.Events.Metadata;
 
 namespace Revo.Infrastructure.Events
 {
-    public class EventMessageFactory : IEventMessageFactory
+    public class EventMessageFactory(IEventMetadataProvider[] metadataProviders) : IEventMessageFactory
     {
-        private readonly IEventMetadataProvider[] metadataProviders;
-
-        public EventMessageFactory(IEventMetadataProvider[] metadataProviders)
-        {
-            this.metadataProviders = metadataProviders;
-        }
-
         public async Task<IEventMessageDraft> CreateMessageAsync(IEvent @event)
         {
             Type messageType = typeof(EventMessageDraft<>).MakeGenericType(@event.GetType());

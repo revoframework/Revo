@@ -12,24 +12,12 @@ using System.Threading.Tasks;
 
 namespace Revo.Infrastructure.Projections
 {
-    public abstract class ProjectionEventListener :
+    public abstract class ProjectionEventListener(Func<IProjectionSubSystem> projectionSubSystemFunc,
+            IUnitOfWorkFactory unitOfWorkFactory, Func<CommandContextStack> commandContextStackFunc,
+            ITenantProvider tenantProvider) :
         IAsyncEventListener<DomainAggregateEvent>
     {
-        private readonly Func<IProjectionSubSystem> projectionSubSystemFunc;
-        private readonly IUnitOfWorkFactory unitOfWorkFactory;
-        private readonly Func<CommandContextStack> commandContextStackFunc;
-        private readonly ITenantProvider tenantProvider;
         private readonly List<IEventMessage<DomainAggregateEvent>> events = new List<IEventMessage<DomainAggregateEvent>>();
-
-        public ProjectionEventListener(Func<IProjectionSubSystem> projectionSubSystemFunc,
-            IUnitOfWorkFactory unitOfWorkFactory, Func<CommandContextStack> commandContextStackFunc,
-            ITenantProvider tenantProvider)
-        {
-            this.projectionSubSystemFunc = projectionSubSystemFunc;
-            this.unitOfWorkFactory = unitOfWorkFactory;
-            this.commandContextStackFunc = commandContextStackFunc;
-            this.tenantProvider = tenantProvider;
-        }
 
         public abstract IAsyncEventSequencer EventSequencer { get; }
 

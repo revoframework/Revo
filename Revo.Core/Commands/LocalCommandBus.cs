@@ -7,17 +7,8 @@ using Revo.Core.Core;
 
 namespace Revo.Core.Commands
 {
-    public class LocalCommandBus : ILocalCommandBus
+    public class LocalCommandBus(IServiceLocator serviceLocator, ICommandBusPipeline pipeline) : ILocalCommandBus
     {
-        private readonly IServiceLocator serviceLocator;
-        private readonly ICommandBusPipeline pipeline;
-
-        public LocalCommandBus(IServiceLocator serviceLocator, ICommandBusPipeline pipeline)
-        {
-            this.serviceLocator = serviceLocator;
-            this.pipeline = pipeline;
-        }
-
         public async Task<TResult> SendAsync<TResult>(ICommand<TResult> command, CommandExecutionOptions executionOptions,
             CancellationToken cancellationToken)
         {
@@ -76,7 +67,7 @@ namespace Revo.Core.Commands
                     .GetRuntimeMethod(nameof(ICommandHandler<ICommand>.HandleAsync),
                         new[] { commandType, typeof(CancellationToken) });
 
-                var resultTask = (Task) handleMethod.Invoke(listener, new object[] {command, cancellationToken});
+                var resultTask = (Task)handleMethod.Invoke(listener, new object[] { command, cancellationToken });
 
                 if (resultTask is Task<TResult> resultObjectTask)
                 {
@@ -91,7 +82,7 @@ namespace Revo.Core.Commands
 
             object result = await pipeline.ProcessAsync(command, executionHandler, this,
                 executionOptions, cancellationToken);
-            return (TResult) result;
+            return (TResult)result;
             // TODO test with contravariant handlers
         }
     }

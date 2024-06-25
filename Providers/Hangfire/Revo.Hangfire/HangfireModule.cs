@@ -5,15 +5,8 @@ using Revo.Infrastructure.Jobs;
 namespace Revo.Hangfire
 {
     [AutoLoadModule(false)]
-    public class HangfireModule : NinjectModule
+    public class HangfireModule(HangfireConfigurationSection configurationSection) : NinjectModule
     {
-        private readonly HangfireConfigurationSection configurationSection;
-
-        public HangfireModule(HangfireConfigurationSection configurationSection)
-        {
-            this.configurationSection = configurationSection;
-        }
-
         public override void Load()
         {
             Bind<HangfireConfigurationSection>()

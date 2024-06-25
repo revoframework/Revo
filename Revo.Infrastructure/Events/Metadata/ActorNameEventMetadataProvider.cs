@@ -4,15 +4,8 @@ using Revo.Core.Events;
 
 namespace Revo.Infrastructure.Events.Metadata
 {
-    public class ActorNameEventMetadataProvider : IEventMetadataProvider
+    public class ActorNameEventMetadataProvider(IActorContext actorContext) : IEventMetadataProvider
     {
-        private readonly IActorContext actorContext;
-
-        public ActorNameEventMetadataProvider(IActorContext actorContext)
-        {
-            this.actorContext = actorContext;
-        }
-
         public Task<(string key, string value)[]> GetMetadataAsync(IEventMessage eventMessage)
         {
             return Task.FromResult(new[]

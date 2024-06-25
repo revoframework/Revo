@@ -12,27 +12,12 @@ using Revo.Infrastructure.Jobs.InMemory;
 
 namespace Revo.Extensions.Notifications.Channels.Buffering
 {
-    public class ProcessBufferedNotificationsJobHandler : IJobHandler<ProcessBufferedNotificationsJob>
-    {
-        private readonly IBufferGovernor[] bufferGovernors;
-        private readonly ICrudRepository crudRepository;
-        private readonly INotificationPipeline[] notificationPipelines;
-        private readonly INotificationSerializer notificationSerializer;
-        private readonly IInMemoryJobScheduler inMemoryJobScheduler;
-
-        public ProcessBufferedNotificationsJobHandler(IBufferGovernor[] bufferGovernors,
+    public class ProcessBufferedNotificationsJobHandler(IBufferGovernor[] bufferGovernors,
             ICrudRepository crudRepository,
             INotificationPipeline[] notificationPipelines,
             INotificationSerializer notificationSerializer,
-            IInMemoryJobScheduler inMemoryJobScheduler)
-        {
-            this.bufferGovernors = bufferGovernors;
-            this.crudRepository = crudRepository;
-            this.notificationPipelines = notificationPipelines;
-            this.notificationSerializer = notificationSerializer;
-            this.inMemoryJobScheduler = inMemoryJobScheduler;
-        }
-
+            IInMemoryJobScheduler inMemoryJobScheduler) : IJobHandler<ProcessBufferedNotificationsJob>
+    {
         public async Task HandleAsync(ProcessBufferedNotificationsJob job, CancellationToken cancellationToken)
         {
             foreach (IBufferGovernor bufferGovernor in bufferGovernors)

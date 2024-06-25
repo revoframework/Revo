@@ -4,16 +4,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Revo.Core.Commands
 {
-    public class CommandRouter : ICommandRouter
+    public class CommandRouter(ILogger logger) : ICommandRouter
     {
-        private readonly ILogger logger;
-
         private readonly Dictionary<Type, Func<ICommandBus>> routes = new Dictionary<Type, Func<ICommandBus>>();
-
-        public CommandRouter(ILogger logger)
-        {
-            this.logger = logger;
-        }
 
         public void AddRoute(Type commandType, Func<ICommandBus> commandBus)
         {

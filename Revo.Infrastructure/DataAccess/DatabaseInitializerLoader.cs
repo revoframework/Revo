@@ -9,25 +9,12 @@ using Revo.Infrastructure.Repositories;
 
 namespace Revo.Infrastructure.DataAccess
 {
-    public class DatabaseInitializerLoader : IDatabaseInitializerLoader, IApplicationStartedListener
-    {
-        private readonly IDatabaseInitializerDiscovery databaseInitializerDiscovery;
-        private readonly IDatabaseInitializerSorter sorter;
-        private readonly Func<IRepository> repositoryFunc; // using func factories for late resolving in the scope of different tasks
-        private readonly Func<IUnitOfWorkFactory> unitOfWorkFactoryFunc;
-        private readonly Func<CommandContextStack> commandContextStackFunc;
-        private bool isInitialized = false;
-
-        public DatabaseInitializerLoader(IDatabaseInitializerDiscovery databaseInitializerDiscovery,
+    public class DatabaseInitializerLoader(IDatabaseInitializerDiscovery databaseInitializerDiscovery,
             IDatabaseInitializerSorter sorter, Func<IRepository> repositoryFunc,
             Func<IUnitOfWorkFactory> unitOfWorkFactoryFunc, Func<CommandContextStack> commandContextStackFunc)
-        {
-            this.databaseInitializerDiscovery = databaseInitializerDiscovery;
-            this.sorter = sorter;
-            this.repositoryFunc = repositoryFunc;
-            this.unitOfWorkFactoryFunc = unitOfWorkFactoryFunc;
-            this.commandContextStackFunc = commandContextStackFunc;
-        }
+        : IDatabaseInitializerLoader, IApplicationStartedListener
+    {
+        private bool isInitialized = false;
 
         public void OnApplicationStarted()
         {

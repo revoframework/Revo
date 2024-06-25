@@ -4,21 +4,10 @@ using System.Threading.Tasks;
 
 namespace Revo.Core.Security
 {
-    public class UserPermissionAuthorizer : IUserPermissionAuthorizer
-    {
-        private readonly IUserContext userContext;
-        private readonly IPermissionAuthorizationMatcher permissionAuthorizationMatcher;
-        private readonly IUserPermissionResolver userPermissionResolver;
-
-        public UserPermissionAuthorizer(IUserContext userContext,
+    public class UserPermissionAuthorizer(IUserContext userContext,
             IPermissionAuthorizationMatcher permissionAuthorizationMatcher,
-            IUserPermissionResolver userPermissionResolver)
-        {
-            this.userContext = userContext;
-            this.permissionAuthorizationMatcher = permissionAuthorizationMatcher;
-            this.userPermissionResolver = userPermissionResolver;
-        }
-
+            IUserPermissionResolver userPermissionResolver) : IUserPermissionAuthorizer
+    {
         public async Task<bool> CheckAuthorizationAsync(IUser user, Guid permissionId, string resourceId = null, string contextId = null)
         {
             var userPermissions = await userPermissionResolver.GetUserPermissionsAsync(user);

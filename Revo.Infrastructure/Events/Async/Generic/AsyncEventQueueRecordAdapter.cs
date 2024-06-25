@@ -3,17 +3,9 @@ using Revo.Core.Events;
 
 namespace Revo.Infrastructure.Events.Async.Generic
 {
-    public class AsyncEventQueueRecordAdapter : IAsyncEventQueueRecord
+    public class AsyncEventQueueRecordAdapter(QueuedAsyncEvent queuedEvent, IQueuedAsyncEventMessageFactory messageFactory) : IAsyncEventQueueRecord
     {
-        private readonly QueuedAsyncEvent queuedEvent;
-        private readonly IQueuedAsyncEventMessageFactory messageFactory;
         private IEventMessage eventMessage;
-
-        public AsyncEventQueueRecordAdapter(QueuedAsyncEvent queuedEvent, IQueuedAsyncEventMessageFactory messageFactory)
-        {
-            this.queuedEvent = queuedEvent;
-            this.messageFactory = messageFactory;
-        }
 
         public Guid Id => queuedEvent.Id;
         public Guid EventId => queuedEvent.EventStreamRowId ?? queuedEvent.ExternalEventRecordId

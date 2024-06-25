@@ -5,18 +5,9 @@ using Revo.Infrastructure.Jobs;
 
 namespace Revo.Extensions.Notifications.Channels.Mail
 {
-    public class MailBufferedNotificationChannel : IBufferedNotificationChannel
+    public class MailBufferedNotificationChannel(IMailNotificationFormatter[] mailNotificationFormatters,
+            IJobScheduler jobScheduler) : IBufferedNotificationChannel
     {
-        private readonly IMailNotificationFormatter[] mailNotificationFormatters;
-        private readonly IJobScheduler jobScheduler;
-
-        public MailBufferedNotificationChannel(IMailNotificationFormatter[] mailNotificationFormatters,
-            IJobScheduler jobScheduler)
-        {
-            this.mailNotificationFormatters = mailNotificationFormatters;
-            this.jobScheduler = jobScheduler;
-        }
-
         public async Task SendNotificationsAsync(IReadOnlyCollection<INotification> notifications)
         {
             foreach (IMailNotificationFormatter formatter in mailNotificationFormatters)

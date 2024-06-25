@@ -2,17 +2,13 @@
 
 namespace Revo.Infrastructure.Sagas
 {
-    public class LocatedSaga
+    public class LocatedSaga(Guid? id, Type sagaType)
     {
-        private LocatedSaga(Guid? id, Type sagaType)
-        {
-            Id = id;
-            SagaType = sagaType;
-        }
 
-        public Guid? Id { get; }
-        public Type SagaType { get; }
-        
+
+        public Guid? Id { get; } = id;
+        public Type SagaType { get; } = sagaType;
+
         public static LocatedSaga FromId(Guid id, Type sagaType)
         {
             return new LocatedSaga(id, sagaType);

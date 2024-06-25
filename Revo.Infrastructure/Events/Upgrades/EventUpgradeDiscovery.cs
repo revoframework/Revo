@@ -8,19 +8,9 @@ using Revo.Core.Types;
 
 namespace Revo.Infrastructure.Events.Upgrades
 {
-    public class EventUpgradeDiscovery : IApplicationConfigurer
+    public class EventUpgradeDiscovery(ITypeExplorer typeExplorer, StandardKernel kernel,
+        ILogger logger) : IApplicationConfigurer
     {
-        private readonly ITypeExplorer typeExplorer;
-        private readonly StandardKernel kernel;
-        private readonly ILogger logger;
-
-        public EventUpgradeDiscovery(ITypeExplorer typeExplorer, StandardKernel kernel, ILogger logger)
-        {
-            this.typeExplorer = typeExplorer;
-            this.kernel = kernel;
-            this.logger = logger;
-        }
-
         public void Configure()
         {
             Discover();

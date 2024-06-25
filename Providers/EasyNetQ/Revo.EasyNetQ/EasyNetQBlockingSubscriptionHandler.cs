@@ -4,15 +4,8 @@ using Revo.Core.Events;
 
 namespace Revo.EasyNetQ
 {
-    public class EasyNetQBlockingSubscriptionHandler : IEasyNetQBlockingSubscriptionHandler
+    public class EasyNetQBlockingSubscriptionHandler(IEventBus eventBus) : IEasyNetQBlockingSubscriptionHandler
     {
-        private readonly IEventBus eventBus;
-
-        public EasyNetQBlockingSubscriptionHandler(IEventBus eventBus)
-        {
-            this.eventBus = eventBus;
-        }
-
         public void HandleMessage(object message)
         {
             if (message is IEventMessage eventMessage)

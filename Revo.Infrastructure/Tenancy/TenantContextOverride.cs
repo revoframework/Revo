@@ -6,19 +6,14 @@ using Revo.Core.Tenancy;
 
 namespace Revo.Infrastructure.Tenancy
 {
-    public sealed class TenantContextOverride : IDisposable
+    public sealed class TenantContextOverride(ITenant tenant) : IDisposable
     {
         private static readonly AsyncLocal<TenantContextOverride[]> CurrentLocal = new AsyncLocal<TenantContextOverride[]>();
         private bool isDisposed;
 
-        private TenantContextOverride(ITenant tenant)
-        {
-            Tenant = tenant;
-        }
-
         public static TenantContextOverride Current => CurrentLocal.Value?.LastOrDefault();
 
-        public ITenant Tenant { get; }
+        public ITenant Tenant { get; } = tenant;
 
         public static TenantContextOverride Push(ITenant tenant)
         {

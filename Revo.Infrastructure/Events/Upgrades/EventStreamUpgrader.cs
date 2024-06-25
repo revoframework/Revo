@@ -5,18 +5,9 @@ using Revo.Domain.Events;
 
 namespace Revo.Infrastructure.Events.Upgrades
 {
-    public class EventStreamUpgrader : IEventStreamUpgrader
+    public class EventStreamUpgrader(Func<IEventUpgrade[]> eventUpgradesFunc,
+            IEventStreamSequenceNumbersUpgrade sequenceNumbersUpgrade) : IEventStreamUpgrader
     {
-        private readonly Func<IEventUpgrade[]> eventUpgradesFunc;
-        private readonly IEventStreamSequenceNumbersUpgrade sequenceNumbersUpgrade;
-
-        public EventStreamUpgrader(Func<IEventUpgrade[]> eventUpgradesFunc,
-            IEventStreamSequenceNumbersUpgrade sequenceNumbersUpgrade)
-        {
-            this.eventUpgradesFunc = eventUpgradesFunc;
-            this.sequenceNumbersUpgrade = sequenceNumbersUpgrade;
-        }
-
         public IEnumerable<IEventMessage<DomainAggregateEvent>> UpgradeStream(
             IEnumerable<IEventMessage<DomainAggregateEvent>> eventStream,
             IReadOnlyDictionary<string, string> eventStreamMetadata)

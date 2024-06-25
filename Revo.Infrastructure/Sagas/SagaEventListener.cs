@@ -6,26 +6,16 @@ using Revo.Core.Events;
 using Revo.Core.Transactions;
 using Revo.Domain.Events;
 using Revo.Infrastructure.Events.Async;
+using static Revo.Infrastructure.Sagas.SagaEventListener;
 
 namespace Revo.Infrastructure.Sagas
 {
-    public class SagaEventListener :
+    public class SagaEventListener(SagaEventSequencer sagaEventSequencer,
+            Func<ISagaEventDispatcher> sagaEventDispatcherFunc, CommandContextStack commandContextStack,
+            IUnitOfWorkFactory unitOfWorkFactory) :
         IAsyncEventListener<DomainEvent>
     {
-        private readonly Func<ISagaEventDispatcher> sagaEventDispatcherFunc;
-        private readonly CommandContextStack commandContextStack;
-        private readonly IUnitOfWorkFactory unitOfWorkFactory;
         private readonly List<IEventMessage<DomainEvent>> bufferedEvents = new List<IEventMessage<DomainEvent>>();
-
-        public SagaEventListener(SagaEventSequencer sagaEventSequencer,
-            Func<ISagaEventDispatcher> sagaEventDispatcherFunc, CommandContextStack commandContextStack,
-            IUnitOfWorkFactory unitOfWorkFactory)
-        {
-            this.sagaEventDispatcherFunc = sagaEventDispatcherFunc;
-            this.commandContextStack = commandContextStack;
-            this.unitOfWorkFactory = unitOfWorkFactory;
-            EventSequencer = sagaEventSequencer;
-        }
 
         public Task HandleAsync(IEventMessage<DomainEvent> message, string sequenceName)
         {

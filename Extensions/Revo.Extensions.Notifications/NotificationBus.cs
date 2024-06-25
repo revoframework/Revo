@@ -4,15 +4,8 @@ using System.Threading.Tasks;
 
 namespace Revo.Extensions.Notifications
 {
-    public class NotificationBus : INotificationBus
+    public class NotificationBus(INotificationChannel[] notificationChannels) : INotificationBus
     {
-        private readonly INotificationChannel[] notificationChannels;
-
-        public NotificationBus(INotificationChannel[] notificationChannels)
-        {
-            this.notificationChannels = notificationChannels;
-        }
-
         public async Task PushNotificationAsync(INotification notification)
         {
             IEnumerable<INotificationChannel> channels = notificationChannels
@@ -26,7 +19,7 @@ namespace Revo.Extensions.Notifications
         public async Task PushNotificationsAsync(IEnumerable<INotification> notifications)
         {
             var notificationsByType = notifications.GroupBy(x => x.GetType());
-            
+
             foreach (var byType in notificationsByType)
             {
                 IEnumerable<INotificationChannel> channels = notificationChannels

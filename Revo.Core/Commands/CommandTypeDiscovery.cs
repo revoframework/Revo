@@ -5,15 +5,8 @@ using Revo.Core.Types;
 
 namespace Revo.Core.Commands
 {
-    public class CommandTypeDiscovery : ICommandTypeDiscovery
+    public class CommandTypeDiscovery(ITypeExplorer typeExplorer) : ICommandTypeDiscovery
     {
-        private readonly ITypeExplorer typeExplorer;
-
-        public CommandTypeDiscovery(ITypeExplorer typeExplorer)
-        {
-            this.typeExplorer = typeExplorer;
-        }
-
         public IEnumerable<Type> DiscoverCommandTypes()
         {
             return typeExplorer

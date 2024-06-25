@@ -5,15 +5,8 @@ using Revo.DataAccess.Entities;
 
 namespace Revo.Infrastructure.Tenancy
 {
-    public class TenancyModule : NinjectModule
+    public class TenancyModule(TenancyConfiguration configuration) : NinjectModule
     {
-        private readonly TenancyConfiguration configuration;
-
-        public TenancyModule(TenancyConfiguration configuration)
-        {
-            this.configuration = configuration;
-        }
-
         public override void Load()
         {
             Bind<ITenantContext>()
@@ -41,7 +34,7 @@ namespace Revo.Infrastructure.Tenancy
                     .To<DefaultTenantProvider>()
                     .InTransientScope();
             }
-            
+
             Bind<ICommandBusMiddleware<ICommandBase>>()
                 .To<TenantContextCommandBusMiddleware>()
                 .InTransientScope();

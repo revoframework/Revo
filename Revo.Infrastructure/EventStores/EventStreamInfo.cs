@@ -2,18 +2,13 @@
 
 namespace Revo.Infrastructure.EventStores
 {
-    public class EventStreamInfo
+    public class EventStreamInfo(Guid id, long eventCount, long version)
     {
-        public EventStreamInfo(Guid id, long eventCount, long version)
-        {
-            Id = id;
-            EventCount = eventCount;
-            Version = version;
-        }
 
-        public Guid Id { get; }
-        public long EventCount { get; }
-        public long Version { get; }
+
+        public Guid Id { get; } = id;
+        public long EventCount { get; } = eventCount;
+        public long Version { get; } = version;
         //public bool IsArchived { get; }
     }
 }

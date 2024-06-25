@@ -6,15 +6,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Revo.Core.Types
 {
-    public class TypeExplorer : ITypeExplorer
+    public class TypeExplorer(ILogger logger) : ITypeExplorer
     {
-        private readonly ILogger logger;
-
-        public TypeExplorer(ILogger logger)
-        {
-            this.logger = logger;
-        }
-
         public virtual IEnumerable<Assembly> GetAllReferencedAssemblies()
         {
             return AppDomain.CurrentDomain.GetAssemblies();
