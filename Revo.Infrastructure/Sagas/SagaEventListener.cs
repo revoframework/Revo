@@ -9,23 +9,12 @@ using Revo.Infrastructure.Events.Async;
 
 namespace Revo.Infrastructure.Sagas
 {
-    public class SagaEventListener :
+    public class SagaEventListener(SagaEventSequencer sagaEventSequencer,
+            Func<ISagaEventDispatcher> sagaEventDispatcherFunc, CommandContextStack commandContextStack,
+            IUnitOfWorkFactory unitOfWorkFactory) :
         IAsyncEventListener<DomainEvent>
     {
-        private readonly Func<ISagaEventDispatcher> sagaEventDispatcherFunc;
-        private readonly CommandContextStack commandContextStack;
-        private readonly IUnitOfWorkFactory unitOfWorkFactory;
         private readonly List<IEventMessage<DomainEvent>> bufferedEvents = new List<IEventMessage<DomainEvent>>();
-
-        public SagaEventListener(SagaEventSequencer sagaEventSequencer,
-            Func<ISagaEventDispatcher> sagaEventDispatcherFunc, CommandContextStack commandContextStack,
-            IUnitOfWorkFactory unitOfWorkFactory)
-        {
-            this.sagaEventDispatcherFunc = sagaEventDispatcherFunc;
-            this.commandContextStack = commandContextStack;
-            this.unitOfWorkFactory = unitOfWorkFactory;
-            EventSequencer = sagaEventSequencer;
-        }
 
         public Task HandleAsync(IEventMessage<DomainEvent> message, string sequenceName)
         {
@@ -60,26 +49,6 @@ namespace Revo.Infrastructure.Sagas
                 {
                     commandContextStack.Pop();
                 }
-            }
-        }
-
-        public class SagaEventSequencer : AsyncEventSequencer<DomainEvent>
-        {
-            protected override IEnumerable<EventSequencing> GetEventSequencing(IEventMessage<DomainEvent> message)
-            {
-                yield return new EventSequencing()
-                {
-                    SequenceName = message.Event is DomainAggregateEvent domainAggregateEvent
-                        ? "SagaEventListener:" + domainAggregateEvent.AggregateId.ToString()
-                        : "SagaEventListener",
-                    EventSequenceNumber = message.Event is DomainAggregateEvent
-                        ? message.Metadata.GetStreamSequenceNumber() : null
-                };
-            }
-
-            protected override bool ShouldAttemptSynchronousDispatch(IEventMessage<DomainEvent> message)
-            {
-                return false;
             }
         }
     }

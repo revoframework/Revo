@@ -2,18 +2,10 @@
 
 namespace Revo.Infrastructure.Sagas
 {
-    public class SagaConfigurationLoader : IApplicationStartedListener
-    {
-        private readonly ISagaConfigurator[] sagaConfigurators;
-        private readonly ISagaRegistry sagaRegistry;
-
-        public SagaConfigurationLoader(ISagaConfigurator[] sagaConfigurators,
+    public class SagaConfigurationLoader(ISagaConfigurator[] sagaConfigurators,
             ISagaRegistry sagaRegistry)
-        {
-            this.sagaConfigurators = sagaConfigurators;
-            this.sagaRegistry = sagaRegistry;
-        }
-
+     : IApplicationStartedListener
+    {
         public void OnApplicationStarted()
         {
             foreach (ISagaConfigurator sagaConfigurator in sagaConfigurators)

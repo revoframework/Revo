@@ -16,24 +16,11 @@ using Revo.Infrastructure.EventSourcing;
 
 namespace Revo.Infrastructure.Repositories
 {
-    public class CrudAggregateStore : IQueryableAggregateStore
-    {
-        private readonly ICrudRepository crudRepository;
-        private readonly IEntityTypeManager entityTypeManager;
-        private readonly IPublishEventBuffer publishEventBuffer;
-        private readonly IEventMessageFactory eventMessageFactory;
-
-        public CrudAggregateStore(ICrudRepository crudRepository,
+    public class CrudAggregateStore(ICrudRepository crudRepository,
             IEntityTypeManager entityTypeManager,
             IPublishEventBuffer publishEventBuffer,
-            IEventMessageFactory eventMessageFactory)
-        {
-            this.crudRepository = crudRepository;
-            this.entityTypeManager = entityTypeManager;
-            this.publishEventBuffer = publishEventBuffer;
-            this.eventMessageFactory = eventMessageFactory;
-        }
-
+            IEventMessageFactory eventMessageFactory) : IQueryableAggregateStore
+    {
         public virtual bool NeedsSave => crudRepository.GetEntities<object>(
             EntityState.Added, EntityState.Deleted, EntityState.Modified).Any()
             || GetAttachedAggregates().Any(x => x.IsChanged || x.IsDeleted);
@@ -42,7 +29,7 @@ namespace Revo.Infrastructure.Repositories
         {
             crudRepository.Add(aggregate);
         }
-        
+
         public bool CanHandleAggregateType(Type aggregateType)
         {
             return aggregateType.GetCustomAttributes(typeof(DatabaseEntityAttribute), true).Any();
@@ -52,7 +39,7 @@ namespace Revo.Infrastructure.Repositories
         {
             return CheckAggregate(await crudRepository.FindAsync<T>(id), false);
         }
-        
+
         public async Task<T> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
         {
             return CheckAggregate(await crudRepository.FirstOrDefaultAsync(predicate), false);
@@ -116,7 +103,7 @@ namespace Revo.Infrastructure.Repositories
         {
             return crudRepository;
         }
-        
+
         public IQueryable<T> Where<T>(Expression<Func<T, bool>> predicate) where T : class, IAggregateRoot, IQueryableEntity
         {
             return crudRepository.Where(predicate);
@@ -157,7 +144,7 @@ namespace Revo.Infrastructure.Repositories
             {
                 if (aggregate.IsDeleted)
                 {
-                    crudRepository.Remove((dynamic) aggregate);
+                    crudRepository.Remove((dynamic)aggregate);
                 }
             }
         }
@@ -175,7 +162,7 @@ namespace Revo.Infrastructure.Repositories
             {
                 if (aggregate.IsChanged)
                 {
-                    var eventMessages = await CreateEventMessagesAsync(aggregate, aggregate.UncommittedEvents, utcNow); 
+                    var eventMessages = await CreateEventMessagesAsync(aggregate, aggregate.UncommittedEvents, utcNow);
                     eventMessages.ForEach(publishEventBuffer.PushEvent);
                 }
             }
@@ -221,7 +208,7 @@ namespace Revo.Infrastructure.Repositories
                 {
                     message.SetMetadata(BasicEventMetadataNames.AggregateClassId, aggregateClassId.Value.ToString());
                 }
-                
+
                 if (aggregate is ITenantOwned tenantOwned)
                 {
                     message.SetMetadata(BasicEventMetadataNames.AggregateTenantId, tenantOwned.TenantId?.ToString());
@@ -234,7 +221,7 @@ namespace Revo.Infrastructure.Repositories
 
                 message.SetMetadata(BasicEventMetadataNames.AggregateVersion, (aggregate.Version + 1).ToString());
                 message.SetMetadata(BasicEventMetadataNames.StoreDate, utcNow.ToString(CultureInfo.InvariantCulture));
-                
+
                 messages.Add(message);
             }
 

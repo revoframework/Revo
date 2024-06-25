@@ -7,17 +7,9 @@ using Revo.Core.Commands;
 
 namespace Revo.Infrastructure.Security.Commands
 {
-    public class EntityQueryAuthorizer : IEntityQueryAuthorizer
+    public class EntityQueryAuthorizer(IEntityQueryFilterFactory entityQueryFilterFactory,
+        ICommandContext commandContext) : IEntityQueryAuthorizer
     {
-        private readonly IEntityQueryFilterFactory entityQueryFilterFactory;
-        private readonly ICommandContext commandContext;
-
-        public EntityQueryAuthorizer(IEntityQueryFilterFactory entityQueryFilterFactory, ICommandContext commandContext)
-        {
-            this.entityQueryFilterFactory = entityQueryFilterFactory;
-            this.commandContext = commandContext;
-        }
-
         public Task<IQueryable<T>> AuthorizeQueryAsync<T, TResult>(IQueryable<T> results, Expression<Func<T, TResult>> authorizedEntity)
         {
             var command = commandContext.CurrentCommand;
@@ -34,7 +26,7 @@ namespace Revo.Infrastructure.Security.Commands
                 var filterExpression = await filter.FilterAsync<TResult>(command);
 
                 if (filterExpression == null)
-                { 
+                {
                     continue;
                 }
 

@@ -10,15 +10,10 @@ using EntityState = Revo.DataAccess.Entities.EntityState;
 
 namespace Revo.Infrastructure.Sagas.Generic
 {
-    public class SagaMetadataRepository : ISagaMetadataRepository
+    public class SagaMetadataRepository(ICrudRepository crudRepository) : ISagaMetadataRepository
     {
-        private readonly ICrudRepository crudRepository;
         private readonly Dictionary<Guid, SagaMetadataRecord> metadataRecords = new Dictionary<Guid, SagaMetadataRecord>();
 
-        public SagaMetadataRepository(ICrudRepository crudRepository)
-        {
-            this.crudRepository = crudRepository;
-        }
 
         public void AddSaga(Guid id, Guid classId)
         {
@@ -36,7 +31,7 @@ namespace Revo.Infrastructure.Sagas.Generic
             return QuerySagaRecords(x => x.ClassId == classId);
         }
 
-        public  Task<SagaMatch[]> FindSagasByKeyAsync(Guid classId, string keyName, string keyValue)
+        public Task<SagaMatch[]> FindSagasByKeyAsync(Guid classId, string keyName, string keyValue)
         {
             return QuerySagaRecords(x => x.ClassId == classId
                                          && x.Keys.Any(y => y.KeyName == keyName && y.KeyValue == keyValue));
@@ -79,7 +74,7 @@ namespace Revo.Infrastructure.Sagas.Generic
                 crudRepository.Remove(key);
             }
         }
-        
+
         public Task SaveChangesAsync()
         {
             return crudRepository.SaveChangesAsync();

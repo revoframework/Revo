@@ -9,20 +9,9 @@ using Revo.Infrastructure.Repositories;
 
 namespace Revo.Infrastructure.Sagas
 {
-    public class SagaEventDispatcher : ISagaEventDispatcher
+    public class SagaEventDispatcher(ISagaLocator[] sagaLocators, ISagaRepository sagaRepository,
+            IEntityFactory entityFactory) : ISagaEventDispatcher
     {
-        private readonly ISagaLocator[] sagaLocators;
-        private readonly ISagaRepository sagaRepository;
-        private readonly IEntityFactory entityFactory;
-
-        public SagaEventDispatcher(ISagaLocator[] sagaLocators, ISagaRepository sagaRepository,
-            IEntityFactory entityFactory)
-        {
-            this.sagaLocators = sagaLocators;
-            this.sagaRepository = sagaRepository;
-            this.entityFactory = entityFactory;
-        }
-
         public async Task DispatchEventsToSagas(IEnumerable<IEventMessage<DomainEvent>> eventMessages)
         {
             foreach (var eventMessage in eventMessages)
@@ -42,14 +31,14 @@ namespace Revo.Infrastructure.Sagas
                     ISaga saga;
                     if (locatedSaga.Id.HasValue)
                     {
-                        var getTask = (Task<ISaga>) GetType().GetMethod(nameof(GetSagaAsync), BindingFlags.Instance | BindingFlags.NonPublic)
-                            .MakeGenericMethod(new[] {locatedSaga.SagaType}).Invoke(this, new object[] { locatedSaga.Id });
+                        var getTask = (Task<ISaga>)GetType().GetMethod(nameof(GetSagaAsync), BindingFlags.Instance | BindingFlags.NonPublic)
+                            .MakeGenericMethod(new[] { locatedSaga.SagaType }).Invoke(this, new object[] { locatedSaga.Id });
                         saga = await getTask;
 
                     }
                     else
                     {
-                        saga = (ISaga) entityFactory.ConstructEntity(locatedSaga.SagaType, Guid.NewGuid());
+                        saga = (ISaga)entityFactory.ConstructEntity(locatedSaga.SagaType, Guid.NewGuid());
                         sagaRepository.Add(saga);
                     }
 

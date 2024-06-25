@@ -4,21 +4,10 @@ using Revo.Core.Security;
 
 namespace Revo.Infrastructure.Security.Commands
 {
-    public class CommandPermissionAuthorizer : CommandAuthorizer<ICommandBase>
-    {
-        private readonly ICommandPermissionCache commandPermissionCache;
-        private readonly IPermissionAuthorizationMatcher permissionAuthorizationMatcher;
-        private readonly IUserContext userContext;
-
-        public CommandPermissionAuthorizer(ICommandPermissionCache commandPermissionCache,
+    public class CommandPermissionAuthorizer(ICommandPermissionCache commandPermissionCache,
             IPermissionAuthorizationMatcher permissionAuthorizationMatcher,
-            IUserContext userContext)
-        {
-            this.commandPermissionCache = commandPermissionCache;
-            this.permissionAuthorizationMatcher = permissionAuthorizationMatcher;
-            this.userContext = userContext;
-        }
-
+            IUserContext userContext) : CommandAuthorizer<ICommandBase>
+    {
         protected override async Task AuthorizeCommand(ICommandBase command)
         {
             bool isAuthRequired = commandPermissionCache.IsAuthenticationRequired(command);

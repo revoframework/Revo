@@ -11,20 +11,9 @@ using Revo.Infrastructure.EventStores;
 
 namespace Revo.Infrastructure.Repositories
 {
-    public class EventSourcedAggregateFactory : IEventSourcedAggregateFactory
+    public class EventSourcedAggregateFactory(IEventStreamUpgrader eventStreamUpgrader,
+        IEntityFactory entityFactory, IEntityTypeManager entityTypeManager) : IEventSourcedAggregateFactory
     {
-        private readonly IEventStreamUpgrader eventStreamUpgrader;
-        private readonly IEntityFactory entityFactory;
-        private readonly IEntityTypeManager entityTypeManager;
-
-        public EventSourcedAggregateFactory(IEventStreamUpgrader eventStreamUpgrader, IEntityFactory entityFactory, IEntityTypeManager entityTypeManager)
-        {
-            this.eventStreamUpgrader = eventStreamUpgrader;
-            this.entityFactory = entityFactory;
-            this.entityTypeManager = entityTypeManager;
-        }
-
-
         public IEventSourcedAggregateRoot ConstructAndLoadEntityFromEvents(Guid aggregateId, IReadOnlyDictionary<string, string> eventStreamMetadata,
             IReadOnlyCollection<IEventStoreRecord> eventRecords)
         {
@@ -58,7 +47,7 @@ namespace Revo.Infrastructure.Repositories
 
             AggregateState state = new AggregateState(version, events);
 
-            IEventSourcedAggregateRoot aggregate = (IEventSourcedAggregateRoot) ConstructEntity(entityType, aggregateId);
+            IEventSourcedAggregateRoot aggregate = (IEventSourcedAggregateRoot)ConstructEntity(entityType, aggregateId);
             aggregate.LoadState(state);
 
             return aggregate;

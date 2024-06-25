@@ -3,15 +3,9 @@ using System.Collections.Immutable;
 
 namespace Revo.Infrastructure.Sagas
 {
-    public class SagaMetadata
+    public class SagaMetadata(ImmutableDictionary<string, ImmutableList<string>> keys, Guid classId)
     {
-        public SagaMetadata(ImmutableDictionary<string, ImmutableList<string>> keys, Guid classId)
-        {
-            Keys = keys;
-            ClassId = classId;
-        }
-        
-        public ImmutableDictionary<string, ImmutableList<string>> Keys { get; }
-        public Guid ClassId { get; }
+        public ImmutableDictionary<string, ImmutableList<string>> Keys { get; } = keys;
+        public Guid ClassId { get; } = classId;
     }
 }
