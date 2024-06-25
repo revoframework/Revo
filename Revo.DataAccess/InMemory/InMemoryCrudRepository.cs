@@ -10,10 +10,6 @@ namespace Revo.DataAccess.InMemory
 {
     public class InMemoryCrudRepository : ICrudRepository
     {
-        public InMemoryCrudRepository()
-        {
-        }
-
         public IEnumerable<IRepositoryFilter> DefaultFilters => Filters;
         
         protected List<EntityEntry> EntityEntries { get; } = new List<EntityEntry>();
