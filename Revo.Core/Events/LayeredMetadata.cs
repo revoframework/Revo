@@ -5,17 +5,8 @@ using System.Linq;
 
 namespace Revo.Core.Events
 {
-    public class LayeredMetadata : IReadOnlyDictionary<string, string>
+    public class LayeredMetadata(IReadOnlyDictionary<string, string> values, IReadOnlyDictionary<string, Func<string>> getters) : IReadOnlyDictionary<string, string>
     {
-        private readonly IReadOnlyDictionary<string, string> values;
-        private readonly IReadOnlyDictionary<string, Func<string>> getters;
-
-        public LayeredMetadata(IReadOnlyDictionary<string, string> values, IReadOnlyDictionary<string, Func<string>> getters)
-        {
-            this.values = values;
-            this.getters = getters;
-        }
-
         public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
         {
             foreach (KeyValuePair<string, Func<string>> getter in getters)

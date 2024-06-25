@@ -6,16 +6,10 @@ using System.Linq;
 
 namespace Revo.Core.Types
 {
-    public class VersionedTypeRegistry : IVersionedTypeRegistry
+    public class VersionedTypeRegistry(ITypeIndexer typeIndexer) : IVersionedTypeRegistry
     {
-        private readonly ITypeIndexer typeIndexer;
         private readonly ConcurrentDictionary<Type, SubtypeRegistry> registries =
             new ConcurrentDictionary<Type, SubtypeRegistry>();
-
-        public VersionedTypeRegistry(ITypeIndexer typeIndexer)
-        {
-            this.typeIndexer = typeIndexer;
-        }
 
         public IEnumerable<VersionedType> GetAllTypes<TBase>()
         {

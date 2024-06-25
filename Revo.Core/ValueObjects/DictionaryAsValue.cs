@@ -6,14 +6,10 @@ using System.Linq;
 
 namespace Revo.Core.ValueObjects
 {
-    public class DictionaryAsValue<TKey, TValue> : ValueObject<DictionaryAsValue<TKey, TValue>>, IReadOnlyDictionary<TKey, TValue>
+    public class DictionaryAsValue<TKey, TValue>(IImmutableDictionary<TKey, TValue> dictionary)
+        : ValueObject<DictionaryAsValue<TKey, TValue>>, IReadOnlyDictionary<TKey, TValue>
     {
-        public DictionaryAsValue(IImmutableDictionary<TKey, TValue> dictionary)
-        {
-            Dictionary = dictionary;
-        }
-
-        public IReadOnlyDictionary<TKey, TValue> Dictionary { get; }
+        public IReadOnlyDictionary<TKey, TValue> Dictionary { get; } = dictionary;
         public int Count => Dictionary.Count;
         public TValue this[TKey key] => Dictionary[key];
         public IEnumerable<TKey> Keys => Dictionary.Keys;

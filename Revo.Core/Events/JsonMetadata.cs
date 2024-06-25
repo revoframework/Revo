@@ -6,15 +6,8 @@ using Newtonsoft.Json.Linq;
 
 namespace Revo.Core.Events
 {
-    public class JsonMetadata : IReadOnlyDictionary<string, string>
+    public class JsonMetadata(JObject jsonMetadata) : IReadOnlyDictionary<string, string>
     {
-        private readonly JObject jsonMetadata;
-
-        public JsonMetadata(JObject jsonMetadata)
-        {
-            this.jsonMetadata = jsonMetadata;
-        }
-
         public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
         {
             foreach (var pair in jsonMetadata)

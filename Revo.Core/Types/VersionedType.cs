@@ -2,16 +2,12 @@
 
 namespace Revo.Core.Types
 {
-    public class VersionedType
+    public class VersionedType(VersionedTypeId id, Type clrType)
     {
-        public VersionedType(VersionedTypeId id, Type clrType)
-        {
-            Id = id;
-            ClrType = clrType;
-        }
 
-        public VersionedTypeId Id { get; }
-        public Type ClrType { get; }
+
+        public VersionedTypeId Id { get; } = id;
+        public Type ClrType { get; } = clrType;
 
         public override string ToString()
         {

@@ -6,14 +6,9 @@ using System.Linq;
 
 namespace Revo.Core.ValueObjects
 {
-    public class SetAsValue<T> : ValueObject<SetAsValue<T>>, IEnumerable<T>
+    public class SetAsValue<T>(IImmutableSet<T> set) : ValueObject<SetAsValue<T>>, IEnumerable<T>
     {
-        public SetAsValue(IImmutableSet<T> set)
-        {
-            Set = set;
-        }
-
-        public IReadOnlyCollection<T> Set { get; }
+        public IReadOnlyCollection<T> Set { get; } = set;
 
         public IEnumerator<T> GetEnumerator() => Set.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Set).GetEnumerator();

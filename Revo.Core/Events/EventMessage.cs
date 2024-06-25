@@ -14,18 +14,12 @@ namespace Revo.Core.Events
         }
     }
 
-    public class EventMessage<TEvent> : IEventMessage<TEvent>
+    public class EventMessage<TEvent>(TEvent @event, IReadOnlyDictionary<string, string> metadata) : IEventMessage<TEvent>
         where TEvent : IEvent
     {
-        public EventMessage(TEvent @event, IReadOnlyDictionary<string, string> metadata)
-        {
-            Event = @event;
-            Metadata = metadata;
-        }
-
         IEvent IEventMessage.Event => Event;
 
-        public TEvent Event { get; }
-        public IReadOnlyDictionary<string, string> Metadata { get; }
+        public TEvent Event { get; } = @event;
+        public IReadOnlyDictionary<string, string> Metadata { get; } = metadata;
     }
 }

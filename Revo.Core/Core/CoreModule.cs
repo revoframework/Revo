@@ -13,15 +13,8 @@ using Revo.Core.Types;
 namespace Revo.Core.Core
 {
     [AutoLoadModule(false)]
-    public class CoreModule : NinjectModule
+    public class CoreModule(CoreConfigurationSection coreConfigurationSection) : NinjectModule
     {
-        private readonly CoreConfigurationSection coreConfigurationSection;
-
-        public CoreModule(CoreConfigurationSection coreConfigurationSection)
-        {
-            this.coreConfigurationSection = coreConfigurationSection;
-        }
-
         public override void Load()
         {
             Kernel.Components.Add<IBindingResolver, ContravariantBindingResolver>();
@@ -79,7 +72,7 @@ namespace Revo.Core.Core
             Bind<IPermissionAuthorizationMatcher>()
                 .To<PermissionAuthorizationMatcher>()
                 .InTaskScope();
-            
+
             Bind<IUserPermissionAuthorizer>()
                 .To<UserPermissionAuthorizer>()
                 .InTaskScope();

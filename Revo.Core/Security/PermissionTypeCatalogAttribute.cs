@@ -2,13 +2,8 @@
 
 namespace Revo.Core.Security
 {
-    public class PermissionTypeCatalogAttribute : Attribute
+    public class PermissionTypeCatalogAttribute(string catalogName) : Attribute
     {
-        public PermissionTypeCatalogAttribute(string catalogName)
-        {
-            CatalogName = catalogName;
-        }
-
-        public string CatalogName { get; }
+        public string CatalogName { get; } = catalogName;
     }
 }
