@@ -1,12 +1,7 @@
 ﻿namespace Revo.EasyNetQ.Configuration
 {
-    public class EasyNetQConnectionConfiguration
+    public class EasyNetQConnectionConfiguration(string connectionString)
     {
-        public EasyNetQConnectionConfiguration(string connectionString)
-        {
-            ConnectionString = connectionString;
-        }
-
-        public string ConnectionString { get; }
+        public string ConnectionString { get; } = connectionString;
     }
 }
