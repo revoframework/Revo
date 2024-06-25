@@ -6,8 +6,15 @@ using Revo.Infrastructure.Projections;
 
 namespace Revo.EFCore.Projections
 {
-    public class EFCoreProjectorResolver(IKernel kernel) : IEFCoreProjectorResolver
+    public class EFCoreProjectorResolver : IEFCoreProjectorResolver
     {
+        private readonly IKernel kernel;
+
+        public EFCoreProjectorResolver(IKernel kernel)
+        {
+            this.kernel = kernel;
+        }
+
         public bool HasAnyProjectors(Type aggregateType)
         {
             var bindings = kernel.GetBindings(

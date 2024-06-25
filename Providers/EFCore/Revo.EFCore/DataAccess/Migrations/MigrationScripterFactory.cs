@@ -6,7 +6,7 @@ using Revo.Infrastructure.DataAccess.Migrations.Providers;
 
 namespace Revo.EFCore.DataAccess.Migrations
 {
-    public class MigrationScripterFactory(IDatabaseMigrationsConfiguration migrationsConfiguration) : IMigrationScripterFactory
+    public class MigrationScripterFactory : IMigrationScripterFactory
     {
         private static readonly Dictionary<string[], IDatabaseMigrationScripter> ProviderScripters = new Dictionary<string[], IDatabaseMigrationScripter>()
         {
@@ -16,6 +16,13 @@ namespace Revo.EFCore.DataAccess.Migrations
             { new []{ "firebird" }, new GenericSqlDatabaseMigrationScripter("firebird") },
             { new []{ "oracle" }, new GenericSqlDatabaseMigrationScripter("oracle") }
         };
+
+        private readonly IDatabaseMigrationsConfiguration migrationsConfiguration;
+
+        public MigrationScripterFactory(IDatabaseMigrationsConfiguration migrationsConfiguration)
+        {
+            this.migrationsConfiguration = migrationsConfiguration;
+        }
 
         public IDatabaseMigrationScripter GetProviderScripter(IEFCoreDatabaseAccess databaseAccess)
         {

@@ -10,13 +10,20 @@ using EntityState = Revo.DataAccess.Entities.EntityState;
 
 namespace Revo.EFCore.DataAccess.Entities
 {
-    public class EFCoreCrudRepository(IRepositoryFilter[] repositoryFilters,
-            IEFCoreDatabaseAccess databaseAccess) :
+    public class EFCoreCrudRepository :
         IEFCoreCrudRepository,
         IFilteringRepository<IEFCoreCrudRepository>
     {
+        private readonly IRepositoryFilter[] repositoryFilters;
 
-        public IEFCoreDatabaseAccess DatabaseAccess { get; } = databaseAccess;
+        public EFCoreCrudRepository(IRepositoryFilter[] repositoryFilters,
+            IEFCoreDatabaseAccess databaseAccess)
+        {
+            this.repositoryFilters = repositoryFilters;
+            DatabaseAccess = databaseAccess;
+        }
+
+        public IEFCoreDatabaseAccess DatabaseAccess { get; }
 
         public IEnumerable<IRepositoryFilter> DefaultFilters => repositoryFilters;
 

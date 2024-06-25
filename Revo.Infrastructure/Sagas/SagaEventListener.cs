@@ -6,6 +6,7 @@ using Revo.Core.Events;
 using Revo.Core.Transactions;
 using Revo.Domain.Events;
 using Revo.Infrastructure.Events.Async;
+using static Revo.Infrastructure.Sagas.SagaEventListener;
 
 namespace Revo.Infrastructure.Sagas
 {
@@ -49,6 +50,26 @@ namespace Revo.Infrastructure.Sagas
                 {
                     commandContextStack.Pop();
                 }
+            }
+        }
+
+        public class SagaEventSequencer : AsyncEventSequencer<DomainEvent>
+        {
+            protected override IEnumerable<EventSequencing> GetEventSequencing(IEventMessage<DomainEvent> message)
+            {
+                yield return new EventSequencing()
+                {
+                    SequenceName = message.Event is DomainAggregateEvent domainAggregateEvent
+                        ? "SagaEventListener:" + domainAggregateEvent.AggregateId.ToString()
+                        : "SagaEventListener",
+                    EventSequenceNumber = message.Event is DomainAggregateEvent
+                        ? message.Metadata.GetStreamSequenceNumber() : null
+                };
+            }
+
+            protected override bool ShouldAttemptSynchronousDispatch(IEventMessage<DomainEvent> message)
+            {
+                return false;
             }
         }
     }

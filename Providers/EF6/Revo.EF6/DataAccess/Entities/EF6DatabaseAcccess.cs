@@ -9,12 +9,22 @@ using Revo.EF6.DataAccess.Model;
 
 namespace Revo.EF6.DataAccess.Entities
 {
-    public class EF6DatabaseAccess(IDbContextFactory dbContextFactory,
-            IRequestDbContextCache requestDbContextCache,
-            IModelMetadataExplorer modelMetadataExplorer) : IEF6DatabaseAccess
+    public class EF6DatabaseAccess : IEF6DatabaseAccess
     {
         private readonly Dictionary<string, DbContext> dbContexts = new Dictionary<string, DbContext>();
-     
+        private readonly IDbContextFactory dbContextFactory;
+        private readonly IRequestDbContextCache requestDbContextCache;
+        private readonly IModelMetadataExplorer modelMetadataExplorer;
+
+        public EF6DatabaseAccess(IDbContextFactory dbContextFactory,
+            IRequestDbContextCache requestDbContextCache,
+            IModelMetadataExplorer modelMetadataExplorer)
+        {
+            this.dbContextFactory = dbContextFactory;
+            this.requestDbContextCache = requestDbContextCache;
+            this.modelMetadataExplorer = modelMetadataExplorer;
+        }
+
         public IReadOnlyDictionary<string, DbContext> DbContexts => dbContexts;
 
         public void ExecuteProcedure(string procedureCommand, string schemaSpace, params object[] sqlParams)

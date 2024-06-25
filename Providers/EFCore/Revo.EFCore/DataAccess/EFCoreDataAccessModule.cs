@@ -12,8 +12,15 @@ using Revo.EFCore.DataAccess.Query;
 
 namespace Revo.EFCore.DataAccess
 {
-    public class EFCoreDataAccessModule(EFCoreDataAccessConfigurationSection configurationSection) : NinjectModule
+    public class EFCoreDataAccessModule : NinjectModule
     {
+        private readonly EFCoreDataAccessConfigurationSection configurationSection;
+
+        public EFCoreDataAccessModule(EFCoreDataAccessConfigurationSection configurationSection)
+        {
+            this.configurationSection = configurationSection;
+        }
+        
         public override void Load()
         {
             List<Type> repositoryTypes = new List<Type>()
@@ -57,9 +64,9 @@ namespace Revo.EFCore.DataAccess
             Bind<IDbContextFactory>()
                 .To<DbContextFactory>()
                 .InSingletonScope();
-
+            
             Bind<EFCoreDataAccessConfigurationSection>().ToConstant(configurationSection);
-
+            
             if (configurationSection.EnableCustomQueryProvider)
             {
                 Bind<IEFCoreConfigurer>().To<CustomQueryProviderConfigurer>();

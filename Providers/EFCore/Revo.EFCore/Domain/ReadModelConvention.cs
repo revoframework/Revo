@@ -9,8 +9,15 @@ using Revo.EFCore.DataAccess.Conventions;
 
 namespace Revo.EFCore.Domain
 {
-    public class ReadModelConvention(EFCoreDataAccessConfigurationSection configurationSection) : EFCoreConventionBase
+    public class ReadModelConvention : EFCoreConventionBase
     {
+        private readonly EFCoreDataAccessConfigurationSection configurationSection;
+
+        public ReadModelConvention(EFCoreDataAccessConfigurationSection configurationSection)
+        {
+            this.configurationSection = configurationSection;
+        }
+
         public override void Initialize(ModelBuilder modelBuilder)
         {
         }

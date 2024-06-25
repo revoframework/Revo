@@ -3,8 +3,15 @@ using Revo.Core.Transactions;
 
 namespace Revo.EF6.DataAccess.Entities
 {
-    public class RepositoryTransaction(EF6CrudRepository repository) : ITransaction
+    public class RepositoryTransaction : ITransaction
     {
+        private readonly EF6CrudRepository repository;
+
+        public RepositoryTransaction(EF6CrudRepository repository)
+        {
+            this.repository = repository;
+        }
+
         public void Commit()
         {
             repository.SaveChanges();

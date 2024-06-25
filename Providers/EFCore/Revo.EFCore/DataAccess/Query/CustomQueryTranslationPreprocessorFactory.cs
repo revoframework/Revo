@@ -4,19 +4,27 @@ using Revo.Core.Core;
 
 namespace Revo.EFCore.DataAccess.Query
 {
-    public class CustomQueryTranslationPreprocessorFactory(QueryTranslationPreprocessorDependencies dependencies,
-            RelationalQueryTranslationPreprocessorDependencies relationalDependencies,
-            IServiceLocator serviceLocator) : IQueryTranslationPreprocessorFactory
+    public class CustomQueryTranslationPreprocessorFactory : IQueryTranslationPreprocessorFactory
     {
-        protected QueryTranslationPreprocessorDependencies Dependencies { get; } = dependencies;
+        private readonly IServiceLocator serviceLocator;
 
-        protected RelationalQueryTranslationPreprocessorDependencies RelationalDependencies = relationalDependencies;
+        public CustomQueryTranslationPreprocessorFactory(QueryTranslationPreprocessorDependencies dependencies,
+            RelationalQueryTranslationPreprocessorDependencies relationalDependencies, IServiceLocator serviceLocator)
+        {
+            Dependencies = dependencies;
+            RelationalDependencies = relationalDependencies;
+            this.serviceLocator = serviceLocator;
+        }
+
+        protected QueryTranslationPreprocessorDependencies Dependencies { get; }
+
+        protected RelationalQueryTranslationPreprocessorDependencies RelationalDependencies;
 
         public QueryTranslationPreprocessor Create(QueryCompilationContext queryCompilationContext)
         {
             var translationPlugins = serviceLocator.GetAll<IQueryTranslationPlugin>();
             return new CustomQueryTranslationPreprocessor(Dependencies, RelationalDependencies,
-                queryCompilationContext, translationPlugins.ToArray());
+                queryCompilationContext,  translationPlugins.ToArray());
         }
     }
 }

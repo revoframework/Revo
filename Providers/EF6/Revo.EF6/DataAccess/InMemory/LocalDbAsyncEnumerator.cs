@@ -5,8 +5,14 @@ using System.Threading.Tasks;
 
 namespace Revo.EF6.DataAccess.InMemory
 {
-    public class LocalDbAsyncEnumerator<T>(IEnumerator<T> inner) : IDbAsyncEnumerator<T>
+    public class LocalDbAsyncEnumerator<T> : IDbAsyncEnumerator<T>
     {
+        private readonly IEnumerator<T> inner;
+
+        public LocalDbAsyncEnumerator(IEnumerator<T> inner)
+        {
+            this.inner = inner;
+        }
 
         public void Dispose()
         {

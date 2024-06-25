@@ -10,8 +10,15 @@ using Revo.EFCore.DataAccess.Configuration;
 
 namespace Revo.EFCore.DataAccess.Query
 {
-    public class CustomQueryProviderConfigurer(IServiceLocator serviceLocator) : IEFCoreConfigurer
+    public class CustomQueryProviderConfigurer : IEFCoreConfigurer
     {
+        private readonly IServiceLocator serviceLocator;
+
+        public CustomQueryProviderConfigurer(IServiceLocator serviceLocator)
+        {
+            this.serviceLocator = serviceLocator;
+        }
+        
         public void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var builder = (IDbContextOptionsBuilderInfrastructure)optionsBuilder;

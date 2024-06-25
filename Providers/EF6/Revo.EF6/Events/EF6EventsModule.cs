@@ -13,9 +13,15 @@ using Revo.Infrastructure.Events.Async.Generic;
 namespace Revo.EF6.Events
 {
     [AutoLoadModule(false)]
-    public class EF6AsyncEventsModule(Func<JsonSerializerSettings, JsonSerializerSettings> customizeEventJsonSerializer)
-        : NinjectModule
+    public class EF6AsyncEventsModule : NinjectModule
     {
+        private readonly Func<JsonSerializerSettings, JsonSerializerSettings> customizeEventJsonSerializer;
+
+        public EF6AsyncEventsModule(Func<JsonSerializerSettings, JsonSerializerSettings> customizeEventJsonSerializer)
+        {
+            this.customizeEventJsonSerializer = customizeEventJsonSerializer;
+        }
+
         public override void Load()
         {
             Bind<IAsyncEventQueueManager>()

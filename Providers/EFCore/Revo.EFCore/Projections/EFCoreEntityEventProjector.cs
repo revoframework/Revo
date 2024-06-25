@@ -9,9 +9,14 @@ namespace Revo.EFCore.Projections
     /// A convention-based abstract base class that calls an Apply for every event type
     /// and also supports sub-projectors.
     /// </summary>
-    public abstract class EFCoreEntityEventProjector(IEFCoreCrudRepository repository) : EntityEventProjector
+    public abstract class EFCoreEntityEventProjector : EntityEventProjector
     {
-        protected IEFCoreCrudRepository Repository { get; } = repository;
+        public EFCoreEntityEventProjector(IEFCoreCrudRepository repository)
+        {
+            Repository = repository;
+        }
+
+        protected IEFCoreCrudRepository Repository { get; }
     }
 
     /// <summary>

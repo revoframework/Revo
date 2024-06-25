@@ -6,8 +6,15 @@ using System.Threading.Tasks;
 
 namespace Revo.EF6.DataAccess.InMemory
 {
-    public class LocalDbAsyncQueryProvider<TEntity>(IQueryProvider inner) : IDbAsyncQueryProvider
+    public class LocalDbAsyncQueryProvider<TEntity> : IDbAsyncQueryProvider
     {
+        private readonly IQueryProvider inner;
+
+        internal LocalDbAsyncQueryProvider(IQueryProvider inner)
+        {
+            this.inner = inner;
+        }
+
         public IQueryable CreateQuery(Expression expression)
         {
             return new LocalDbAsyncEnumerable<TEntity>(expression);

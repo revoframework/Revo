@@ -5,8 +5,15 @@ using Revo.Core.Core;
 
 namespace Revo.EFCore.DataAccess.Query
 {
-    public class CustomQueryDbContextOptionsExtension(IServiceLocator serviceLocator) : IDbContextOptionsExtension
+    public class CustomQueryDbContextOptionsExtension : IDbContextOptionsExtension
     {
+        private readonly IServiceLocator serviceLocator;
+
+        public CustomQueryDbContextOptionsExtension(IServiceLocator serviceLocator)
+        {
+            this.serviceLocator = serviceLocator;
+        }
+
         public void ApplyServices(IServiceCollection services)
         {
             services.AddSingleton(serviceLocator);

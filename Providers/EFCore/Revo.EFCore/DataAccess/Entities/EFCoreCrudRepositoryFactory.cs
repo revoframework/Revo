@@ -3,14 +3,25 @@ using Revo.DataAccess.Entities;
 
 namespace Revo.EFCore.DataAccess.Entities
 {
-    public class EFCoreCrudRepositoryFactory(Func<IDbContextFactory> dbContextFactoryFunc,
-            Func<IRepositoryFilter[]> repositoryFiltersFunc,
-            Func<IRequestDbContextCache> requestDbContextCacheFunc) :
+    public class EFCoreCrudRepositoryFactory :
         ICrudRepositoryFactory<IReadRepository>,
         ICrudRepositoryFactory<ICrudRepository>,
         ICrudRepositoryFactory<IEFCoreReadRepository>,
         ICrudRepositoryFactory<IEFCoreCrudRepository>
     {
+        private readonly Func<IDbContextFactory> dbContextFactoryFunc;
+        private readonly Func<IRepositoryFilter[]> repositoryFiltersFunc;
+        private readonly Func<IRequestDbContextCache> requestDbContextCacheFunc;
+
+        public EFCoreCrudRepositoryFactory(Func<IDbContextFactory> dbContextFactoryFunc,
+            Func<IRepositoryFilter[]> repositoryFiltersFunc,
+            Func<IRequestDbContextCache> requestDbContextCacheFunc)
+        {
+            this.dbContextFactoryFunc = dbContextFactoryFunc;
+            this.repositoryFiltersFunc = repositoryFiltersFunc;
+            this.requestDbContextCacheFunc = requestDbContextCacheFunc;
+        }
+
         public IEFCoreCrudRepository Create()
         {
             var databaseAccess = new EFCoreDatabaseAccess(dbContextFactoryFunc(), requestDbContextCacheFunc());

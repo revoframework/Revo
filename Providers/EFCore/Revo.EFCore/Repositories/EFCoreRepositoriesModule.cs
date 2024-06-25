@@ -6,8 +6,15 @@ using Revo.Infrastructure.Repositories;
 namespace Revo.EFCore.Repositories
 {
     [AutoLoadModule(false)]
-    public class EFCoreRepositoriesModule(EFCoreInfrastructureConfigurationSection configurationSection) : NinjectModule
+    public class EFCoreRepositoriesModule : NinjectModule
     {
+        private readonly EFCoreInfrastructureConfigurationSection configurationSection;
+
+        public EFCoreRepositoriesModule(EFCoreInfrastructureConfigurationSection configurationSection)
+        {
+            this.configurationSection = configurationSection;
+        }
+
         public override void Load()
         {
             if (configurationSection.UseCrudAggregateStore)
