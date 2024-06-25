@@ -2,15 +2,9 @@
 
 namespace Revo.Domain.Entities.Attributes
 {
-    public class DomainClassIdAttribute : Attribute
+    public class DomainClassIdAttribute(string classIdGuid, string code = null) : Attribute
     {
-        public DomainClassIdAttribute(string classIdGuid, string code = null)
-        {
-            ClassId = Guid.Parse(classIdGuid);
-            Code = code;
-        }
-
-        public Guid ClassId { get; private set; }
-        public string Code { get; private set; }
+        public Guid ClassId { get; private set; } = Guid.Parse(classIdGuid);
+        public string Code { get; private set; } = code;
     }
 }

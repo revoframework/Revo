@@ -2,13 +2,8 @@
 
 namespace Revo.Domain.ReadModel
 {
-    public class ReadModelForEntityAttribute : Attribute
+    public class ReadModelForEntityAttribute(Type entityType) : Attribute
     {
-        public ReadModelForEntityAttribute(Type entityType)
-        {
-            EntityType = entityType;
-        }
-
-        public Type EntityType { get; }
+        public Type EntityType { get; } = entityType;
     }
 }
