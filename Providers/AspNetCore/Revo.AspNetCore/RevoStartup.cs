@@ -23,17 +23,22 @@ using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 
 namespace Revo.AspNetCore
 {
-    public abstract class RevoStartup(IConfiguration configuration, ILoggerFactory loggerFactory)
+    public abstract class RevoStartup
     {
         private static readonly AsyncLocal<Scope> scopeProvider = new();
         public static object RequestScope(IContext context) => scopeProvider.Value;
-
+        
         private KernelBootstrapper kernelBootstrapper;
         private ITypeExplorer typeExplorer;
 
+        public RevoStartup(IConfiguration configuration, ILoggerFactory loggerFactory)
+        {
+            Configuration = configuration;
+            LoggerFactory = loggerFactory;
+        }
 
-        public IConfiguration Configuration { get; } = configuration;
-        public ILoggerFactory LoggerFactory { get; } = loggerFactory;
+        public IConfiguration Configuration { get; }
+        public ILoggerFactory LoggerFactory { get; }
         public IKernel Kernel { get; private set; }
 
         public virtual void ConfigureServices(IServiceCollection services)
@@ -43,7 +48,7 @@ namespace Revo.AspNetCore
 
             /** NOTE: these assemblies containing these modules are usually not directly referenced
              * and thus would other not get loaded into the app domain */
-            Type[] ninjectExtModules = new[] { typeof(FuncModule), typeof(ContextPreservationModule) };
+            Type[] ninjectExtModules = new[] {typeof(FuncModule), typeof(ContextPreservationModule)};
             foreach (Type ninjectExtModule in ninjectExtModules)
             {
                 if (!revoConfiguration
@@ -64,28 +69,28 @@ namespace Revo.AspNetCore
             services.AddCustomControllerActivation();
             services.AddCustomHubActivation();
             services.AddCustomViewComponentActivation();
-
+            
             kernelBootstrapper = new KernelBootstrapper(Kernel, revoConfiguration,
                 LoggerFactory.CreateLogger<KernelBootstrapper>());
-
+            
             this.typeExplorer = new TypeExplorer(LoggerFactory.CreateLogger<TypeExplorer>());
 
             kernelBootstrapper.Configure();
-
+            
             var assemblies = typeExplorer
                 .GetAllReferencedAssemblies()
                 .Where(a => !a.GetName().Name.StartsWith("System."))
                 .Where(a => !a.IsDynamic).ToList();
 
             kernelBootstrapper.LoadAssemblies(assemblies);
-
+            
             var aspNetCoreConfigurers = Kernel.GetAll<IAspNetCoreStartupConfigurer>();
             foreach (var aspNetCoreConfigurer in aspNetCoreConfigurers)
             {
                 aspNetCoreConfigurer.ConfigureServices(services);
             }
         }
-
+        
         public virtual void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             RegisterAspNetCoreService(app);
@@ -96,7 +101,7 @@ namespace Revo.AspNetCore
             {
                 aspNetCoreConfigurer.Configure(app, env);
             }
-
+            
             kernelBootstrapper.RunAppStartListeners();
         }
 
@@ -151,7 +156,7 @@ namespace Revo.AspNetCore
 
             Kernel.Bind<IConfiguration>().ToConstant(Configuration);
         }
-
+        
         private sealed class Scope : DisposableObject { }
     }
 }

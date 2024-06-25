@@ -3,8 +3,15 @@ using Revo.Core.Security;
 
 namespace Revo.AspNetCore.Core
 {
-    public class UserActorContext(IUserContext userContext) : IActorContext
+    public class UserActorContext : IActorContext
     {
+        private readonly IUserContext userContext;
+
+        public UserActorContext(IUserContext userContext)
+        {
+            this.userContext = userContext;
+        }
+
         public string CurrentActorName
         {
             get
