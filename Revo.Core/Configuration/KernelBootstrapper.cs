@@ -10,19 +10,9 @@ using Revo.Core.Lifecycle;
 
 namespace Revo.Core.Configuration
 {
-    public class KernelBootstrapper
+    public class KernelBootstrapper(IKernel kernel, IRevoConfiguration configuration, ILogger logger)
     {
-        private readonly IKernel kernel;
-        private readonly IRevoConfiguration configuration;
         private readonly HashSet<Assembly> loadedAssemblies = new HashSet<Assembly>();
-        private readonly ILogger logger;
-
-        public KernelBootstrapper(IKernel kernel, IRevoConfiguration configuration, ILogger logger)
-        {
-            this.kernel = kernel;
-            this.configuration = configuration;
-            this.logger = logger;
-        }
 
         public void Configure()
         {
@@ -43,7 +33,7 @@ namespace Revo.Core.Configuration
                 {
                     continue;
                 }
-                
+
                 var modules = GetNinjectModules(assembly).Where(x => !kernel.HasModule(x.Name)).ToArray();
                 if (modules.Length > 0)
                 {
