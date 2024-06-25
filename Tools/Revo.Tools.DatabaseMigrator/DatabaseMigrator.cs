@@ -19,7 +19,7 @@ using Revo.Core.Events;
 
 namespace Revo.Tools.DatabaseMigrator
 {
-    public class DatabaseMigrator : IDisposable
+    public class DatabaseMigrator(ICommonOptions options, ILogger logger) : IDisposable
     {
         private readonly StandardKernel kernel = new StandardKernel();
         private readonly IDatabaseMigrationRegistry migrationRegistry = new DatabaseMigrationRegistry();
@@ -30,13 +30,7 @@ namespace Revo.Tools.DatabaseMigrator
         private AdoNetDatabaseMigrationProvider migrationProvider;
         private IDatabaseMigrationDiscovery[] migrationDiscoveries;
 
-        public DatabaseMigrator(ICommonOptions options, ILogger logger)
-        {
-            this.Options = options;
-            this.logger = logger;
-        }
-
-        public ICommonOptions Options { get; }
+        public ICommonOptions Options { get; } = options;
 
         public async Task UpgradeAsync(UpgradeVerb verb)
         {
