@@ -10,6 +10,7 @@ namespace Revo.Core.Events
             where TEvent : IEvent
         {
             Type messageType = typeof(EventMessageDraft<>).MakeGenericType(@event.GetType());
+
             return (IEventMessageDraft<TEvent>)messageType.GetConstructor(new[] {@event.GetType()})
                 .Invoke(new object[] { @event });
         }

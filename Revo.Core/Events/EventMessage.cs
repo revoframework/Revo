@@ -8,24 +8,19 @@ namespace Revo.Core.Events
         public static IEventMessage FromEvent(IEvent @event, IReadOnlyDictionary<string, string> metadata)
         {
             Type messageType = typeof(EventMessage<>).MakeGenericType(@event.GetType());
+
             return (IEventMessage)messageType.GetConstructor(new[]
                     {@event.GetType(), typeof(IReadOnlyDictionary<string, string>)})
                 .Invoke(new object[] { @event, metadata });
         }
     }
 
-    public class EventMessage<TEvent> : IEventMessage<TEvent>
+    public class EventMessage<TEvent>(TEvent @event, IReadOnlyDictionary<string, string> metadata) : IEventMessage<TEvent>
         where TEvent : IEvent
     {
-        public EventMessage(TEvent @event, IReadOnlyDictionary<string, string> metadata)
-        {
-            Event = @event;
-            Metadata = metadata;
-        }
-
         IEvent IEventMessage.Event => Event;
 
-        public TEvent Event { get; }
-        public IReadOnlyDictionary<string, string> Metadata { get; }
+        public TEvent Event { get; } = @event;
+        public IReadOnlyDictionary<string, string> Metadata { get; } = metadata;
     }
 }

@@ -6,25 +6,17 @@ namespace Revo.Core.Core
 {
     public static class StringExtensions
     {
-        public static int IndexOfI(this string haystack, string needle)
-        {
-            return haystack.IndexOf(needle, StringComparison.Ordinal);
-        }
+        public static int IndexOfI(this string haystack, string needle) =>
+            haystack.IndexOf(needle, StringComparison.Ordinal);
 
-        public static int IndexOfI(this string haystack, string needle, int startIndex)
-        {
-            return haystack.IndexOf(needle, startIndex, StringComparison.Ordinal);
-        }
+        public static int IndexOfI(this string haystack, string needle, int startIndex) =>
+            haystack.IndexOf(needle, startIndex, StringComparison.Ordinal);
 
-        public static int IndexOfI(this string haystack, string needle, int startIndex, int count)
-        {
-            return haystack.IndexOf(needle, startIndex, count, StringComparison.Ordinal);
-        }
+        public static int IndexOfI(this string haystack, string needle, int startIndex, int count) =>
+            haystack.IndexOf(needle, startIndex, count, StringComparison.Ordinal);
 
-        public static int LastIndexOfI(this string haystack, string needle)
-        {
-            return haystack.LastIndexOf(needle, StringComparison.Ordinal);
-        }
+        public static int LastIndexOfI(this string haystack, string needle) =>
+            haystack.LastIndexOf(needle, StringComparison.Ordinal);
 
         /// <summary>
         /// It the last character of given string is a backslash, result is the string without this backslash. Otherwise result is the input string.
@@ -50,8 +42,8 @@ namespace Revo.Core.Core
             {
                 if (CharUnicodeInfo.GetUnicodeCategory(s[i]) != UnicodeCategory.NonSpacingMark)
                     sb.Append(s[i]);
-            }                
-            return sb.ToString();            
+            }
+            return sb.ToString();
         }
     }
 }
