@@ -12,15 +12,10 @@ namespace Revo.Core.Commands
     /// and filters.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class CommandBusPipeline : ICommandBusPipeline
+    public class CommandBusPipeline(ICommandBusMiddlewareFactory middlewareFactory) : ICommandBusPipeline
     {
-        private readonly ICommandBusMiddlewareFactory middlewareFactory;
+        private readonly ICommandBusMiddlewareFactory middlewareFactory = middlewareFactory;
 
-        public CommandBusPipeline(ICommandBusMiddlewareFactory middlewareFactory)
-        {
-            this.middlewareFactory = middlewareFactory;
-        }
-        
         public Task<object> ProcessAsync(ICommandBase command, CommandBusMiddlewareDelegate executionHandler,
             ICommandBus commandBus, CommandExecutionOptions executionOptions, CancellationToken cancellationToken)
         {

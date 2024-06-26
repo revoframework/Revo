@@ -6,14 +6,9 @@ using Revo.Core.Transactions;
 namespace Revo.Core.Commands
 {
     [AutoLoadModule(false)]
-    public class CommandsModule : NinjectModule
+    public class CommandsModule(CommandsConfiguration configurationSection) : NinjectModule
     {
-        private readonly CommandsConfiguration configurationSection;
-
-        public CommandsModule(CommandsConfiguration configurationSection)
-        {
-            this.configurationSection = configurationSection;
-        }
+        private readonly CommandsConfiguration configurationSection = configurationSection;
 
         public override void Load()
         {

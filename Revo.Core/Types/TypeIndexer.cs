@@ -4,14 +4,9 @@ using System.Linq;
 
 namespace Revo.Core.Types
 {
-    public class TypeIndexer : ITypeIndexer
+    public class TypeIndexer(ITypeExplorer typeExplorer) : ITypeIndexer
     {
-        private readonly ITypeExplorer typeExplorer;
-
-        public TypeIndexer(ITypeExplorer typeExplorer)
-        {
-            this.typeExplorer = typeExplorer;
-        }
+        private readonly ITypeExplorer typeExplorer = typeExplorer;
 
         public IEnumerable<VersionedType> IndexTypes<TBase>()
         {

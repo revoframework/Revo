@@ -6,14 +6,9 @@ using Newtonsoft.Json.Linq;
 
 namespace Revo.Core.Events
 {
-    public class JsonMetadata : IReadOnlyDictionary<string, string>
+    public class JsonMetadata(JObject jsonMetadata) : IReadOnlyDictionary<string, string>
     {
-        private readonly JObject jsonMetadata;
-
-        public JsonMetadata(JObject jsonMetadata)
-        {
-            this.jsonMetadata = jsonMetadata;
-        }
+        private readonly JObject jsonMetadata = jsonMetadata;
 
         public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
         {
@@ -23,16 +18,10 @@ namespace Revo.Core.Events
             }
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public int Count => jsonMetadata.Count;
-        public bool ContainsKey(string key)
-        {
-            return jsonMetadata[key] != null;
-        }
+        public bool ContainsKey(string key) => jsonMetadata[key] != null;
 
         public bool TryGetValue(string key, out string value)
         {
@@ -46,7 +35,8 @@ namespace Revo.Core.Events
             return false;
         }
 
-        public string this[string key] => jsonMetadata[key]?.ToString() ?? throw new ArgumentException($"JSON metadata key not found: {key}");
+        public string this[string key] =>
+            jsonMetadata[key]?.ToString() ?? throw new ArgumentException($"JSON metadata key not found: {key}");
 
         public IEnumerable<string> Keys => jsonMetadata.Properties().Select(x => x.Name);
         public IEnumerable<string> Values => jsonMetadata.PropertyValues().Select(x => x.ToString());

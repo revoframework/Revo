@@ -14,9 +14,6 @@ namespace Revo.Core.Core
             currentFunc = () => ts;
         }
 
-        public static void SetSleep(Func<ISleep> sleep)
-        {
-            currentFunc = sleep;
-        }
+        public static void SetSleep(Func<ISleep> sleep) => currentFunc = sleep;
     }
 }

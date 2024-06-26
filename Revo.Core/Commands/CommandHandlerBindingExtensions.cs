@@ -64,13 +64,11 @@ namespace Revo.Core.Commands
                 .InTaskScope();
         }
 
-        public static Type[] GetCommandHandlerInterfaces(Type commandHandlerType)
-        {
-            return commandHandlerType.GetInterfaces()
+        public static Type[] GetCommandHandlerInterfaces(Type commandHandlerType) => 
+            commandHandlerType.GetInterfaces()
                 .Where(x => x.IsGenericType
-                            && new[] {typeof(ICommandHandler<>), typeof(ICommandHandler<,>)}
+                            && new[] { typeof(ICommandHandler<>), typeof(ICommandHandler<,>) }
                                 .Contains(x.GetGenericTypeDefinition()))
                 .ToArray();
-        }
     }
 }
