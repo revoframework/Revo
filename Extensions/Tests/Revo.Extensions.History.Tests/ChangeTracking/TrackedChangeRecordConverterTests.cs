@@ -1,5 +1,7 @@
 ﻿using System;
-using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
+using System.Text.Json;
+
 using NSubstitute;
 using Revo.Extensions.History.ChangeTracking;
 using Revo.Extensions.History.ChangeTracking.Model;
@@ -67,7 +69,7 @@ namespace Revo.Extensions.History.Tests.ChangeTracking
             Assert.Equal(change.EntityId, record.EntityId);
             Assert.Equal(change.EntityClassId, record.EntityClassId);
             Assert.Equal("TestChangeData", record.ChangeDataClassName);
-            Assert.Equal("bar", JObject.Parse(record.ChangeDataJson)["Foo"]);
+            Assert.Equal("bar", JsonSerializer.Deserialize<Dictionary<string, string>>(record.ChangeDataJson)["Foo"]);
             Assert.Equal(change.ChangeTime, record.ChangeTime);
         }
         

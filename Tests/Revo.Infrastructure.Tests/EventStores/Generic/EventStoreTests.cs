@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using NSubstitute;
 using Revo.Core.Core;
 using Revo.Core.Events;
@@ -34,12 +34,12 @@ namespace Revo.Infrastructure.Tests.EventStores.Generic
         {
             inMemoryCrudRepository = Substitute.ForPartsOf<InMemoryCrudRepository>();
             
-            eventStreams = new[]
-            {
+            eventStreams =
+            [
                 new EventStream(Guid.NewGuid()),
                 new EventStream(Guid.NewGuid()),
                 new EventStream(Guid.NewGuid())
-            };
+            ];
             inMemoryCrudRepository.AttachRange(eventStreams);
 
             eventSerializer = Substitute.For<IEventSerializer>();
@@ -47,30 +47,30 @@ namespace Revo.Infrastructure.Tests.EventStores.Generic
             eventSerializer.SerializeEvent(null)
                 .ReturnsForAnyArgs(ci => ("{\"bar\":" + ci.ArgAt<Event1>(0).Foo + "}", new VersionedTypeId("EventName", 5)));
             eventSerializer.DeserializeEvent(Arg.Any<string>(), new VersionedTypeId("EventName", 5))
-                .Returns(ci => new Event1((int) JObject.Parse(ci.ArgAt<string>(0))["bar"]));
+                .Returns(ci => new Event1((int) JsonNode.Parse(ci.ArgAt<string>(0))["bar"]));
             eventSerializer.SerializeEventMetadata(null)
-                .ReturnsForAnyArgs(ci => JsonConvert.SerializeObject(ci.Arg<IReadOnlyDictionary<string, string>>()
+                .ReturnsForAnyArgs(ci => JsonSerializer.Serialize(ci.Arg<IReadOnlyDictionary<string, string>>()
                     .Append(new KeyValuePair<string, string>("fakeSer", "true"))
                     .ToDictionary(x => x.Key, x => x.Value)));
             eventSerializer.DeserializeEventMetadata(null)
                 .ReturnsForAnyArgs(ci =>
                 {
-                    var json = JObject.Parse(ci.Arg<string>());
+                    var json = JsonNode.Parse(ci.Arg<string>()).AsObject();
                     json["fakeDeser"] = "true";
                     return new JsonMetadata(json);
                 });
 
             FakeClock.Setup();
 
-            eventStreamRows = new[]
-            {
+            eventStreamRows =
+            [
                 new EventStreamRow(Guid.NewGuid(), "{\"bar\":1}", "EventName", 5, eventStreams[0].Id, 1, Clock.Current.UtcNow, "{\"doh\":\"1\"}"),
                 new EventStreamRow(Guid.NewGuid(), "{\"bar\":2}", "EventName", 5, eventStreams[0].Id, 2, Clock.Current.UtcNow, "{\"doh\":\"2\"}"),
                 new EventStreamRow(Guid.NewGuid(), "{\"bar\":3}", "EventName", 5, eventStreams[1].Id, 3, Clock.Current.UtcNow, "{\"doh\":\"3\"}"),
                 new EventStreamRow(Guid.NewGuid(), "{\"bar\":4}", "EventName", 5, eventStreams[1].Id, 2, Clock.Current.UtcNow, "{\"doh\":\"4\"}"),
                 new EventStreamRow(Guid.NewGuid(), "{\"bar\":5}", "EventName", 5, eventStreams[1].Id, 4, Clock.Current.UtcNow, "{\"doh\":\"5\"}"),
                 new EventStreamRow(Guid.NewGuid(), "{\"bar\":6}", "EventName", 5, eventStreams[1].Id, 5, Clock.Current.UtcNow, "{\"doh\":\"6\"}")
-            };
+            ];
 
             expectedStoreRecords = eventStreamRows.Select((x, i) =>
                     new FakeEventStoreRecord()
@@ -190,9 +190,11 @@ namespace Revo.Infrastructure.Tests.EventStores.Generic
             newRows[0].StreamSequenceNumber.Should().Be(3);
             newRows[0].StreamId.Should().Be(eventStreams[0].Id);
 
-            JObject jsonMetadata = JObject.Parse(newRows[0].AdditionalMetadataJson);
-            jsonMetadata.Should().Contain("doh", "42");
-            jsonMetadata.Should().Contain("fakeSer", "true");
+            var jsonMetadata = JsonNode.Parse(newRows[0].AdditionalMetadataJson).AsObject();
+            jsonMetadata.ContainsKey("doh").Should().BeTrue();
+            jsonMetadata["doh"].GetValue<string>().Should().Be("42");
+            jsonMetadata.ContainsKey("fakeSer").Should().BeTrue();
+            jsonMetadata["fakeSer"].GetValue<string>().Should().Be("true");
         }
 
         [Fact]
@@ -224,7 +226,7 @@ namespace Revo.Infrastructure.Tests.EventStores.Generic
             var newRows = inMemoryCrudRepository.GetEntities<EventStreamRow>(EntityState.Added).ToList();
             newRows.Should().HaveCount(1);
 
-            JObject jsonMetadata = JObject.Parse(newRows[0].AdditionalMetadataJson);
+            var jsonMetadata = JsonNode.Parse(newRows[0].AdditionalMetadataJson).AsObject();
             jsonMetadata.Should().ContainKey(BasicEventMetadataNames.EventSourceName);
             jsonMetadata[BasicEventMetadataNames.EventSourceName]?.ToString().Should().NotBeNullOrEmpty();
         }

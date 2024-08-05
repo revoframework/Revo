@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
 using Revo.Core.Events;
 
 namespace Revo.Domain.Events
@@ -7,7 +7,7 @@ namespace Revo.Domain.Events
     {
         public override string ToString()
         {
-            return $"{this.GetType().FullName} : {JsonConvert.SerializeObject(this)}";
+            return $"{GetType().FullName} : {JsonSerializer.Serialize(this, GetType())}";
         }
     }
 }

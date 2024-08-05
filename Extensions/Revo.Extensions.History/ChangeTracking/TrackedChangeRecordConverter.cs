@@ -1,5 +1,5 @@
 ﻿using System;
-using Newtonsoft.Json;
+using System.Text.Json;
 using Revo.Extensions.History.ChangeTracking.Model;
 
 namespace Revo.Extensions.History.ChangeTracking
@@ -15,8 +15,8 @@ namespace Revo.Extensions.History.ChangeTracking
 
         public TrackedChange FromRecord(TrackedChangeRecord record)
         {
-            Type changeDataType = changeDataTypeCache.GetClrChangeDataType(record.ChangeDataClassName);
-            ChangeData changeData = (ChangeData)JsonConvert.DeserializeObject(record.ChangeDataJson, changeDataType);
+            var changeDataType = changeDataTypeCache.GetClrChangeDataType(record.ChangeDataClassName);
+            var changeData = (ChangeData)JsonSerializer.Deserialize(record.ChangeDataJson, changeDataType);
 
             return new TrackedChange(
                 record.Id,
@@ -41,7 +41,7 @@ namespace Revo.Extensions.History.ChangeTracking
                 AggregateClassId = change.AggregateClassId,
                 AggregateId = change.AggregateId,
                 ChangeDataClassName = changeDataTypeCache.GetChangeDataTypeName(change.ChangeData.GetType()),
-                ChangeDataJson = JsonConvert.SerializeObject(change.ChangeData),
+                ChangeDataJson = JsonSerializer.Serialize(change.ChangeData, change.ChangeData.GetType()),
                 ChangeTime = change.ChangeTime,
                 EntityClassId = change.EntityClassId,
                 EntityId = change.EntityId

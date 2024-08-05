@@ -37,7 +37,7 @@ public class EFCoreSyncProjectionHookTests
 
         await sut.OnBeforeCommitAsync();
 
-        projectionSubSystem.Received(1).ExecuteProjectionsAsync(
+        await projectionSubSystem.Received(1).ExecuteProjectionsAsync(
             Arg.Is<IReadOnlyCollection<IEventMessage<DomainAggregateEvent>>>(
                 evs =>  evs.SequenceEqual(events)),
             unitOfWork,
@@ -54,15 +54,15 @@ public class EFCoreSyncProjectionHookTests
         events.Add(new TestEvent().ToMessageDraft());
         await sut.OnBeforeCommitAsync();
 
-        projectionSubSystem.ReceivedWithAnyArgs(2).ExecuteProjectionsAsync(null, null, null);
+        await projectionSubSystem.ReceivedWithAnyArgs(2).ExecuteProjectionsAsync(null, null, null);
 
-        projectionSubSystem.Received(1).ExecuteProjectionsAsync(
+        await projectionSubSystem.Received(1).ExecuteProjectionsAsync(
             Arg.Is<IReadOnlyCollection<IEventMessage<DomainAggregateEvent>>>(
                 evs => evs.SequenceEqual(new[] { events[0] })),
             unitOfWork,
             Arg.Is<EFCoreEventProjectionOptions>(x => x.IsSynchronousProjection));
 
-        projectionSubSystem.Received(1).ExecuteProjectionsAsync(
+        await projectionSubSystem.Received(1).ExecuteProjectionsAsync(
             Arg.Is<IReadOnlyCollection<IEventMessage<DomainAggregateEvent>>>(
                 evs => evs.SequenceEqual(new[] { events[1] })),
             unitOfWork,
@@ -79,7 +79,7 @@ public class EFCoreSyncProjectionHookTests
         await sut.OnCommitSucceededAsync();
         await sut.OnBeforeCommitAsync();
 
-        projectionSubSystem.Received(2).ExecuteProjectionsAsync(
+        await projectionSubSystem.Received(2).ExecuteProjectionsAsync(
             Arg.Is<IReadOnlyCollection<IEventMessage<DomainAggregateEvent>>>(
                 evs => evs.SequenceEqual(events)),
             unitOfWork,
@@ -96,7 +96,7 @@ public class EFCoreSyncProjectionHookTests
         await sut.OnCommitFailedAsync();
         await sut.OnBeforeCommitAsync();
 
-        projectionSubSystem.Received(2).ExecuteProjectionsAsync(
+        await projectionSubSystem.Received(2).ExecuteProjectionsAsync(
             Arg.Is<IReadOnlyCollection<IEventMessage<DomainAggregateEvent>>>(
                 evs => evs.SequenceEqual(events)),
             unitOfWork,

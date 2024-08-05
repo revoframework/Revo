@@ -1,6 +1,6 @@
-﻿using FluentAssertions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+using FluentAssertions;
 using Revo.Core.ValueObjects;
 using Xunit;
 
@@ -13,21 +13,22 @@ namespace Revo.Core.Tests.ValueObjects
         {
             var value = new MyValue("hello");
 
-            string json = JsonConvert.SerializeObject(value);
-            JToken jtoken = JToken.Parse(json);
+            var json = JsonSerializer.Serialize(value);
+            var jdoc = JsonDocument.Parse(json);
 
-            jtoken.Type.Should().Be(JTokenType.String);
-            jtoken.Value<string>().Should().Be("hello");
+            jdoc.RootElement.ValueKind.Should().Be(JsonValueKind.String);
+            jdoc.RootElement.GetString().Should().Be("hello");
         }
 
         [Fact]
         public void JsonDeserializesAsSingleValue()
         {
             string json = "\"hello\"";
-            MyValue value = JsonConvert.DeserializeObject<MyValue>(json);
+            var value = JsonSerializer.Deserialize<MyValue>(json);
             value.Value.Should().Be("hello");
         }
 
+        [JsonConverter(typeof(SingleValueObjectJsonConverter))]
         public class MyValue : SingleValueObject<MyValue, string>
         {
             public MyValue(string value) : base(value)

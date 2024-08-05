@@ -38,7 +38,7 @@ namespace Revo.EasyNetQ.Tests
             
             await sut.PublishAsync(event1);
 
-            pubSub.Received(1).PublishAsync(Arg.Is<IEventMessage<Event1>>(
+            await pubSub.Received(1).PublishAsync(Arg.Is<IEventMessage<Event1>>(
                 x => x.GetType().IsConstructedGenericType
                      && x.GetType().GetGenericTypeDefinition() == typeof(EventMessage<>)
                      && x.Event == event1
@@ -56,7 +56,7 @@ namespace Revo.EasyNetQ.Tests
 
             await sut.PublishAsync(message);
 
-            pubSub.Received(1).PublishAsync(Arg.Is<IEventMessage<Event1>>(
+            await pubSub.Received(1).PublishAsync(Arg.Is<IEventMessage<Event1>>(
                 x => x.GetType().IsConstructedGenericType
                      && x.GetType().GetGenericTypeDefinition() == typeof(EventMessage<>)
                      && x.Event == event1

@@ -1,5 +1,5 @@
 ﻿using System;
-using Newtonsoft.Json;
+using System.Text.Json;
 using Revo.Core.Configuration;
 
 namespace Revo.EF6.Configuration
@@ -14,6 +14,6 @@ namespace Revo.EF6.Configuration
         public bool UseEventSourcedAggregateStore { get; set; }
         public bool UseCrudAggregateStore { get; set; }
 
-        public Func<JsonSerializerSettings, JsonSerializerSettings> CustomizeEventJsonSerializer { get; set; } = settings => settings;
+        public Func<JsonSerializerOptions, JsonSerializerOptions> CustomizeEventJsonSerializer { get; set; } = settings => settings;
     }
 }

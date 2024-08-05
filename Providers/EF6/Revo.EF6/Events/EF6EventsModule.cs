@@ -1,5 +1,5 @@
 ﻿using System;
-using Newtonsoft.Json;
+using System.Text.Json;
 using Ninject.Modules;
 using Revo.Core.Core;
 using Revo.DataAccess.Entities;
@@ -15,9 +15,9 @@ namespace Revo.EF6.Events
     [AutoLoadModule(false)]
     public class EF6AsyncEventsModule : NinjectModule
     {
-        private readonly Func<JsonSerializerSettings, JsonSerializerSettings> customizeEventJsonSerializer;
+        private readonly Func<JsonSerializerOptions, JsonSerializerOptions> customizeEventJsonSerializer;
 
-        public EF6AsyncEventsModule(Func<JsonSerializerSettings, JsonSerializerSettings> customizeEventJsonSerializer)
+        public EF6AsyncEventsModule(Func<JsonSerializerOptions, JsonSerializerOptions> customizeEventJsonSerializer)
         {
             this.customizeEventJsonSerializer = customizeEventJsonSerializer;
         }

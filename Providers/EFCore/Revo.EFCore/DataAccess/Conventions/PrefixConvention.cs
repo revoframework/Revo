@@ -52,7 +52,7 @@ namespace Revo.EFCore.DataAccess.Conventions
         {
             foreach (var property in entity.GetProperties())
             {
-                if (property.DeclaringEntityType != entity)
+                if (property.DeclaringType != entity)
                 {
                     continue;
                 }
@@ -64,7 +64,7 @@ namespace Revo.EFCore.DataAccess.Conventions
                     ?? property.FieldInfo?.DeclaringType;
                 TablePrefixAttribute clrTypePrefixAttribute;
                 if (clrDeclaringType != null
-                    && property.DeclaringEntityType.ClrType != clrDeclaringType
+                    && property.DeclaringType.ClrType != clrDeclaringType
                     && (clrTypePrefixAttribute = GetTablePrefixAttribute(clrDeclaringType)) != null) //this might happen e.g. if clrDeclaringType is abstract but not 
                 {
                     propertyNamespacePrefix = clrTypePrefixAttribute.NamespacePrefix;
@@ -73,12 +73,12 @@ namespace Revo.EFCore.DataAccess.Conventions
 
                 if (propertyColumnPrefix?.Length > 0)
                 {
-                    property.SetColumnName($"{propertyColumnPrefix}_{property.GetColumnBaseName()}");
+                    property.SetColumnName($"{propertyColumnPrefix}_{property.GetColumnName()}");
                 }
 
                 if (propertyNamespacePrefix?.Length > 0)
                 {
-                    property.SetColumnName($"{propertyNamespacePrefix}_{property.GetColumnBaseName()}");
+                    property.SetColumnName($"{propertyNamespacePrefix}_{property.GetColumnName()}");
                 }
             }
         }

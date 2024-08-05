@@ -16,9 +16,5 @@ namespace Revo.Infrastructure.Validation
         public CommandValidationException(string message, Exception innerException) : base(message, innerException)
         {
         }
-
-        protected CommandValidationException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
     }
 }
