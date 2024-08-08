@@ -24,7 +24,7 @@ namespace Revo.EasyNetQ.Tests
             var message = (IEventMessage<Event2>) EventMessage.FromEvent(new Event2(), new Dictionary<string, string>());
             await sut.HandleAsync(message, CancellationToken.None);
 
-            easyNetQBus.Received(1).PublishAsync<Event1>(message);
+            await easyNetQBus.Received(1).PublishAsync<Event1>(message);
         }
 
         private class Event1 : IEvent

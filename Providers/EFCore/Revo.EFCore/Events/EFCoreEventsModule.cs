@@ -1,5 +1,5 @@
 ﻿using System;
-using Newtonsoft.Json;
+using System.Text.Json;
 using Ninject.Modules;
 using Revo.Core.Core;
 using Revo.Infrastructure;
@@ -13,9 +13,9 @@ namespace Revo.EFCore.Events
     [AutoLoadModule(false)]
     public class EFCoreAsyncEventsModule : NinjectModule
     {
-        private readonly Func<JsonSerializerSettings, JsonSerializerSettings> customizeEventJsonSerializer;
+        private readonly Func<JsonSerializerOptions, JsonSerializerOptions> customizeEventJsonSerializer;
 
-        public EFCoreAsyncEventsModule(Func<JsonSerializerSettings, JsonSerializerSettings> customizeEventJsonSerializer)
+        public EFCoreAsyncEventsModule(Func<JsonSerializerOptions, JsonSerializerOptions> customizeEventJsonSerializer)
         {
             this.customizeEventJsonSerializer = customizeEventJsonSerializer;
         }

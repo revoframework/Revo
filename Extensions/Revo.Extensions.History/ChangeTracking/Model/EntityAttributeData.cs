@@ -1,6 +1,6 @@
 ﻿using System;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
+using System.Text.Json;
 using Revo.DataAccess.Entities;
 using Revo.Domain.ReadModel;
 
@@ -10,7 +10,7 @@ namespace Revo.Extensions.History.ChangeTracking.Model
     public class EntityAttributeData : EntityReadModel
     {
         private string attributeValueMapJson;
-        private JObject attributeValueMap;
+        private Dictionary<string, dynamic> attributeValueMap = [];
 
         public EntityAttributeData(Guid id, Guid? aggregateId, Guid? entityId)
         {
@@ -28,38 +28,42 @@ namespace Revo.Extensions.History.ChangeTracking.Model
 
         public string AttributeValueMapJson
         {
-            get { return attributeValueMapJson ?? (attributeValueMapJson = attributeValueMap?.ToString(Formatting.None) ?? "{}"); }
+            get
+            {
+                return attributeValueMapJson ??= JsonSerializer.Serialize(attributeValueMap);
+            }
 
             private set
             {
                 attributeValueMapJson = value;
-                attributeValueMap = JObject.Parse(attributeValueMapJson);
+                if (string.IsNullOrWhiteSpace(attributeValueMapJson))
+                {
+                    attributeValueMap = [];
+                } 
+                else
+                {
+                    attributeValueMap = JsonSerializer.Deserialize<Dictionary<string, dynamic>>(attributeValueMapJson);
+                }
             }
         }
 
         public bool TryGetAttributeValue<T>(string attributeName, out T value)
         {
-            JToken token = null;
-            if (attributeValueMap?.TryGetValue(attributeName, out token) ?? false)
+            if (attributeValueMap.TryGetValue(attributeName, out dynamic token))
             {
-                value = (T)(dynamic)token;
+                value = (T)token;
                 return true;
             }
             else
             {
-                value = default(T);
+                value = default;
                 return false;
             }
         }
 
         public void SetAttributeValue<T>(string attributeName, T attributeValue)
         {
-            if (attributeValueMap == null)
-            {
-                attributeValueMap = new JObject();
-            }
-
-            attributeValueMap[attributeName] = attributeValue != null ? JToken.FromObject(attributeValue) : JValue.CreateNull();
+            attributeValueMap[attributeName] = attributeValue;
             attributeValueMapJson = null;
         }
 

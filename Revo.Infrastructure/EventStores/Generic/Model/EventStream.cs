@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using Revo.Core.Events;
 using Revo.DataAccess.Entities;
 
@@ -14,7 +14,7 @@ namespace Revo.Infrastructure.EventStores.Generic.Model
     public class EventStream : IRowVersioned, IHasId<Guid>
     {
         private IReadOnlyDictionary<string, string> metadata;
-        private JObject metadataJsonObject;
+        private JsonObject metadataJsonObject;
 
         public EventStream(Guid id)
         {
@@ -41,8 +41,8 @@ namespace Revo.Infrastructure.EventStores.Generic.Model
                         try
                         {
                             metadataJsonObject = MetadataJson?.Length > 0
-                                ? JObject.Parse(MetadataJson)
-                                : new JObject();
+                                ? JsonObject.Parse(MetadataJson).AsObject()
+                                : [];
                         }
                         catch (JsonException e)
                         {
@@ -58,13 +58,13 @@ namespace Revo.Infrastructure.EventStores.Generic.Model
 
             set
             {
-                metadataJsonObject = new JObject();
+                metadataJsonObject = [];
                 foreach (var pair in value)
                 {
                     metadataJsonObject[pair.Key] = pair.Value;
                 }
 
-                MetadataJson = metadataJsonObject.ToString(Formatting.None);
+                MetadataJson = metadataJsonObject.ToString();
                 metadata = new JsonMetadata(metadataJsonObject);
             }
         }

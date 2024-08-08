@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using Revo.Core.Events;
 using Revo.Core.Types;
 
@@ -12,26 +11,19 @@ namespace Revo.Infrastructure.Events
 {
     public class EventSerializer : IEventSerializer
     {
-        private readonly JsonSerializerSettings jsonSerializerSettings = new JsonSerializerSettings
+        private readonly JsonSerializerOptions jsonSerializerSettings = new()
         {
-            ContractResolver = new DefaultContractResolver
-            {
-                NamingStrategy = new CamelCaseNamingStrategy
-                {
-                    ProcessDictionaryKeys = false
-                }
-            },
-            Formatting = Formatting.None
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         };
-        
+
         private readonly IVersionedTypeRegistry versionedTypeRegistry;
 
         public EventSerializer(IVersionedTypeRegistry versionedTypeRegistry,
-            Func<JsonSerializerSettings, JsonSerializerSettings> customizeEventJsonSerializer)
+            Func<JsonSerializerOptions, JsonSerializerOptions> customizeEventJsonSerializer)
         {
             this.versionedTypeRegistry = versionedTypeRegistry;
 
-            jsonSerializerSettings.Converters.Add(new StringEnumConverter());
+            jsonSerializerSettings.Converters.Add(new JsonStringEnumConverter());
             jsonSerializerSettings = customizeEventJsonSerializer(jsonSerializerSettings);
         }
 
@@ -45,8 +37,7 @@ namespace Revo.Infrastructure.Events
                     throw new ArgumentException($"Cannot deserialize event of an unknown type ID {typeId}");
                 }
 
-                Type clrType = versionedType.ClrType;
-                return (IEvent)JsonConvert.DeserializeObject(eventJson, clrType, jsonSerializerSettings);
+                return (IEvent)JsonSerializer.Deserialize(eventJson, versionedType.ClrType, jsonSerializerSettings);
             }
             catch (JsonException e)
             {
@@ -62,18 +53,18 @@ namespace Revo.Infrastructure.Events
                 throw new ArgumentException($"Cannot serialize event of an unknown type {@event.GetType()}");
             }
 
-            return (JsonConvert.SerializeObject(@event, jsonSerializerSettings), versionedType.Id);
+            return (JsonSerializer.Serialize(@event, @event.GetType(), jsonSerializerSettings), versionedType.Id);
         }
 
         public string SerializeEventMetadata(IReadOnlyDictionary<string, string> metadata)
         {
-            return JsonConvert.SerializeObject(metadata, Formatting.None);
+            return JsonSerializer.Serialize(metadata);
         }
 
         public IReadOnlyDictionary<string, string> DeserializeEventMetadata(string metadataJson)
         {
-            return new JsonMetadata(metadataJson?.Length > 0
-                ? JObject.Parse(metadataJson) : new JObject());
+            return new JsonMetadata(string.IsNullOrWhiteSpace(metadataJson)
+                ? [] : JsonObject.Parse(metadataJson).AsObject());
         }
     }
 }

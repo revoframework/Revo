@@ -2,15 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace Revo.Core.Events
 {
     public class JsonMetadata : IReadOnlyDictionary<string, string>
     {
-        private readonly JObject jsonMetadata;
+        private readonly JsonObject jsonMetadata;
 
-        public JsonMetadata(JObject jsonMetadata)
+        public JsonMetadata(JsonObject jsonMetadata)
         {
             this.jsonMetadata = jsonMetadata;
         }
@@ -36,9 +37,9 @@ namespace Revo.Core.Events
 
         public bool TryGetValue(string key, out string value)
         {
-            if (jsonMetadata.TryGetValue(key, out JToken token))
+            if (jsonMetadata.TryGetPropertyValue(key, out JsonNode token))
             {
-                value = token.Type != JTokenType.Null ? token.ToString() : null;
+                value = token?.ToString();
                 return true;
             }
 
@@ -48,7 +49,7 @@ namespace Revo.Core.Events
 
         public string this[string key] => jsonMetadata[key]?.ToString() ?? throw new ArgumentException($"JSON metadata key not found: {key}");
 
-        public IEnumerable<string> Keys => jsonMetadata.Properties().Select(x => x.Name);
-        public IEnumerable<string> Values => jsonMetadata.PropertyValues().Select(x => x.ToString());
+        public IEnumerable<string> Keys => jsonMetadata.Select(x => x.Key);
+        public IEnumerable<string> Values => jsonMetadata.Select(x => x.Value.ToString());
     }
 }

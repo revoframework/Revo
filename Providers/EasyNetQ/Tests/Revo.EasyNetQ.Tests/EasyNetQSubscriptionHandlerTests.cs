@@ -32,7 +32,7 @@ namespace Revo.EasyNetQ.Tests
 
             await sut.HandleMessageAsync(eventMessage);
 
-            eventBus.Received(1).PublishAsync(eventMessage);
+            await eventBus.Received(1).PublishAsync(eventMessage);
             currentTaskContext.Should().NotBeNull();
             currentTaskContext.Should().NotBe(prevTaskContext);
         }

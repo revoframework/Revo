@@ -20,10 +20,6 @@ namespace Revo.Infrastructure.Events.Async
             LastSequenceNumberProcessed = lastSequenceNumberProcessed;
         }
 
-        protected AsyncEventProcessingSequenceException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
-
         public long? LastSequenceNumberProcessed { get; }
     }
 }

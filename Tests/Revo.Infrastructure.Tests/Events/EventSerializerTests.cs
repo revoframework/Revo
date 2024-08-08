@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using FluentAssertions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
 using NSubstitute;
 using Revo.Core.Events;
 using Revo.Core.Types;
@@ -55,9 +54,10 @@ namespace Revo.Infrastructure.Tests.Events
         {
             var result = sut.SerializeEvent(new Event1(123));
 
-            JObject json = JObject.Parse(result.EventJson);
+            var json = JsonNode.Parse(result.EventJson).AsObject();
             json.Should().HaveCount(1);
-            json.Should().Contain("fooBar", 123);
+            json.ContainsKey("fooBar").Should().BeTrue();
+            json["fooBar"].GetValue<int>().Should().Be(123);
             result.TypeId.Should().Be(new VersionedTypeId("Event1", 1));
         }
 
@@ -65,9 +65,10 @@ namespace Revo.Infrastructure.Tests.Events
         public void SerializeEventMetadata()
         {
             var result = sut.SerializeEventMetadata(new Dictionary<string, string>() { { "Bar", "123" } });
-            JObject json = JObject.Parse(result);
+            var json = JsonNode.Parse(result).AsObject();
             json.Should().HaveCount(1);
-            json.Should().Contain("Bar", "123");
+            json.ContainsKey("Bar").Should().BeTrue();
+            json["Bar"].GetValue<string>().Should().Be("123");
         }
 
         [Fact]
@@ -80,10 +81,10 @@ namespace Revo.Infrastructure.Tests.Events
                     {"key", "value"}
                 }.ToImmutableDictionary()));
 
-            JObject json = JObject.Parse(result.EventJson);
-            json.Should().ContainKey("pairs");
-            json["pairs"].Children<JProperty>().Should().Contain(x => x.Name == "Key" && x.Value.ToString() == "Value");
-            json["pairs"].Children<JProperty>().Should().Contain(x => x.Name == "key" && x.Value.ToString() == "value");
+            var json = JsonDocument.Parse(result.EventJson).RootElement;
+            json.TryGetProperty("pairs", out var pairsProperty);
+            pairsProperty.EnumerateObject().Should().Contain(x => x.Name == "Key" && x.Value.ToString() == "Value");
+            pairsProperty.EnumerateObject().Should().Contain(x => x.Name == "key" && x.Value.ToString() == "value");
         }
 
         [Fact]
@@ -91,34 +92,27 @@ namespace Revo.Infrastructure.Tests.Events
         {
             sut = new EventSerializer(versionedTypeRegistry,
                 x =>
-                    new JsonSerializerSettings
+                    new JsonSerializerOptions
                     {
-                        ContractResolver = new DefaultContractResolver
-                        {
-                            NamingStrategy = new SnakeCaseNamingStrategy()
-                        },
-                        Formatting = Formatting.None
+                        PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
                     });
 
             var result = sut.SerializeEvent(new Event1(123));
 
-            JObject json = JObject.Parse(result.EventJson);
+            var json = JsonNode.Parse(result.EventJson).AsObject();
             json.Should().HaveCount(1);
-            json.Should().Contain("foo_bar", 123);
+            json.ContainsKey("foo_bar").Should().BeTrue();
+            json["foo_bar"].GetValue<int>().Should().Be(123);
         }
-        
+
         [Fact]
         public void DeserializeEvent_CustomizeEventJsonSerializer()
         {
             sut = new EventSerializer(versionedTypeRegistry,
                 x =>
-                    new JsonSerializerSettings
+                    new JsonSerializerOptions
                     {
-                        ContractResolver = new DefaultContractResolver
-                        {
-                            NamingStrategy = new SnakeCaseNamingStrategy()
-                        },
-                        Formatting = Formatting.None
+                        PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
                     });
 
             var result = sut.DeserializeEvent("{\"foo_bar\":123}", new VersionedTypeId("Event1", 1));
@@ -126,7 +120,7 @@ namespace Revo.Infrastructure.Tests.Events
             result.Should().BeOfType<Event1>();
             ((Event1)result).FooBar.Should().Be(123);
         }
-        
+
         public class Event1 : IEvent
         {
             public Event1(int fooBar)

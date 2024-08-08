@@ -19,7 +19,7 @@ namespace Revo.EFCore.DataAccess.Conventions
                 
                 foreach (var property in entity.GetProperties())
                 {
-                    property.SetColumnName(property.GetColumnBaseName().ToLowerInvariant());
+                    property.SetColumnName(property.GetColumnName().ToLowerInvariant());
                 }
 
                 foreach (var key in entity.GetKeys())

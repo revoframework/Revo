@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Text.Json.Nodes;
 using FluentAssertions;
-using Newtonsoft.Json.Linq;
 using Revo.Core.Events;
 using Xunit;
 
@@ -9,13 +9,15 @@ namespace Revo.Core.Tests.Events
     public class JsonMetadataTests
     {
         private JsonMetadata sut;
-        private JObject json;
+        private JsonObject json;
 
         public JsonMetadataTests()
         {
-            json = new JObject();
-            json["key1"] = "value1";
-            json["key2"] = "value2";
+            json = new JsonObject
+            {
+                ["key1"] = "value1",
+                ["key2"] = "value2"
+            };
 
             sut = new JsonMetadata(json);
         }

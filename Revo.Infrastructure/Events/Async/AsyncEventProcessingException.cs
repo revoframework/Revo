@@ -16,9 +16,5 @@ namespace Revo.Infrastructure.Events.Async
         public AsyncEventProcessingException(string message, Exception innerException) : base(message, innerException)
         {
         }
-
-        protected AsyncEventProcessingException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
     }
 }

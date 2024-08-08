@@ -1,42 +1,28 @@
-﻿using System;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Revo.Extensions.Notifications
 {
-    public class NotificationSerializer : INotificationSerializer
+    public class NotificationSerializer(INotificationTypeCache notificationTypeCache) : INotificationSerializer
     {
-        private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings
+        private static readonly JsonSerializerOptions JsonSerializerSettings = new()
         {
-            ContractResolver = new DefaultContractResolver
-            {
-                NamingStrategy = new CamelCaseNamingStrategy
-                {
-                    ProcessDictionaryKeys = false
-                }
-            },
-            Formatting = Formatting.None
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         };
 
         static NotificationSerializer()
         {
-            JsonSerializerSettings.Converters.Add(new StringEnumConverter());
+            JsonSerializerSettings.Converters.Add(new JsonStringEnumConverter());
         }
 
-        private readonly INotificationTypeCache notificationTypeCache;
-
-        public NotificationSerializer(INotificationTypeCache notificationTypeCache)
-        {
-            this.notificationTypeCache = notificationTypeCache;
-        }
+        private readonly INotificationTypeCache notificationTypeCache = notificationTypeCache;
 
         public SerializedNotification ToJson(INotification notification)
         {
-            SerializedNotification serialized = new SerializedNotification()
+            var serialized = new SerializedNotification()
             {
                 NotificationClassName = notificationTypeCache.GetNotificationTypeName(notification.GetType()),
-                NotificationJson = JsonConvert.SerializeObject(notification, JsonSerializerSettings)
+                NotificationJson = JsonSerializer.Serialize(notification, notification.GetType(), JsonSerializerSettings)
             };
 
             return serialized;
@@ -44,8 +30,8 @@ namespace Revo.Extensions.Notifications
 
         public INotification FromJson(SerializedNotification serializedNotification)
         {
-            Type notificationType = notificationTypeCache.GetClrNotificationType(serializedNotification.NotificationClassName);
-            return (INotification)JsonConvert.DeserializeObject(serializedNotification.NotificationJson, notificationType, JsonSerializerSettings);
+            var notificationType = notificationTypeCache.GetClrNotificationType(serializedNotification.NotificationClassName);
+            return (INotification)JsonSerializer.Deserialize(serializedNotification.NotificationJson, notificationType, JsonSerializerSettings);
         }
     }
 }
