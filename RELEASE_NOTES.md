@@ -1,5 +1,10 @@
 # RELEASE NOTES
 
+## [1.36.1] - 2024-11-07
+
+### Fixed
+- fixed LowerCaseConvention null reference exceptions when key names were null (e.g. with owned types)
+
 ## [1.36.0] - 2024-06-24
 
 ### Fixed

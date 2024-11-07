@@ -14,27 +14,27 @@ namespace Revo.EFCore.DataAccess.Conventions
             {
                 if (entity.BaseType == null)
                 {
-                    entity.SetTableName(entity.GetTableName().ToLowerInvariant());
+                    entity.SetTableName(entity.GetTableName()?.ToLowerInvariant());
                 }
                 
                 foreach (var property in entity.GetProperties())
                 {
-                    property.SetColumnName(property.GetColumnBaseName().ToLowerInvariant());
+                    property.SetColumnName(property.GetColumnBaseName()?.ToLowerInvariant());
                 }
 
                 foreach (var key in entity.GetKeys())
                 {
-                    key.SetName(key.GetName().ToLowerInvariant());
+                    key.SetName(key.GetName()?.ToLowerInvariant());
                 }
 
                 foreach (var key in entity.GetForeignKeys())
                 {
-                    key.SetConstraintName(key.GetConstraintName().ToLowerInvariant());
+                    key.SetConstraintName(key.GetConstraintName()?.ToLowerInvariant());
                 }
 
                 foreach (var index in entity.GetIndexes())
                 {
-                    index.SetDatabaseName(index.GetDatabaseName().ToLowerInvariant());
+                    index.SetDatabaseName(index.GetDatabaseName()?.ToLowerInvariant());
                 }
             }
         }
