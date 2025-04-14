@@ -3,16 +3,16 @@
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), Common.props))\Common.props" />
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>net9.0</TargetFrameworks>
     <Configurations>Debug;Release</Configurations>
     <Description>Event Sourcing, CQRS and DDD framework for modern C#/.NET applications.
 Framework infrastruture package - event stores, projections, jobs, etc.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LinqKit.Core" Version="1.2.5" />
+    <PackageReference Include="LinqKit.Core" Version="1.2.8" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="morelinq" Version="3.3.2" />
+    <PackageReference Include="morelinq" Version="4.4.0" />
     <PackageReference Include="Nito.AsyncEx" Version="5.1.2" />
   </ItemGroup>
 

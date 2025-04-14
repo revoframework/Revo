@@ -4,7 +4,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>net9.0</TargetFrameworks>
     <Configurations>Debug;Release</Configurations>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>revo-dbmigrate</ToolCommandName>
@@ -16,9 +16,9 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
     <PackageReference Include="McMaster.NETCore.Plugins" Version="1.4.0" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.1" />
-    <PackageReference Include="Npgsql" Version="8.0.1" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.4" />
+    <PackageReference Include="Npgsql" Version="9.0.3" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
   </ItemGroup>
 
   <ItemGroup>

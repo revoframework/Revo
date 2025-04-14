@@ -3,15 +3,15 @@
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), Common.props))\Common.props" />
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>net9.0</TargetFrameworks>
     <Configurations>Debug;Release</Configurations>
     <Description>Event Sourcing, CQRS and DDD framework for modern C#/.NET applications.
 Hangfire background job support.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Hangfire" Version="1.7.31" />
-    <PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />
+    <PackageReference Include="Hangfire" Version="1.8.18" />
+    <PackageReference Include="Hangfire.MemoryStorage" Version="1.8.1.1" />
   </ItemGroup>
 
   <ItemGroup>

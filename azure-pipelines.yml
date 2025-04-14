@@ -8,7 +8,7 @@ trigger:
 - develop
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'ubuntu-22.04'
 
 variables:
 - group: ci-nuget-vars
@@ -17,7 +17,7 @@ steps:
 - task: UseDotNet@2
   inputs:
     packageType: 'sdk'
-    version: '8.0.x'
+    version: '9.0.x'
 - task: DotNetCoreCLI@2
   inputs:
     command: 'custom'
