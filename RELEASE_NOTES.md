@@ -1,5 +1,8 @@
 # RELEASE NOTES
 
+## [1.37.0] - 2025-04-14
+-upgraded solution to NET 9.0 & other dependencies (EF Core, AutoMapper, Hangfire...)
+
 ## [1.36.1] - 2024-11-07
 
 ### Fixed
