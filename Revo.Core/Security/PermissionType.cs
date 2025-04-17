@@ -4,16 +4,10 @@ using Revo.Core.ValueObjects;
 
 namespace Revo.Core.Security
 {
-    public class PermissionType : ValueObject<PermissionType>
+    public class PermissionType(Guid id, string name) : ValueObject<PermissionType>
     {
-        public PermissionType(Guid id, string name)
-        {
-            Id = id;
-            Name = name;
-        }
-
-        public Guid Id { get; }
-        public string Name { get; }
+        public Guid Id { get; } = id;
+        public string Name { get; } = name;
 
         protected override IEnumerable<(string Name, object Value)> GetValueComponents()
         {

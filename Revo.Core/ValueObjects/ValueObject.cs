@@ -20,10 +20,7 @@ namespace Revo.Core.ValueObjects
         private WeakReference<(string Name, object Value)[]> cachedValueMembers;
         private int? hashCode;
 
-        public ValueObject()
-        {
-            Debug.Assert(typeof(T).IsAssignableFrom(GetType()));
-        }
+        public ValueObject() => Debug.Assert(typeof(T).IsAssignableFrom(GetType()));
 
         /// <summary>
         /// Gets the components that define the value of this objects.
@@ -87,6 +84,7 @@ namespace Revo.Core.ValueObjects
         public override string ToString()
         {
             var valueMembers = GetValueComponentsWithCache();
+
             return $"{typeof(T).Name} {{ {string.Join(", ", valueMembers.Select(x => (x.Name != null ? x.Name + " = " : "") + (x.Value?.ToString() ?? "null")))} }}";
         }
 
