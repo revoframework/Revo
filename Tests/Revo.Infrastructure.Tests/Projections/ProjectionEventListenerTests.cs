@@ -163,7 +163,7 @@ namespace Revo.Infrastructure.Tests.Projections
             projectionSubSystem.WhenForAnyArgs(x => x.ExecuteProjectionsAsync(null, null, null))
                 .Do(ci =>
                 {
-                    unitsOfWork.Should().HaveCountGreaterOrEqualTo(1);
+                    unitsOfWork.Should().HaveCountGreaterThanOrEqualTo(1);
                     commandContextStack.UnitOfWork.Should().Be(unitsOfWork.Last());
                     unitsOfWork.Last().Should().Be(ci.Arg<IUnitOfWork>());
                 });

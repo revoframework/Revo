@@ -181,7 +181,7 @@ namespace Revo.Testing.Infrastructure
                             newEvents[i].Should().BeEquivalentTo(expectedEvent.ev,
                                 config => config
                                     //.IncludingAllRuntimeProperties()
-                                    .RespectingRuntimeTypes()
+                                    .PreferringRuntimeMemberTypes()
                                     //.Excluding(x => x.Id)
                                     .Excluding(x => x.AggregateId)
                                     /*.Excluding(x => x.AggregateClassId)*/);
