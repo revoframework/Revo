@@ -5,7 +5,6 @@ using Rebus.Activation;
 using Rebus.Config;
 using Rebus.Handlers;
 using Rebus.Ninject;
-using Rebus.NLog.Config;
 using Revo.Core.Core;
 using Revo.Core.Events;
 using Revo.Infrastructure.Events.Async;

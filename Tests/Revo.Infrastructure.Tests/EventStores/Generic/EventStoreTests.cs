@@ -207,7 +207,7 @@ namespace Revo.Infrastructure.Tests.EventStores.Generic
 
             records.Should().HaveCount(1);
             records.ElementAt(0).AdditionalMetadata.Should().Contain(uncommittedRecords[0].Metadata);
-            records.ElementAt(0).Event.Should().BeEquivalentTo(uncommittedRecords[0].Event, cfg => cfg.RespectingRuntimeTypes());
+            records.ElementAt(0).Event.Should().BeEquivalentTo(uncommittedRecords[0].Event, cfg => cfg.PreferringRuntimeMemberTypes());
             records.ElementAt(0).EventId.Should().NotBeEmpty();
             records.ElementAt(0).StoreDate.Should().Be(Clock.Current.UtcNow);
             records.ElementAt(0).StreamSequenceNumber.Should().Be(3);

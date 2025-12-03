@@ -3,11 +3,12 @@ using Ninject.Extensions.ContextPreservation;
 using Ninject.Modules;
 using Revo.Core.Core;
 using Revo.Core.Lifecycle;
+using Revo.Extensions.AutoMapper.Configuration;
 
 namespace Revo.Extensions.AutoMapper
 {
     [AutoLoadModule(false)]
-    public class AutoMapperModule : NinjectModule
+    public class AutoMapperModule(AutoMapperConfigurationSection section) : NinjectModule
     {
         public override void Load()
         {
@@ -18,6 +19,9 @@ namespace Revo.Extensions.AutoMapper
             Bind<IAutoMapperInitializer, IApplicationConfigurer>()
                 .To<AutoMapperInitializer>()
                 .InSingletonScope();
+            
+            Bind<AutoMapperConfigurationSection>()
+                .ToConstant(section);
 
             Bind<MapperConfiguration>()
                 .ToMethod(ctx => ctx.ContextPreservingGet<IAutoMapperInitializer>()

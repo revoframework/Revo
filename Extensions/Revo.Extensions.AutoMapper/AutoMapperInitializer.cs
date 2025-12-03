@@ -1,8 +1,10 @@
 ﻿using System;
 using AutoMapper;
 using AutoMapper.Extensions.ExpressionMapping;
+using Microsoft.Extensions.Logging;
 using Revo.Core.Core;
 using Revo.Core.Lifecycle;
+using Revo.Extensions.AutoMapper.Configuration;
 
 namespace Revo.Extensions.AutoMapper
 {
@@ -11,12 +13,14 @@ namespace Revo.Extensions.AutoMapper
         private readonly IAutoMapperProfileDiscovery profileDiscovery;
         private readonly Lazy<MapperConfiguration> mapperConfiguration;
         private readonly IServiceLocator serviceLocator;
+        private readonly AutoMapperConfigurationSection configurationSection;
 
         public AutoMapperInitializer(IAutoMapperProfileDiscovery profileDiscovery,
-            IServiceLocator serviceLocator)
+            IServiceLocator serviceLocator, AutoMapperConfigurationSection configurationSection)
         {
             this.profileDiscovery = profileDiscovery;
             this.serviceLocator = serviceLocator;
+            this.configurationSection = configurationSection;
 
             mapperConfiguration = new Lazy<MapperConfiguration>(CreateMapperConfiguration);
         }
@@ -51,6 +55,8 @@ namespace Revo.Extensions.AutoMapper
                 {
                     configExpression.AddProfile(profile);
                 }
+                
+                configurationSection.ConfigureAction?.Invoke(configExpression);
             });
 
             return config;

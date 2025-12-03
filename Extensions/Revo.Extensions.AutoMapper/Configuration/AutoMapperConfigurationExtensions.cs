@@ -17,7 +17,7 @@ namespace Revo.Extensions.AutoMapper.Configuration
             {
                 if (section.AutoDiscoverProfiles)
                 {
-                    c.LoadModule(new AutoMapperModule());
+                    c.LoadModule(new AutoMapperModule(section));
                 }
             });
 

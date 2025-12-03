@@ -1,5 +1,9 @@
 # RELEASE NOTES
 
+## [1.38.0] - 2025-12-12
+-upgraded to NET 10.0 & EF Core 10.0
+-added optional AutoMapper config action
+
 ## [1.37.0] - 2025-04-14
 -upgraded solution to NET 9.0 & other dependencies (EF Core, AutoMapper, Hangfire...)
 
