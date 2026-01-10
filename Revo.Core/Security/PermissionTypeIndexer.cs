@@ -6,23 +6,14 @@ using Revo.Core.Types;
 
 namespace Revo.Core.Security
 {
-    public class PermissionTypeIndexer : IApplicationStartedListener, IPermissionTypeIndexer
+    public class PermissionTypeIndexer(ITypeExplorer typeExplorer,
+        IPermissionTypeRegistry permissionTypeRegistry) : IApplicationStartedListener, IPermissionTypeIndexer
     {
-        private readonly IPermissionTypeRegistry permissionTypeRegistry;
-        private readonly ITypeExplorer typeExplorer;
+        private readonly IPermissionTypeRegistry permissionTypeRegistry = permissionTypeRegistry;
+        private readonly ITypeExplorer typeExplorer = typeExplorer;
         private readonly HashSet<Type> registeredCatalogTypes = new HashSet<Type>();
 
-        public PermissionTypeIndexer(ITypeExplorer typeExplorer,
-            IPermissionTypeRegistry permissionTypeRegistry)
-        {
-            this.typeExplorer = typeExplorer;
-            this.permissionTypeRegistry = permissionTypeRegistry;
-        }
-
-        public void OnApplicationStarted()
-        {
-            Index();
-        }
+        public void OnApplicationStarted() => Index();
 
         public void EnsureIndexed()
         {

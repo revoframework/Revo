@@ -4,16 +4,10 @@ using Ninject.Modules;
 
 namespace Revo.Core.Configuration
 {
-    public class KernelConfigurationContext : IKernelConfigurationContext
+    public class KernelConfigurationContext(IKernel kernel, KernelConfigurationSection kernelConfigurationSection) : IKernelConfigurationContext
     {
-        public KernelConfigurationContext(IKernel kernel, KernelConfigurationSection kernelConfigurationSection)
-        {
-            Kernel = kernel;
-            KernelConfigurationSection = kernelConfigurationSection;
-        }
-
-        public IKernel Kernel { get; }
-        public KernelConfigurationSection KernelConfigurationSection { get; }
+        public IKernel Kernel { get; } = kernel;
+        public KernelConfigurationSection KernelConfigurationSection { get; } = kernelConfigurationSection;
 
         public void LoadModule<TModule>() where TModule : class, INinjectModule, new()
         {

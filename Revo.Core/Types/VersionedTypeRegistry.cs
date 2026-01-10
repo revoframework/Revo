@@ -6,21 +6,13 @@ using System.Linq;
 
 namespace Revo.Core.Types
 {
-    public class VersionedTypeRegistry : IVersionedTypeRegistry
+    public class VersionedTypeRegistry(ITypeIndexer typeIndexer) : IVersionedTypeRegistry
     {
-        private readonly ITypeIndexer typeIndexer;
+        private readonly ITypeIndexer typeIndexer = typeIndexer;
         private readonly ConcurrentDictionary<Type, SubtypeRegistry> registries =
             new ConcurrentDictionary<Type, SubtypeRegistry>();
 
-        public VersionedTypeRegistry(ITypeIndexer typeIndexer)
-        {
-            this.typeIndexer = typeIndexer;
-        }
-
-        public IEnumerable<VersionedType> GetAllTypes<TBase>()
-        {
-            return GetSubtypeRegistry<TBase>().Ids.Values;
-        }
+        public IEnumerable<VersionedType> GetAllTypes<TBase>() => GetSubtypeRegistry<TBase>().Ids.Values;
 
         public VersionedType GetTypeInfo<TBase>(VersionedTypeId id)
         {
@@ -55,37 +47,26 @@ namespace Revo.Core.Types
             return typeVersions;
         }
 
-        public void ClearCache<TBase>()
-        {
-            registries.TryRemove(typeof(TBase), out var _);
-        }
+        public void ClearCache<TBase>() => registries.TryRemove(typeof(TBase), out var _);
 
-        private SubtypeRegistry GetSubtypeRegistry<TBase>()
-        {
-            return registries.GetOrAdd(typeof(TBase), type =>
+        private SubtypeRegistry GetSubtypeRegistry<TBase>() =>
+            registries.GetOrAdd(typeof(TBase), type =>
             {
                 var ids = typeIndexer.IndexTypes<TBase>().ToImmutableDictionary(x => x.Id, x => x);
                 var types = ids.Values.ToImmutableDictionary(x => x.ClrType, x => x);
                 var typeVersions = ids.Values.GroupBy(x => x.Id.Name)
                     .ToImmutableDictionary(x => x.Key, x => x.ToImmutableList());
+
                 return new SubtypeRegistry(ids, types, typeVersions);
             });
-        }
 
-        private class SubtypeRegistry
+        private class SubtypeRegistry(ImmutableDictionary<VersionedTypeId, VersionedType> ids,
+            ImmutableDictionary<Type, VersionedType> types,
+            ImmutableDictionary<string, ImmutableList<VersionedType>> typeVersions)
         {
-            public SubtypeRegistry(ImmutableDictionary<VersionedTypeId, VersionedType> ids,
-                ImmutableDictionary<Type, VersionedType> types,
-                ImmutableDictionary<string, ImmutableList<VersionedType>> typeVersions)
-            {
-                Ids = ids;
-                Types = types;
-                TypeVersions = typeVersions;
-            }
-
-            public ImmutableDictionary<VersionedTypeId, VersionedType> Ids { get; }
-            public ImmutableDictionary<Type, VersionedType> Types { get; }
-            public ImmutableDictionary<string, ImmutableList<VersionedType>> TypeVersions { get; }
+            public ImmutableDictionary<VersionedTypeId, VersionedType> Ids { get; } = ids;
+            public ImmutableDictionary<Type, VersionedType> Types { get; } = types;
+            public ImmutableDictionary<string, ImmutableList<VersionedType>> TypeVersions { get; } = typeVersions;
         }
     }
 }

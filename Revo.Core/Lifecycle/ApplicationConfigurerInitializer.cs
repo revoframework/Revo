@@ -2,14 +2,9 @@
 
 namespace Revo.Core.Lifecycle
 {
-    public class ApplicationConfigurerInitializer : IApplicationConfigurerInitializer
+    public class ApplicationConfigurerInitializer(Func<IApplicationConfigurer[]> configurersFunc) : IApplicationConfigurerInitializer
     {
-        private readonly Func<IApplicationConfigurer[]> configurersFunc;
-
-        public ApplicationConfigurerInitializer(Func<IApplicationConfigurer[]> configurersFunc)
-        {
-            this.configurersFunc = configurersFunc;
-        }
+        private readonly Func<IApplicationConfigurer[]> configurersFunc = configurersFunc;
 
         public void ConfigureAll()
         {
