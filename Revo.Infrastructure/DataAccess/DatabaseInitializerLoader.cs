@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Revo.Core.Commands;
 using Revo.Core.Core;
@@ -16,6 +17,7 @@ namespace Revo.Infrastructure.DataAccess
         private readonly Func<IRepository> repositoryFunc; // using func factories for late resolving in the scope of different tasks
         private readonly Func<IUnitOfWorkFactory> unitOfWorkFactoryFunc;
         private readonly Func<CommandContextStack> commandContextStackFunc;
+        private readonly object initLock = new object();
         private bool isInitialized = false;
 
         public DatabaseInitializerLoader(IDatabaseInitializerDiscovery databaseInitializerDiscovery,
@@ -36,8 +38,13 @@ namespace Revo.Infrastructure.DataAccess
 
         public void EnsureDatabaseInitialized()
         {
-            if (!isInitialized)
+            lock (initLock)
             {
+                if (isInitialized)
+                {
+                    return;
+                }
+
                 isInitialized = true;
 
                 var initializers = databaseInitializerDiscovery.DiscoverDatabaseInitializers();
@@ -47,20 +54,20 @@ namespace Revo.Infrastructure.DataAccess
                 {
                     Task.Factory.StartNewWithContext(async () =>
                     {
-                        using (IUnitOfWork uow = unitOfWorkFactoryFunc().CreateUnitOfWork())
+                        using var uow = unitOfWorkFactoryFunc().CreateUnitOfWork();
+                        
+                        var commandContextStack = commandContextStackFunc();
+                        commandContextStack.Push(new CommandContext(null, uow));
+                        
+                        try
                         {
-                            var commandContextStack = commandContextStackFunc();
-                            commandContextStack.Push(new CommandContext(null, uow));
-                            try
-                            {
-                                uow.Begin();
-                                await initializer.InitializeAsync(repositoryFunc());
-                                await uow.CommitAsync();
-                            }
-                            finally
-                            {
-                                commandContextStack.Pop();
-                            }
+                            uow.Begin();
+                            await initializer.InitializeAsync(repositoryFunc());
+                            await uow.CommitAsync();
+                        }
+                        finally
+                        {
+                            commandContextStack.Pop();
                         }
                     }).GetAwaiter().GetResult();
                 }
