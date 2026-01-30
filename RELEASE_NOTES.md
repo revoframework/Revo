@@ -1,5 +1,9 @@
 # RELEASE NOTES
 
+## [1.38.1] - 2026-01-30
+-fixed IDatabaseInitializerLoader.EnsureDatabaseInitialized thread-safety (added a lock)
+-removed xunit dependency from Revo.Testing
+
 ## [1.38.0] - 2025-12-12
 -upgraded to NET 10.0 & EF Core 10.0
 -added optional AutoMapper config action
