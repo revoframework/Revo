@@ -7,16 +7,10 @@ using Revo.Core.Core;
 
 namespace Revo.Core.Commands
 {
-    public class LocalCommandBus : ILocalCommandBus
+    public class LocalCommandBus(IServiceLocator serviceLocator, ICommandBusPipeline pipeline) : ILocalCommandBus
     {
-        private readonly IServiceLocator serviceLocator;
-        private readonly ICommandBusPipeline pipeline;
-
-        public LocalCommandBus(IServiceLocator serviceLocator, ICommandBusPipeline pipeline)
-        {
-            this.serviceLocator = serviceLocator;
-            this.pipeline = pipeline;
-        }
+        private readonly IServiceLocator serviceLocator = serviceLocator;
+        private readonly ICommandBusPipeline pipeline = pipeline;
 
         public async Task<TResult> SendAsync<TResult>(ICommand<TResult> command, CommandExecutionOptions executionOptions,
             CancellationToken cancellationToken)
@@ -26,10 +20,8 @@ namespace Revo.Core.Commands
             return result;
         }
 
-        public Task SendAsync(ICommandBase command, CancellationToken cancellationToken)
-        {
-            return SendAsync(command, CommandExecutionOptions.Default, cancellationToken);
-        }
+        public Task SendAsync(ICommandBase command, CancellationToken cancellationToken) =>
+            SendAsync(command, CommandExecutionOptions.Default, cancellationToken);
 
         public Task SendAsync(ICommandBase command, CommandExecutionOptions executionOptions,
             CancellationToken cancellationToken)
@@ -49,10 +41,8 @@ namespace Revo.Core.Commands
             return InvokeHandleAsync<object>(handlerType, command, executionOptions, cancellationToken);
         }
 
-        public Task<TResult> SendAsync<TResult>(ICommand<TResult> command, CancellationToken cancellationToken)
-        {
-            return SendAsync<TResult>(command, CommandExecutionOptions.Default, cancellationToken);
-        }
+        public Task<TResult> SendAsync<TResult>(ICommand<TResult> command, CancellationToken cancellationToken) =>
+            SendAsync<TResult>(command, CommandExecutionOptions.Default, cancellationToken);
 
         private async Task<TResult> InvokeHandleAsync<TResult>(Type handlerType, ICommandBase command, CommandExecutionOptions executionOptions,
             CancellationToken cancellationToken)
@@ -76,7 +66,7 @@ namespace Revo.Core.Commands
                     .GetRuntimeMethod(nameof(ICommandHandler<ICommand>.HandleAsync),
                         new[] { commandType, typeof(CancellationToken) });
 
-                var resultTask = (Task) handleMethod.Invoke(listener, new object[] {command, cancellationToken});
+                var resultTask = (Task)handleMethod.Invoke(listener, new object[] { command, cancellationToken });
 
                 if (resultTask is Task<TResult> resultObjectTask)
                 {
@@ -91,7 +81,8 @@ namespace Revo.Core.Commands
 
             object result = await pipeline.ProcessAsync(command, executionHandler, this,
                 executionOptions, cancellationToken);
-            return (TResult) result;
+
+            return (TResult)result;
             // TODO test with contravariant handlers
         }
     }

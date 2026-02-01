@@ -5,9 +5,7 @@ namespace Revo.Core.Security
 {
     public class NullUserPermissionResolver : IUserPermissionResolver
     {
-        public Task<IReadOnlyCollection<Permission>> GetUserPermissionsAsync(IUser user)
-        {
-            return Task.FromResult((IReadOnlyCollection<Permission>) new List<Permission>());
-        }
+        public Task<IReadOnlyCollection<Permission>> GetUserPermissionsAsync(IUser user) =>
+            Task.FromResult((IReadOnlyCollection<Permission>)new List<Permission>());
     }
 }

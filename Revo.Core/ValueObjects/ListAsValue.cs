@@ -7,15 +7,9 @@ namespace Revo.Core.ValueObjects
 {
     public class ListAsValue<T> : ValueObject<ListAsValue<T>>, IEnumerable<T>
     {
-        public ListAsValue(ImmutableArray<T> list)
-        {
-            List = list;
-        }
+        public ListAsValue(ImmutableArray<T> list) => List = list;
 
-        public ListAsValue(IImmutableList<T> list)
-        {
-            List = list;
-        }
+        public ListAsValue(IImmutableList<T> list) => List = list;
 
         public IReadOnlyList<T> List { get; }
 

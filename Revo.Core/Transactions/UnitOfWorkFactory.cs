@@ -3,20 +3,15 @@ using System;
 
 namespace Revo.Core.Transactions
 {
-    public class UnitOfWorkFactory : IUnitOfWorkFactory
+    public class UnitOfWorkFactory(Func<Lazy<IUnitOfWorkListener[]>> unitOfWorkListenersLazyFunc, IPublishEventBufferFactory publishEventBufferFactory) : IUnitOfWorkFactory
     {
-        private readonly Func<Lazy<IUnitOfWorkListener[]>> unitOfWorkListenersLazyFunc;
-        private readonly IPublishEventBufferFactory publishEventBufferFactory;
-
-        public UnitOfWorkFactory(Func<Lazy<IUnitOfWorkListener[]>> unitOfWorkListenersLazyFunc, IPublishEventBufferFactory publishEventBufferFactory)
-        {
-            this.unitOfWorkListenersLazyFunc = unitOfWorkListenersLazyFunc;
-            this.publishEventBufferFactory = publishEventBufferFactory;
-        }
+        private readonly Func<Lazy<IUnitOfWorkListener[]>> unitOfWorkListenersLazyFunc = unitOfWorkListenersLazyFunc;
+        private readonly IPublishEventBufferFactory publishEventBufferFactory = publishEventBufferFactory;
 
         public IUnitOfWork CreateUnitOfWork()
         {
             var tx = new UnitOfWork(unitOfWorkListenersLazyFunc(), publishEventBufferFactory.CreateEventBuffer());
+
             return tx;
         }
     }
