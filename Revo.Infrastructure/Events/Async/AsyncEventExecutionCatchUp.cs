@@ -1,27 +1,21 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Revo.Core.Core;
-using Revo.Core.Services;
 
 namespace Revo.Infrastructure.Events.Async;
 
 public class AsyncEventExecutionCatchUp(
-    IEnumerable<IEventSourceCatchUp> eventSourceCatchUps,
-    IAsyncEventQueueManager asyncEventQueueManager,
     IAsyncEventPipelineConfiguration asyncEventPipelineConfiguration,
     IServiceScopeFactory serviceScopeFactory,
     ILogger<AsyncEventExecutionCatchUp> logger)
     : IHostedService
 {
-    private readonly IEventSourceCatchUp[] eventSourceCatchUpsArray = eventSourceCatchUps.ToArray();
     private Task task;
-    
+
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         task = Task.Run(InitializeAsync);
@@ -48,23 +42,33 @@ public class AsyncEventExecutionCatchUp(
 
     private async Task CatchUpEventSourcesAsync()
     {
-        foreach (var eventSourceCatchUp in eventSourceCatchUpsArray)
+        using (var scope = serviceScopeFactory.CreateScope())
         {
-            try
+            foreach (var eventSourceCatchUp in scope.ServiceProvider.GetServices<IEventSourceCatchUp>())
             {
-                await eventSourceCatchUp.CatchUpAsync();
-            }
-            catch (Exception e)
-            {
-                // TODO reschedule?
-                logger.LogError(e, $"Failed to catch-up an event source {eventSourceCatchUp} during startup");
+                try
+                {
+                    await eventSourceCatchUp.CatchUpAsync();
+                }
+                catch (Exception e)
+                {
+                    // TODO reschedule?
+                    logger.LogError(e, $"Failed to catch-up an event source {eventSourceCatchUp} during startup");
+                }
             }
         }
     }
-        
+
     private async Task RunBackloggedQueuesAsync()
     {
-        var backloggedQueueNames = await asyncEventQueueManager.GetNonemptyQueueNamesAsync();
+        IReadOnlyCollection<string> backloggedQueueNames;
+        using (var managerScope = serviceScopeFactory.CreateScope())
+        {
+            var asyncEventQueueManager =
+                managerScope.ServiceProvider.GetRequiredService<IAsyncEventQueueManager>();
+            backloggedQueueNames = await asyncEventQueueManager.GetNonemptyQueueNamesAsync();
+        }
+
         var throttledTasks = new List<Task>();
 
         using (var throttle = new SemaphoreSlim(asyncEventPipelineConfiguration.CatchUpProcessingParallelism))
@@ -78,7 +82,7 @@ public class AsyncEventExecutionCatchUp(
                     using var scope = serviceScopeFactory.CreateScope();
                     try
                     {
-                        var asyncEventQueueBacklogWorker = 
+                        var asyncEventQueueBacklogWorker =
                             scope.ServiceProvider.GetRequiredService<IAsyncEventWorker>();
                         await asyncEventQueueBacklogWorker.RunQueueBacklogAsync(queueName);
                     }

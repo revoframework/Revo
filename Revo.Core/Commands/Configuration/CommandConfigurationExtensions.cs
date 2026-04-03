@@ -39,6 +39,9 @@ public static class CommandConfigurationExtensions
                     serviceProvider.GetRequiredService<CommandContextStack>());
                 serviceCollection.AddTransient<IUnitOfWorkAccessor>(serviceProvider =>
                     serviceProvider.GetRequiredService<CommandContextStack>());
+
+                serviceCollection.AddTransient(typeof(ICommandBusMiddleware<ICommandBase>),
+                    typeof(UnitOfWorkCommandBusMiddleware));
             });
 
             cfg.AddAfterConfigureServicesAction(serviceCollection =>
@@ -51,7 +54,7 @@ public static class CommandConfigurationExtensions
 
             return commandsSection;
         });
-            
+
         advancedAction?.Invoke(section);
 
         return configuration;
