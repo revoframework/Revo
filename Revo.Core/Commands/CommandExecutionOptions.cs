@@ -8,7 +8,7 @@
 /// significance if a remote command handler is registered for the command).</remarks>
 public class CommandExecutionOptions
 {
-    public static readonly CommandExecutionOptions Default = new CommandExecutionOptions(null, null);
+    public static readonly CommandExecutionOptions Default = new();
 
     public CommandExecutionOptions(bool? autoCommitUnitOfWork = null,
         CommandTenantContextOverride tenantContext = null)

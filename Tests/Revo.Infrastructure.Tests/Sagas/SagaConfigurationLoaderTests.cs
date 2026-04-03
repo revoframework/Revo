@@ -21,9 +21,9 @@ namespace Revo.Infrastructure.Tests.Sagas
         }
 
         [Fact]
-        public async Task StartedAsync_ConfiguresSagas()
+        public async Task ExecuteAsync_ConfiguresSagas()
         {
-            await sut.StartedAsync(CancellationToken.None);
+            await sut.ExecuteAsync(CancellationToken.None);
 
             sagaConfigurators[0].Received(1).ConfigureSagas(sagaRegistry);
             sagaConfigurators[1].Received(1).ConfigureSagas(sagaRegistry);

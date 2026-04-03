@@ -46,24 +46,36 @@ namespace Revo.Infrastructure.Tests.Events.Async
             };
 
             serviceScopeFactory = Substitute.For<IServiceScopeFactory>();
-            serviceScopeFactory.CreateScope().Returns(ci =>
+            serviceScopeFactory.CreateScope().Returns(_ =>
             {
-                var worker = Substitute.For<IAsyncEventWorker>();
-                worker.WhenForAnyArgs(x => x.RunQueueBacklogAsync(null)).Do(innerCi =>
-                {
-                    lock (processedQueues)
-                    {
-                        processedQueues.Add((worker, innerCi.ArgAt<string>(0)));
-                    }
-                });
-
-                lock (asyncEventQueueBacklogWorkers)
-                {
-                    asyncEventQueueBacklogWorkers.Add(worker);
-                }
-
                 var scopedProvider = Substitute.For<IServiceProvider>();
-                scopedProvider.GetService(typeof(IAsyncEventWorker)).Returns(worker);
+                scopedProvider.GetService(typeof(IEnumerable<IEventSourceCatchUp>)).Returns(eventSourceCatchUps);
+                scopedProvider.GetService(typeof(IAsyncEventQueueManager)).Returns(asyncEventQueueManager);
+
+                IAsyncEventWorker worker = null;
+                scopedProvider.GetService(typeof(IAsyncEventWorker)).Returns(_ =>
+                {
+                    if (worker != null)
+                    {
+                        return worker;
+                    }
+
+                    worker = Substitute.For<IAsyncEventWorker>();
+                    worker.WhenForAnyArgs(x => x.RunQueueBacklogAsync(null)).Do(innerCi =>
+                    {
+                        lock (processedQueues)
+                        {
+                            processedQueues.Add((worker, innerCi.ArgAt<string>(0)));
+                        }
+                    });
+
+                    lock (asyncEventQueueBacklogWorkers)
+                    {
+                        asyncEventQueueBacklogWorkers.Add(worker);
+                    }
+
+                    return worker;
+                });
 
                 var scope = Substitute.For<IServiceScope>();
                 scope.ServiceProvider.Returns(scopedProvider);
@@ -71,8 +83,6 @@ namespace Revo.Infrastructure.Tests.Events.Async
             });
 
             sut = new AsyncEventExecutionCatchUp(
-                eventSourceCatchUps,
-                asyncEventQueueManager,
                 asyncEventPipelineConfiguration,
                 serviceScopeFactory,
                 new NullLogger<AsyncEventExecutionCatchUp>());
@@ -122,9 +132,11 @@ namespace Revo.Infrastructure.Tests.Events.Async
                 .Returns(Task.FromException(new AsyncEventProcessingException()));
 
             var testScopeFactory = Substitute.For<IServiceScopeFactory>();
-            testScopeFactory.CreateScope().Returns(ci =>
+            testScopeFactory.CreateScope().Returns(_ =>
             {
                 var scopedProvider = Substitute.For<IServiceProvider>();
+                scopedProvider.GetService(typeof(IEnumerable<IEventSourceCatchUp>)).Returns(eventSourceCatchUps);
+                scopedProvider.GetService(typeof(IAsyncEventQueueManager)).Returns(asyncEventQueueManager);
                 scopedProvider.GetService(typeof(IAsyncEventWorker)).Returns(worker);
 
                 var scope = Substitute.For<IServiceScope>();
@@ -133,8 +145,6 @@ namespace Revo.Infrastructure.Tests.Events.Async
             });
 
             sut = new AsyncEventExecutionCatchUp(
-                eventSourceCatchUps,
-                asyncEventQueueManager,
                 asyncEventPipelineConfiguration,
                 testScopeFactory,
                 new NullLogger<AsyncEventExecutionCatchUp>());

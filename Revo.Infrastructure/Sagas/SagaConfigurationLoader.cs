@@ -2,24 +2,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
+using Revo.Core.Lifecycle;
 
 namespace Revo.Infrastructure.Sagas;
 
 public class SagaConfigurationLoader(
     IEnumerable<ISagaConfigurator> sagaConfigurators,
-    ISagaRegistry sagaRegistry) : IHostedLifecycleService
+    ISagaRegistry sagaRegistry) : IStartupTask
 {
     private readonly ISagaConfigurator[] sagaConfigurators = sagaConfigurators.ToArray();
 
-    public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-
-    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-
-    public Task StartingAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-
-    public Task StartedAsync(CancellationToken cancellationToken)
+    public Task ExecuteAsync(CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         foreach (ISagaConfigurator sagaConfigurator in sagaConfigurators)
         {
             sagaConfigurator.ConfigureSagas(sagaRegistry);
@@ -27,8 +22,4 @@ public class SagaConfigurationLoader(
 
         return Task.CompletedTask;
     }
-
-    public Task StoppingAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-
-    public Task StoppedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }
