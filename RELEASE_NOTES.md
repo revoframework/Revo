@@ -1,5 +1,8 @@
 # RELEASE NOTES
 
+## [1.38.2] - 2026-05-29
+-fixed repeatable SQL migrations not being transitively reapplied when a (transitive) dependency changed; repeatable modules are now ordered dependencies-first using the active tag-compatible variant
+
 ## [1.38.1] - 2026-01-30
 -fixed IDatabaseInitializerLoader.EnsureDatabaseInitialized thread-safety (added a lock)
 -removed xunit dependency from Revo.Testing
