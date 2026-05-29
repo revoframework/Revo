@@ -734,6 +734,236 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
         }
 
         [Fact]
+        public async Task SelectMigrationsAsync_RepeatablesRerunTransitivelyWhenDependenciesUpdated()
+        {
+            // create (changed) <- view (unchanged) <- biExportView (unchanged)
+            // updating "create" must rerun "view" AND, transitively, "biExportView"
+            migrationProvider.GetMigrationHistoryAsync()
+                .Returns(new[]
+                {
+                    new FakeDatabaseMigrationRecord()
+                    {
+                        ModuleName = "create",
+                        Checksum = "create-old",
+                        TimeApplied = Clock.Current.UtcNow
+                    },
+                    new FakeDatabaseMigrationRecord()
+                    {
+                        ModuleName = "view",
+                        Checksum = "view-checksum",
+                        TimeApplied = Clock.Current.UtcNow
+                    },
+                    new FakeDatabaseMigrationRecord()
+                    {
+                        ModuleName = "biExportView",
+                        Checksum = "biexport-checksum",
+                        TimeApplied = Clock.Current.UtcNow
+                    }
+                });
+
+            migrationRegistry.Migrations.Returns(new List<IDatabaseMigration>()
+            {
+                new FakeDatabaseMigration()
+                {
+                    ModuleName = "create",
+                    IsRepeatable = true,
+                    Checksum = "create-new"
+                },
+                new FakeDatabaseMigration()
+                {
+                    ModuleName = "view",
+                    IsRepeatable = true,
+                    Checksum = "view-checksum",
+                    Dependencies = new []
+                    {
+                        new DatabaseMigrationSpecifier("create", null),
+                    }
+                },
+                new FakeDatabaseMigration()
+                {
+                    ModuleName = "biExportView",
+                    IsRepeatable = true,
+                    Checksum = "biexport-checksum",
+                    Dependencies = new []
+                    {
+                        new DatabaseMigrationSpecifier("view", null),
+                    }
+                }
+            });
+
+            // intentionally pass the dependent before its dependencies to exercise ordering
+            var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
+                new[]
+                {
+                    new DatabaseMigrationSpecifier("biExportView", null),
+                    new DatabaseMigrationSpecifier("create", null),
+                    new DatabaseMigrationSpecifier("view", null)
+                },
+                new string[0]);
+
+            migrations.Should().HaveCount(3);
+            migrations.Should().Contain(x => x.Specifier.Equals(new DatabaseMigrationSpecifier("create", null)));
+            migrations.Should().Contain(x => x.Specifier.Equals(new DatabaseMigrationSpecifier("view", null)));
+            migrations.Should().Contain(x => x.Specifier.Equals(new DatabaseMigrationSpecifier("biExportView", null)));
+        }
+
+        [Fact]
+        public async Task SelectMigrationsAsync_RepeatablesRerunInDependencyOrderWhenDependenciesUpdated()
+        {
+            // create (changed) <- view (unchanged) <- biExportView (unchanged)
+            // the reapplied repeatables must be ordered dependencies-first
+            migrationProvider.GetMigrationHistoryAsync()
+                .Returns(new[]
+                {
+                    new FakeDatabaseMigrationRecord()
+                    {
+                        ModuleName = "create",
+                        Checksum = "create-old",
+                        TimeApplied = Clock.Current.UtcNow
+                    },
+                    new FakeDatabaseMigrationRecord()
+                    {
+                        ModuleName = "view",
+                        Checksum = "view-checksum",
+                        TimeApplied = Clock.Current.UtcNow
+                    },
+                    new FakeDatabaseMigrationRecord()
+                    {
+                        ModuleName = "biExportView",
+                        Checksum = "biexport-checksum",
+                        TimeApplied = Clock.Current.UtcNow
+                    }
+                });
+
+            migrationRegistry.Migrations.Returns(new List<IDatabaseMigration>()
+            {
+                new FakeDatabaseMigration()
+                {
+                    ModuleName = "create",
+                    IsRepeatable = true,
+                    Checksum = "create-new"
+                },
+                new FakeDatabaseMigration()
+                {
+                    ModuleName = "view",
+                    IsRepeatable = true,
+                    Checksum = "view-checksum",
+                    Dependencies = new []
+                    {
+                        new DatabaseMigrationSpecifier("create", null),
+                    }
+                },
+                new FakeDatabaseMigration()
+                {
+                    ModuleName = "biExportView",
+                    IsRepeatable = true,
+                    Checksum = "biexport-checksum",
+                    Dependencies = new []
+                    {
+                        new DatabaseMigrationSpecifier("view", null),
+                    }
+                }
+            });
+
+            var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
+                new[]
+                {
+                    new DatabaseMigrationSpecifier("biExportView", null),
+                    new DatabaseMigrationSpecifier("create", null),
+                    new DatabaseMigrationSpecifier("view", null)
+                },
+                new string[0]);
+
+            migrations.Select(x => x.Specifier.ModuleName).Should().Equal(
+                "create", "view", "biExportView");
+        }
+
+        [Fact]
+        public async Task SelectMigrationsAsync_RepeatablesRerunTransitivelyUsingTagSpecificDependencies()
+        {
+            // biExportView has a tag-specific dependency: only the DEV variant depends on "view".
+            // The ordering must use the DEV variant's dependencies for a DEV run, otherwise
+            // biExportView would be evaluated before "view" is queued and skipped incorrectly.
+            migrationProvider.GetMigrationHistoryAsync()
+                .Returns(new[]
+                {
+                    new FakeDatabaseMigrationRecord()
+                    {
+                        ModuleName = "create",
+                        Checksum = "create-old",
+                        TimeApplied = Clock.Current.UtcNow
+                    },
+                    new FakeDatabaseMigrationRecord()
+                    {
+                        ModuleName = "view",
+                        Checksum = "view-checksum",
+                        TimeApplied = Clock.Current.UtcNow
+                    },
+                    new FakeDatabaseMigrationRecord()
+                    {
+                        ModuleName = "biExportView",
+                        Checksum = "biexport-checksum",
+                        TimeApplied = Clock.Current.UtcNow
+                    }
+                });
+
+            migrationRegistry.Migrations.Returns(new List<IDatabaseMigration>()
+            {
+                new FakeDatabaseMigration()
+                {
+                    ModuleName = "create",
+                    IsRepeatable = true,
+                    Checksum = "create-new"
+                },
+                new FakeDatabaseMigration()
+                {
+                    ModuleName = "view",
+                    IsRepeatable = true,
+                    Checksum = "view-checksum",
+                    Dependencies = new []
+                    {
+                        new DatabaseMigrationSpecifier("create", null),
+                    }
+                },
+                // PROD variant registered first and WITHOUT a dependency on "view"
+                new FakeDatabaseMigration()
+                {
+                    ModuleName = "biExportView",
+                    IsRepeatable = true,
+                    Checksum = "biexport-checksum",
+                    Tags = new [] { new [] { "PROD" } }
+                },
+                // DEV variant depends on "view"
+                new FakeDatabaseMigration()
+                {
+                    ModuleName = "biExportView",
+                    IsRepeatable = true,
+                    Checksum = "biexport-checksum",
+                    Tags = new [] { new [] { "DEV" } },
+                    Dependencies = new []
+                    {
+                        new DatabaseMigrationSpecifier("view", null),
+                    }
+                }
+            });
+
+            var migrations = await sut.SelectMigrationsAsync(
+                migrationProvider,
+                new[]
+                {
+                    new DatabaseMigrationSpecifier("biExportView", null),
+                    new DatabaseMigrationSpecifier("view", null),
+                    new DatabaseMigrationSpecifier("create", null)
+                },
+                new[] { "DEV" });
+
+            migrations.Select(x => x.Specifier.ModuleName).Should().Equal(
+                "create", "view", "biExportView");
+        }
+
+        [Fact]
         public async Task SelectMigrationsAsync_RepeatablesRunLast()
         {
             migrationProvider.GetMigrationHistoryAsync()

@@ -27,8 +27,14 @@ namespace Revo.Infrastructure.DataAccess.Migrations
                 var result = new List<SelectedModuleMigrations>();
                 history = await migrationProvider.GetMigrationHistoryAsync();
 
-                // select migrations for modules, repeatable and unversioned last
-                var sortedModules = modules.OrderBy(x => IsRepeatableMigration(x) ? 1 : 0);
+                // select migrations for modules, repeatable and unversioned last;
+                // repeatables are additionally ordered so that dependencies are processed
+                // before their dependents - this ensures that an updated dependency is already
+                // queued when a (possibly transitively) dependent repeatable is evaluated for rerun
+                var versionedModules = modules.Where(x => !IsRepeatableMigration(x));
+                var repeatableModules = SortRepeatablesByDependencies(
+                    modules.Where(IsRepeatableMigration).ToList(), tags);
+                var sortedModules = versionedModules.Concat(repeatableModules);
 
                 foreach (var module in sortedModules)
                 {
@@ -46,6 +52,61 @@ namespace Revo.Infrastructure.DataAccess.Migrations
             {
                 history = null;
             }
+        }
+
+        // Orders repeatable modules so that a module's dependencies (that are themselves part of
+        // the requested module set) appear before it. Dependencies outside the set are ignored
+        // (versioned dependencies are processed earlier; repeatables not requested are not rerun).
+        // Cycles are tolerated and broken at an arbitrary point to avoid infinite recursion -
+        // cyclic dependencies are an invalid configuration that the registry is expected to reject.
+        private List<DatabaseMigrationSpecifier> SortRepeatablesByDependencies(
+            IReadOnlyCollection<DatabaseMigrationSpecifier> repeatableModules, string[] tags)
+        {
+            var modulesByName = new Dictionary<string, DatabaseMigrationSpecifier>(
+                StringComparer.InvariantCultureIgnoreCase);
+            foreach (var module in repeatableModules)
+            {
+                modulesByName[module.ModuleName] = module;
+            }
+
+            var sorted = new List<DatabaseMigrationSpecifier>();
+            // marking a module visited on entry (before recursing into its dependencies) also
+            // breaks any dependency cycle at an arbitrary point, preventing infinite recursion
+            var visited = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+
+            void Visit(DatabaseMigrationSpecifier module)
+            {
+                if (!visited.Add(module.ModuleName))
+                {
+                    return;
+                }
+
+                // pick the same tag-compatible migration that SelectModuleMigrationsNoDependenciesAsync
+                // will select, so the ordering uses the dependencies that actually apply for these tags
+                var migration = migrationRegistry.Migrations
+                    .FirstOrDefault(x => string.Equals(x.ModuleName, module.ModuleName,
+                                             StringComparison.InvariantCultureIgnoreCase)
+                                         && x.Tags.All(tagGroup => tags.Any(tagGroup.Contains)));
+                if (migration != null)
+                {
+                    foreach (var dependency in migration.Dependencies)
+                    {
+                        if (modulesByName.TryGetValue(dependency.ModuleName, out var dependencyModule))
+                        {
+                            Visit(dependencyModule);
+                        }
+                    }
+                }
+
+                sorted.Add(module);
+            }
+
+            foreach (var module in repeatableModules)
+            {
+                Visit(module);
+            }
+
+            return sorted;
         }
 
         private bool IsRepeatableMigration(DatabaseMigrationSpecifier specifier)
