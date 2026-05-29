@@ -264,6 +264,7 @@ Task("PushNuGet")
       {
         ApiKey = PreReleaseNuGetApiKey,
         Interactive = !IsCiBuild,
+        SkipDuplicate = true,
         Source = PreRelaseNuGetSourceUrl
       });
 
@@ -279,6 +280,7 @@ Task("PushNuGet")
         {
           ApiKey = ReleaseNuGetApiKey,
           Interactive = !IsCiBuild,
+          SkipDuplicate = true,
           Source = RelaseNuGetSourceUrl
         });
     }
