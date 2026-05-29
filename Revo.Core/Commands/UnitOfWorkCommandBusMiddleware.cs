@@ -6,17 +6,11 @@ using Revo.Core.Transactions;
 
 namespace Revo.Core.Commands
 {
-    public class UnitOfWorkCommandBusMiddleware : ICommandBusMiddleware<ICommandBase>
+    public class UnitOfWorkCommandBusMiddleware(IUnitOfWorkFactory unitOfWorkFactory,
+        CommandContextStack commandContextStack) : ICommandBusMiddleware<ICommandBase>
     {
-        private readonly IUnitOfWorkFactory unitOfWorkFactory;
-        private readonly CommandContextStack commandContextStack;
-
-        public UnitOfWorkCommandBusMiddleware(IUnitOfWorkFactory unitOfWorkFactory,
-            CommandContextStack commandContextStack)
-        {
-            this.unitOfWorkFactory = unitOfWorkFactory;
-            this.commandContextStack = commandContextStack;
-        }
+        private readonly IUnitOfWorkFactory unitOfWorkFactory = unitOfWorkFactory;
+        private readonly CommandContextStack commandContextStack = commandContextStack;
 
         public int Order { get; set; } = -2000;
 
@@ -62,10 +56,8 @@ namespace Revo.Core.Commands
             }
         }
 
-        private bool IsQuery(ICommandBase command)
-        {
-            return command.GetType().GetInterfaces().Any(
+        private bool IsQuery(ICommandBase command) =>
+            command.GetType().GetInterfaces().Any(
                 x => x.IsConstructedGenericType && x.GetGenericTypeDefinition() == typeof(IQuery<>));
-        }
     }
 }

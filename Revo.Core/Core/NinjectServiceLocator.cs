@@ -4,33 +4,16 @@ using Ninject;
 
 namespace Revo.Core.Core
 {
-    public class NinjectServiceLocator : IServiceLocator
+    public class NinjectServiceLocator(IKernel kernel) : IServiceLocator
     {
-        private readonly IKernel kernel;
+        private readonly IKernel kernel = kernel;
 
-        public NinjectServiceLocator(IKernel kernel)
-        {
-            this.kernel = kernel;
-        }
+        public object Get(Type serviceType) => kernel.Get(serviceType);
 
-        public object Get(Type serviceType)
-        {
-            return kernel.Get(serviceType);
-        }
+        public T Get<T>() => kernel.Get<T>();
 
-        public T Get<T>()
-        {
-            return kernel.Get<T>();
-        }
+        public IEnumerable<object> GetAll(Type serviceType) => kernel.GetAll(serviceType);
 
-        public IEnumerable<object> GetAll(Type serviceType)
-        {
-            return kernel.GetAll(serviceType);
-        }
-
-        public IEnumerable<T> GetAll<T>()
-        {
-            return kernel.GetAll<T>();
-        }
+        public IEnumerable<T> GetAll<T>() => kernel.GetAll<T>();
     }
 }

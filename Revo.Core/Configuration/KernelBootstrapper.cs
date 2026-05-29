@@ -10,19 +10,12 @@ using Revo.Core.Lifecycle;
 
 namespace Revo.Core.Configuration
 {
-    public class KernelBootstrapper
+    public class KernelBootstrapper(IKernel kernel, IRevoConfiguration configuration, ILogger logger)
     {
-        private readonly IKernel kernel;
-        private readonly IRevoConfiguration configuration;
+        private readonly IKernel kernel = kernel;
+        private readonly IRevoConfiguration configuration = configuration;
         private readonly HashSet<Assembly> loadedAssemblies = new HashSet<Assembly>();
-        private readonly ILogger logger;
-
-        public KernelBootstrapper(IKernel kernel, IRevoConfiguration configuration, ILogger logger)
-        {
-            this.kernel = kernel;
-            this.configuration = configuration;
-            this.logger = logger;
-        }
+        private readonly ILogger logger = logger;
 
         public void Configure()
         {
@@ -74,14 +67,12 @@ namespace Revo.Core.Configuration
             initializer.NotifyStopping();
         }
 
-        private INinjectModule[] GetNinjectModules(Assembly assembly)
-        {
-            return assembly.IsDynamic
+        private INinjectModule[] GetNinjectModules(Assembly assembly) => 
+            assembly.IsDynamic
                 ? new INinjectModule[0]
                 : assembly.ExportedTypes.Where(IsLoadableModule)
                     .Select(type => Activator.CreateInstance(type) as INinjectModule)
                     .ToArray();
-        }
 
         private bool IsModuleEnabled(Type type)
         {

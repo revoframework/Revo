@@ -10,10 +10,7 @@ namespace Revo.Core.Types
             Version = version;
         }
 
-        public TypeVersionAttribute(int version)
-        {
-            Version = version;
-        }
+        public TypeVersionAttribute(int version) => Version = version;
 
         public string Name { get; }
         public int Version { get; }

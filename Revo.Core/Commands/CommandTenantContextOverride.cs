@@ -2,13 +2,8 @@
 
 namespace Revo.Core.Commands
 {
-    public class CommandTenantContextOverride
+    public class CommandTenantContextOverride(ITenant tenant)
     {
-        public CommandTenantContextOverride(ITenant tenant)
-        {
-            Tenant = tenant;
-        }
-
-        public ITenant Tenant { get; }
+        public ITenant Tenant { get; } = tenant;
     }
 }

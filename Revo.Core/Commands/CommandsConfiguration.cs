@@ -13,10 +13,8 @@ namespace Revo.Core.Commands
         public bool AutoDiscoverCommandHandlers { get; set; } = true;
         public IReadOnlyDictionary<Type, Func<ICommandBus>> CommandRoutes => commandBusRoutes;
 
-        public CommandsConfiguration AddCommandRoute<TCommand>(Func<ICommandBus> commandBusFunc) where TCommand : ICommandBase
-        {
-            return AddCommandRoute(commandBusFunc, typeof(TCommand));
-        }
+        public CommandsConfiguration AddCommandRoute<TCommand>(Func<ICommandBus> commandBusFunc) where TCommand : ICommandBase => 
+            AddCommandRoute(commandBusFunc, typeof(TCommand));
 
         public CommandsConfiguration AddCommandRoute(Func<ICommandBus> commandBusFunc, params Type[] commandTypes)
         {

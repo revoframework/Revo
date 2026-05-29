@@ -31,9 +31,7 @@ namespace Revo.Core.Configuration
 
         public static IRevoConfiguration OverrideModuleLoading<TModule>(this IRevoConfiguration configuration,
             bool isLoaded,
-            Action<KernelConfigurationSection> advancedAction = null) where TModule : INinjectModule
-        {
-            return OverrideModuleLoading(configuration, typeof(TModule), isLoaded, advancedAction);
-        }
+            Action<KernelConfigurationSection> advancedAction = null) where TModule : INinjectModule =>
+            OverrideModuleLoading(configuration, typeof(TModule), isLoaded, advancedAction);
     }
 }

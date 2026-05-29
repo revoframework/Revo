@@ -6,20 +6,13 @@ using Revo.Core.Events;
 
 namespace Revo.Core.Transactions
 {
-    public class UnitOfWork : IUnitOfWork
+    public class UnitOfWork(Lazy<IUnitOfWorkListener[]> unitOfWorkListeners,
+        IPublishEventBuffer publishEventBuffer) : IUnitOfWork
     {
         private readonly List<ITransaction> innerTransactions = new List<ITransaction>();
-        private readonly Lazy<IUnitOfWorkListener[]> unitOfWorkListeners;
-        
-        public UnitOfWork(Lazy<IUnitOfWorkListener[]> unitOfWorkListeners,
-            IPublishEventBuffer publishEventBuffer)
-        {
-            this.unitOfWorkListeners = unitOfWorkListeners;
+        private readonly Lazy<IUnitOfWorkListener[]> unitOfWorkListeners = unitOfWorkListeners;
 
-            EventBuffer = publishEventBuffer;
-        }
-        
-        public IPublishEventBuffer EventBuffer { get; }
+        public IPublishEventBuffer EventBuffer { get; } = publishEventBuffer;
         public bool IsWorkBegun { get; private set; }
 
         public void Begin()

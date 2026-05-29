@@ -5,16 +5,11 @@ using Revo.Core.Core;
 
 namespace Revo.Core.Commands.Lambda
 {
-    public class LambdaCommandHandler :
+    public class LambdaCommandHandler(IServiceLocator serviceLocator) :
         ICommandHandler<LambdaCommand>,
         ICommandHandler<LambdaResultCommand, object>
     {
-        private readonly IServiceLocator serviceLocator;
-
-        public LambdaCommandHandler(IServiceLocator serviceLocator)
-        {
-            this.serviceLocator = serviceLocator;
-        }
+        private readonly IServiceLocator serviceLocator = serviceLocator;
 
         public async Task HandleAsync(LambdaCommand command, CancellationToken cancellationToken)
         {
