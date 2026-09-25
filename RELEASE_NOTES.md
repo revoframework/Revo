@@ -1,5 +1,10 @@
 # RELEASE NOTES
 
+## [1.38.4] - 2026-09-25
+-fixed RequestDbContextCache so synchronous event queues running in parallel on one request can add and dispose DbContexts safely
+
+## [1.38.3] - skipped
+
 ## [1.38.2] - 2026-05-29
 -fixed repeatable SQL migrations not being transitively reapplied when a (transitive) dependency changed; repeatable modules are now ordered dependencies-first using the active tag-compatible variant
 
