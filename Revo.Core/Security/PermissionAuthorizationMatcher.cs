@@ -28,14 +28,14 @@ namespace Revo.Core.Security
             {
                 matchingPermissions = matchingPermissions
                     .Where(x => x.ContextId == null
-                                || x.ContextId == requiredPermission.ContextId);
+                                || object.Equals(x.ContextId, requiredPermission.ContextId));
             }
 
             if (requiredPermission.ResourceId != null)
             {
                 matchingPermissions = matchingPermissions
                     .Where(x => x.ResourceId == null
-                                || x.ResourceId == requiredPermission.ResourceId);
+                                || object.Equals(x.ResourceId, requiredPermission.ResourceId));
             }
 
             return matchingPermissions.Any();

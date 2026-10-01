@@ -260,6 +260,38 @@ namespace Revo.Core.Tests.Security
             var result = sut.CheckAuthorization(availablePermissions, requiredPermissions);
             result.Should().BeTrue();
         }
+
+        [Fact]
+        public void AuthorizePermission_MatchingValueContextPasses()
+        {
+            var contextId = Guid.Parse("56E72B4D-79D8-4CA4-BE51-B3406DB2B40A");
+            var availablePermissions = new List<Permission>()
+            {
+                new Permission(permissionType1Id, null, contextId)
+            };
+            var requiredPermissions = new List<Permission>()
+            {
+                new Permission(permissionType1Id, null, Guid.Parse(contextId.ToString()))
+            };
+
+            sut.CheckAuthorization(availablePermissions, requiredPermissions).Should().BeTrue();
+        }
+
+        [Fact]
+        public void AuthorizePermission_MatchingValueResourcePasses()
+        {
+            var resourceId = "resource";
+            var availablePermissions = new List<Permission>()
+            {
+                new Permission(permissionType1Id, new string(resourceId.ToCharArray()), null)
+            };
+            var requiredPermissions = new List<Permission>()
+            {
+                new Permission(permissionType1Id, new string(resourceId.ToCharArray()), null)
+            };
+
+            sut.CheckAuthorization(availablePermissions, requiredPermissions).Should().BeTrue();
+        }
         
         [Fact]
         public void AuthorizePermission_MatchingContextNonAndMatchingResourceFails()
