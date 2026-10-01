@@ -119,7 +119,7 @@ public class Todo : EventSourcedAggregateRoot
     
     public void Rename(string name)
     {
-        if (!Name != name)
+        if (Name != name)
         {
             Publish(new TodoRenamedEvent(name));
         }
@@ -139,10 +139,13 @@ Command to save a new task.
 ```C#
 public class CreateTodoCommand : ICommand
 {
-    public CreateTodoCommand(string name)
+    public CreateTodoCommand(Guid id, string name)
     {
+        Id = id;
         Name = name;
     }
+
+    public Guid Id { get; }
 
     [Required]
     public string Name { get; }
@@ -161,9 +164,8 @@ public class TodoCommandHandler : ICommandHandler<CreateTodoCommand>
     
     public Task HandleAsync(CreateTodoCommand command, CancellationToken cancellationToken)
     {
-        var todo = new Todo(command.Id);
-        todo.Rename(command.Name);
-        repository.Add(todoList);
+        var todo = new Todo(command.Id, command.Name);
+        repository.Add(todo);
         return Task.CompletedTask;
     }   
 }
@@ -181,9 +183,9 @@ public class TodoReadModel : EntityReadModel
 ```
 
 ```C#
-public class TodoListReadModelProjector : EFCoreEntityEventToPocoProjector<Todo, TodoReadModel>
+public class TodoReadModelProjector : EFCoreEntityEventToPocoProjector<Todo, TodoReadModel>
 {
-    public TodoListReadModelProjector(IEFCoreCrudRepository repository) : base(repository)
+    public TodoReadModelProjector(IEFCoreCrudRepository repository) : base(repository)
     {
     }
     
@@ -205,19 +207,19 @@ public class GetTodosQuery : IQuery<IQueryable<TodoReadModel>>
 ```
 
 ```C#
-public class TaskQueryHandler : IQueryHandler<GetTodoQuery, IQueryable<TodoReadModel>>
+public class GetTodosQueryHandler : IQueryHandler<GetTodosQuery, IQueryable<TodoReadModel>>
 {
     private readonly IReadRepository readRepository;
     
-    public TaskListQueryHandler(IReadRepository readRepository)
+    public GetTodosQueryHandler(IReadRepository readRepository)
     {
         this.readRepository = readRepository;
     }
     
-    public Task<IQueryable<TodoReadModel>> HandleAsync(GetTodoListsQuery query, CancellationToken cancellationToken)
+    public Task<IQueryable<TodoReadModel>> HandleAsync(GetTodosQuery query, CancellationToken cancellationToken)
     {
         return Task.FromResult(readRepository
-            .FindAll<TodoListReadModel>());
+            .FindAll<TodoReadModel>());
     }
 }
 ```
@@ -226,7 +228,7 @@ public class TaskQueryHandler : IQueryHandler<GetTodoQuery, IQueryable<TodoReadM
 
 If you are new to the framework, you can
  * begin with reading the quick walkthrough for the [**Simple TO-DOs example**](https://docs.revoframework.net/general/example-simple-to-dos-task-list-app) (a task list app)
- * or try exploring [~~**the other examples**~~](https://github.com/revoframework/Revo/tree/develop/Examples) (TODO!) and framework sources on Github.
+ * or explore the [Todo example application](https://github.com/revoframework/Revo/tree/develop/Examples/Todos) and framework sources on GitHub.
  
 You can also start by reading the 📘 [**reference guide**](https://docs.revoframework.net/general/getting-started).
 
