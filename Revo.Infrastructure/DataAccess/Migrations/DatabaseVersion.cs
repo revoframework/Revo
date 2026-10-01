@@ -21,10 +21,15 @@ namespace Revo.Infrastructure.DataAccess.Migrations
         
         public static DatabaseVersion Parse(string versionString)
         {
-            var stringFractions = versionString.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+            var stringFractions = versionString.Split(new[] { '.' }, StringSplitOptions.None);
             List<int> fractions = new List<int>();
             foreach (string stringFraction in stringFractions)
             {
+                if (string.IsNullOrEmpty(stringFraction))
+                {
+                    throw new FormatException($"Invalid DatabaseVersion string '{versionString}'");
+                }
+
                 try
                 {
                     fractions.Add(int.Parse(stringFraction));
@@ -44,10 +49,10 @@ namespace Revo.Infrastructure.DataAccess.Migrations
             {
                 int thisPart = i < Fractions.Length ? Fractions[i] : 0;
                 int otherPart = i < other.Fractions.Length ? other.Fractions[i] : 0;
-                int diff = thisPart - otherPart;
-                if (diff != 0)
+                int comparison = thisPart.CompareTo(otherPart);
+                if (comparison != 0)
                 {
-                    return diff;
+                    return comparison;
                 }
             }
 
