@@ -389,6 +389,7 @@ namespace Revo.EF6.DataAccess.Entities
             }
 
             DbContext dbContext = modifiedDbContexts.First();
+            FilterSavedEntities(dbContext);
             IncrementEntityVersions(dbContext);
             try
             {
