@@ -43,7 +43,7 @@ namespace Revo.Core.Commands
 
                 if (middlewares.Length == 0)
                 {
-                    return executionHandler(command);
+                    return await executionHandler(command);
                 }
 
                 middlewares = middlewares.OrderBy(x => x.Order).ToArray();

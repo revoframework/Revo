@@ -92,11 +92,14 @@ namespace Revo.Core.Tests.Commands
             var cancellationToken = new CancellationToken();
             var executionOptions = new CommandExecutionOptions();
             var executionHandler = Substitute.For<CommandBusMiddlewareDelegate>();
+            var expectedResult = new object();
+            executionHandler.Invoke(command).Returns(Task.FromResult(expectedResult));
             
-            await sut.ProcessAsync(command, executionHandler, commandBus, executionOptions,
+            var result = await sut.ProcessAsync(command, executionHandler, commandBus, executionOptions,
                 cancellationToken);
 
             executionHandler.Received(1).Invoke(command);
+            result.Should().BeSameAs(expectedResult);
         }
         
         [Fact]
