@@ -63,7 +63,7 @@ namespace Revo.Infrastructure.Events.Async
                 logger.LogDebug($"Scheduling '{job.QueueName}' async event queue processing retry in {timeout.TotalSeconds} seconds");
 
                 ProcessAsyncEventsJob newJob = new ProcessAsyncEventsJob(job.QueueName, job.AttemptsLeft - 1, timeout);
-                await jobScheduler.EnqeueJobAsync(newJob, job.RetryTimeout);
+                await jobScheduler.EnqeueJobAsync(newJob, timeout);
             }
             else
             {
