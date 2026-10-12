@@ -1,24 +1,25 @@
-using System;
 using System.Collections.Generic;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Revo.Core.Services;
 
-public class ContainerServiceFactory<T>(IServiceProvider serviceProvider)
+/// <summary>
+/// Resolves services from the container, honoring generic variance (see <see cref="IVariantServiceResolver"/>).
+/// </summary>
+public class ContainerServiceFactory<T>(IVariantServiceResolver serviceResolver)
     : IServiceFactory<T>
 {
     public T GetRequiredService()
     {
-        return serviceProvider.GetRequiredService<T>();    
+        return serviceResolver.GetRequiredService<T>();
     }
 
     public T GetService()
     {
-        return serviceProvider.GetService<T>();
+        return serviceResolver.GetService<T>();
     }
 
     public IEnumerable<T> GetServices()
     {
-        return serviceProvider.GetServices<T>();
+        return serviceResolver.GetServices<T>();
     }
 }

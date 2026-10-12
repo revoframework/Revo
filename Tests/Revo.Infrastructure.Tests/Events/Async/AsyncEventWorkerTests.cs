@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Revo.Core.Services;
 using Microsoft.Extensions.Logging.Abstractions;
 using Revo.Core.Events;
 using Revo.Infrastructure.Events.Async;
@@ -14,7 +15,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
     {
         private AsyncEventWorker sut;
         private IAsyncEventQueueManager asyncEventQueueManager;
-        private IServiceProvider serviceProvider;
+        private IVariantServiceResolver serviceResolver;
         private List<IAsyncEventQueueRecord> events = new();
         private FakeAsyncEventQueueState queueState = new();
         private List<IAsyncEventListener> listeners = new();
@@ -22,12 +23,12 @@ namespace Revo.Infrastructure.Tests.Events.Async
         public AsyncEventWorkerTests()
         {
             asyncEventQueueManager = Substitute.For<IAsyncEventQueueManager>();
-            serviceProvider = Substitute.For<IServiceProvider>();
-            sut = new AsyncEventWorker(asyncEventQueueManager, serviceProvider, new NullLogger<AsyncEventWorker>());
+            serviceResolver = Substitute.For<IVariantServiceResolver>();
+            sut = new AsyncEventWorker(asyncEventQueueManager, serviceResolver, new NullLogger<AsyncEventWorker>());
 
             asyncEventQueueManager.GetQueueStateAsync("queue").Returns(ci => queueState);
             asyncEventQueueManager.GetQueueEventsAsync("queue").Returns(ci => events);
-            serviceProvider.GetService(typeof(IEnumerable<IAsyncEventListener<Event1>>))
+            serviceResolver.GetServices(typeof(IAsyncEventListener<Event1>))
                 .Returns(ci => listeners);
 
             listeners.Add(Substitute.For<IAsyncEventListener<Event1>>());
@@ -241,6 +242,34 @@ namespace Revo.Infrastructure.Tests.Events.Async
             
             asyncEventQueueManager.DidNotReceiveWithAnyArgs().DequeueEventAsync(Guid.Empty);
             asyncEventQueueManager.DidNotReceive().CommitAsync();
+        }
+
+        [Fact]
+        public async Task RunQueueBacklogAsync_InvokesListenersOfBaseEventTypes()
+        {
+            var baseListener = Substitute.For<IAsyncEventListener<IEvent>>();
+            baseListener.EventSequencer.Returns(Substitute.For<IAsyncEventSequencer<IEvent>>());
+            baseListener.EventSequencer.GetEventSequencing(null).ReturnsForAnyArgs(new List<EventSequencing>()
+            {
+                new() {EventSequenceNumber = 0, SequenceName = "queue"}
+            });
+
+            var services = new ServiceCollection();
+            services.AddSingleton(baseListener);
+            var worker = new AsyncEventWorker(asyncEventQueueManager,
+                new VariantServiceResolver(services.BuildServiceProvider(), new VariantServiceTypeIndex(services)),
+                new NullLogger<AsyncEventWorker>());
+
+            events.Add(new FakeAsyncEventQueueRecord() { EventId = Guid.NewGuid(),
+                EventMessage = new EventMessage<Event1>(new Event1(), new Dictionary<string, string>()),
+                Id = Guid.NewGuid(), QueueName = "queue", SequenceNumber = 1
+            });
+
+            await worker.RunQueueBacklogAsync("queue");
+
+            await baseListener.Received(1).HandleAsync((IEventMessage<IEvent>)events[0].EventMessage, "queue");
+            await baseListener.Received(1).OnFinishedEventQueueAsync("queue");
+            await asyncEventQueueManager.Received(1).DequeueEventAsync(events[0].Id);
         }
 
         public class Event1 : IEvent

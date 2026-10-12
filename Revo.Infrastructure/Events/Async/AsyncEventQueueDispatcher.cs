@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using MoreLinq;
 using Revo.Core.Events;
+using Revo.Core.Services;
 
 namespace Revo.Infrastructure.Events.Async;
 
-public class AsyncEventQueueDispatcher(IAsyncEventQueueManager asyncEventQueueManager, IServiceProvider serviceProvider)
+public class AsyncEventQueueDispatcher(IAsyncEventQueueManager asyncEventQueueManager, IVariantServiceResolver serviceResolver)
     : IAsyncEventQueueDispatcher
 {
     public Task<string> GetLastEventSourceDispatchCheckpointAsync(string eventSourceName)
@@ -49,7 +49,8 @@ public class AsyncEventQueueDispatcher(IAsyncEventQueueManager asyncEventQueueMa
     private IReadOnlyCollection<(EventSequencing Sequencing, bool SynchronousDispatch)> GetEventQueues(IEventMessage message)
     {
         var eventSequencerType = typeof(IAsyncEventSequencer<>).MakeGenericType(message.Event.GetType());
-        var eventSequencers = serviceProvider.GetServices(eventSequencerType).Cast<IAsyncEventSequencer>();
+        // variant resolution, so that e.g. IAsyncEventSequencer<DomainAggregateEvent> sequences all aggregate events
+        var eventSequencers = serviceResolver.GetServices(eventSequencerType).Cast<IAsyncEventSequencer>();
             
         var allQueues = new Dictionary<string, (EventSequencing sequencing, bool synchronousDispatch)>();
         foreach (var eventSequencer in eventSequencers)

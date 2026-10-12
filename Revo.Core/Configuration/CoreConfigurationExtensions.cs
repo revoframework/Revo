@@ -25,6 +25,8 @@ public static class CoreConfigurationExtensions
                 serviceCollection.AddSingleton(coreSection);
                 serviceCollection.AddSingleton<ITypesConfiguration>(serviceProvider =>
                     serviceProvider.GetRequiredService<CoreConfigurationSection>());
+                serviceCollection.AddSingleton(new VariantServiceTypeIndex(serviceCollection));
+                serviceCollection.AddTransient<IVariantServiceResolver, VariantServiceResolver>();
                 serviceCollection.AddTransient(typeof(IServiceFactory<>), typeof(ContainerServiceFactory<>));
                 serviceCollection.AddTransient<IClock>(_ => Clock.Current);
                 serviceCollection.AddSingleton<IEnvironment, Environment>();
