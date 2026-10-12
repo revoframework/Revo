@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Revo.Core.Core;
 using Revo.Core.Events;
@@ -12,7 +11,7 @@ namespace Revo.Infrastructure.Events.Async;
 
 public class AsyncEventWorker(
     IAsyncEventQueueManager asyncEventQueueManager,
-    IServiceProvider serviceProvider,
+    IVariantServiceResolver serviceResolver,
     ILogger<AsyncEventWorker> logger)
     : IAsyncEventWorker
 {
@@ -91,7 +90,8 @@ public class AsyncEventWorker(
             var listenerType = typeof(IAsyncEventListener<>).MakeGenericType(record.EventMessage.Event.GetType());
             var handleAsyncMethod = listenerType.GetMethod(nameof(IAsyncEventListener<IEvent>.HandleAsync));
             
-            var listeners = serviceProvider.GetServices(listenerType).Cast<IAsyncEventListener>();
+            // variant resolution, so that e.g. IAsyncEventListener<DomainAggregateEvent> receives all aggregate events
+            var listeners = serviceResolver.GetServices(listenerType).Cast<IAsyncEventListener>();
             foreach (var listener in listeners)
             {
                 var sequencer = listener.EventSequencer;

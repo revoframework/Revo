@@ -1,20 +1,20 @@
-using System;
 using System.Collections.Generic;
-using Microsoft.Extensions.DependencyInjection;
+using Revo.Core.Services;
 
 namespace Revo.Infrastructure.Security.Commands;
 
 public class EntityQueryFilterFactory : IEntityQueryFilterFactory
 {
-    private readonly IServiceProvider serviceProvider;
+    private readonly IVariantServiceResolver serviceResolver;
 
-    public EntityQueryFilterFactory(IServiceProvider serviceProvider)
+    public EntityQueryFilterFactory(IVariantServiceResolver serviceResolver)
     {
-        this.serviceProvider = serviceProvider;
+        this.serviceResolver = serviceResolver;
     }
 
     public IEnumerable<IEntityQueryFilter<T>> GetEntityQueryFilters<T>()
     {
-        return serviceProvider.GetServices<IEntityQueryFilter<T>>();
+        // variant resolution, so that filters for base entity types apply to derived entity types as well
+        return serviceResolver.GetServices<IEntityQueryFilter<T>>();
     }
 }

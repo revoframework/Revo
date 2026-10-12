@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using Revo.Core.Commands;
@@ -100,6 +101,31 @@ namespace Revo.Core.Tests.Commands
             next.Received(1).Invoke(command, CancellationToken.None);
             exceptionFilters[0].Received(1).FilterExceptionAsync(command, e);
             postFilters[0].DidNotReceiveWithAnyArgs().PostFilterAsync(null, null);
+        }
+
+        [Fact]
+        public async Task Handle_CallsFiltersOfBaseCommandTypes()
+        {
+            var preFilter = Substitute.For<IPreCommandFilter<ICommandBase>>();
+            var postFilter = Substitute.For<IPostCommandFilter<ICommandBase>>();
+            var services = new ServiceCollection();
+            services.AddSingleton(preFilter);
+            services.AddSingleton(postFilter);
+
+            var resolver = new VariantServiceResolver(services.BuildServiceProvider(),
+                new VariantServiceTypeIndex(services));
+            var middleware = new FilterCommandBusMiddleware<MyCommand>(
+                new ContainerServiceFactory<IPreCommandFilter<MyCommand>>(resolver),
+                new ContainerServiceFactory<IPostCommandFilter<MyCommand>>(resolver),
+                new ContainerServiceFactory<IExceptionCommandFilter<MyCommand>>(resolver));
+
+            var command = new MyCommand();
+            var next = Substitute.For<CommandBusMiddlewareDelegate>();
+
+            await middleware.HandleAsync(command, CommandExecutionOptions.Default, next, CancellationToken.None);
+
+            await preFilter.Received(1).PreFilterAsync(command);
+            await postFilter.Received(1).PostFilterAsync(command, null);
         }
 
         public class MyCommand : ICommand

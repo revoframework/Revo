@@ -3,12 +3,12 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
+using Revo.Core.Services;
 
 namespace Revo.Core.Commands;
 
 public class LocalCommandBus(
-    IServiceProvider serviceProvider,
+    IVariantServiceResolver serviceResolver,
     ICommandBusPipeline pipeline)
     : ILocalCommandBus
 {
@@ -61,7 +61,8 @@ public class LocalCommandBus(
             handlerType = typeof(ICommandHandler<>).MakeGenericType(command.GetType());
         }
             
-        object commandHandler = serviceProvider.GetRequiredService(handlerType);
+        // variant resolution, so that a handler for a base command type can handle derived commands
+        object commandHandler = serviceResolver.GetRequiredService(handlerType);
         var handleMethod = commandHandler.GetType()
             .GetRuntimeMethod(nameof(ICommandHandler<ICommand>.HandleAsync), [commandType, typeof(CancellationToken)
             ]);

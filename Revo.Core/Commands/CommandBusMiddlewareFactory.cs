@@ -1,15 +1,15 @@
-﻿using System;
 using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
+using Revo.Core.Services;
 
 namespace Revo.Core.Commands;
 
-public class CommandBusMiddlewareFactory(IServiceProvider serviceProvider) : ICommandBusMiddlewareFactory
+public class CommandBusMiddlewareFactory(IVariantServiceResolver serviceResolver) : ICommandBusMiddlewareFactory
 {
     public ICommandBusMiddleware<TCommand>[] CreateMiddlewares<TCommand>(ICommandBus commandBus)
         where TCommand : class, ICommandBase
     {
-        return serviceProvider.GetServices<ICommandBusMiddleware<TCommand>>()
+        // variant resolution, so that e.g. ICommandBusMiddleware<ICommandBase> applies to all commands
+        return serviceResolver.GetServices<ICommandBusMiddleware<TCommand>>()
             .ToArray();
     }
 }

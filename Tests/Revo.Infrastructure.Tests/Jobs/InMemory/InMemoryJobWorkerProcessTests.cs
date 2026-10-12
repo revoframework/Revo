@@ -39,6 +39,25 @@ namespace Revo.Infrastructure.Tests.Jobs.InMemory
         }
 
         [Fact]
+        public async Task EnqueueJob_RunsSubsequentJobs()
+        {
+            var jobs = new[] { new Job1(), new Job1(), new Job1() };
+
+            await sut.StartAsync(CancellationToken.None);
+            foreach (var job in jobs)
+            {
+                sut.EnqueueJob(job, (j, e) => { });
+            }
+
+            await sut.StopAsync(CancellationToken.None);
+
+            foreach (var job in jobs)
+            {
+                await jobRunner.Received(1).RunJobAsync(job, CancellationToken.None);
+            }
+        }
+
+        [Fact]
         public async Task ThrottlesTasks()
         {
             schedulerConfiguration.WorkerTaskParallelism = 2;

@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 using Revo.Core.Events;
+using Revo.Core.Services;
 using Revo.Infrastructure.DataAccess.Migrations;
 using Revo.Infrastructure.DataAccess.Migrations.Providers;
 
@@ -246,7 +247,8 @@ public class DatabaseMigrator : IDisposable
         }
 
         var services = new ServiceCollection();
-        var eventBus = new EventBus(services.BuildServiceProvider());
+        var eventBus = new EventBus(new VariantServiceResolver(services.BuildServiceProvider(),
+            new VariantServiceTypeIndex(services)));
 
         migrationProvider = new AdoNetDatabaseMigrationProvider(dbConnection, scripter, eventBus,
             loggerFactory.CreateLogger<AdoNetDatabaseMigrationProvider>());

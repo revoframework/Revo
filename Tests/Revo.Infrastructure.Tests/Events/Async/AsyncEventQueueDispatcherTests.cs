@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
+using Revo.Core.Services;
 using Revo.Core.Events;
 using Revo.Infrastructure.Events.Async;
 using NSubstitute;
@@ -15,21 +15,21 @@ namespace Revo.Infrastructure.Tests.Events.Async
     {
         private AsyncEventQueueDispatcher sut;
         private IAsyncEventQueueManager asyncEventQueueManager;
-        private IServiceProvider serviceProvider;
+        private IVariantServiceResolver serviceResolver;
         private List<IEventMessage> eventMessages = new List<IEventMessage>();
         private List<IAsyncEventSequencer> eventSequencers = new List<IAsyncEventSequencer>();
 
         public AsyncEventQueueDispatcherTests()
         {
             asyncEventQueueManager = Substitute.For<IAsyncEventQueueManager>();
-            serviceProvider = Substitute.For<IServiceProvider>();
+            serviceResolver = Substitute.For<IVariantServiceResolver>();
 
-            sut = new AsyncEventQueueDispatcher(asyncEventQueueManager, serviceProvider);
+            sut = new AsyncEventQueueDispatcher(asyncEventQueueManager, serviceResolver);
 
             eventSequencers.Add(Substitute.For<IAsyncEventSequencer<Event1>>());
             eventSequencers.Add(Substitute.For<IAsyncEventSequencer<Event1>>());
 
-            serviceProvider.GetService(typeof(IEnumerable<IAsyncEventSequencer<Event1>>))
+            serviceResolver.GetServices(typeof(IAsyncEventSequencer<Event1>))
                 .Returns(eventSequencers);
 
             eventMessages = new List<IEventMessage>()

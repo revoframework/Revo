@@ -65,14 +65,15 @@ public class InMemoryJobWorkerProcess(
                 }
 
                 throttle.Wait();
-                Task<Task> task = null;
-                task = Task.Factory.StartNew(async () =>
+                Task jobTask = null;
+                // created cold and only started after jobTask is tracked, so that the job can't finish
+                // (and untrack itself) before it has even been added to runningTasks
+                var task = new Task<Task>(async () =>
                 {
                     try
                     {
                         // TODO pass CancellationToken
                         await jobRunner.RunJobAsync(enqueuedJob.Job, CancellationToken.None);
-                        runningTasks.TryRemove(task, out _); // TODO shouldnt this be in finally?
                     }
                     catch (Exception e)
                     {
@@ -80,12 +81,14 @@ public class InMemoryJobWorkerProcess(
                     }
                     finally
                     {
+                        // release before untracking, so that the final WaitAll can't dispose the throttle before this
                         throttle.Release();
+                        runningTasks.TryRemove(jobTask, out _);
                     }
                 });
 
-                var unwrappedTask = task.Unwrap();
-                runningTasks[unwrappedTask] = enqueuedJob;
+                jobTask = task.Unwrap();
+                runningTasks[jobTask] = enqueuedJob;
 
                 task.Start();
             }
