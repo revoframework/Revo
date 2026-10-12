@@ -35,7 +35,9 @@ public class DatabaseInitializerDiscovery : IDatabaseInitializerDiscovery
 
             if (!alreadyRegistered)
             {
-                serviceCollection.AddTransient(typeof(IDatabaseInitializer), implType);
+                // initializers are run once at startup, resolved from the root provider - the repository they
+                // need is passed to them, so they must not depend on scoped services
+                serviceCollection.AddSingleton(typeof(IDatabaseInitializer), implType);
             }
         }
     }
