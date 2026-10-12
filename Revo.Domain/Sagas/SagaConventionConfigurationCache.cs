@@ -42,14 +42,18 @@ public class SagaConventionConfigurationCache : ISagaConventionConfigurationCach
 
     private void CreateConfigurationInfos()
     {
-        configurationInfos = new Dictionary<Type, SagaConfigurationInfo>();
+        // built separately and only then published to the static field, because multiple instances can get
+        // created concurrently (e.g. with multiple hosts in one process)
+        var newConfigurationInfos = new Dictionary<Type, SagaConfigurationInfo>();
         var sagaTypes = typeExplorer.GetAllTypes()
             .Where(x => x.IsClass && typeof(IConventionBasedSaga).IsAssignableFrom(x)
                                   && !x.IsAbstract && !x.IsGenericTypeDefinition);
 
         foreach (Type sagaType in sagaTypes)
         {
-            configurationInfos.Add(sagaType, SagaConventionConfigurationScanner.GetSagaConfiguration(sagaType));
+            newConfigurationInfos.Add(sagaType, SagaConventionConfigurationScanner.GetSagaConfiguration(sagaType));
         }
+
+        configurationInfos = newConfigurationInfos;
     }
 }
