@@ -4,6 +4,7 @@ using Revo.Core.Configuration;
 using Revo.EFCore.Configuration;
 using Revo.EFCore.DataAccess.Configuration;
 using Revo.EFCore.DataAccess.Conventions;
+using Revo.Examples.Todos;
 using Revo.Infrastructure.DataAccess.Migrations;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,7 +19,9 @@ builder.Services.AddRevo(configurator =>
         .ConfigureCore(core => core.UseAllAppDomainAssembliesForTypeDiscovery())
         .UseAspNetCore()
         .UseEFCoreDataAccess(
-            contextBuilder => contextBuilder.UseSqlite("Data Source=todos.db"),
+            contextBuilder => contextBuilder
+                .UseSqlite(builder.Configuration.GetConnectionString("Sqlite") ?? "Data Source=todos.db")
+                .AddInterceptors(new SqliteConcurrencyInterceptor()),
             advancedAction: config =>
             {
                 config
@@ -57,3 +60,6 @@ app.MapControllers();
 app.MapRazorPages();
 
 app.Run();
+
+// for WebApplicationFactory in the tests
+public partial class Program;
