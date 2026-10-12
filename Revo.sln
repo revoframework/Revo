@@ -80,6 +80,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Minimal", "Minimal", "{635C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.Examples.Minimal", "Examples\Minimal\Revo.Examples.Minimal\Revo.Examples.Minimal.csproj", "{A69B2EE9-EB02-4040-BC0D-E6E320A98639}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revo.IntegrationTests", "IntegrationTests\Revo.IntegrationTests\Revo.IntegrationTests.csproj", "{F64F07AF-6403-4B32-8B32-4FE1CDCC6F27}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -166,6 +168,10 @@ Global
 		{A69B2EE9-EB02-4040-BC0D-E6E320A98639}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A69B2EE9-EB02-4040-BC0D-E6E320A98639}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A69B2EE9-EB02-4040-BC0D-E6E320A98639}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F64F07AF-6403-4B32-8B32-4FE1CDCC6F27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F64F07AF-6403-4B32-8B32-4FE1CDCC6F27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F64F07AF-6403-4B32-8B32-4FE1CDCC6F27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F64F07AF-6403-4B32-8B32-4FE1CDCC6F27}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -201,6 +207,7 @@ Global
 		{DD6B984E-3F40-4735-A030-1331F56EBACC} = {80BDC064-0388-4205-BA2A-ADB72ED29B38}
 		{635C4C1B-8C96-4DC7-BD9B-BAD0DD895D1C} = {1D1A12B3-9916-430C-8ACB-B7243FF6B656}
 		{A69B2EE9-EB02-4040-BC0D-E6E320A98639} = {635C4C1B-8C96-4DC7-BD9B-BAD0DD895D1C}
+		{F64F07AF-6403-4B32-8B32-4FE1CDCC6F27} = {4B3444F3-30D5-4347-AD6B-DACC118685B2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C98B2018-4C0A-4011-94CB-77D70109215F}

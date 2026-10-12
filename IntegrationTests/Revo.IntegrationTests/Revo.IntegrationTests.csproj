@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net10.0</TargetFrameworks>
+    <Configurations>Debug;Release</Configurations>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="FluentAssertions" Version="8.8.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Providers\AspNetCore\Revo.AspNetCore\Revo.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\Providers\EasyNetQ\Revo.EasyNetQ\Revo.EasyNetQ.csproj" />
+    <ProjectReference Include="..\..\Providers\EFCore\Revo.EFCore\Revo.EFCore.csproj" />
+    <ProjectReference Include="..\..\Providers\Hangfire\Revo.Hangfire\Revo.Hangfire.csproj" />
+    <ProjectReference Include="..\..\Revo.Testing\Revo.Testing.csproj" />
+  </ItemGroup>
+
+</Project>
