@@ -21,6 +21,7 @@ public static class SecurityConfigurationExtensions
                 serviceCollection.AddScoped<IUserPermissionAuthorizer, UserPermissionAuthorizer>();
                 
                 // default null implementations
+                serviceCollection.TryAddSingleton<IUserContext, NullUserContext>();
                 serviceCollection.TryAddSingleton<IClaimsPrincipalUserResolver, NullClaimsPrincipalUserResolver>();
                 serviceCollection.TryAddSingleton<IUserPermissionResolver, NullUserPermissionResolver>();
             });
