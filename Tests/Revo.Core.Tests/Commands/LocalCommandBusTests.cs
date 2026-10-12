@@ -16,12 +16,25 @@ namespace Revo.Core.Tests.Commands
         private readonly LocalCommandBus sut;
         private readonly IVariantServiceResolver serviceResolver;
         private readonly ICommandBusPipeline commandBusPipeline;
+        private readonly IServiceScopeFactory serviceScopeFactory;
+        private readonly IServiceScope commandScope;
 
         public LocalCommandBusTests()
         {
             serviceResolver = Substitute.For<IVariantServiceResolver>();
             commandBusPipeline = Substitute.For<ICommandBusPipeline>();
-            sut = new LocalCommandBus(serviceResolver, commandBusPipeline);
+
+            var commandScopeServiceProvider = Substitute.For<IServiceProvider>();
+            commandScopeServiceProvider.GetService(typeof(IVariantServiceResolver)).Returns(serviceResolver);
+            commandScopeServiceProvider.GetService(typeof(ICommandBusPipeline)).Returns(commandBusPipeline);
+
+            commandScope = Substitute.For<IServiceScope>();
+            commandScope.ServiceProvider.Returns(commandScopeServiceProvider);
+
+            serviceScopeFactory = Substitute.For<IServiceScopeFactory>();
+            serviceScopeFactory.CreateScope().Returns(commandScope);
+
+            sut = new LocalCommandBus(serviceScopeFactory);
         }
 
         [Fact]
@@ -113,15 +126,48 @@ namespace Revo.Core.Tests.Commands
         }
 
         [Fact]
+        public async Task SendAsync_ExecutesEachCommandInNewScope()
+        {
+            commandBusPipeline
+                .ProcessAsync(null, null, null, null, CancellationToken.None)
+                .ReturnsForAnyArgs(Task.FromResult<object>(null));
+
+            await sut.SendAsync(new TestCommand(), CancellationToken.None);
+            await sut.SendAsync(new TestCommand(), CancellationToken.None);
+
+            serviceScopeFactory.Received(2).CreateScope();
+            commandScope.Received(2).Dispose();
+        }
+
+        [Fact]
+        public async Task SendAsync_DisposesScopeOnlyAfterCommandFinishes()
+        {
+            var pipelineCompletion = new TaskCompletionSource<object>();
+            commandBusPipeline
+                .ProcessAsync(null, null, null, null, CancellationToken.None)
+                .ReturnsForAnyArgs(pipelineCompletion.Task);
+
+            var sendTask = sut.SendAsync(new TestCommand(), CancellationToken.None);
+
+            commandScope.DidNotReceive().Dispose();
+
+            pipelineCompletion.SetResult(null);
+            await sendTask;
+
+            commandScope.Received(1).Dispose();
+        }
+
+        [Fact]
         public async Task SendAsync_UsesHandlerOfBaseCommandType()
         {
             var commandHandler = new BaseTestCommandHandler();
             var services = new ServiceCollection();
+            services.AddSingleton(new VariantServiceTypeIndex(services));
+            services.AddTransient<IVariantServiceResolver, VariantServiceResolver>();
+            services.AddSingleton(commandBusPipeline);
             services.AddSingleton<ICommandHandler<BaseTestCommand>>(commandHandler);
 
-            var bus = new LocalCommandBus(
-                new VariantServiceResolver(services.BuildServiceProvider(), new VariantServiceTypeIndex(services)),
-                commandBusPipeline);
+            var bus = new LocalCommandBus(services.BuildServiceProvider().GetRequiredService<IServiceScopeFactory>());
 
             var command = new DerivedTestCommand();
             var cancellationToken = new CancellationToken();

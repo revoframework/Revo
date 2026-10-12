@@ -13,7 +13,7 @@ public class UnitOfWorkCommandBusMiddleware(
 {
     public int Order { get; set; } = -2000;
 
-    public Task<object> HandleAsync(ICommandBase command, CommandExecutionOptions executionOptions,
+    public async Task<object> HandleAsync(ICommandBase command, CommandExecutionOptions executionOptions,
         CommandBusMiddlewareDelegate next, CancellationToken cancellationToken)
     {
         if (executionOptions.AutoCommitUnitOfWork == true
@@ -21,12 +21,12 @@ public class UnitOfWorkCommandBusMiddleware(
         {
             using (var uow = unitOfWorkFactory.CreateUnitOfWork())
             {
-                return HandleNext(command, next, uow, cancellationToken);
+                return await HandleNext(command, next, uow, cancellationToken);
             }
         }
         else
         {
-            return HandleNext(command, next, null, cancellationToken);
+            return await HandleNext(command, next, null, cancellationToken);
         }
     }
 

@@ -1,23 +1,22 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Revo.Core.Lifecycle;
 
 namespace Revo.EFCore.DataAccess.Entities
 {
     /// <summary>
-    /// Request-scoped set of <see cref="DbContext"/> instances created during the request.
-    /// Task-scoped database access does not dispose them; this cache does, when the request ends.
+    /// Keeps the DbContexts alive until the end of the current request (if there is one), so that they can outlive
+    /// the command that created them - e.g. a query returning an IQueryable that is evaluated only later.
+    /// Outside of a request, DbContexts get disposed together with the current scope (e.g. a command's one).
     /// <para>
-    /// After a command commits, <c>AsyncEventProcessor.TryRunQueues</c> can run several
-    /// synchronous event-listener queues at once (<c>SyncQueueProcessingParallelism</c>).
-    /// Each queue has its own task scope and therefore its own <see cref="DbContext"/>, but
-    /// those tasks inherit the HTTP request scope, so they all add to this same set.
-    /// The first use of a context calls <see cref="AddDbContext"/> from those threads together,
-    /// and request disposal can overlap that. The set is locked so concurrent add and dispose
-    /// do not corrupt it.
+    /// Thread-safe, as DbContexts can get added concurrently with each other and with the disposal of the cache
+    /// (e.g. when <c>AsyncEventProcessor.TryRunQueues</c> processes several synchronous event-listener queues
+    /// at once, see <c>SyncQueueProcessingParallelism</c>). A DbContext added after the cache has been disposed
+    /// gets disposed right away.
     /// </para>
     /// </summary>
-    public class RequestDbContextCache : IRequestDbContextCache
+    public class RequestDbContextCache(IRequestLifetime requestLifetime) : IRequestDbContextCache
     {
         private readonly object sync = new object();
         private readonly HashSet<DbContext> dbContexts = new HashSet<DbContext>();
@@ -25,6 +24,11 @@ namespace Revo.EFCore.DataAccess.Entities
 
         public void AddDbContext(DbContext dbContext)
         {
+            if (requestLifetime.TryRegisterForDispose(dbContext))
+            {
+                return;
+            }
+
             lock (sync)
             {
                 if (disposed)

@@ -1,6 +1,6 @@
+using System;
 using System.Collections.Generic;
 using Revo.Core.Events;
-using Revo.Core.Transactions;
 using Revo.Domain.Entities;
 using Revo.Domain.Events;
 using Revo.Infrastructure.Events.Async;
@@ -13,14 +13,18 @@ namespace Revo.EFCore.Projections
     public class EFCoreProjectionEventListener : ProjectionEventListener
     {
         public EFCoreProjectionEventListener(IServiceScopeFactory serviceScopeFactory,
-            IUnitOfWorkFactory unitOfWorkFactory,
             ITenantProvider tenantProvider, EFCoreProjectionEventSequencer eventSequencer) :
-            base(serviceScopeFactory, unitOfWorkFactory, tenantProvider)
+            base(serviceScopeFactory, tenantProvider)
         {
             EventSequencer = eventSequencer;
         }
-        
+
         public override IAsyncEventSequencer EventSequencer { get; }
+
+        protected override IProjectionSubSystem GetProjectionSubSystem(IServiceProvider serviceProvider)
+        {
+            return serviceProvider.GetRequiredService<IEFCoreProjectionSubSystem>();
+        }
 
         protected override EventProjectionOptions GetEventProjectionOptions()
         {

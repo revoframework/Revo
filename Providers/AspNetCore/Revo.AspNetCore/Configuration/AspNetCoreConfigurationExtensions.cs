@@ -4,6 +4,7 @@ using Revo.AspNetCore.Core;
 using Revo.AspNetCore.Security;
 using Revo.Core.Configuration;
 using Revo.Core.Core;
+using Revo.Core.Lifecycle;
 using Revo.Core.Security;
 
 namespace Revo.AspNetCore.Configuration;
@@ -22,6 +23,7 @@ public static class AspNetCoreConfigurationExtensions
                 serviceCollection.AddScoped<IActorContext, UserActorContext>();
                 serviceCollection.AddSingleton<IEnvironmentProvider, AspNetCoreEnvironmentProvider>();
                 serviceCollection.AddScoped<IUserContext, AspNetCoreUserContext>();
+                serviceCollection.AddSingleton<IRequestLifetime, AspNetCoreRequestLifetime>();
                 serviceCollection.AddHttpContextAccessor();
             });
             

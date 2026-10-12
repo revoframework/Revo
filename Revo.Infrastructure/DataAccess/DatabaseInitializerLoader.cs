@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Revo.Core.Commands;
 using Revo.Core.Transactions;
 using Revo.Infrastructure.Repositories;
 
@@ -54,23 +53,11 @@ public class DatabaseInitializerLoader(
 
             foreach (var initializer in sortedInitializers)
             {
-                using var scope = serviceScopeFactory.CreateScope();
-                var unitOfWorkFactory = scope.ServiceProvider.GetRequiredService<IUnitOfWorkFactory>();
-                var commandContextStack = scope.ServiceProvider.GetRequiredService<CommandContextStack>();
-                var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
-
-                using IUnitOfWork uow = unitOfWorkFactory.CreateUnitOfWork();
-                commandContextStack.Push(new CommandContext(null, uow));
-                try
+                await serviceScopeFactory.ExecuteInUnitOfWorkScopeAsync(async (serviceProvider, _) =>
                 {
-                    uow.Begin();
+                    var repository = serviceProvider.GetRequiredService<IRepository>();
                     await initializer.InitializeAsync(repository).ConfigureAwait(false);
-                    await uow.CommitAsync().ConfigureAwait(false);
-                }
-                finally
-                {
-                    commandContextStack.Pop();
-                }
+                }).ConfigureAwait(false);
             }
         }
         finally

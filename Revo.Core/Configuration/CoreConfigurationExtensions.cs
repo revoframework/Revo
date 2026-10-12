@@ -1,8 +1,10 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Revo.Core.Commands;
 using Revo.Core.Core;
 using Revo.Core.Events;
+using Revo.Core.Lifecycle;
 using Revo.Core.Security;
 using Revo.Core.Services;
 using Revo.Core.Transactions;
@@ -32,13 +34,15 @@ public static class CoreConfigurationExtensions
                 serviceCollection.AddSingleton<IEnvironment, Environment>();
                 serviceCollection.AddScoped<IEventBus, EventBus>();
                 serviceCollection.AddScoped<IUnitOfWorkFactory, UnitOfWorkFactory>();
-                serviceCollection.AddScoped<IUnitOfWork>(serviceProvider =>
+                // transient, so that it always reflects the unit of work active at the time of the resolution
+                serviceCollection.AddTransient<IUnitOfWork>(serviceProvider =>
                     serviceProvider.GetRequiredService<ICommandContext>().UnitOfWork
                     ?? throw new InvalidOperationException(
                         "Trying to resolve IUnitOfWork when there is not one active in current command context"));
                 serviceCollection.AddScoped<IPublishEventBufferFactory, PublishEventBufferFactory>();
-                serviceCollection.AddScoped<IPublishEventBuffer>(serviceProvider =>
+                serviceCollection.AddTransient<IPublishEventBuffer>(serviceProvider =>
                     serviceProvider.GetRequiredService<IUnitOfWork>().EventBuffer);
+                serviceCollection.TryAddSingleton<IRequestLifetime, NullRequestLifetime>();
                 serviceCollection.AddSingleton<ITypeExplorer, TypeExplorer>();
                 serviceCollection.AddSingleton<ITypeIndexer, TypeIndexer>();
                 serviceCollection.AddSingleton<IVersionedTypeRegistry, VersionedTypeRegistry>();

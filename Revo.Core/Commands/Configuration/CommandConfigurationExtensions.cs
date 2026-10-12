@@ -21,7 +21,8 @@ public static class CommandConfigurationExtensions
                 serviceCollection.AddSingleton(commandsSection);
                 serviceCollection.AddScoped<ICommandGateway, CommandGateway>();
 
-                serviceCollection.AddScoped<LocalCommandBus>();
+                // singleton, since it creates a new service scope for every command anyway
+                serviceCollection.AddSingleton<LocalCommandBus>();
                 serviceCollection.AddTransient<ICommandBus>(serviceProvider =>
                     serviceProvider.GetRequiredService<LocalCommandBus>());
                 serviceCollection.AddTransient<ILocalCommandBus>(serviceProvider =>
