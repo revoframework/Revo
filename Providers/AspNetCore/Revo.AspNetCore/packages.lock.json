@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net10.0": {
+      "Hangfire": {
+        "type": "Direct",
+        "requested": "[1.8.22, )",
+        "resolved": "1.8.22",
+        "contentHash": "hA+HPipSEeGvsWsVFZG+2PI5+LNLRVOn2WYY+9jgIl1wgCsxECYKzU0DCCk/TA2UzeEuU5AzKaWyhs8clJP+yw==",
+        "dependencies": {
+          "Hangfire.AspNetCore": "[1.8.22]",
+          "Hangfire.Core": "[1.8.22]",
+          "Hangfire.SqlServer": "[1.8.22]"
+        }
+      },
+      "Hangfire.MemoryStorage": {
+        "type": "Direct",
+        "requested": "[1.8.1.2, )",
+        "resolved": "1.8.1.2",
+        "contentHash": "Z2C+WOHRHMe4Oh4VghJPGTECh0+/sndaLiUCv1Zyoq+6Y79FXteUg+nl2M40xc1D9ntntBfLwfLpfDpLA/idEg==",
+        "dependencies": {
+          "Hangfire.Core": "1.7.35"
+        }
+      },
+      "Microsoft.SourceLink.GitHub": {
+        "type": "Direct",
+        "requested": "[8.0.0, )",
+        "resolved": "8.0.0",
+        "contentHash": "G5q7OqtwIyGTkeIOAc3u2ZuV/kicQaec5EaRnc0pIeSnh9LUjj+PYQrJYBURvDt7twGl2PKA7nSN0kz1Zw5bnQ==",
+        "dependencies": {
+          "Microsoft.Build.Tasks.Git": "8.0.0",
+          "Microsoft.SourceLink.Common": "8.0.0"
+        }
+      },
+      "Hangfire.AspNetCore": {
+        "type": "Transitive",
+        "resolved": "1.8.22",
+        "contentHash": "Ud5ZNnH9q5+3MryiuPTW7baRERN9QYLyX+8muLwH9BqumoE9eWZRxna9RrunYaMVkNGbTUUuwOfSYIvCC222TQ==",
+        "dependencies": {
+          "Hangfire.NetCore": "[1.8.22]"
+        }
+      },
+      "Hangfire.Core": {
+        "type": "Transitive",
+        "resolved": "1.8.22",
+        "contentHash": "fjgEtlfkLNnUcX9IB+fp3gTPtt5G7VJ0PCcoKLEWnXJXn5qTm/mvrm/t3/T+Xj35ZePtbWBm+j2PXE0beFwzbA==",
+        "dependencies": {
+          "Newtonsoft.Json": "11.0.1"
+        }
+      },
+      "Hangfire.NetCore": {
+        "type": "Transitive",
+        "resolved": "1.8.22",
+        "contentHash": "I7LiUHpC3ks7k+vLFOdwwCwDHxT83H+Mv6bT+7vkI1SLOc4Vwv2zOWdeeN1K86vddu7R36ho+eKP0gvfYlSZjg==",
+        "dependencies": {
+          "Hangfire.Core": "[1.8.22]"
+        }
+      },
+      "Hangfire.SqlServer": {
+        "type": "Transitive",
+        "resolved": "1.8.22",
+        "contentHash": "EXuS2taxDrYwznuabkqkYZNOJEEs4Y6A5w7JwuufGES3uJHsdA+3ELqVM9GrUxatGcko4DWIRnMTI2U2YBP1WA==",
+        "dependencies": {
+          "Hangfire.Core": "[1.8.22]"
+        }
+      },
+      "Microsoft.Build.Tasks.Git": {
+        "type": "Transitive",
+        "resolved": "8.0.0",
+        "contentHash": "bZKfSIKJRXLTuSzLudMFte/8CempWjVamNUR5eHJizsy+iuOuO/k2gnh7W0dHJmYY0tBf+gUErfluCv5mySAOQ=="
+      },
+      "Microsoft.SourceLink.Common": {
+        "type": "Transitive",
+        "resolved": "8.0.0",
+        "contentHash": "dk9JPxTCIevS75HyEQ0E4OVAFhB2N+V9ShCXf8Q6FkUQZDkgLI12y679Nym1YqsiSysuQskT7Z+6nUf3yab6Vw=="
+      },
+      "Newtonsoft.Json": {
+        "type": "Transitive",
+        "resolved": "13.0.4",
+        "contentHash": "pdgNNMai3zv51W5aq268sujXUyx7SNdE2bj1wZcWjAQrKMFZV260lbqYop1d2GM67JI1huLRwxo9ZqnfF/lC6A=="
+      },
+      "revo.core": {
+        "type": "Project",
+        "dependencies": {
+          "Newtonsoft.Json": "[13.0.4, )"
+        }
+      }
+    }
+  }
+}

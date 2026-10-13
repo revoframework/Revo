@@ -1,0 +1,105 @@
+name: Release
+
+# Releases a version to nuget.org when its tag is pushed:
+#   1. bump the VersionPrefix in Common.props and add a "## [X.Y.Z] - date" section to RELEASE_NOTES.md
+#   2. tag the commit (Revo-X.Y.Z, or e.g. Revo-X.Y.Z-rc.1 for a prerelease) and push the tag
+# The packages are built and tested from the tag first, then pushed to nuget.org (trusted publishing, in the nuget.org
+# environment) and attached to a GitHub Release with the notes from RELEASE_NOTES.md.
+
+on:
+  push:
+    tags: ['Revo-*']
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_NOLOGO: 1
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # the .NET SDK from global.json, with the NuGet packages cached by the lock files
+      - uses: actions/setup-dotnet@v6
+        with:
+          cache: true
+          cache-dependency-path: '**/packages.lock.json'
+
+      # fails if the tag does not match the VersionPrefix or the release notes are missing
+      - name: Build and test
+        run: ./build.sh Test Pack ReleaseNotes
+
+      - name: Upload test results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results
+          path: artifacts/test-results
+          if-no-files-found: ignore
+
+      - name: Upload release
+        uses: actions/upload-artifact@v7
+        with:
+          name: release
+          path: |
+            artifacts/packages
+            artifacts/release-notes.md
+
+  publish:
+    needs: build
+    runs-on: ubuntu-24.04
+    environment:
+      name: nuget.org
+      url: https://www.nuget.org/packages/Revo.Core
+    permissions:
+      contents: write # creating the GitHub Release
+      id-token: write # nuget.org trusted publishing
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          cache: true
+          cache-dependency-path: '**/packages.lock.json'
+
+      - name: Download release
+        uses: actions/download-artifact@v8
+        with:
+          name: release
+          path: artifacts
+
+      # exchanges the GitHub OIDC token for a short-lived nuget.org API key (no stored key needed)
+      - name: Log in to nuget.org
+        id: nuget-login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
+      - name: Push packages to nuget.org
+        run: ./build.sh Push
+        env:
+          NUGET_SOURCE: https://api.nuget.org/v3/index.json
+          NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
+
+      - name: Create GitHub Release
+        run: |
+          tag="$GITHUB_REF_NAME"
+          if gh release view "$tag" > /dev/null 2>&1; then
+            gh release upload "$tag" artifacts/packages/* --clobber
+          else
+            version="${tag#Revo-}"
+            prerelease=$([[ "$version" == *-* ]] && echo --prerelease || true)
+            gh release create "$tag" artifacts/packages/* --verify-tag --title "$tag" \
+              --notes-file artifacts/release-notes.md $prerelease
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}

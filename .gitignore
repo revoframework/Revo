@@ -2,7 +2,7 @@ bin/
 obj/
 .vs/
 .cake-tools/
-build/
+artifacts/
 *.user
 build-local.ps1
 

@@ -1,0 +1,93 @@
+name: CI
+
+# Builds and tests every pull request and push to main or a release branch; packages built from the branches are
+# pushed to GitHub Packages as X.Y.Z-ci.N (see build/Build.cs). Releases to nuget.org are done by release.yml.
+
+on:
+  push:
+    branches: [main, 'release/**']
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_NOLOGO: 1
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write # pushing to GitHub Packages
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # the .NET SDK from global.json, with the NuGet packages cached by the lock files
+      - uses: actions/setup-dotnet@v6
+        with:
+          cache: true
+          cache-dependency-path: '**/packages.lock.json'
+
+      # the tests using Testcontainers (PostgreSQL) run on the runner's Docker
+      - name: Build and test
+        run: ./build.sh Test Pack
+
+      - name: Upload test results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results
+          path: artifacts/test-results
+          if-no-files-found: ignore
+
+      - name: Upload code coverage to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/codecov-action@v7
+        with:
+          directory: artifacts/test-results
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v7
+        with:
+          name: packages
+          path: artifacts/packages
+
+      - name: Push packages to GitHub Packages
+        if: github.event_name == 'push'
+        run: ./build.sh Push
+        env:
+          NUGET_SOURCE: https://nuget.pkg.github.com/revoframework/index.json
+          NUGET_API_KEY: ${{ secrets.GITHUB_TOKEN }}
+
+  # the tests on Windows too - except for the ones needing Linux containers, which the Windows runners cannot run
+  test-windows:
+    runs-on: windows-2025
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          cache: true
+          cache-dependency-path: '**/packages.lock.json'
+
+      - name: Build and test
+        run: ./build.ps1 Test --test-filter "FullyQualifiedName!~PostgreSql"
+
+      - name: Upload test results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results-windows
+          path: artifacts/test-results
+          if-no-files-found: ignore
