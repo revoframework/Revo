@@ -58,11 +58,14 @@ namespace Revo.Examples.Todos.Tests.Api
             await EnsureSuccessAsync(await client.PostAsJsonAsync($"/api/todo-lists/{id}",
                 new { text = "Milk" }));
 
-            var lists = await client.GetFromJsonAsync<JsonElement[]>("/api/todo-lists");
+            var listsResponse = await client.GetAsync("/api/todo-lists");
+            await EnsureSuccessAsync(listsResponse);
+            var lists = await listsResponse.Content.ReadFromJsonAsync<JsonElement[]>();
 
             var list = lists.Should().ContainSingle(x => x.GetProperty("id").GetGuid() == id).Which;
             list.GetProperty("name").GetString().Should().Be("Weekly groceries");
-            list.GetProperty("version").GetInt32().Should().Be(3);
+            list.GetProperty("todos").EnumerateArray().Select(x => x.GetProperty("text").GetString())
+                .Should().Equal("Milk");
         }
 
         private static async Task EnsureSuccessAsync(HttpResponseMessage response)

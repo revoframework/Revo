@@ -22,7 +22,7 @@ namespace Revo.Examples.Todos.Reads.Handlers
                         Id = t.Id,
                         Text = t.Text,
                         IsComplete = t.IsComplete,
-                        TodoListId = x.Id
+                        TodoListId = t.TodoListId // not x.Id - referencing the parent would require APPLY, unsupported by SQLite
                     }).ToList()
                 }));
         }
