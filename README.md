@@ -1,6 +1,6 @@
 
 <p align="center">
-<img src="https://github.com/revoframework/Revo/blob/develop/res/revo-framework.png" alt="Revo framework">
+<img src="https://github.com/revoframework/Revo/blob/main/res/revo-framework.png" alt="Revo framework">
 </p>
 <p align="center">
 <a href="https://github.com/revoframework/Revo/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/revoframework/Revo/ci.yml?branch=main&style=flat-square&logo=githubactions&logoColor=white" alt="Build status"></a>
@@ -11,7 +11,7 @@
 <a href="https://revoframework.gitbook.io/revo/"><img src="https://img.shields.io/badge/docs-GITBOOK-blue.svg?style=flat-square" alt="Docs"></a>
 <a href="https://gitter.im/revoframework/Revo?utm_source=share-link&utm_medium=link&utm_campaign=share-link"><img src="https://img.shields.io/gitter/room/revoframework/Revo?color=4BB595&logo=gitter&&style=flat-square" alt="Gitter chat"></a>
 <a href="https://github.com/revoframework/Revo/pulls"><img src="https://img.shields.io/badge/PRs-welcome-green?style=flat-square" alt="PRs welcome"></a>
-<a href="https://github.com/revoframework/Revo/blob/develop/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="License"></a>
+<a href="https://github.com/revoframework/Revo/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="License"></a>
 </p>
 
 # Revo Framework
@@ -229,7 +229,7 @@ public class GetTodosQueryHandler : IQueryHandler<GetTodosQuery, IQueryable<Todo
 
 If you are new to the framework, you can
  * begin with reading the quick walkthrough for the [**Simple TO-DOs example**](https://docs.revoframework.net/general/example-simple-to-dos-task-list-app) (a task list app)
- * or explore the [Todo example application](https://github.com/revoframework/Revo/tree/develop/Examples/Todos) and framework sources on GitHub.
+ * or explore the [Todo example application](https://github.com/revoframework/Revo/tree/main/Examples/Todos) and framework sources on GitHub.
  
 You can also start by reading the 📘 [**reference guide**](https://docs.revoframework.net/general/getting-started).
 
