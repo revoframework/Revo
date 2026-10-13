@@ -19,9 +19,7 @@ builder.Services.AddRevo(configurator =>
         .ConfigureCore(core => core.UseAllAppDomainAssembliesForTypeDiscovery())
         .UseAspNetCore()
         .UseEFCoreDataAccess(
-            contextBuilder => contextBuilder
-                .UseSqlite(builder.Configuration.GetConnectionString("Sqlite") ?? "Data Source=todos.db")
-                .AddInterceptors(new SqliteConcurrencyInterceptor()),
+            ConfigureDatabase,
             advancedAction: config =>
             {
                 config
@@ -60,6 +58,29 @@ app.MapControllers();
 app.MapRazorPages();
 
 app.Run();
+
+// SQLite by default (nothing to install), PostgreSQL with "DatabaseProvider": "PostgreSQL"
+// (connection strings "ConnectionStrings:Sqlite" and "ConnectionStrings:PostgreSQL")
+void ConfigureDatabase(DbContextOptionsBuilder contextBuilder)
+{
+    var provider = builder.Configuration["DatabaseProvider"] ?? "Sqlite";
+
+    if (string.Equals(provider, "Sqlite", StringComparison.OrdinalIgnoreCase))
+    {
+        contextBuilder
+            .UseSqlite(builder.Configuration.GetConnectionString("Sqlite") ?? "Data Source=todos.db")
+            .AddInterceptors(new SqliteConcurrencyInterceptor());
+    }
+    else if (string.Equals(provider, "PostgreSQL", StringComparison.OrdinalIgnoreCase))
+    {
+        contextBuilder.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSQL"));
+    }
+    else
+    {
+        throw new InvalidOperationException(
+            $"Unsupported DatabaseProvider '{provider}', use Sqlite or PostgreSQL");
+    }
+}
 
 // for WebApplicationFactory in the tests
 public partial class Program;
