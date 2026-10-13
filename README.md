@@ -3,11 +3,11 @@
 <img src="https://github.com/revoframework/Revo/blob/develop/res/revo-framework.png" alt="Revo framework">
 </p>
 <p align="center">
-<a href="https://dev.azure.com/revoframework/Revo/_build?definitionId=1&view=runs"><img src="https://img.shields.io/azure-devops/build/revoframework/7ff8258b-dd3c-4007-9d06-7609742e93cf/1/develop?style=flat-square&logo=azure-pipelines" alt="Build status"></a>
+<a href="https://github.com/revoframework/Revo/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/revoframework/Revo/ci.yml?branch=main&style=flat-square&logo=githubactions&logoColor=white" alt="Build status"></a>
 <a href="https://codecov.io/gh/revoframework/Revo"><img src="https://img.shields.io/codecov/c/github/revoframework/Revo?logo=codecov&style=flat-square" alt="Code coverage"></a>
 <a href="https://github.com/revoframework/Revo/releases"><img src="https://img.shields.io/github/release-date/revoframework/Revo?label=latest%20release&style=flat-square" alt="Latest release date"></a>
 <a href="https://www.nuget.org/packages?q=revo"><img src="https://img.shields.io/nuget/v/Revo.Core?logo=NuGet&style=flat-square" alt="NuGet packages"></a>
-<a href="https://pkgs.dev.azure.com/revoframework/_packaging/revoframework/nuget/v3/index.json"><img src="https://img.shields.io/badge/nuget%20CI-source-blue?logo=NuGet&style=flat-square" alt="CI NuGet feed at Azure"></a><br>
+<a href="https://github.com/orgs/revoframework/packages?repo_name=Revo"><img src="https://img.shields.io/badge/nuget%20CI-source-blue?logo=NuGet&style=flat-square" alt="CI NuGet feed at GitHub Packages"></a><br>
 <a href="https://revoframework.gitbook.io/revo/"><img src="https://img.shields.io/badge/docs-GITBOOK-blue.svg?style=flat-square" alt="Docs"></a>
 <a href="https://gitter.im/revoframework/Revo?utm_source=share-link&utm_medium=link&utm_campaign=share-link"><img src="https://img.shields.io/gitter/room/revoframework/Revo?color=4BB595&logo=gitter&&style=flat-square" alt="Gitter chat"></a>
 <a href="https://github.com/revoframework/Revo/pulls"><img src="https://img.shields.io/badge/PRs-welcome-green?style=flat-square" alt="PRs welcome"></a>
@@ -28,6 +28,7 @@ _Development of this framework is supported by <a href="https://olify.io">OLIFY 
 * 🚀 [Getting started](#getting-started)
 * 📘 [Full documentation](https://docs.revoframework.net/)
 * 📦 [Packages](#packages)
+* 🔧 [Building](#building)
 * 📑 [License](#license)
 
 ## ⚡️ Features
@@ -233,7 +234,7 @@ You can also start by reading the 📘 [**reference guide**](https://docs.revofr
 ## 📦 Packages
 
 Released version are available in form of NuGet packages.  
-There is also a separate [**pre-release CI package feed at Azure**](https://pkgs.dev.azure.com/revoframework/_packaging/revoframework/nuget/v3/index.json).
+There is also a separate [**pre-release CI package feed at GitHub Packages**](https://github.com/orgs/revoframework/packages?repo_name=Revo) (`https://nuget.pkg.github.com/revoframework/index.json`; GitHub Packages require authenticating with a personal access token with the `read:packages` scope).
 
 <div style="width:100%";>
 <table border="0" cellpadding="0" cellspacing="0" style="float:left;">
@@ -391,6 +392,17 @@ There is also a separate [**pre-release CI package feed at Azure**](https://pkgs
 </div>
 
 Most applications will require at least **Revo.Core**, **Revo.DataAccess**, **Revo.Domain**, **Revo.Infrastructure** packages to get started with and then typically a platform package like **Revo.Platforms.AspNetCore** (ASP.NET Core platform implementation) and a data-access package like **Revo.EFCore** (for Entity Framework Core support).
+
+## 🔧 Building
+
+```
+./build.sh     # tests and packs the solution -> artifacts/
+.\build.ps1    # the same on Windows
+```
+
+The build requires the .NET SDK from [global.json](global.json); the PostgreSQL integration tests also need Docker (without it, they are skipped). It is written with [Fallout](https://docs.fallout.build/) in [build/Build.cs](build/Build.cs) - `./build.sh --help` lists its targets and parameters. CI builds of the `main` and `release/*` branches are published to the pre-release feed; releases are published to NuGet by pushing a `Revo-X.Y.Z` tag (see [the release workflow](.github/workflows/release.yml)).
+
+The versions of all packages, including the transitive ones, are pinned in the `packages.lock.json` files. Restoring the solution (`dotnet restore Revo.slnx`) updates them after a package reference changes; CI builds fail if they are not up to date.
 
 ## 📑 License
 
