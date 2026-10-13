@@ -26,7 +26,6 @@ public static class EventsConfigurationExtensions
 
             cfg.ConfigureServices(serviceCollection =>
             {
-                serviceCollection.AddTransient<IJobHandler<IExecuteCommandJob>, ExecuteCommandJobHandler>();
                 serviceCollection.AddScoped<IEventMessageFactory, EventMessageFactory>();
                 serviceCollection.AddScoped<IEventMetadataProvider, ActorNameEventMetadataProvider>();
                 serviceCollection.AddScoped<IEventMetadataProvider, MachineNameEventMetadataProvider>();

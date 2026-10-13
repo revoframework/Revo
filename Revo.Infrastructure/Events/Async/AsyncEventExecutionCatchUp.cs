@@ -8,15 +8,27 @@ using Microsoft.Extensions.Logging;
 
 namespace Revo.Infrastructure.Events.Async;
 
+/// <summary>
+/// Catches up the event sources and processes the backlogged async event queues upon startup.
+/// </summary>
+/// <remarks>
+/// Runs in <see cref="IHostedLifecycleService.StartedAsync"/>, i.e. only after the framework's state needed for the
+/// event processing (entity types, sagas, permissions...) has been initialized in <see cref="IHostedService.StartAsync"/>
+/// of the other hosted services.
+/// </remarks>
 public class AsyncEventExecutionCatchUp(
     IAsyncEventPipelineConfiguration asyncEventPipelineConfiguration,
     IServiceScopeFactory serviceScopeFactory,
     ILogger<AsyncEventExecutionCatchUp> logger)
-    : IHostedService
+    : IHostedLifecycleService
 {
     private Task task;
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    public Task StartingAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public async Task StartedAsync(CancellationToken cancellationToken)
     {
         task = Task.Run(InitializeAsync);
 
@@ -25,6 +37,10 @@ public class AsyncEventExecutionCatchUp(
             await task;
         }
     }
+
+    public Task StoppingAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public Task StoppedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
     public async Task StopAsync(CancellationToken cancellationToken)
     {
