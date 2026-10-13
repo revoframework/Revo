@@ -9,10 +9,9 @@ namespace Revo.Core.Commands;
 /// <example>
 /// Routes can be configured upon framework startup like this:
 /// <code>
-/// new RevoConfiguration().ConfigureCore(cfg =&gt;
-/// {
-///   cfg.Commands.AddCommandRoute&lt;MyCommand&gt;(() =&gt; Kernel.Get&lt;ICustomCommandBus&gt;())
-/// })
+/// services.AddRevo(revo =&gt; revo
+///   .ConfigureCommands(commands =&gt; commands
+///     .AddCommandRoute&lt;MyCommand&gt;(serviceProvider =&gt; serviceProvider.GetRequiredService&lt;ICustomCommandBus&gt;())));
 /// </code>
 /// </example>
 public interface ICommandRouter

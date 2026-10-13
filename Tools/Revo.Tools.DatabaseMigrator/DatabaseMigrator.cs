@@ -8,11 +8,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using McMaster.NETCore.Plugins;
 using Microsoft.Data.Sqlite;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Npgsql;
-using Revo.Core.Events;
-using Revo.Core.Services;
 using Revo.Infrastructure.DataAccess.Migrations;
 using Revo.Infrastructure.DataAccess.Migrations.Providers;
 
@@ -246,11 +243,7 @@ public class DatabaseMigrator : IDisposable
                 throw new ArgumentOutOfRangeException($"Unknown database provider value");
         }
 
-        var services = new ServiceCollection();
-        var eventBus = new EventBus(new VariantServiceResolver(services.BuildServiceProvider(),
-            new VariantServiceTypeIndex(services)));
-
-        migrationProvider = new AdoNetDatabaseMigrationProvider(dbConnection, scripter, eventBus,
+        migrationProvider = new AdoNetDatabaseMigrationProvider(dbConnection, scripter, new NullEventBus(),
             loggerFactory.CreateLogger<AdoNetDatabaseMigrationProvider>());
     }
 

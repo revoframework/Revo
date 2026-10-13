@@ -8,11 +8,12 @@ public static class AsyncEventListenerBindingExtensions
 {
     /// <summary>
     /// Binds event listener class and its event sequencer class to all of its implemented <see cref="IAsyncEventListener{T}"/>
-    /// and <see cref="IAsyncEventSequencer{TEvent}"/> interfaces correspondingly. Uses InTaskScope() life-time.
+    /// and <see cref="IAsyncEventSequencer{TEvent}"/> interfaces correspondingly. Both are scoped (one instance
+    /// per scope, e.g. per async event worker run), shared by all of their interfaces.
     /// </summary>
     /// <typeparam name="TListener">Async event listener class that implements <see cref="IAsyncEventListener{T}"/>.</typeparam>
     /// <typeparam name="TSequencer">Async event sequencer class that implements <see cref="IAsyncEventSequencer{T}"/>.</typeparam>
-    /// <param name="bindingRoot">Ninject module or kernel.</param>
+    /// <param name="serviceCollection">Service collection to register the listener to.</param>
     /// <param name="additionalListenerServices">Additional services to bind the listener for.</param>
     public static IServiceCollection BindAsyncEventListener<TListener, TSequencer>(
         this IServiceCollection serviceCollection, params Type[] additionalListenerServices)
@@ -60,9 +61,10 @@ public static class AsyncEventListenerBindingExtensions
 
     /// <summary>
     /// Binds event listener class and its event sequencer class to all of its implemented <see cref="IAsyncEventListener{T}"/>
-    /// and <see cref="IAsyncEventSequencer{TEvent}"/> interfaces correspondingly. Uses InTaskScope() life-time.
+    /// and <see cref="IAsyncEventSequencer{TEvent}"/> interfaces correspondingly. Both are scoped (one instance
+    /// per scope, e.g. per async event worker run), shared by all of their interfaces.
     /// </summary>
-    /// <param name="bindingRoot">Ninject module or kernel.</param>
+    /// <param name="serviceCollection">Service collection to register the listener to.</param>
     /// <param name="listenerType">Async event listener class that implements <see cref="IAsyncEventListener{T}"/>.</param>
     /// <param name="sequencerType">Async event sequencer class that implements <see cref="IAsyncEventSequencer{T}"/>.</param>
     /// <param name="additionalListenerServices">Additional services to bind the listener for.</param>

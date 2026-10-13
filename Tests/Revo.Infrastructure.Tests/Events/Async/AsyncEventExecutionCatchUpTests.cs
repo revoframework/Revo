@@ -89,7 +89,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
         }
 
         [Fact]
-        public async Task StartAsync_InvokesCatchups()
+        public async Task StartedAsync_InvokesCatchups()
         {
             List<string> nonEmptyQueueNames = new List<string>();
 
@@ -107,7 +107,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
 
             asyncEventQueueManager.GetNonemptyQueueNamesAsync().Returns(nonEmptyQueueNames);
 
-            await sut.StartAsync(CancellationToken.None);
+            await sut.StartedAsync(CancellationToken.None);
             
             processedQueues.Should().HaveCount(2);
             processedQueues.Select(x => x.Item1).Should().BeEquivalentTo(asyncEventQueueBacklogWorkers, cfg => cfg.ComparingByValue<IAsyncEventWorker>());
@@ -115,7 +115,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
         }
 
         [Fact]
-        public async Task StartAsync_RunsQueues()
+        public async Task StartedAsync_RunsQueues()
         {
             asyncEventQueueManager.GetNonemptyQueueNamesAsync().Returns(
                 new List<string>() { "throwing", "okay" });
@@ -149,7 +149,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
                 testScopeFactory,
                 new NullLogger<AsyncEventExecutionCatchUp>());
 
-            await sut.StartAsync(CancellationToken.None);
+            await sut.StartedAsync(CancellationToken.None);
 
             processedQueues.Should().HaveCount(1);
             processedQueues.Select(x => x.Item2).Should().BeEquivalentTo("okay");

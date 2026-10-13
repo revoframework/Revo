@@ -2,6 +2,20 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Revo.Core.Lifecycle;
 
+/// <summary>
+/// Registrations of the work executed upon application startup.
+/// </summary>
+/// <remarks>
+/// The framework's startup work is divided by the phases of <see cref="Microsoft.Extensions.Hosting.IHostedLifecycleService"/>,
+/// so that it does not depend on the order in which the hosted services were registered:
+/// <list type="number">
+/// <item><c>StartingAsync</c> - database schema (migrations).</item>
+/// <item><c>StartAsync</c> - in-memory state of the framework (entity type cache, saga configuration, permission
+/// index...) and the background job workers.</item>
+/// <item><c>StartedAsync</c> - work processing the data, which may need any of the above: database initializers,
+/// catch-up of the async event queues, message bus subscriptions.</item>
+/// </list>
+/// </remarks>
 public static class HostingServiceCollectionExtensions
 {
     /// <summary>
