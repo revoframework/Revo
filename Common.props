@@ -11,7 +11,7 @@
     <IncludeSymbols>true</IncludeSymbols>
     <LangVersion>12</LangVersion>
     <PackageIcon>icon-128.png</PackageIcon>
-    <PackageIconUrl>https://raw.githubusercontent.com/revoframework/Revo/develop/res/icon-128.png</PackageIconUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/revoframework/Revo/main/res/icon-128.png</PackageIconUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/revoframework/Revo</PackageProjectUrl>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
