@@ -21,6 +21,11 @@ namespace Revo.Infrastructure.DataAccess.Migrations
         
         public static DatabaseVersion Parse(string versionString)
         {
+            if (versionString == string.Empty)
+            {
+                return new DatabaseVersion();
+            }
+
             var stringFractions = versionString.Split(new[] { '.' }, StringSplitOptions.None);
             List<int> fractions = new List<int>();
             foreach (string stringFraction in stringFractions)

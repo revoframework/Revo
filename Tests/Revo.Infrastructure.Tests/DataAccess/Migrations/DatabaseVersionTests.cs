@@ -7,7 +7,6 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
     public class DatabaseVersionTests
     {
         [Theory]
-        [InlineData("")]
         [InlineData(".")]
         [InlineData(".1")]
         [InlineData("1.")]
@@ -17,6 +16,14 @@ namespace Revo.Infrastructure.Tests.DataAccess.Migrations
             var act = () => DatabaseVersion.Parse(value);
 
             act.Should().Throw<System.FormatException>();
+        }
+
+        [Fact]
+        public void Parse_RoundTripsEmptyVersion()
+        {
+            var version = new DatabaseVersion();
+
+            DatabaseVersion.Parse(version.ToString()).Fractions.Should().BeEmpty();
         }
 
         [Fact]
