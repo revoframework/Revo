@@ -41,12 +41,14 @@ namespace Revo.Infrastructure.Tests.Events.Async
         {
             ProcessAsyncEventsJob job = new ProcessAsyncEventsJob("queue", 5, TimeSpan.FromMinutes(1));
             asyncEventWorker.When(x => x.RunQueueBacklogAsync(job.QueueName)).Throw(new AsyncEventProcessingSequenceException(0));
-            
+            TimeSpan expectedRetryTimeout = TimeSpan.FromTicks(job.RetryTimeout.Ticks
+                * asyncEventPipelineConfiguration.AsyncProcessRetryTimeoutMultiplier);
+
             await sut.HandleAsync(job, CancellationToken.None);
 
             jobScheduler.Received(1).EnqeueJobAsync(Arg.Is<ProcessAsyncEventsJob>(x => x.AttemptsLeft == 4
-                && x.RetryTimeout == TimeSpan.FromTicks(job.RetryTimeout.Ticks * asyncEventPipelineConfiguration.AsyncProcessRetryTimeoutMultiplier)
-                && x.QueueName == "queue"), job.RetryTimeout);
+                && x.RetryTimeout == expectedRetryTimeout
+                && x.QueueName == "queue"), expectedRetryTimeout);
         }
 
         [Fact]
@@ -65,12 +67,14 @@ namespace Revo.Infrastructure.Tests.Events.Async
         {
             ProcessAsyncEventsJob job = new ProcessAsyncEventsJob("queue", 5, TimeSpan.FromMinutes(1));
             asyncEventWorker.When(x => x.RunQueueBacklogAsync(job.QueueName)).Throw(new OptimisticConcurrencyException());
-            
+            TimeSpan expectedRetryTimeout = TimeSpan.FromTicks(job.RetryTimeout.Ticks
+                * asyncEventPipelineConfiguration.AsyncProcessRetryTimeoutMultiplier);
+
             await sut.HandleAsync(job, CancellationToken.None);
 
             jobScheduler.Received(1).EnqeueJobAsync(Arg.Is<ProcessAsyncEventsJob>(x => x.AttemptsLeft == 4
-                && x.RetryTimeout == TimeSpan.FromTicks(job.RetryTimeout.Ticks * asyncEventPipelineConfiguration.AsyncProcessRetryTimeoutMultiplier)
-                && x.QueueName == "queue"), job.RetryTimeout);
+                && x.RetryTimeout == expectedRetryTimeout
+                && x.QueueName == "queue"), expectedRetryTimeout);
         }
 
 
