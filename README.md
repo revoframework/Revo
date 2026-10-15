@@ -34,7 +34,6 @@ _Development of this framework is supported by <a href="https://olify.io">OLIFY 
 ## ⚡️ Features
 
 The project combines the concepts of event sourcing, CQRS and DDD to provide framework for building applications that are scalable, maintainable, can work in distributed environments and are easy to integrate with outside world. As such, it takes some rather opinionated approaches on the design of certain parts of its architecture. Revo also offers other common features and infrastructure that is often necessary for building complete applications – for example, authorizations, validations, messaging, integrations, multi-tenancy or testing.
-Furthermore, its extensions implement other useful features like entity history change-tracking, auditing or user notifications.
 
 [**Domain-Driven Design**](https://revoframework.gitbook.io/revo/reference-guide/domain-building-blocks)  
 Building blocks for rich DDD-style domain models \([aggregates](https://revoframework.gitbook.io/revo/reference-guide/domain-building-blocks#aggregates), [entities](https://revoframework.gitbook.io/revo/reference-guide/domain-building-blocks#entities), [value objects](https://revoframework.gitbook.io/revo/reference-guide/domain-building-blocks#value-objects), [domain events](https://revoframework.gitbook.io/revo/reference-guide/domain-building-blocks#domain-events), [repositories](https://revoframework.gitbook.io/revo/reference-guide/data-persistence#aggregate-repository)...\).
@@ -53,14 +52,14 @@ Segregating command and query responsibilities with:
 Support for both [synchronous](https://revoframework.gitbook.io/revo/reference-guide/events#synchronous-event-processing) and [asynchronous](https://revoframework.gitbook.io/revo/reference-guide/events#asynchronous-event-processing) event processing, guaranteed _at-least-once_ delivery, event queues with strict sequence ordering \(optionally\), event source catch-ups, optional [pseudo-synchronous event dispatch](https://revoframework.gitbook.io/revo/reference-guide/events#pseudo-synchronous-event-dispatch) for listeners \(projectors, for example\).
 
 [**Data access**](https://revoframework.gitbook.io/revo/reference-guide/data-persistence)  
-Thin abstraction layer for easy data persistence (e.g. querying read models) using _Entity Framework Core_, _Entity Framework 6_, _RavenDB,_ testable _in-memory database_ or other data providers. Includes support for simple [database migrations](https://revoframework.gitbook.io/revo/reference-guide/database-migrations).
+Thin abstraction layer for easy data persistence (e.g. querying read models) using _Entity Framework Core_, testable _in-memory database_ or other data providers. Includes support for simple [database migrations](https://revoframework.gitbook.io/revo/reference-guide/database-migrations).
 
 [**Projections**](https://revoframework.gitbook.io/revo/reference-guide/projections)  
-Support for read-model projections with various backends \(e.g. _Entity Framework Core_ (_PostgreSQL_, _MSSQL_, _SQLite_,...), _Entity Framework 6_, _RavenDB_...\), automatic idempotency- and concurrency-handling, etc.
+Support for read-model projections with _Entity Framework Core_ \(_PostgreSQL_, _MSSQL_, _SQLite_...\), automatic idempotency- and concurrency-handling, etc.
 
 [**SOA, messaging and integration**](https://revoframework.gitbook.io/revo/reference-guide/integrations)  
 Scale and integrate by [publishing and receiving events](https://docs.revoframework.net/~/drafts/-LaA9ji7E8zsIXVOg-qo/primary/reference-guide/integrations#rabbitmq-messaging-with-easynetq), commands and queries using common messaging patterns,<br>
-e.g. with _RabbitMQ_ message queue (using _EasyNetQ_ connector or _Rebus_ service bus).
+e.g. with _RabbitMQ_ message queue (using _EasyNetQ_ connector).
 
 [**Sagas**](https://revoframework.gitbook.io/revo/reference-guide/sagas)  
 Coordinating long-running processes or inter-aggregate cooperation with sagas that react to events<br>\(a.k.a. _process managers_\).
@@ -76,9 +75,8 @@ Basic permission/role-based ACL for commands and queries, fine-grained row filte
 * [**Event versioning**](https://revoframework.gitbook.io/revo/reference-guide/events#event-versioning)
 * [**Event upgrades**](https://revoframework.gitbook.io/revo/reference-guide/events#event-upgrades)
 * [**Database migrations**](https://revoframework.gitbook.io/revo/reference-guide/database-migrations)
-* **History and change-tracking**
-* **User notifications:** event-based, with different output channels (mail, etc.), aggregation, buffering, etc.
-* **.NET 6.0+ support (with integration for ASP.NET Core)**
+* **Standard .NET hosting:** services registered with _Microsoft.Extensions.DependencyInjection_, background work running as hosted services
+* **.NET 10 support (with integration for ASP.NET Core)**
 
 ## 👓 Show me how it looks!
 
@@ -229,7 +227,7 @@ public class GetTodosQueryHandler : IQueryHandler<GetTodosQuery, IQueryable<Todo
 
 If you are new to the framework, you can
  * begin with reading the quick walkthrough for the [**Simple TO-DOs example**](https://docs.revoframework.net/general/example-simple-to-dos-task-list-app) (a task list app)
- * or explore the [Todo example application](https://github.com/revoframework/Revo/tree/main/Examples/Todos) and framework sources on GitHub.
+ * or explore the [example applications](https://github.com/revoframework/Revo/tree/main/Examples) (_Todos_ and _Minimal_, a minimal ASP.NET Core app) and framework sources on GitHub.
  
 You can also start by reading the 📘 [**reference guide**](https://docs.revoframework.net/general/getting-started).
 
@@ -301,22 +299,6 @@ There is also a separate [**pre-release CI package feed at GitHub Packages**](ht
       <a href="https://www.nuget.org/packages/Revo.EFCore/"><img src="https://img.shields.io/nuget/v/Revo.EFCore.svg" alt="NuGet package version"></a>
     </td>
   </tr>
-  <tr>
-    <td>
-      Revo.EF6
-    </td>
-    <td>
-      <a href="https://www.nuget.org/packages/Revo.EF6/"><img src="https://img.shields.io/nuget/v/Revo.EF6.svg" alt="NuGet package version"></a>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      Revo.RavenDB
-    </td>
-    <td>
-      <a href="https://www.nuget.org/packages/Revo.RavenDB/"><img src="https://img.shields.io/nuget/v/Revo.RavenDB.svg" alt="NuGet package version"></a>
-    </td>
-  </tr>
 </table>
 
 
@@ -358,42 +340,10 @@ There is also a separate [**pre-release CI package feed at GitHub Packages**](ht
       <a href="https://www.nuget.org/packages/Revo.EasyNetQ/"><img src="https://img.shields.io/nuget/v/Revo.EasyNetQ.svg" alt="NuGet package version"></a>
     </td>
   </tr>
-  <tr>
-    <td>
-      Revo.Rebus (service bus, deprecated)
-    </td>
-    <td>
-      <a href="https://www.nuget.org/packages/Revo.Rebus/"><img src="https://img.shields.io/nuget/v/Revo.Rebus.svg" alt="NuGet package version"></a>
-    </td>
-  </tr>
-</table>
-
-<table border="0" cellpadding="0" cellspacing="0" style="float:left;">
-  <tr>
-    <th colspan="2">
-      Other extensions
-    </th>
-  </tr>
-  <tr>
-    <td>
-      Revo.Extensions.History
-    </td>
-    <td>
-      <a href="https://www.nuget.org/packages/Revo.Extensions.History/"><img src="https://img.shields.io/nuget/v/Revo.Extensions.History.svg" alt="NuGet package version"></a>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      Revo.Extensions.Notifications
-    </td>
-    <td>
-      <a href="https://www.nuget.org/packages/Revo.Extensions.Notifications/"><img src="https://img.shields.io/nuget/v/Revo.Extensions.Notifications.svg" alt="NuGet package version"></a>
-    </td>
-  </tr>
 </table>
 </div>
 
-Most applications will require at least **Revo.Core**, **Revo.DataAccess**, **Revo.Domain**, **Revo.Infrastructure** packages to get started with and then typically a platform package like **Revo.Platforms.AspNetCore** (ASP.NET Core platform implementation) and a data-access package like **Revo.EFCore** (for Entity Framework Core support).
+Most applications will require at least **Revo.Core**, **Revo.DataAccess**, **Revo.Domain**, **Revo.Infrastructure** packages to get started with and then typically a platform package like **Revo.AspNetCore** (ASP.NET Core platform implementation) and a data-access package like **Revo.EFCore** (for Entity Framework Core support).
 
 ## 🔧 Building
 
