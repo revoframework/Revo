@@ -5,16 +5,10 @@ using System.Linq;
 
 namespace Revo.Core.Events
 {
-    public class LayeredMetadata : IReadOnlyDictionary<string, string>
+    public class LayeredMetadata(IReadOnlyDictionary<string, string> values, IReadOnlyDictionary<string, Func<string>> getters) : IReadOnlyDictionary<string, string>
     {
-        private readonly IReadOnlyDictionary<string, string> values;
-        private readonly IReadOnlyDictionary<string, Func<string>> getters;
-
-        public LayeredMetadata(IReadOnlyDictionary<string, string> values, IReadOnlyDictionary<string, Func<string>> getters)
-        {
-            this.values = values;
-            this.getters = getters;
-        }
+        private readonly IReadOnlyDictionary<string, string> values = values;
+        private readonly IReadOnlyDictionary<string, Func<string>> getters = getters;
 
         public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
         {
@@ -32,10 +26,7 @@ namespace Revo.Core.Events
             }
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public int Count => values.Keys.Concat(getters.Keys).Distinct().Count();
 
@@ -78,11 +69,8 @@ namespace Revo.Core.Events
                 }
             }
         }
-        
-        public bool ContainsKey(string key)
-        {
-            return getters.ContainsKey(key) || values.ContainsKey(key);
-        }
+
+        public bool ContainsKey(string key) => getters.ContainsKey(key) || values.ContainsKey(key);
 
         public bool TryGetValue(string key, out string value)
         {

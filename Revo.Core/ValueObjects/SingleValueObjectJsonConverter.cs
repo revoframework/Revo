@@ -42,13 +42,12 @@ namespace Revo.Core.ValueObjects
                 });
 
             object value = serializer.Deserialize(reader, parameterType);
+
             return Activator.CreateInstance(objectType, value);
         }
 
-        public override bool CanConvert(Type objectType)
-        {
-            return typeof(ISingleValueObject).IsAssignableFrom(objectType)
+        public override bool CanConvert(Type objectType) =>
+            typeof(ISingleValueObject).IsAssignableFrom(objectType)
                 && objectType.IsClass && !objectType.IsAbstract && !objectType.IsGenericTypeDefinition;
-        }
     }
 }

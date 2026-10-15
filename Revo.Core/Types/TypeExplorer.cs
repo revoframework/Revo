@@ -6,23 +6,16 @@ using Microsoft.Extensions.Logging;
 
 namespace Revo.Core.Types
 {
-    public class TypeExplorer : ITypeExplorer
+    public class TypeExplorer(ILogger logger) : ITypeExplorer
     {
-        private readonly ILogger logger;
+        private readonly ILogger logger = logger;
 
-        public TypeExplorer(ILogger logger)
-        {
-            this.logger = logger;
-        }
-
-        public virtual IEnumerable<Assembly> GetAllReferencedAssemblies()
-        {
-            return AppDomain.CurrentDomain.GetAssemblies();
-        }
+        public virtual IEnumerable<Assembly> GetAllReferencedAssemblies() => AppDomain.CurrentDomain.GetAssemblies();
 
         public IEnumerable<Type> GetAllTypes()
         {
             var assemblies = GetAllReferencedAssemblies();
+
             return assemblies.SelectMany(x =>
             {
                 try
@@ -44,6 +37,7 @@ namespace Revo.Core.Types
                 if (type.FullName == typeName)
                     return type;
             }
+
             return null;
         }
     }

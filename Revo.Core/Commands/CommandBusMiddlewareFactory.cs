@@ -3,20 +3,13 @@ using Revo.Core.Core;
 
 namespace Revo.Core.Commands
 {
-    public class CommandBusMiddlewareFactory : ICommandBusMiddlewareFactory
+    public class CommandBusMiddlewareFactory(IServiceLocator serviceLocator) : ICommandBusMiddlewareFactory
     {
-        private readonly IServiceLocator serviceLocator;
-
-        public CommandBusMiddlewareFactory(IServiceLocator serviceLocator)
-        {
-            this.serviceLocator = serviceLocator;
-        }
+        private readonly IServiceLocator serviceLocator = serviceLocator;
 
         public ICommandBusMiddleware<TCommand>[] CreateMiddlewares<TCommand>(ICommandBus commandBus)
-            where TCommand : class, ICommandBase
-        {
-            return serviceLocator.GetAll<ICommandBusMiddleware<TCommand>>()
-                .ToArray();
-        }
+            where TCommand : class, ICommandBase => 
+            serviceLocator.GetAll<ICommandBusMiddleware<TCommand>>()
+                          .ToArray();
     }
 }
