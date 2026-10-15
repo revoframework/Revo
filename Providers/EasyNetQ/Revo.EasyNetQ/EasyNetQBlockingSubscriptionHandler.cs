@@ -1,24 +1,20 @@
-﻿using System.Threading.Tasks;
-using Revo.Core.Core;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Revo.Core.Events;
 
 namespace Revo.EasyNetQ
 {
-    public class EasyNetQBlockingSubscriptionHandler : IEasyNetQBlockingSubscriptionHandler
+    public class EasyNetQBlockingSubscriptionHandler(IServiceScopeFactory serviceScopeFactory)
+        : IEasyNetQBlockingSubscriptionHandler
     {
-        private readonly IEventBus eventBus;
-
-        public EasyNetQBlockingSubscriptionHandler(IEventBus eventBus)
-        {
-            this.eventBus = eventBus;
-        }
-
         public void HandleMessage(object message)
         {
             if (message is IEventMessage eventMessage)
             {
-                Task.Factory.StartNewWithContext(async () =>
+                Task.Run(async () =>
                 {
+                    using var scope = serviceScopeFactory.CreateScope();
+                    var eventBus = scope.ServiceProvider.GetRequiredService<IEventBus>();
                     await eventBus.PublishAsync(eventMessage);
                 }).GetAwaiter().GetResult();
             }

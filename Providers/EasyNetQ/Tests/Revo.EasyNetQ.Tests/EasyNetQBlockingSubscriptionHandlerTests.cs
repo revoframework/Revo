@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
-using Revo.Core.Core;
 using Revo.Core.Events;
 using Xunit;
 
@@ -10,13 +10,24 @@ namespace Revo.EasyNetQ.Tests
 {
     public class EasyNetQBlockingSubscriptionHandlerTests
     {
-        private IEventBus eventBus;
-        private EasyNetQBlockingSubscriptionHandler sut;
+        private readonly IEventBus eventBus;
+        private readonly IServiceScopeFactory serviceScopeFactory;
+        private readonly EasyNetQBlockingSubscriptionHandler sut;
 
         public EasyNetQBlockingSubscriptionHandlerTests()
         {
             eventBus = Substitute.For<IEventBus>();
-            sut = new EasyNetQBlockingSubscriptionHandler(eventBus);
+
+            var serviceProvider = Substitute.For<IServiceProvider>();
+            serviceProvider.GetService(typeof(IEventBus)).Returns(eventBus);
+
+            var scope = Substitute.For<IServiceScope>();
+            scope.ServiceProvider.Returns(serviceProvider);
+
+            serviceScopeFactory = Substitute.For<IServiceScopeFactory>();
+            serviceScopeFactory.CreateScope().Returns(scope);
+
+            sut = new EasyNetQBlockingSubscriptionHandler(serviceScopeFactory);
         }
 
         [Fact]
@@ -24,16 +35,9 @@ namespace Revo.EasyNetQ.Tests
         {
             var eventMessage = EventMessage.FromEvent(new Event1(), new Dictionary<string, string>());
 
-            var prevTaskContext = TaskContext.Current;
-            TaskContext currentTaskContext = null;
-
-            eventBus.When(x => x.PublishAsync(eventMessage)).Do(ci => currentTaskContext = TaskContext.Current);
-
             sut.HandleMessage(eventMessage);
 
             eventBus.Received(1).PublishAsync(eventMessage);
-            currentTaskContext.Should().NotBeNull();
-            currentTaskContext.Should().NotBe(prevTaskContext);
         }
 
         [Fact]

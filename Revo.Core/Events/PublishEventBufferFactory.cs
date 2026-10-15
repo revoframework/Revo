@@ -1,17 +1,16 @@
-﻿namespace Revo.Core.Events
+﻿namespace Revo.Core.Events;
+
+public class PublishEventBufferFactory : IPublishEventBufferFactory
 {
-    public class PublishEventBufferFactory : IPublishEventBufferFactory
+    private readonly IEventBus eventBus;
+
+    public PublishEventBufferFactory(IEventBus eventBus)
     {
-        private readonly IEventBus eventBus;
+        this.eventBus = eventBus;
+    }
 
-        public PublishEventBufferFactory(IEventBus eventBus)
-        {
-            this.eventBus = eventBus;
-        }
-
-        public IPublishEventBuffer CreateEventBuffer()
-        {
-            return new PublishEventBuffer(eventBus);
-        }
+    public IPublishEventBuffer CreateEventBuffer()
+    {
+        return new PublishEventBuffer(eventBus);
     }
 }

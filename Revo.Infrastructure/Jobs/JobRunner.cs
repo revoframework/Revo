@@ -1,25 +1,23 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Revo.Core.Core;
+using Microsoft.Extensions.DependencyInjection;
+using Revo.Core.Services;
 
-namespace Revo.Infrastructure.Jobs
+namespace Revo.Infrastructure.Jobs;
+
+public class JobRunner(IServiceProvider serviceProvider) : IJobRunner
 {
-    public class JobRunner : IJobRunner
+    public async Task RunJobAsync(IJob job, CancellationToken cancellationToken)
     {
-        private readonly IServiceLocator serviceLocator;
+        // the scope must stay alive until the job has finished, hence the await
+        using var scope = serviceProvider.CreateScope();
 
-        public JobRunner(IServiceLocator serviceLocator)
-        {
-            this.serviceLocator = serviceLocator;
-        }
-
-        public Task RunJobAsync(IJob job, CancellationToken cancellationToken)
-        {
-            Type jobHandlerType = typeof(IJobHandler<>).MakeGenericType(job.GetType());
-            object jobHandler = serviceLocator.Get(jobHandlerType);
-            var handleAsyncMethod = jobHandlerType.GetMethod(nameof(IJobHandler<IJob>.HandleAsync));
-            return (Task)handleAsyncMethod.Invoke(jobHandler, new object[] {job, cancellationToken});
-        }
+        Type jobHandlerType = typeof(IJobHandler<>).MakeGenericType(job.GetType());
+        // variant resolution, so that e.g. IJobHandler<IExecuteCommandJob> handles ExecuteCommandJob
+        object jobHandler = scope.ServiceProvider.GetRequiredService<IVariantServiceResolver>()
+            .GetRequiredService(jobHandlerType);
+        var handleAsyncMethod = jobHandlerType.GetMethod(nameof(IJobHandler<IJob>.HandleAsync));
+        await (Task)handleAsyncMethod.Invoke(jobHandler, new object[] {job, cancellationToken});
     }
 }

@@ -1,10 +1,3 @@
-﻿using McMaster.NETCore.Plugins;
-using Microsoft.Data.Sqlite;
-using Ninject;
-using Ninject.Modules;
-using Npgsql;
-using Revo.Infrastructure.DataAccess.Migrations;
-using Revo.Infrastructure.DataAccess.Migrations.Providers;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -13,247 +6,249 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using McMaster.NETCore.Plugins;
+using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
-using Revo.Core.Core;
-using Revo.Core.Events;
+using Npgsql;
+using Revo.Infrastructure.DataAccess.Migrations;
+using Revo.Infrastructure.DataAccess.Migrations.Providers;
 
-namespace Revo.Tools.DatabaseMigrator
+namespace Revo.Tools.DatabaseMigrator;
+
+public class DatabaseMigrator : IDisposable
 {
-    public class DatabaseMigrator : IDisposable
+    private readonly IDatabaseMigrationRegistry migrationRegistry = new DatabaseMigrationRegistry();
+    private readonly ILogger<DatabaseMigrator> logger;
+    private readonly ILoggerFactory loggerFactory;
+    private readonly DatabaseMigrationExecutionOptions executionOptions = new();
+    private readonly List<FileDatabaseMigrationDiscoveryPath> fileDiscoveryPaths = [];
+    private readonly DatabaseMigratorBindings migratorBindings = new();
+    private IDatabaseMigrationExecutor executor;
+    private IDatabaseMigrationSelector migrationSelector;
+    private AdoNetDatabaseMigrationProvider migrationProvider;
+    private IDatabaseMigrationDiscovery[] migrationDiscoveries;
+
+    public DatabaseMigrator(ICommonOptions options, ILogger<DatabaseMigrator> logger, ILoggerFactory loggerFactory)
     {
-        private readonly StandardKernel kernel = new StandardKernel();
-        private readonly IDatabaseMigrationRegistry migrationRegistry = new DatabaseMigrationRegistry();
-        private readonly ILogger logger;
-        private readonly DatabaseMigrationExecutionOptions executionOptions = new();
-        private IDatabaseMigrationExecutor executor;
-        private IDatabaseMigrationSelector migrationSelector;
-        private AdoNetDatabaseMigrationProvider migrationProvider;
-        private IDatabaseMigrationDiscovery[] migrationDiscoveries;
+        Options = options;
+        this.logger = logger;
+        this.loggerFactory = loggerFactory;
+    }
 
-        public DatabaseMigrator(ICommonOptions options, ILogger logger)
+    public ICommonOptions Options { get; }
+
+    public async Task UpgradeAsync(UpgradeVerb verb)
+    {
+        await InitializeAsync();
+
+        var appliedMigrations = await executor.ExecuteAsync();
+
+        if (appliedMigrations.Count == 0)
         {
-            this.Options = options;
-            this.logger = logger;
+            logger.LogInformation("There are no pending migrations. No changes have been made.");
+        }
+    }
+
+    public async Task PreviewAsync(PreviewVerb verb)
+    {
+        await InitializeAsync();
+
+        var appliedMigrations = await executor.PreviewAsync();
+
+        if (appliedMigrations.Count == 0)
+        {
+            logger.LogInformation("There are no pending migrations to be applied.");
+        }
+        else
+        {
+            string GetMigrationLines(PendingModuleMigration moduleMigration)
+            {
+                return string.Join('\n',
+                    moduleMigration.Migrations.Select((x, i) =>
+                        $"  {i + 1}. {x.ToString(false)}{(x.ModuleName != moduleMigration.Specifier.ModuleName ? " (dependency)" : "")}"));
+            }
+
+            var moduleInfos = appliedMigrations.Select(x =>
+                $"{x.Specifier.ModuleName}{(x.Migrations.Any(y => y.Version != null) ? $" to version {x.Migrations.OrderByDescending(y => y.Version).First().Version}" : "")} ({x.Migrations.Count()} migration(s)):\n{GetMigrationLines(x)}");
+            string moduleInfosLines = string.Join("\n\n", moduleInfos);
+            logger.LogInformation($"There are {appliedMigrations.Count} modules to be migrated:\n\n{moduleInfosLines}");
+        }
+    }
+
+    private Task InitializeAsync()
+    {
+        if (executor != null)
+        {
+            return Task.CompletedTask;
         }
 
-        public ICommonOptions Options { get; }
+        LoadModules();
 
-        public async Task UpgradeAsync(UpgradeVerb verb)
-        {
-            await InitializeAsync();
+        CreateMigrationProvider();
 
-            var appliedMigrations = await executor.ExecuteAsync();
-
-            if (appliedMigrations.Count == 0)
+        executionOptions.EnvironmentTags = Options.EnvironmentTags?.ToArray() ?? [];
+        executionOptions.MigrateOnlySpecifiedModules = Options.Modules?.Count() > 0
+            ? Options.Modules.Select(x =>
             {
-                logger.LogInformation("There are no pending migrations. No changes have been made.");
-            }
-        }
-
-        public async Task PreviewAsync(PreviewVerb verb)
-        {
-            await InitializeAsync();
-            
-            var appliedMigrations = await executor.PreviewAsync();
-
-            if (appliedMigrations.Count == 0)
-            {
-                logger.LogInformation("There are no pending migrations to be applied.");
-            }
-            else
-            {
-                string GetMigrationLines(PendingModuleMigration moduleMigration)
+                string[] parts = x.Split('@', 2);
+                if (parts.Length > 1)
                 {
-                    return string.Join('\n',
-                        moduleMigration.Migrations.Select((x, i) =>
-                            $"  {i + 1}. {x.ToString(false)}{(x.ModuleName != moduleMigration.Specifier.ModuleName ? " (dependency)" : "")}"));
+                    return new DatabaseMigrationSearchSpecifier(parts[0], DatabaseVersion.Parse(parts[1]));
                 }
 
-                var moduleInfos = appliedMigrations.Select(x => $"{x.Specifier.ModuleName}{(x.Migrations.Any(y => y.Version != null) ? $" to version {x.Migrations.OrderByDescending(y => y.Version).First().Version}" : "")} ({x.Migrations.Count()} migration(s)):\n{GetMigrationLines(x)}");
-                string moduleInfosLines = string.Join("\n\n", moduleInfos);
-                logger.LogInformation($"There are {appliedMigrations.Count} modules to be migrated:\n\n{moduleInfosLines}");
-            }
+                return new DatabaseMigrationSearchSpecifier(x, null);
+            }).ToArray()
+            : null;
+
+        migrationSelector = new DatabaseMigrationSelector(migrationRegistry,
+            executionOptions.MigrationSelectorOptions);
+
+        Regex fileNameRegex = Options.FileNameRegex != null
+            ? new Regex(Options.FileNameRegex, RegexOptions.Compiled | RegexOptions.IgnoreCase)
+            : null;
+
+        foreach (string path in Options.DirectoryPaths)
+        {
+            fileDiscoveryPaths.Add(new FileDatabaseMigrationDiscoveryPath(path, true, fileNameRegex));
         }
 
-        private async Task InitializeAsync()
+        if (!Options.DirectoryPaths.Any() && !Options.Assemblies.Any())
         {
-            if (executor != null)
-            {
-                return;
-            }
-
-            LoadModules();
-
-            CreateMigrationProvider();
-
-            executionOptions.EnvironmentTags = Options.EnvironmentTags?.ToArray() ?? new string[0];
-            executionOptions.MigrateOnlySpecifiedModules = Options.Modules?.Count() > 0
-                ? Options.Modules.Select(x =>
-                {
-                    string[] parts = x.Split('@', 2);
-                    if (parts.Length > 1)
-                    {
-                        return new DatabaseMigrationSearchSpecifier(parts[0], DatabaseVersion.Parse(parts[1]));
-                    }
-                    else
-                    {
-                        return new DatabaseMigrationSearchSpecifier(x, null);
-                    }
-                }).ToArray()
-                : null;
-
-            migrationSelector = new DatabaseMigrationSelector(migrationRegistry,
-                executionOptions.MigrationSelectorOptions);
-
-            Regex fileNameRegex = Options.FileNameRegex != null
-                ? new Regex(Options.FileNameRegex, RegexOptions.Compiled | RegexOptions.IgnoreCase)
-                : null;
-
-            foreach (string path in Options.DirectoryPaths)
-            {
-                kernel.Bind<FileDatabaseMigrationDiscoveryPath>()
-                    .ToConstant(new FileDatabaseMigrationDiscoveryPath(path, true, fileNameRegex));
-            }
-
-            if (!Options.DirectoryPaths.Any() && !Options.Assemblies.Any())
-            {
-                logger.LogError("You have not passed any --directoryPaths nor --assemblies to load the migrations from. No migrations will be performed.");
-            }
-
-            migrationDiscoveries = new IDatabaseMigrationDiscovery[]
-            {
-                    new FileDatabaseMigrationDiscovery(kernel.GetBindings(typeof(FileDatabaseMigrationDiscoveryPath)).Count() > 0
-                        ? kernel.GetAll<FileDatabaseMigrationDiscoveryPath>().ToArray() : new FileDatabaseMigrationDiscoveryPath[0]),
-                    new ResourceDatabaseMigrationDiscovery(kernel.GetBindings(typeof(ResourceDatabaseMigrationDiscoveryAssembly)).Count() > 0
-                        ? kernel.GetAll<ResourceDatabaseMigrationDiscoveryAssembly>().ToArray()
-                        : new ResourceDatabaseMigrationDiscoveryAssembly[0])
-            };
-
-            executor = new DatabaseMigrationExecutor(new[] { migrationProvider }, migrationRegistry,
-                migrationDiscoveries, migrationSelector, executionOptions, logger);
+            logger.LogError(
+                "You have not passed any --directoryPaths nor --assemblies to load the migrations from. No migrations will be performed.");
         }
 
-        private void LoadModules()
+        var resourceAssemblies = migratorBindings.GetResourceAssemblies();
+        migrationDiscoveries =
+        [
+            new FileDatabaseMigrationDiscovery(fileDiscoveryPaths),
+            new ResourceDatabaseMigrationDiscovery(resourceAssemblies.Length > 0
+                ? resourceAssemblies
+                : [])
+        ];
+
+        executor = new DatabaseMigrationExecutor([migrationProvider], migrationRegistry,
+            migrationDiscoveries, migrationSelector, executionOptions,
+            loggerFactory.CreateLogger<DatabaseMigrationExecutor>());
+
+        return Task.CompletedTask;
+    }
+
+    private void LoadModules()
+    {
+        var loadedAssemblies = new Dictionary<string, Assembly>();
+
+        foreach (var assemblyName in Options.Assemblies)
         {
-            var loadedAssemblies = new Dictionary<string, Assembly>();
+            var pluginLoader = PluginLoader.CreateFromAssemblyFile(
+                assemblyFile: assemblyName,
+                [typeof(IDatabaseMigratorPlugin), typeof(ResourceDatabaseMigrationDiscoveryAssembly)],
+                config => { config.PreferSharedTypes = true; });
 
-            foreach (var assemblyName in Options.Assemblies)
-            {
-                var pluginLoader = PluginLoader.CreateFromAssemblyFile(
-                    assemblyFile: assemblyName, new[] { typeof(INinjectModule), typeof(ResourceDatabaseMigrationDiscoveryAssembly) },
-                    config =>
-                    {
-                        config.PreferSharedTypes = true;
-                    });
+            Assembly mainAssembly = pluginLoader.LoadDefaultAssembly();
 
-                Assembly mainAssembly = pluginLoader.LoadDefaultAssembly();
-                
-                loadedAssemblies.Add(mainAssembly.GetName().Name, mainAssembly);
+            loadedAssemblies.Add(mainAssembly.GetName().Name, mainAssembly);
 
-                LoadReferencedAssembliesRecursive(mainAssembly, pluginLoader, loadedAssemblies);
-            }
-
-            LoadAssemblyModules(loadedAssemblies.Values);
+            LoadReferencedAssembliesRecursive(mainAssembly, pluginLoader, loadedAssemblies);
         }
 
-        private INinjectModule[] GetNinjectModules(Assembly assembly)
+        ApplyDatabaseMigratorPlugins(loadedAssemblies.Values);
+    }
+
+    private static IEnumerable<Type> GetDatabaseMigratorPluginTypes(Assembly assembly)
+    {
+        if (assembly.IsDynamic)
         {
-            return assembly.IsDynamic
-                ? new INinjectModule[0]
-                : assembly.ExportedTypes.Where(IsLoadableModule)
-                    .Select(type => Activator.CreateInstance(type) as INinjectModule)
-                    .ToArray();
+            yield break;
         }
 
-        private bool IsLoadableModule(Type type)
+        Type pluginInterface = typeof(IDatabaseMigratorPlugin);
+        foreach (Type type in assembly.ExportedTypes)
         {
-            if (!typeof(INinjectModule).IsAssignableFrom(type)
+            if (!pluginInterface.IsAssignableFrom(type)
                 || type.IsAbstract
                 || type.IsInterface
                 || type.GetConstructor(Type.EmptyTypes) == null)
             {
-                return false;
+                continue;
             }
 
-            return true;
+            yield return type;
         }
+    }
 
-        private void LoadAssemblyModules(IReadOnlyCollection<Assembly> assemblies)
+    private void ApplyDatabaseMigratorPlugins(IEnumerable<Assembly> assemblies)
+    {
+        foreach (Assembly assembly in assemblies)
         {
-            foreach (var assembly in assemblies)
+            try
             {
-                try
+                foreach (Type pluginType in GetDatabaseMigratorPluginTypes(assembly))
                 {
-                    var modules = GetNinjectModules(assembly).Where(x => !kernel.HasModule(x.Name)).ToArray();
-                    if (modules.Length > 0)
-                    {
-                        kernel.Load(modules);
-                    }
-                }
-                catch (Exception e)
-                {
-                    logger.LogWarning(e, $"Failed to load referenced assembly");
-                    throw;
+                    var plugin = (IDatabaseMigratorPlugin)Activator.CreateInstance(pluginType);
+                    plugin.Configure(migratorBindings);
                 }
             }
-        }
-
-        private void LoadReferencedAssembliesRecursive(Assembly assembly, PluginLoader pluginLoader,
-            Dictionary<string, Assembly> loadedAssemblies)
-        {
-            foreach (var assemblyName in assembly.GetReferencedAssemblies())
+            catch (Exception e)
             {
-                if (!loadedAssemblies.ContainsKey(assemblyName.Name)
-                    && !assemblyName.Name.StartsWith("Microsoft.")
-                    && !assemblyName.Name.StartsWith("System."))
-                {
-                    var referencedAssembly = pluginLoader.LoadAssembly(assemblyName);
-
-                    loadedAssemblies.Add(referencedAssembly.GetName().Name, referencedAssembly);
-                    LoadReferencedAssembliesRecursive(referencedAssembly, pluginLoader, loadedAssemblies);
-                }
+                logger.LogWarning(e, "Failed to load referenced assembly");
+                throw;
             }
         }
+    }
 
-        private void CreateMigrationProvider()
+    private void LoadReferencedAssembliesRecursive(Assembly assembly, PluginLoader pluginLoader,
+        Dictionary<string, Assembly> loadedAssemblies)
+    {
+        foreach (var assemblyName in assembly.GetReferencedAssemblies())
         {
-            IDbConnection dbConnection;
-            IDatabaseMigrationScripter scripter;
-
-            switch (Options.DatabaseProvider)
+            if (!loadedAssemblies.ContainsKey(assemblyName.Name)
+                && !assemblyName.Name.StartsWith("Microsoft.")
+                && !assemblyName.Name.StartsWith("System."))
             {
-                case DatabaseProvider.Npgsql:
-                    dbConnection = new NpgsqlConnection(Options.ConnectionString);
-                    scripter = new PgsqlMigrationScripter();
-                    logger.LogInformation("Using Npgsql database provider with PostgreSQL scripter");
-                    break;
+                var referencedAssembly = pluginLoader.LoadAssembly(assemblyName);
 
-                case DatabaseProvider.SqlServer:
-                    dbConnection = new SqlConnection(Options.ConnectionString);
-                    scripter = new MssqlMigrationScripter();
-                    logger.LogInformation("Using SQL Server database provider with MSSQL scripter");
-                    break;
-                
-                case DatabaseProvider.SQLite:
-                    dbConnection = new SqliteConnection(Options.ConnectionString);
-                    scripter = new SqliteMigrationScripter();
-                    logger.LogInformation("Using SQLite file database provider with SQLite scripter");
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException($"Unknown database provider value");
+                loadedAssemblies.Add(referencedAssembly.GetName().Name, referencedAssembly);
+                LoadReferencedAssembliesRecursive(referencedAssembly, pluginLoader, loadedAssemblies);
             }
-
-            var serviceLocator = new NinjectServiceLocator(kernel);
-            var eventBus = new EventBus(serviceLocator);
-
-            migrationProvider = new AdoNetDatabaseMigrationProvider(dbConnection, scripter, eventBus, logger);
         }
+    }
 
-        public void Dispose()
+    private void CreateMigrationProvider()
+    {
+        IDbConnection dbConnection;
+        IDatabaseMigrationScripter scripter;
+
+        switch (Options.DatabaseProvider)
         {
-            kernel?.Dispose();
-            migrationProvider?.Dispose();
+            case DatabaseProvider.Npgsql:
+                dbConnection = new NpgsqlConnection(Options.ConnectionString);
+                scripter = new PgsqlMigrationScripter();
+                logger.LogInformation("Using Npgsql database provider with PostgreSQL scripter");
+                break;
+
+            case DatabaseProvider.SqlServer:
+                dbConnection = new SqlConnection(Options.ConnectionString);
+                scripter = new MssqlMigrationScripter();
+                logger.LogInformation("Using SQL Server database provider with MSSQL scripter");
+                break;
+
+            case DatabaseProvider.SQLite:
+                dbConnection = new SqliteConnection(Options.ConnectionString);
+                scripter = new SqliteMigrationScripter();
+                logger.LogInformation("Using SQLite file database provider with SQLite scripter");
+                break;
+
+            default:
+                throw new ArgumentOutOfRangeException($"Unknown database provider value");
         }
+
+        migrationProvider = new AdoNetDatabaseMigrationProvider(dbConnection, scripter, new NullEventBus(),
+            loggerFactory.CreateLogger<AdoNetDatabaseMigrationProvider>());
+    }
+
+    public void Dispose()
+    {
+        migrationProvider?.Dispose();
     }
 }

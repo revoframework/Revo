@@ -1,11 +1,10 @@
 ﻿using System.Threading.Tasks;
 
-namespace Revo.Core.Transactions
+namespace Revo.Core.Transactions;
+
+public interface ITransactionParticipant
 {
-    public interface ITransactionParticipant
-    {
-        Task OnBeforeCommitAsync();
-        Task OnCommitSucceededAsync();
-        Task OnCommitFailedAsync();
-    }
+    Task OnBeforeCommitAsync();
+    Task OnCommitSucceededAsync();
+    Task OnCommitFailedAsync();
 }

@@ -1,6 +1,5 @@
-﻿namespace Revo.Domain.Sagas
+﻿namespace Revo.Domain.Sagas;
+
+public interface IConventionBasedSaga : ISaga
 {
-    public interface IConventionBasedSaga : ISaga
-    {
-    }
 }

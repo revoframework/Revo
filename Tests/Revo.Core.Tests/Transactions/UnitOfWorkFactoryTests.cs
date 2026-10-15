@@ -1,7 +1,7 @@
-﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Revo.Core.Events;
+using Revo.Core.Services;
 using Revo.Core.Transactions;
 using NSubstitute;
 using Xunit;
@@ -21,11 +21,12 @@ namespace Revo.Core.Tests.Transactions
 
             publishEventBufferFactory = Substitute.For<IPublishEventBufferFactory>();
 
-            sut = new UnitOfWorkFactory(() => new Lazy<IUnitOfWorkListener[]>(unitOfWorkListeners.ToArray()), publishEventBufferFactory);
+            var unitOfWorkListenerFactory = Substitute.For<IServiceFactory<IUnitOfWorkListener>>();
+            unitOfWorkListenerFactory.GetServices().Returns(unitOfWorkListeners);
+
+            sut = new UnitOfWorkFactory(unitOfWorkListenerFactory, publishEventBufferFactory);
         }
 
-        // TODO merge these tests with UnitOfWorkTests?
-        
         [Fact]
         public void CreateUnitOfWork_NotifiesListeners()
         {

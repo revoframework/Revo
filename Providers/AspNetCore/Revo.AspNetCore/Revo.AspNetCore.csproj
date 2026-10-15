@@ -17,8 +17,7 @@ Entity Framework (EF) Core data-access layer implementation.</Description>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Revo.Infrastructure\Revo.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\Hangfire\Revo.Hangfire\Revo.Hangfire.csproj" />
+    <ProjectReference Include="..\..\..\Revo.Core\Revo.Core.csproj" />
   </ItemGroup>
 
 </Project>

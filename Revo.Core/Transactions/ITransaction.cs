@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Revo.Core.Transactions
+namespace Revo.Core.Transactions;
+
+public interface ITransaction : IDisposable
 {
-    public interface ITransaction : IDisposable
-    {
-        Task CommitAsync();
-    }
+    Task CommitAsync();
 }

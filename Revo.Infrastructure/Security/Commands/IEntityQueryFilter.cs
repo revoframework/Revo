@@ -3,14 +3,13 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Revo.Core.Commands;
 
-namespace Revo.Infrastructure.Security.Commands
-{
-    public interface IEntityQueryFilter
-    {
-    }
+namespace Revo.Infrastructure.Security.Commands;
 
-    public interface IEntityQueryFilter<in TBase> : IEntityQueryFilter
-    {
-        Task<Expression<Func<T, bool>>> FilterAsync<T>(ICommandBase query) where T : TBase;
-    }
+public interface IEntityQueryFilter
+{
+}
+
+public interface IEntityQueryFilter<in TBase> : IEntityQueryFilter
+{
+    Task<Expression<Func<T, bool>>> FilterAsync<T>(ICommandBase query) where T : TBase;
 }

@@ -1,22 +1,15 @@
-﻿using System.Linq;
-using Revo.Core.Core;
+using System.Linq;
+using Revo.Core.Services;
 
-namespace Revo.Core.Commands
+namespace Revo.Core.Commands;
+
+public class CommandBusMiddlewareFactory(IVariantServiceResolver serviceResolver) : ICommandBusMiddlewareFactory
 {
-    public class CommandBusMiddlewareFactory : ICommandBusMiddlewareFactory
+    public ICommandBusMiddleware<TCommand>[] CreateMiddlewares<TCommand>(ICommandBus commandBus)
+        where TCommand : class, ICommandBase
     {
-        private readonly IServiceLocator serviceLocator;
-
-        public CommandBusMiddlewareFactory(IServiceLocator serviceLocator)
-        {
-            this.serviceLocator = serviceLocator;
-        }
-
-        public ICommandBusMiddleware<TCommand>[] CreateMiddlewares<TCommand>(ICommandBus commandBus)
-            where TCommand : class, ICommandBase
-        {
-            return serviceLocator.GetAll<ICommandBusMiddleware<TCommand>>()
-                .ToArray();
-        }
+        // variant resolution, so that e.g. ICommandBusMiddleware<ICommandBase> applies to all commands
+        return serviceResolver.GetServices<ICommandBusMiddleware<TCommand>>()
+            .ToArray();
     }
 }

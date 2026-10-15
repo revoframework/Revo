@@ -1,6 +1,5 @@
-﻿namespace Revo.Infrastructure.Jobs.InMemory
+﻿namespace Revo.Infrastructure.Jobs.InMemory;
+
+public interface IInMemoryJobScheduler : IJobScheduler
 {
-    public interface IInMemoryJobScheduler : IJobScheduler
-    {
-    }
 }

@@ -1,6 +1,5 @@
-﻿namespace Revo.Core.Events
+﻿namespace Revo.Core.Events;
+
+public interface IEvent
 {
-    public interface IEvent
-    {
-    }
 }

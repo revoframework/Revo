@@ -2,11 +2,10 @@
 using Revo.Core.Commands;
 using Revo.Core.Security;
 
-namespace Revo.Infrastructure.Security.Commands
+namespace Revo.Infrastructure.Security.Commands;
+
+public interface ICommandPermissionCache
 {
-    public interface ICommandPermissionCache
-    {
-        IReadOnlyCollection<Permission> GetCommandPermissions(ICommandBase command);
-        bool IsAuthenticationRequired(ICommandBase command);
-    }
+    IReadOnlyCollection<Permission> GetCommandPermissions(ICommandBase command);
+    bool IsAuthenticationRequired(ICommandBase command);
 }

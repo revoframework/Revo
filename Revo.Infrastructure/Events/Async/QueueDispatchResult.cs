@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 
-namespace Revo.Infrastructure.Events.Async
+namespace Revo.Infrastructure.Events.Async;
+
+public struct QueueDispatchResult
 {
-    public struct QueueDispatchResult
-    {
-        public IReadOnlyCollection<IAsyncEventQueueRecord> EnqueuedEventsAsyncProcessed { get; set; }
-        public IReadOnlyCollection<IAsyncEventQueueRecord> EnqueuedEventsSyncProcessed { get; set; }
-    }
+    public IReadOnlyCollection<IAsyncEventQueueRecord> EnqueuedEventsAsyncProcessed { get; set; }
+    public IReadOnlyCollection<IAsyncEventQueueRecord> EnqueuedEventsSyncProcessed { get; set; }
 }

@@ -1,10 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using Revo.Core.Commands;
+using Revo.Core.Services;
 using Xunit;
 
 namespace Revo.Core.Tests.Commands
@@ -13,31 +15,31 @@ namespace Revo.Core.Tests.Commands
     {
         private readonly FilterCommandBusMiddleware<MyCommand> sut;
         private readonly List<IPreCommandFilter<MyCommand>> preFilters = new List<IPreCommandFilter<MyCommand>>();
-        private readonly Func<IPreCommandFilter<MyCommand>[]> preFiltersFunc;
+        private readonly IServiceFactory<IPreCommandFilter<MyCommand>> preFiltersFactory;
         private readonly List<IPostCommandFilter<MyCommand>> postFilters = new List<IPostCommandFilter<MyCommand>>();
-        private readonly Func<IPostCommandFilter<MyCommand>[]> postFiltersFunc;
+        private readonly IServiceFactory<IPostCommandFilter<MyCommand>> postFiltersFactory;
         private readonly List<IExceptionCommandFilter<MyCommand>> exceptionFilters = new List<IExceptionCommandFilter<MyCommand>>();
-        private readonly Func<IExceptionCommandFilter<MyCommand>[]> exceptionFiltersFunc;
+        private readonly IServiceFactory<IExceptionCommandFilter<MyCommand>> exceptionFiltersFactory;
 
         public FilterCommandBusMiddlewareTests()
         {
             var preFilter = Substitute.For<IPreCommandFilter<MyCommand>>();
             preFilters.Add(preFilter);
-            preFiltersFunc = Substitute.For<Func<IPreCommandFilter<MyCommand>[]>>();
-            preFiltersFunc.Invoke().Returns(preFilters.ToArray());
+            preFiltersFactory = Substitute.For<IServiceFactory<IPreCommandFilter<MyCommand>>>();
+            preFiltersFactory.GetServices().Returns(preFilters);
 
             var postFilter = Substitute.For<IPostCommandFilter<MyCommand>>();
             postFilters.Add(postFilter);
-            postFiltersFunc = Substitute.For<Func<IPostCommandFilter<MyCommand>[]>>();
-            postFiltersFunc.Invoke().Returns(postFilters.ToArray());
+            postFiltersFactory = Substitute.For<IServiceFactory<IPostCommandFilter<MyCommand>>>();
+            postFiltersFactory.GetServices().Returns(postFilters);
 
             var exceptionFilter = Substitute.For<IExceptionCommandFilter<MyCommand>>();
             exceptionFilters.Add(exceptionFilter);
-            exceptionFiltersFunc = Substitute.For<Func<IExceptionCommandFilter<MyCommand>[]>>();
-            exceptionFiltersFunc.Invoke().Returns(exceptionFilters.ToArray());
+            exceptionFiltersFactory = Substitute.For<IServiceFactory<IExceptionCommandFilter<MyCommand>>>();
+            exceptionFiltersFactory.GetServices().Returns(exceptionFilters);
             
-            sut = new FilterCommandBusMiddleware<MyCommand>(preFiltersFunc, postFiltersFunc,
-                exceptionFiltersFunc);
+            sut = new FilterCommandBusMiddleware<MyCommand>(preFiltersFactory, postFiltersFactory,
+                exceptionFiltersFactory);
         }
 
         [Fact]
@@ -51,7 +53,7 @@ namespace Revo.Core.Tests.Commands
             Received.InOrder(() =>
             {
                 preFilters[0].PreFilterAsync(command);
-                next.Invoke(command);
+                next.Invoke(command, CancellationToken.None);
             });
         }
 
@@ -66,7 +68,7 @@ namespace Revo.Core.Tests.Commands
             await Assert.ThrowsAsync<Exception>(async () =>
                 await sut.HandleAsync(command, CommandExecutionOptions.Default, next, CancellationToken.None));
 
-            next.DidNotReceiveWithAnyArgs().Invoke(null);
+            next.DidNotReceiveWithAnyArgs().Invoke(null, CancellationToken.None);
         }
 
         [Fact]
@@ -79,7 +81,7 @@ namespace Revo.Core.Tests.Commands
             
             Received.InOrder(() =>
             {
-                next.Invoke(command);
+                next.Invoke(command, CancellationToken.None);
                 postFilters[0].PostFilterAsync(command, null);
             });
         }
@@ -91,14 +93,39 @@ namespace Revo.Core.Tests.Commands
             var next = Substitute.For<CommandBusMiddlewareDelegate>();
 
             InvalidOperationException e = new InvalidOperationException();
-            next.Invoke(command).Throws(e);
+            next.Invoke(command, CancellationToken.None).Throws(e);
 
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
                 await sut.HandleAsync(command, CommandExecutionOptions.Default, next, CancellationToken.None));
 
-            next.Received(1).Invoke(command);
+            next.Received(1).Invoke(command, CancellationToken.None);
             exceptionFilters[0].Received(1).FilterExceptionAsync(command, e);
             postFilters[0].DidNotReceiveWithAnyArgs().PostFilterAsync(null, null);
+        }
+
+        [Fact]
+        public async Task Handle_CallsFiltersOfBaseCommandTypes()
+        {
+            var preFilter = Substitute.For<IPreCommandFilter<ICommandBase>>();
+            var postFilter = Substitute.For<IPostCommandFilter<ICommandBase>>();
+            var services = new ServiceCollection();
+            services.AddSingleton(preFilter);
+            services.AddSingleton(postFilter);
+
+            var resolver = new VariantServiceResolver(services.BuildServiceProvider(),
+                new VariantServiceTypeIndex(services));
+            var middleware = new FilterCommandBusMiddleware<MyCommand>(
+                new ContainerServiceFactory<IPreCommandFilter<MyCommand>>(resolver),
+                new ContainerServiceFactory<IPostCommandFilter<MyCommand>>(resolver),
+                new ContainerServiceFactory<IExceptionCommandFilter<MyCommand>>(resolver));
+
+            var command = new MyCommand();
+            var next = Substitute.For<CommandBusMiddlewareDelegate>();
+
+            await middleware.HandleAsync(command, CommandExecutionOptions.Default, next, CancellationToken.None);
+
+            await preFilter.Received(1).PreFilterAsync(command);
+            await postFilter.Received(1).PostFilterAsync(command, null);
         }
 
         public class MyCommand : ICommand

@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 
-namespace Revo.Core.Security
+namespace Revo.Core.Security;
+
+public interface IPermissionAuthorizationMatcher
 {
-    public interface IPermissionAuthorizationMatcher
-    {
-        bool CheckAuthorization(IReadOnlyCollection<Permission> availablePermissions,
-            IEnumerable<Permission> requiredPermissions);
-    }
+    bool CheckAuthorization(IReadOnlyCollection<Permission> availablePermissions,
+        IEnumerable<Permission> requiredPermissions);
 }

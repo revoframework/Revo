@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using Microsoft.Extensions.DependencyInjection;
 using Revo.DataAccess.Entities;
 
 namespace Revo.EFCore.DataAccess.Entities
@@ -9,23 +10,20 @@ namespace Revo.EFCore.DataAccess.Entities
         ICrudRepositoryFactory<IEFCoreReadRepository>,
         ICrudRepositoryFactory<IEFCoreCrudRepository>
     {
-        private readonly Func<IDbContextFactory> dbContextFactoryFunc;
-        private readonly Func<IRepositoryFilter[]> repositoryFiltersFunc;
-        private readonly Func<IRequestDbContextCache> requestDbContextCacheFunc;
+        private readonly IServiceProvider serviceProvider;
 
-        public EFCoreCrudRepositoryFactory(Func<IDbContextFactory> dbContextFactoryFunc,
-            Func<IRepositoryFilter[]> repositoryFiltersFunc,
-            Func<IRequestDbContextCache> requestDbContextCacheFunc)
+        public EFCoreCrudRepositoryFactory(IServiceProvider serviceProvider)
         {
-            this.dbContextFactoryFunc = dbContextFactoryFunc;
-            this.repositoryFiltersFunc = repositoryFiltersFunc;
-            this.requestDbContextCacheFunc = requestDbContextCacheFunc;
+            this.serviceProvider = serviceProvider;
         }
 
         public IEFCoreCrudRepository Create()
         {
-            var databaseAccess = new EFCoreDatabaseAccess(dbContextFactoryFunc(), requestDbContextCacheFunc());
-            return new EFCoreCrudRepository(repositoryFiltersFunc(), databaseAccess);
+            var dbContextFactory = serviceProvider.GetRequiredService<IDbContextFactory>();
+            var requestDbContextCache = serviceProvider.GetRequiredService<IRequestDbContextCache>();
+            var repositoryFilters = serviceProvider.GetServices<IRepositoryFilter>();
+            var databaseAccess = new EFCoreDatabaseAccess(dbContextFactory, requestDbContextCache);
+            return new EFCoreCrudRepository(repositoryFilters, databaseAccess);
         }
 
         IReadRepository ICrudRepositoryFactory<IReadRepository>.Create()

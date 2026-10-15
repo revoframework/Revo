@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 using Revo.EFCore.DataAccess.Conventions;
 using Revo.EFCore.DataAccess.Model;
@@ -11,12 +13,12 @@ namespace Revo.EFCore.DataAccess.Entities
         private readonly IEFCoreConvention[] conventions;
 
         public EntityDbContext(DbContextOptions<EntityDbContext> options,
-            IEFCoreModelDefinition[] modelDefinitions,
-            IEFCoreConvention[] conventions)
+            IEnumerable<IEFCoreModelDefinition> modelDefinitions,
+            IEnumerable<IEFCoreConvention> conventions)
             : base(options)
         {
-            this.modelDefinitions = modelDefinitions;
-            this.conventions = conventions;
+            this.modelDefinitions = modelDefinitions.ToArray();
+            this.conventions = conventions.ToArray();
         }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)

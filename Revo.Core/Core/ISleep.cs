@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Revo.Core.Core
+namespace Revo.Core.Core;
+
+public interface ISleep
 {
-    public interface ISleep
-    {
-        void Sleep(TimeSpan timeout);
-        Task SleepAsync(TimeSpan timeout);
-    }
+    void Sleep(TimeSpan timeout);
+    Task SleepAsync(TimeSpan timeout);
 }

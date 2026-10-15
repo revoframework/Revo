@@ -1,10 +1,9 @@
 ﻿using System;
 
-namespace Revo.Core.Security
+namespace Revo.Core.Security;
+
+public interface IUser
 {
-    public interface IUser
-    {
-        Guid Id { get; }
-        string UserName { get; }
-    }
+    Guid Id { get; }
+    string UserName { get; }
 }

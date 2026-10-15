@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Revo.Infrastructure.DataAccess.Migrations
@@ -7,7 +7,7 @@ namespace Revo.Infrastructure.DataAccess.Migrations
     {
         private readonly ResourceDatabaseMigrationDiscoveryAssembly[] registeredAssemblies;
 
-        public ResourceDatabaseMigrationDiscovery(ResourceDatabaseMigrationDiscoveryAssembly[] registeredAssemblies)
+        public ResourceDatabaseMigrationDiscovery(IEnumerable<ResourceDatabaseMigrationDiscoveryAssembly> registeredAssemblies)
         {
             this.registeredAssemblies = registeredAssemblies.Distinct().ToArray();
         }

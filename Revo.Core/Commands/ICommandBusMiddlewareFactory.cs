@@ -1,8 +1,7 @@
-﻿namespace Revo.Core.Commands
+﻿namespace Revo.Core.Commands;
+
+public interface ICommandBusMiddlewareFactory
 {
-    public interface ICommandBusMiddlewareFactory
-    {
-        ICommandBusMiddleware<TCommand>[] CreateMiddlewares<TCommand>(ICommandBus commandBus)
-            where TCommand : class, ICommandBase;
-    }
+    ICommandBusMiddleware<TCommand>[] CreateMiddlewares<TCommand>(ICommandBus commandBus)
+        where TCommand : class, ICommandBase;
 }

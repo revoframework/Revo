@@ -1,7 +1,6 @@
-﻿namespace Revo.Core.Security
+﻿namespace Revo.Core.Security;
+
+public interface IPermissionTypeIndexer
 {
-    public interface IPermissionTypeIndexer
-    {
-        void EnsureIndexed();
-    }
+    void EnsureIndexed();
 }

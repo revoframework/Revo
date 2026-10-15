@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Revo.Core.Commands;
 using Revo.Core.Events;
@@ -27,6 +28,8 @@ namespace Revo.Infrastructure.Tests.Projections
         private readonly List<IUnitOfWork> unitsOfWork = new();
         private readonly ITenantProvider tenantProvider;
         private readonly CommandContextStack commandContextStack;
+        private readonly IServiceScopeFactory serviceScopeFactory;
+        private readonly List<IServiceScope> scopes = new();
 
         private readonly Guid aggregate1Id = Guid.Parse("F2280E17-8FC0-4F49-B57B-4335AEFC0063");
         private readonly Guid aggregate2Id = Guid.Parse("8D165937-CB74-4052-B9E3-A7E56AA49106");
@@ -49,7 +52,6 @@ namespace Revo.Infrastructure.Tests.Projections
             sequencer.ShouldAttemptSynchronousDispatch(null).ReturnsForAnyArgs(true);
 
             projectionSubSystem = Substitute.For<IProjectionSubSystem>();
-            Func<IProjectionSubSystem> projectionSubSystemFunc = () => projectionSubSystem;
 
             unitOfWorkFactory = Substitute.For<IUnitOfWorkFactory>();
             unitOfWorkFactory.CreateUnitOfWork().Returns(ci =>
@@ -59,13 +61,24 @@ namespace Revo.Infrastructure.Tests.Projections
             });
 
             commandContextStack = new CommandContextStack();
-            Func<CommandContextStack> commandContextStackFunc = () => commandContextStack;
+
+            var scopeServiceProvider = Substitute.For<IServiceProvider>();
+            scopeServiceProvider.GetService(typeof(IUnitOfWorkFactory)).Returns(unitOfWorkFactory);
+            scopeServiceProvider.GetService(typeof(CommandContextStack)).Returns(commandContextStack);
+            scopeServiceProvider.GetService(typeof(IProjectionSubSystem)).Returns(projectionSubSystem);
+
+            serviceScopeFactory = Substitute.For<IServiceScopeFactory>();
+            serviceScopeFactory.CreateScope().Returns(ci =>
+            {
+                var scope = Substitute.For<IServiceScope>();
+                scope.ServiceProvider.Returns(scopeServiceProvider);
+                scopes.Add(scope);
+                return scope;
+            });
 
             tenantProvider = Substitute.For<ITenantProvider>();
 
-            sut = Substitute.ForPartsOf<ProjectionEventListener>(projectionSubSystemFunc, unitOfWorkFactory,
-                commandContextStackFunc, tenantProvider);
-            sut.EventSequencer.Returns(sequencer);
+            sut = new TestProjectionEventListener(serviceScopeFactory, tenantProvider, sequencer);
         }
 
         [Fact]
@@ -220,8 +233,53 @@ namespace Revo.Infrastructure.Tests.Projections
             TenantContextOverride.Current?.Tenant.Should().Be(null);
         }
 
+        [Fact]
+        public async Task OnFinishedEventQueue_ExecutesEachTenantInOwnScope()
+        {
+            var tenant1 = Substitute.For<ITenant>();
+            tenant1.Id.Returns(Guid.Parse("4FEEE256-9949-45B8-9F04-ED73387B9AF4"));
+            tenantProvider.GetTenant(tenant1.Id).Returns(tenant1);
+
+            var ev1 = new EventMessage<DomainAggregateEvent>(new MyEvent()
+            {
+                AggregateId = aggregate1Id
+            }, new Dictionary<string, string>()
+            {
+                { BasicEventMetadataNames.AggregateTenantId, tenant1.Id.ToString() }
+            });
+
+            var ev2 = new EventMessage<DomainAggregateEvent>(new MyEvent()
+            {
+                AggregateId = aggregate2Id
+            }, new Dictionary<string, string>());
+
+            projectionSubSystem.WhenForAnyArgs(x => x.ExecuteProjectionsAsync(null, null, null))
+                .Do(ci => scopes.Last().DidNotReceive().Dispose());
+
+            await sut.HandleAsync(ev1, "MyProjectionEventListener");
+            await sut.HandleAsync(ev2, "MyProjectionEventListener");
+            await sut.OnFinishedEventQueueAsync("MyProjectionEventListener");
+
+            scopes.Should().HaveCount(2);
+            scopes.ForEach(x => x.Received(1).Dispose());
+        }
+
         public class MyEvent : DomainAggregateEvent
         {
+        }
+
+        public class TestProjectionEventListener(
+            IServiceScopeFactory serviceScopeFactory,
+            ITenantProvider tenantProvider,
+            IAsyncEventSequencer eventSequencer)
+            : ProjectionEventListener(serviceScopeFactory, tenantProvider)
+        {
+            public override IAsyncEventSequencer EventSequencer { get; } = eventSequencer;
+
+            protected override IProjectionSubSystem GetProjectionSubSystem(IServiceProvider serviceProvider)
+            {
+                return serviceProvider.GetRequiredService<IProjectionSubSystem>();
+            }
         }
     }
 }

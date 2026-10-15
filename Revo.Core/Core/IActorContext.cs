@@ -1,7 +1,6 @@
-﻿namespace Revo.Core.Core
+﻿namespace Revo.Core.Core;
+
+public interface IActorContext
 {
-    public interface IActorContext
-    {
-        string CurrentActorName { get; }
-    }
+    string CurrentActorName { get; }
 }

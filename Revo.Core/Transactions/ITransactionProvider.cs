@@ -1,7 +1,6 @@
-﻿namespace Revo.Core.Transactions
+﻿namespace Revo.Core.Transactions;
+
+public interface ITransactionProvider
 {
-    public interface ITransactionProvider
-    {
-        ITransaction CreateTransaction();
-    }
+    ITransaction CreateTransaction();
 }

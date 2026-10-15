@@ -1,15 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Ninject;
 using Revo.Core.Commands;
 
-namespace Revo.AspNetCore.Web
-{
-    public abstract class CommandApiController : ControllerBase
-    {
-        [Inject]
-        public ICommandBus CommandBus { get; set; }
+namespace Revo.AspNetCore.Web;
 
-        [Inject]
-        public ICommandGateway CommandGateway { get; set; }
-    }
+public abstract class CommandApiController(ICommandBus commandBus, ICommandGateway commandGateway) : ControllerBase
+{
+    public ICommandBus CommandBus { get; private set; } = commandBus;
+    public ICommandGateway CommandGateway { get; private set; } = commandGateway;
 }

@@ -1,25 +1,24 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Revo.Core.Configuration;
 
-namespace Revo.Core.Core
+namespace Revo.Core.Core;
+
+public class Environment : IEnvironment
 {
-    public class Environment : IEnvironment
+    private readonly IEnumerable<IEnvironmentProvider> environmentProviders;
+    private readonly CoreConfigurationSection coreConfigurationSection;
+
+    public Environment(IEnumerable<IEnvironmentProvider> environmentProviders,
+        CoreConfigurationSection coreConfigurationSection)
     {
-        private readonly IEnvironmentProvider[] environmentProviders;
+        this.environmentProviders = environmentProviders;
+        this.coreConfigurationSection = coreConfigurationSection;
 
-        public Environment(IEnvironmentProvider[] environmentProviders)
-        {
-            this.environmentProviders = environmentProviders;
-        }
-
-        public bool IsDevelopment
-        {
-            get
-            {
-                return IsDevelopmentOverride
-                    ?? environmentProviders.Any(x => x.IsDevelopment == true);
-            }
-        }
-
-        public bool? IsDevelopmentOverride { get; set; }
+        IsDevelopment = IsDevelopmentOverride
+                        ?? environmentProviders.Any(x => x.IsDevelopment == true);
     }
+
+    public bool IsDevelopment { get; private set; }
+    public bool? IsDevelopmentOverride => coreConfigurationSection.IsDevelopmentEnvironment;
 }

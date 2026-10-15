@@ -1,4 +1,6 @@
-﻿using NSubstitute;
+using System.Threading;
+using System.Threading.Tasks;
+using NSubstitute;
 using Revo.Infrastructure.Sagas;
 using Xunit;
 
@@ -19,9 +21,9 @@ namespace Revo.Infrastructure.Tests.Sagas
         }
 
         [Fact]
-        public void OnApplicationStarted_ConfiguresSagas()
+        public async Task ExecuteAsync_ConfiguresSagas()
         {
-            sut.OnApplicationStarted();
+            await sut.ExecuteAsync(CancellationToken.None);
 
             sagaConfigurators[0].Received(1).ConfigureSagas(sagaRegistry);
             sagaConfigurators[1].Received(1).ConfigureSagas(sagaRegistry);

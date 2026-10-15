@@ -1,7 +1,6 @@
-﻿namespace Revo.Infrastructure.Events.Async
+﻿namespace Revo.Infrastructure.Events.Async;
+
+public interface IAsyncEventQueueState
 {
-    public interface IAsyncEventQueueState
-    {
-        long? LastSequenceNumberProcessed { get; }
-    }
+    long? LastSequenceNumberProcessed { get; }
 }

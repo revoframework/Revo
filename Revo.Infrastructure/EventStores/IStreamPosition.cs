@@ -1,6 +1,5 @@
-﻿namespace Revo.Infrastructure.EventStores
+﻿namespace Revo.Infrastructure.EventStores;
+
+public interface IStreamPosition
 {
-    public interface IStreamPosition
-    {
-    }
 }

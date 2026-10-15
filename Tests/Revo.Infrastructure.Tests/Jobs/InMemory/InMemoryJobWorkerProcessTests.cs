@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -27,19 +27,38 @@ namespace Revo.Infrastructure.Tests.Jobs.InMemory
         }
 
         [Fact]
-        public void EnqueueJob_RunsTask()
+        public async Task EnqueueJob_RunsTask()
         {
             var job = new Job1();
 
-            sut.OnApplicationStarted();
+            await sut.StartAsync(CancellationToken.None);
             sut.EnqueueJob(job, (j, e) => { });
-            sut.OnApplicationStopping();
+            await sut.StopAsync(CancellationToken.None);
 
             jobRunner.Received(1).RunJobAsync(job, CancellationToken.None);
         }
 
         [Fact]
-        public void ThrottlesTasks()
+        public async Task EnqueueJob_RunsSubsequentJobs()
+        {
+            var jobs = new[] { new Job1(), new Job1(), new Job1() };
+
+            await sut.StartAsync(CancellationToken.None);
+            foreach (var job in jobs)
+            {
+                sut.EnqueueJob(job, (j, e) => { });
+            }
+
+            await sut.StopAsync(CancellationToken.None);
+
+            foreach (var job in jobs)
+            {
+                await jobRunner.Received(1).RunJobAsync(job, CancellationToken.None);
+            }
+        }
+
+        [Fact]
+        public async Task ThrottlesTasks()
         {
             schedulerConfiguration.WorkerTaskParallelism = 2;
             
@@ -81,7 +100,7 @@ namespace Revo.Infrastructure.Tests.Jobs.InMemory
             jobRunner.RunJobAsync(job2, CancellationToken.None).Returns(ci => job2Task.Value);
             jobRunner.RunJobAsync(job3, CancellationToken.None).Returns(ci => job3Task.Value);
 
-            sut.OnApplicationStarted();
+            await sut.StartAsync(CancellationToken.None);
             sut.EnqueueJob(job1, (j, e) => { });
             sut.EnqueueJob(job2, (j, e) => { });
 
@@ -98,13 +117,13 @@ namespace Revo.Infrastructure.Tests.Jobs.InMemory
 
             job1Finish = true;
             job2Finish = true;
-            sut.OnApplicationStopping();
+            await sut.StopAsync(CancellationToken.None);
 
             job3Task.Value.IsCompleted.Should().BeTrue();
         }
 
         [Fact]
-        public void CallsErrorHandler()
+        public async Task CallsErrorHandler()
         {
             var job = new Job1();
 
@@ -113,9 +132,9 @@ namespace Revo.Infrastructure.Tests.Jobs.InMemory
 
             var errorHandler = Substitute.For<Action<IJob, Exception>>();
 
-            sut.OnApplicationStarted();
+            await sut.StartAsync(CancellationToken.None);
             sut.EnqueueJob(job, errorHandler);
-            sut.OnApplicationStopping();
+            await sut.StopAsync(CancellationToken.None);
 
             errorHandler.Received(1).Invoke(job, exception);
         }

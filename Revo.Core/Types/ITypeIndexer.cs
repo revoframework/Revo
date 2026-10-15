@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace Revo.Core.Types
+namespace Revo.Core.Types;
+
+public interface ITypeIndexer
 {
-    public interface ITypeIndexer
-    {
-        IEnumerable<VersionedType> IndexTypes<TBase>();
-    }
+    IEnumerable<VersionedType> IndexTypes<TBase>();
 }

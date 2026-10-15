@@ -1,0 +1,16 @@
+@Revo.Examples.Minimal_HostAddress = https://localhost:7193
+
+GET {{Revo.Examples.Minimal_HostAddress}}/
+Accept: text/plain
+
+###
+
+POST {{Revo.Examples.Minimal_HostAddress}}/todo-lists
+Content-Type: application/json
+
+{
+  "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "name": "Shopping"
+}
+
+###

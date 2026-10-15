@@ -2,11 +2,10 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace Revo.Core.Security.ClaimBased
+namespace Revo.Core.Security.ClaimBased;
+
+public interface IClaimsPrincipalUserResolver
 {
-    public interface IClaimsPrincipalUserResolver
-    {
-        Guid? TryGetUserId(ClaimsPrincipal principal);
-        Task<IUser> GetUserAsync(ClaimsPrincipal principal);
-    }
+    Guid? TryGetUserId(ClaimsPrincipal principal);
+    Task<IUser> GetUserAsync(ClaimsPrincipal principal);
 }

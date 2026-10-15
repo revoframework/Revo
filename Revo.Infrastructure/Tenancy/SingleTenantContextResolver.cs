@@ -1,19 +1,18 @@
 ﻿using Revo.Core.Tenancy;
 
-namespace Revo.Infrastructure.Tenancy
+namespace Revo.Infrastructure.Tenancy;
+
+public class SingleTenantContextResolver : ITenantContextResolver
 {
-    public class SingleTenantContextResolver : ITenantContextResolver
+    public SingleTenantContextResolver(ITenant tenant)
     {
-        public SingleTenantContextResolver(ITenant tenant)
-        {
-            Tenant = tenant;
-        }
+        Tenant = tenant;
+    }
 
-        public ITenant Tenant { get; }
+    public ITenant Tenant { get; }
 
-        public ITenant ResolveTenant()
-        {
-            return Tenant;
-        }
+    public ITenant ResolveTenant()
+    {
+        return Tenant;
     }
 }
