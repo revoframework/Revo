@@ -1,7 +1,7 @@
 name: CI
 
 # Builds and tests every pull request and push to main or a release branch; packages built from the branches are
-# pushed to GitHub Packages as X.Y.Z-ci.N (see build/Build.cs). Releases to nuget.org are done by release.yml.
+# pushed to GitHub Packages as X.Y.Z-alpha.0.N (see build/Build.cs). Releases to nuget.org are done by release.yml.
 
 on:
   push:
@@ -29,6 +29,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # the whole history with the tags, to calculate the version (MinVer)
 
       # the .NET SDK from global.json, with the NuGet packages cached by the lock files
       - uses: actions/setup-dotnet@v6
@@ -75,6 +77,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-dotnet@v6
         with:

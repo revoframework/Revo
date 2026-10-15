@@ -112,7 +112,7 @@
       "properties": {
         "BuildVersion": {
           "type": "string",
-          "description": "Package version - computed from Common.props and the build context by default"
+          "description": "Package version - calculated from the git tags by default"
         },
         "Configuration": {
           "type": "string",

@@ -400,7 +400,7 @@ Most applications will require at least **Revo.Core**, **Revo.DataAccess**, **Re
 .\build.ps1    # the same on Windows
 ```
 
-The build requires the .NET SDK from [global.json](global.json); the PostgreSQL integration tests also need Docker (without it, they are skipped). It is written with [Fallout](https://docs.fallout.build/) in [build/Build.cs](build/Build.cs) - `./build.sh --help` lists its targets and parameters. CI builds of the `main` and `release/*` branches are published to the pre-release feed; releases are published to NuGet by pushing a `Revo-X.Y.Z` tag (see [the release workflow](.github/workflows/release.yml)).
+The build requires the .NET SDK from [global.json](global.json); the PostgreSQL integration tests also need Docker (without it, they are skipped). It is written with [Fallout](https://docs.fallout.build/) in [build/Build.cs](build/Build.cs) - `./build.sh --help` lists its targets and parameters. CI builds of the `main` and `release/*` branches are published to the pre-release feed; releases are published to NuGet by pushing a `Revo-X.Y.Z` tag (see [the release workflow](.github/workflows/release.yml)). The package versions are calculated from these tags by [MinVer](https://github.com/adamralph/minver).
 
 The versions of all packages, including the transitive ones, are pinned in the `packages.lock.json` files. Restoring the solution (`dotnet restore Revo.slnx`) updates them after a package reference changes; CI builds fail if they are not up to date.
 

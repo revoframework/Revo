@@ -1,11 +1,11 @@
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
 using Fallout.Common;
 using Fallout.Common.CI;
 using Fallout.Common.CI.GitHubActions;
 using Fallout.Common.IO;
+using Fallout.Common.Tooling;
 using Fallout.Common.Tools.DotNet;
 using Serilog;
 using static Fallout.Common.Tools.DotNet.DotNetTasks;
@@ -15,14 +15,9 @@ using static Fallout.Common.Tools.DotNet.DotNetTasks;
 /// packs the solution.
 /// </summary>
 /// <remarks>
-/// The package version is the VersionPrefix from Common.props with a suffix depending on what is being built:
-/// <list type="bullet">
-/// <item>release tag Revo-X.Y.Z[-suffix] -> X.Y.Z[-suffix] (X.Y.Z must match the VersionPrefix)</item>
-/// <item>main or release/* branch -> X.Y.Z-ci.N</item>
-/// <item>pull request -> X.Y.Z-prN-commit</item>
-/// <item>other branch -> X.Y.Z-branch-commit</item>
-/// <item>local build -> X.Y.Z-localYYMMDD-HHMMSS</item>
-/// </list>
+/// The versions are calculated by MinVer from the Revo-X.Y.Z tags (configured in Common.props): a tagged commit gets
+/// the version of its tag, the commits after it X.Y.(Z+1)-alpha.0.N (N being the number of commits since the tag).
+/// Local builds get X.Y.Z-localYYMMDD-HHMMSS instead, so that every one of them has a version of its own.
 /// </remarks>
 [ShutdownDotNetAfterServerBuild]
 class Build : FalloutBuild
@@ -34,7 +29,7 @@ class Build : FalloutBuild
     [Parameter("Configuration to build - default is 'Release'")]
     readonly Configuration Configuration = Configuration.Release;
 
-    [Parameter("Package version - computed from Common.props and the build context by default")]
+    [Parameter("Package version - calculated from the git tags by default")]
     readonly string BuildVersion;
 
     [Parameter("Filter of the tests to run (see dotnet test --filter)")]
@@ -54,11 +49,12 @@ class Build : FalloutBuild
     AbsolutePath TestResultsDirectory => ArtifactsDirectory / "test-results";
     AbsolutePath ReleaseNotesFile => ArtifactsDirectory / "release-notes.md";
 
-    string VersionPrefix => XDocument.Load(RootDirectory / "Common.props")
-        .Descendants("VersionPrefix")
-        .Single().Value.Trim();
-
     string Version => version ??= GetVersion();
+
+    /// <summary>
+    /// The version without the pre-release part, e.g. 2.0.0 for 2.0.0-rc.1.
+    /// </summary>
+    string ReleaseVersion => Version.Split('-', '+')[0];
 
     Target Restore => _ => _
         .Executes(() =>
@@ -76,7 +72,7 @@ class Build : FalloutBuild
             DotNetBuild(s => s
                 .SetProjectFile(SolutionFile)
                 .SetConfiguration(Configuration)
-                .SetVersion(Version)
+                .SetProperty("MinVerVersionOverride", Version)
                 .SetContinuousIntegrationBuild(IsServerBuild)
                 // keeps the actual source paths in the PDBs for the code coverage (dotnet/sourcelink#91)
                 .SetProperty("DeterministicSourcePaths", false)
@@ -110,7 +106,7 @@ class Build : FalloutBuild
             DotNetPack(s => s
                 .SetProject(SolutionFile)
                 .SetConfiguration(Configuration)
-                .SetVersion(Version)
+                .SetProperty("MinVerVersionOverride", Version)
                 .EnableNoBuild()
                 .SetOutputDirectory(PackagesDirectory));
         });
@@ -137,20 +133,21 @@ class Build : FalloutBuild
     /// Extracts the notes of the version being built from RELEASE_NOTES.md (for its GitHub Release).
     /// </summary>
     Target ReleaseNotes => _ => _
+        .DependsOn(Restore)
         .Executes(() =>
         {
             var notes = (RootDirectory / "RELEASE_NOTES.md").ReadAllLines()
-                .SkipWhile(x => !x.StartsWith($"## [{VersionPrefix}]"))
+                .SkipWhile(x => !x.StartsWith($"## [{ReleaseVersion}]"))
                 .Skip(1)
                 .TakeWhile(x => !x.StartsWith("## "))
                 .Select(x => Regex.Replace(x, @"^-(?=\S)", "- ")) // "-fixed ..." -> list item
                 .ToArray();
 
             var text = string.Join("\n", notes).Trim();
-            Assert.True(text.Length > 0, $"There are no notes for {VersionPrefix} in RELEASE_NOTES.md (expected a '## [{VersionPrefix}] - date' section)");
+            Assert.True(text.Length > 0, $"There are no notes for {ReleaseVersion} in RELEASE_NOTES.md (expected a '## [{ReleaseVersion}] - date' section)");
 
             ReleaseNotesFile.WriteAllText(text + "\n");
-            Log.Information("Release notes of {Version}:\n{Notes}", VersionPrefix, text);
+            Log.Information("Release notes of {Version}:\n{Notes}", ReleaseVersion, text);
         });
 
     string GetVersion()
@@ -160,36 +157,33 @@ class Build : FalloutBuild
             return BuildVersion;
         }
 
+        var minVerVersion = GetMinVerVersion();
+
         var gitHubActions = GitHubActions.Instance;
         if (gitHubActions == null)
         {
-            return $"{VersionPrefix}-local{DateTime.Now:yyMMdd-HHmmss}";
+            return $"{minVerVersion.Split('-', '+')[0]}-local{DateTime.Now:yyMMdd-HHmmss}";
         }
 
         if (gitHubActions.RefType == "tag")
         {
+            // e.g. with a shallow clone, MinVer would not see the tag
             var tag = gitHubActions.RefName;
-            Assert.True(tag.StartsWith(ReleaseTagPrefix), $"{tag} is not a release tag ({ReleaseTagPrefix}X.Y.Z)");
-
-            var tagVersion = tag[ReleaseTagPrefix.Length..];
-            Assert.True(tagVersion.Split('-')[0] == VersionPrefix,
-                $"Release tag {tag} does not match the VersionPrefix in Common.props ({VersionPrefix})");
-            return tagVersion;
+            Assert.True(tag == ReleaseTagPrefix + minVerVersion,
+                $"The version calculated from the tags ({minVerVersion}) does not match the release tag {tag}");
         }
 
-        var commit = gitHubActions.Sha[..7];
-        if (gitHubActions.IsPullRequest)
-        {
-            var pullRequestNumber = gitHubActions.Ref.Split('/')[2]; // refs/pull/N/merge
-            return $"{VersionPrefix}-pr{pullRequestNumber}-{commit}";
-        }
+        return minVerVersion;
+    }
 
-        var branch = gitHubActions.RefName;
-        if (branch == "main" || branch.StartsWith("release/"))
-        {
-            return $"{VersionPrefix}-ci.{gitHubActions.RunNumber}";
-        }
-
-        return $"{VersionPrefix}-{Regex.Replace(branch.ToLowerInvariant(), "[^0-9a-z-]", "-")}-{commit}";
+    /// <summary>
+    /// Gets the version MinVer calculates for the current commit (requires the restored solution).
+    /// </summary>
+    string GetMinVerVersion()
+    {
+        var project = RootDirectory / "Revo.Core" / "Revo.Core.csproj";
+        return DotNet($"msbuild {project} -nologo -t:MinVer -getProperty:MinVerVersion", logOutput: false)
+            .StdToText()
+            .Trim();
     }
 }

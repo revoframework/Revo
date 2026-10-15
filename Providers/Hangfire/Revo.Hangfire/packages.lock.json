@@ -32,6 +32,12 @@
           "Microsoft.SourceLink.Common": "8.0.0"
         }
       },
+      "MinVer": {
+        "type": "Direct",
+        "requested": "[8.0.0, )",
+        "resolved": "8.0.0",
+        "contentHash": "AJy/KVjXgUbgjf6HiI8wAk4DSSq0SCmvXQF8aU6IB+pnIQq+YJvofvMczug2hqO8yEvnQY557ryew66KPpyCsA=="
+      },
       "Hangfire.AspNetCore": {
         "type": "Transitive",
         "resolved": "1.8.22",
@@ -466,14 +472,14 @@
       "revo.dataaccess": {
         "type": "Project",
         "dependencies": {
-          "Revo.Core": "[1.38.4, )"
+          "Revo.Core": "[1.0.0, )"
         }
       },
       "revo.domain": {
         "type": "Project",
         "dependencies": {
-          "Revo.Core": "[1.38.4, )",
-          "Revo.DataAccess": "[1.38.4, )",
+          "Revo.Core": "[1.0.0, )",
+          "Revo.DataAccess": "[1.0.0, )",
           "System.ComponentModel.Annotations": "[5.0.0, )"
         }
       },
@@ -483,7 +489,7 @@
           "LinqKit.Core": "[1.2.9, )",
           "Microsoft.Extensions.Hosting": "[10.0.0, )",
           "Nito.AsyncEx": "[5.1.2, )",
-          "Revo.Domain": "[1.38.4, )",
+          "Revo.Domain": "[1.0.0, )",
           "morelinq": "[4.4.0, )"
         }
       }
