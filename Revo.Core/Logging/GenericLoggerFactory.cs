@@ -13,6 +13,7 @@ public static class GenericLoggerFactory
     {
         var loggerConstructorInfo = typeof(Logger<>).MakeGenericType(type)
             .GetConstructor(BindingFlags.Public | BindingFlags.Instance, new[] { typeof(ILoggerFactory) });
+
         return (ILogger)loggerConstructorInfo.Invoke(new[] { loggerFactory });
     }
 }

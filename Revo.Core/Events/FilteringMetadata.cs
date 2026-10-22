@@ -4,17 +4,11 @@ using System.Linq;
 
 namespace Revo.Core.Events
 {
-    public class FilteringMetadata : IReadOnlyDictionary<string, string>
+    public class FilteringMetadata(IReadOnlyDictionary<string, string> metadata,
+        params string[] removedKeys) : IReadOnlyDictionary<string, string>
     {
-        private readonly IReadOnlyDictionary<string, string> metadata;
-        private readonly string[] removedKeys;
-
-        public FilteringMetadata(IReadOnlyDictionary<string, string> metadata,
-            params string[] removedKeys)
-        {
-            this.metadata = metadata;
-            this.removedKeys = removedKeys;
-        }
+        private readonly IReadOnlyDictionary<string, string> metadata = metadata;
+        private readonly string[] removedKeys = removedKeys;
 
         public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
         {
@@ -27,18 +21,12 @@ namespace Revo.Core.Events
             }
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public int Count => metadata.Count - removedKeys.Length;
 
-        public bool ContainsKey(string key)
-        {
-            return !removedKeys.Contains(key)
-                && metadata.ContainsKey(key);
-        }
+        public bool ContainsKey(string key) =>
+            !removedKeys.Contains(key) && metadata.ContainsKey(key);
 
         public bool TryGetValue(string key, out string value)
         {
