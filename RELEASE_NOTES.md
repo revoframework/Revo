@@ -1,5 +1,15 @@
 # RELEASE NOTES
 
+## [1.38.5] - 2026-10-22
+
+### Fixed
+- fixed EF6 and EF Core repositories not applying write filters on synchronous saves
+- fixed command bus handler results not being awaited when no middleware is registered
+- fixed permission context and resource identifiers being compared by reference instead of value
+- fixed async event retry scheduling not using the multiplied backoff delay
+- fixed database migration version parsing accepting empty version parts and version comparison overflowing; preserved empty version round trips
+- corrected the README Todo example
+
 ## [1.38.4] - 2026-09-25
 -fixed RequestDbContextCache so synchronous event queues running in parallel on one request can add and dispose DbContexts safely
 
