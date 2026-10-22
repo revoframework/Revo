@@ -2,31 +2,30 @@
 using Revo.Core.Commands;
 using Revo.Core.Events;
 
-namespace Revo.Infrastructure.Events.Metadata
+namespace Revo.Infrastructure.Events.Metadata;
+
+public class CommandContextEventMetadataProvider : IEventMetadataProvider
 {
-    public class CommandContextEventMetadataProvider : IEventMetadataProvider
+    private readonly ICommandContext commandContext;
+
+    public CommandContextEventMetadataProvider(ICommandContext commandContext)
     {
-        private readonly ICommandContext commandContext;
+        this.commandContext = commandContext;
+    }
 
-        public CommandContextEventMetadataProvider(ICommandContext commandContext)
+    public Task<(string key, string value)[]> GetMetadataAsync(IEventMessage eventMessage)
+    {
+        if (commandContext.CurrentCommand != null)
         {
-            this.commandContext = commandContext;
+            return Task.FromResult(new[]
+            {
+                //(BasicEventMetadataNames.CommandId, commandContext.CurrentCommand.Id),
+                (BasicEventMetadataNames.CommandTypeId, commandContext.CurrentCommand.GetType().FullName)
+            });
         }
-
-        public Task<(string key, string value)[]> GetMetadataAsync(IEventMessage eventMessage)
+        else
         {
-            if (commandContext.CurrentCommand != null)
-            {
-                return Task.FromResult(new[]
-                {
-                    //(BasicEventMetadataNames.CommandId, commandContext.CurrentCommand.Id),
-                    (BasicEventMetadataNames.CommandTypeId, commandContext.CurrentCommand.GetType().FullName)
-                });
-            }
-            else
-            {
-                return Task.FromResult(new (string key, string value)[] {});
-            }
+            return Task.FromResult(new (string key, string value)[] {});
         }
     }
 }

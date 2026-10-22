@@ -1,20 +1,20 @@
-﻿using System.Collections.Generic;
-using Revo.Core.Core;
+using System.Collections.Generic;
+using Revo.Core.Services;
 
-namespace Revo.Infrastructure.Security.Commands
+namespace Revo.Infrastructure.Security.Commands;
+
+public class EntityQueryFilterFactory : IEntityQueryFilterFactory
 {
-    public class EntityQueryFilterFactory : IEntityQueryFilterFactory
+    private readonly IVariantServiceResolver serviceResolver;
+
+    public EntityQueryFilterFactory(IVariantServiceResolver serviceResolver)
     {
-        private readonly IServiceLocator serviceLocator;
+        this.serviceResolver = serviceResolver;
+    }
 
-        public EntityQueryFilterFactory(IServiceLocator serviceLocator)
-        {
-            this.serviceLocator = serviceLocator;
-        }
-
-        public IEnumerable<IEntityQueryFilter<T>> GetEntityQueryFilters<T>()
-        {
-            return serviceLocator.GetAll<IEntityQueryFilter<T>>();
-        }
+    public IEnumerable<IEntityQueryFilter<T>> GetEntityQueryFilters<T>()
+    {
+        // variant resolution, so that filters for base entity types apply to derived entity types as well
+        return serviceResolver.GetServices<IEntityQueryFilter<T>>();
     }
 }

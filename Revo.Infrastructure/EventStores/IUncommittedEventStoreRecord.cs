@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using Revo.Core.Events;
 
-namespace Revo.Infrastructure.EventStores
+namespace Revo.Infrastructure.EventStores;
+
+public interface IUncommittedEventStoreRecord
 {
-    public interface IUncommittedEventStoreRecord
-    {
-        IEvent Event { get; }
-        IReadOnlyDictionary<string, string> Metadata { get; }
-    }
+    IEvent Event { get; }
+    IReadOnlyDictionary<string, string> Metadata { get; }
 }

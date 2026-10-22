@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Revo.Core.Events;
@@ -15,10 +16,10 @@ namespace Revo.Infrastructure.Sagas
         private readonly ISagaRepository sagaRepository;
         private readonly IEntityFactory entityFactory;
 
-        public SagaEventDispatcher(ISagaLocator[] sagaLocators, ISagaRepository sagaRepository,
+        public SagaEventDispatcher(IEnumerable<ISagaLocator> sagaLocators, ISagaRepository sagaRepository,
             IEntityFactory entityFactory)
         {
-            this.sagaLocators = sagaLocators;
+            this.sagaLocators = sagaLocators.ToArray();
             this.sagaRepository = sagaRepository;
             this.entityFactory = entityFactory;
         }

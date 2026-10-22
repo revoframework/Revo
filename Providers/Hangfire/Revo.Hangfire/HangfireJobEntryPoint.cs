@@ -1,6 +1,6 @@
-﻿using System.Threading;
+using System.Threading;
 using System.Threading.Tasks;
-using Revo.Core.Core;
+using Microsoft.Extensions.DependencyInjection;
 using Revo.Infrastructure.Jobs;
 
 namespace Revo.Hangfire
@@ -8,19 +8,18 @@ namespace Revo.Hangfire
     public class HangfireJobEntryPoint<TJob>
         where TJob : IJob
     {
-        private readonly IJobRunner jobRunner;
+        private readonly IServiceScopeFactory serviceScopeFactory;
 
-        public HangfireJobEntryPoint(IJobRunner jobRunner)
+        public HangfireJobEntryPoint(IServiceScopeFactory serviceScopeFactory)
         {
-            this.jobRunner = jobRunner;
+            this.serviceScopeFactory = serviceScopeFactory;
         }
 
         public async Task ExecuteAsync(TJob job)
         {
-            using (TaskContext.Enter())
-            {
-                await jobRunner.RunJobAsync(job, CancellationToken.None); // must await instead of returning, otherwise task context gets disposed too early
-            }
+            using var scope = serviceScopeFactory.CreateScope();
+            var jobRunner = scope.ServiceProvider.GetRequiredService<IJobRunner>();
+            await jobRunner.RunJobAsync(job, CancellationToken.None);
         }
     }
 }

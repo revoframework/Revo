@@ -1,31 +1,37 @@
-﻿using System;
+using System;
+using Microsoft.Extensions.DependencyInjection;
+using Revo.AspNetCore.Core;
 using Revo.AspNetCore.Security;
 using Revo.Core.Configuration;
-using Revo.Hangfire;
+using Revo.Core.Core;
+using Revo.Core.Lifecycle;
+using Revo.Core.Security;
 
-namespace Revo.AspNetCore.Configuration
+namespace Revo.AspNetCore.Configuration;
+
+public static class AspNetCoreConfigurationExtensions
 {
-    public static class AspNetCoreConfigurationExtensions
+    public static IRevoConfiguration UseAspNetCore(this IRevoConfiguration configuration,
+        Action<AspNetCoreConfigurationSection> advancedAction = null)
     {
-        public static IRevoConfiguration UseAspNetCore(this IRevoConfiguration configuration,
-            Action<AspNetCoreConfigurationSection> advancedAction = null)
+        var section = configuration.GetOrAddSection<AspNetCoreConfigurationSection>(cfg =>
         {
-            var section = configuration.GetSection<AspNetCoreConfigurationSection>();
-            section.IsActive = true;
+            var section = new AspNetCoreConfigurationSection();
 
-            advancedAction?.Invoke(section);
-
-            configuration.ConfigureKernel(c =>
+            cfg.ConfigureServices(serviceCollection =>
             {
-                if (section.IsActive)
-                {
-                    var hangfireConfigurationSection = configuration.GetSection<HangfireConfigurationSection>();
-                    c.LoadModule(new AspNetCoreModule(hangfireConfigurationSection));
-                    c.LoadModule(new AspNetCoreSecurityModule());
-                }
+                serviceCollection.AddScoped<IActorContext, UserActorContext>();
+                serviceCollection.AddSingleton<IEnvironmentProvider, AspNetCoreEnvironmentProvider>();
+                serviceCollection.AddScoped<IUserContext, AspNetCoreUserContext>();
+                serviceCollection.AddSingleton<IRequestLifetime, AspNetCoreRequestLifetime>();
+                serviceCollection.AddHttpContextAccessor();
             });
-
-            return configuration;
-        }
+            
+            return section;
+        });
+        
+        advancedAction?.Invoke(section);
+        
+        return configuration;
     }
 }

@@ -1,78 +1,85 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using EasyNetQ;
+using Microsoft.Extensions.Hosting;
 using Revo.Core.Events;
-using Revo.Core.Lifecycle;
 using Revo.EasyNetQ.Configuration;
 
-namespace Revo.EasyNetQ
+namespace Revo.EasyNetQ;
+
+public class BusInitializer : IHostedLifecycleService
 {
-    public class BusInitializer : IApplicationStartedListener,
-        IApplicationStoppingListener
+    private static readonly MethodInfo SubscribeBlockingMethod = typeof(BusInitializer)
+        .GetMethod(nameof(SubscribeBlocking), BindingFlags.Instance | BindingFlags.NonPublic);
+    private static readonly MethodInfo SubscribeMethod = typeof(BusInitializer)
+        .GetMethod(nameof(Subscribe), BindingFlags.Instance | BindingFlags.NonPublic);
+
+    private readonly IBus bus;
+    private readonly IEasyNetQSubscriptionHandler subscriptionHandler;
+    private readonly IEasyNetQBlockingSubscriptionHandler blockingSubscriptionHandler;
+    private readonly EasyNetQConfigurationSection configurationSection;
+
+    public BusInitializer(IBus bus, IEasyNetQSubscriptionHandler subscriptionHandler,
+        IEasyNetQBlockingSubscriptionHandler blockingSubscriptionHandler,
+        EasyNetQConfigurationSection configurationSection)
     {
-        private static readonly MethodInfo SubscribeBlockingMethod = typeof(BusInitializer)
-            .GetMethod(nameof(SubscribeBlocking), BindingFlags.Instance | BindingFlags.NonPublic);
-        private static readonly MethodInfo SubscribeMethod = typeof(BusInitializer)
-            .GetMethod(nameof(Subscribe), BindingFlags.Instance | BindingFlags.NonPublic);
+        this.bus = bus;
+        this.subscriptionHandler = subscriptionHandler;
+        this.blockingSubscriptionHandler = blockingSubscriptionHandler;
+        this.configurationSection = configurationSection;
+    }
 
-        private readonly IBus bus;
-        private readonly IEasyNetQSubscriptionHandler subscriptionHandler;
-        private readonly IEasyNetQBlockingSubscriptionHandler blockingSubscriptionHandler;
-        private readonly EasyNetQConfigurationSection configurationSection;
+    public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
-        public BusInitializer(IBus bus, IEasyNetQSubscriptionHandler subscriptionHandler,
-            IEasyNetQBlockingSubscriptionHandler blockingSubscriptionHandler,
-            EasyNetQConfigurationSection configurationSection)
+    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public Task StartingAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public async Task StartedAsync(CancellationToken cancellationToken)
+    {
+        foreach (var eventType in configurationSection.Subscriptions.Events)
         {
-            this.bus = bus;
-            this.subscriptionHandler = subscriptionHandler;
-            this.blockingSubscriptionHandler = blockingSubscriptionHandler;
-            this.configurationSection = configurationSection;
-        }
-
-        public void OnApplicationStarted()
-        {
-            foreach (var eventType in configurationSection.Subscriptions.Events)
+            cancellationToken.ThrowIfCancellationRequested();
+            if (eventType.Value.IsBlockingSubscriber)
             {
-                if (eventType.Value.IsBlockingSubscriber)
-                {
-                    var subscribeTask = (Task) SubscribeBlockingMethod.MakeGenericMethod(eventType.Key).Invoke(this, new[] {eventType.Value});
-                    subscribeTask.GetAwaiter().GetResult();
-                }
-                else
-                {
-                    var subscribeTask = (Task)SubscribeMethod.MakeGenericMethod(eventType.Key).Invoke(this, new[] { eventType.Value });
-                    subscribeTask.GetAwaiter().GetResult();
-                }
+                var subscribeTask = (Task)SubscribeBlockingMethod.MakeGenericMethod(eventType.Key)
+                    .Invoke(this, new object[] { eventType.Value });
+                await subscribeTask.ConfigureAwait(false);
+            }
+            else
+            {
+                var subscribeTask = (Task)SubscribeMethod.MakeGenericMethod(eventType.Key)
+                    .Invoke(this, new object[] { eventType.Value });
+                await subscribeTask.ConfigureAwait(false);
             }
         }
+    }
 
-        public void OnApplicationStopping()
+    public Task StoppingAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public Task StoppedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    private async Task SubscribeBlocking<T>(EasyNetQSubscriptionsConfiguration.SubscriptionConfiguration subscriptionConfiguration)
+        where T : class, IEvent
+    {
+        Func<IEventMessage<T>, CancellationToken, Task> onMessage = (e, c) =>
         {
-        }
+            blockingSubscriptionHandler.HandleMessage(e);
+            return Task.CompletedTask;
+        };
 
-        private async Task SubscribeBlocking<T>(EasyNetQSubscriptionsConfiguration.SubscriptionConfiguration subscriptionConfiguration)
-            where T : class, IEvent
-        {
-            Func<IEventMessage<T>, CancellationToken, Task> onMessage = (e, c) =>
-            {
-                blockingSubscriptionHandler.HandleMessage(e);
-                return Task.CompletedTask;
-            };
+        await bus.PubSub.SubscribeAsync(subscriptionConfiguration.SubscriptionId,
+            onMessage,
+            subscriptionConfiguration.ConfigurationAction ?? (_ => { }));
+    }
 
-            await bus.PubSub.SubscribeAsync(subscriptionConfiguration.SubscriptionId,
-                onMessage,
-                subscriptionConfiguration.ConfigurationAction ?? (_ => { }));
-        }
-
-        private async Task Subscribe<T>(EasyNetQSubscriptionsConfiguration.SubscriptionConfiguration subscriptionConfiguration)
-            where T : class, IEvent
-        {
-            await bus.PubSub.SubscribeAsync<IEventMessage<T>>(subscriptionConfiguration.SubscriptionId,
-                (e, c) => subscriptionHandler.HandleMessageAsync(e),
-                subscriptionConfiguration.ConfigurationAction ?? (_ => { }));
-        }
+    private async Task Subscribe<T>(EasyNetQSubscriptionsConfiguration.SubscriptionConfiguration subscriptionConfiguration)
+        where T : class, IEvent
+    {
+        await bus.PubSub.SubscribeAsync<IEventMessage<T>>(subscriptionConfiguration.SubscriptionId,
+            (e, c) => subscriptionHandler.HandleMessageAsync(e),
+            subscriptionConfiguration.ConfigurationAction ?? (_ => { }));
     }
 }

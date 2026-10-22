@@ -1,7 +1,6 @@
-﻿namespace Revo.Core.Events
+﻿namespace Revo.Core.Events;
+
+public interface IPublishEventBufferFactory
 {
-    public interface IPublishEventBufferFactory
-    {
-        IPublishEventBuffer CreateEventBuffer();
-    }
+    IPublishEventBuffer CreateEventBuffer();
 }

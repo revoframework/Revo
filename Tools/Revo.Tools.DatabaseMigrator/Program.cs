@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Threading.Tasks;
 using CommandLine;
 using Microsoft.Extensions.Logging;
@@ -7,18 +7,19 @@ namespace Revo.Tools.DatabaseMigrator
 {
     class Program
     {
-        private static ILogger logger;
+        private static ILoggerFactory loggerFactory;
+        private static ILogger<Program> logger;
 
         static Task<int> Main(string[] args)
         {
-            using var loggerFactory = LoggerFactory.Create(builder =>
+            loggerFactory = LoggerFactory.Create(builder =>
             {
                 builder
                     .AddFilter("Default", LogLevel.Information)
                     .AddConsole();
             });
 
-            ILogger logger = loggerFactory.CreateLogger<Program>();
+            logger = loggerFactory.CreateLogger<Program>();
 
             logger.LogInformation($"Revo Database Migrator (v. {Assembly.GetEntryAssembly()?.GetName().Version}) tool running in standalone mode");
 
@@ -33,7 +34,8 @@ namespace Revo.Tools.DatabaseMigrator
         {
             logger.LogInformation("Running command: upgrade");
 
-            DatabaseMigrator migrator = new DatabaseMigrator(verb, logger);
+            DatabaseMigrator migrator = new DatabaseMigrator(verb, loggerFactory.CreateLogger<DatabaseMigrator>(),
+                loggerFactory);
             await migrator.UpgradeAsync(verb);
 
             return 0;
@@ -43,7 +45,8 @@ namespace Revo.Tools.DatabaseMigrator
         {
             logger.LogInformation("Running command: preview (showing only preview of migrations to be applied)");
 
-            DatabaseMigrator migrator = new DatabaseMigrator(verb, logger);
+            DatabaseMigrator migrator = new DatabaseMigrator(verb, loggerFactory.CreateLogger<DatabaseMigrator>(),
+                loggerFactory);
             await migrator.PreviewAsync(verb);
 
             return 0;

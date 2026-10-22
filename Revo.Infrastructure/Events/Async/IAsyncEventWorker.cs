@@ -1,9 +1,8 @@
 ﻿using System.Threading.Tasks;
 
-namespace Revo.Infrastructure.Events.Async
+namespace Revo.Infrastructure.Events.Async;
+
+public interface IAsyncEventWorker
 {
-    public interface IAsyncEventWorker
-    {
-        Task RunQueueBacklogAsync(string queueName);
-    }
+    Task RunQueueBacklogAsync(string queueName);
 }

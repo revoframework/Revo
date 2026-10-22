@@ -2,23 +2,22 @@
 using Revo.Core.Core;
 using Revo.Core.Events;
 
-namespace Revo.Infrastructure.Events.Metadata
+namespace Revo.Infrastructure.Events.Metadata;
+
+public class ActorNameEventMetadataProvider : IEventMetadataProvider
 {
-    public class ActorNameEventMetadataProvider : IEventMetadataProvider
+    private readonly IActorContext actorContext;
+
+    public ActorNameEventMetadataProvider(IActorContext actorContext)
     {
-        private readonly IActorContext actorContext;
+        this.actorContext = actorContext;
+    }
 
-        public ActorNameEventMetadataProvider(IActorContext actorContext)
+    public Task<(string key, string value)[]> GetMetadataAsync(IEventMessage eventMessage)
+    {
+        return Task.FromResult(new[]
         {
-            this.actorContext = actorContext;
-        }
-
-        public Task<(string key, string value)[]> GetMetadataAsync(IEventMessage eventMessage)
-        {
-            return Task.FromResult(new[]
-            {
-                (BasicEventMetadataNames.ActorName, actorContext.CurrentActorName)
-            });
-        }
+            (BasicEventMetadataNames.ActorName, actorContext.CurrentActorName)
+        });
     }
 }

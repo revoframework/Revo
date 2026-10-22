@@ -1,10 +1,9 @@
 ﻿using System.Threading.Tasks;
 
-namespace Revo.Core.Transactions
+namespace Revo.Core.Transactions;
+
+public interface ITransactionListener
 {
-    public interface ITransactionListener
-    {
-        void OnTransactionBegin(ITransaction transaction);
-        Task OnTransactionSucceededAsync(ITransaction transaction);
-    }
+    void OnTransactionBegin(ITransaction transaction);
+    Task OnTransactionSucceededAsync(ITransaction transaction);
 }

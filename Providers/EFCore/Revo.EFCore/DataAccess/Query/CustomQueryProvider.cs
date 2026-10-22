@@ -1,16 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore.Query.Internal;
-using Revo.Core.Core;
+using System;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 
 namespace Revo.EFCore.DataAccess.Query
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "EF1001:Internal EF Core API usage.")]
     public class CustomQueryProvider : EntityQueryProvider
     {
-        public CustomQueryProvider(IQueryCompiler queryCompiler, IServiceLocator serviceLocator) : base(queryCompiler)
+        public CustomQueryProvider(IQueryCompiler queryCompiler, IServiceProvider serviceProvider) : base(queryCompiler)
         {
-            ServiceLocator = serviceLocator;
+            ServiceProvider = serviceProvider;
         }
         
-        public IServiceLocator ServiceLocator { get; }
+        public IServiceProvider ServiceProvider { get; }
     }
 }

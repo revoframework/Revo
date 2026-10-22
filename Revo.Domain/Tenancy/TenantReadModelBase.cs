@@ -1,10 +1,9 @@
 ﻿using System;
 using Revo.Domain.ReadModel;
 
-namespace Revo.Domain.Tenancy
+namespace Revo.Domain.Tenancy;
+
+public abstract class TenantReadModelBase : ReadModelBase, ITenantOwned
 {
-    public abstract class TenantReadModelBase : ReadModelBase, ITenantOwned
-    {
-        public Guid? TenantId { get; set; }
-    }
+    public Guid? TenantId { get; set; }
 }

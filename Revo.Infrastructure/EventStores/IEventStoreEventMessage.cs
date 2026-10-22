@@ -1,9 +1,8 @@
 ﻿using Revo.Core.Events;
 
-namespace Revo.Infrastructure.EventStores
+namespace Revo.Infrastructure.EventStores;
+
+public interface IEventStoreEventMessage : IEventMessage
 {
-    public interface IEventStoreEventMessage : IEventMessage
-    {
-        IEventStoreRecord Record { get; }
-    }
+    IEventStoreRecord Record { get; }
 }

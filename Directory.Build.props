@@ -1,0 +1,10 @@
+<Project>
+
+  <PropertyGroup>
+    <!-- the versions of all packages (incl. the transitive ones) are pinned in the packages.lock.json files; they are
+         updated by restoring locally, CI builds fail if they are not up to date -->
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RestoreLockedMode Condition="'$(GITHUB_ACTIONS)' == 'true'">true</RestoreLockedMode>
+  </PropertyGroup>
+
+</Project>

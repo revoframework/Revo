@@ -1,24 +1,23 @@
 
 <p align="center">
-<img src="https://github.com/revoframework/Revo/blob/develop/res/revo-framework.png" alt="Revo framework">
+<img src="https://raw.githubusercontent.com/revoframework/Revo/main/res/revo-framework.png" alt="Revo framework">
 </p>
 <p align="center">
-<a href="https://dev.azure.com/revoframework/Revo/_build?definitionId=1&view=runs"><img src="https://img.shields.io/azure-devops/build/revoframework/7ff8258b-dd3c-4007-9d06-7609742e93cf/1/develop?style=flat-square&logo=azure-pipelines" alt="Build status"></a>
+<a href="https://github.com/revoframework/Revo/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/revoframework/Revo/ci.yml?branch=main&style=flat-square&logo=githubactions&logoColor=white" alt="Build status"></a>
 <a href="https://codecov.io/gh/revoframework/Revo"><img src="https://img.shields.io/codecov/c/github/revoframework/Revo?logo=codecov&style=flat-square" alt="Code coverage"></a>
 <a href="https://github.com/revoframework/Revo/releases"><img src="https://img.shields.io/github/release-date/revoframework/Revo?label=latest%20release&style=flat-square" alt="Latest release date"></a>
 <a href="https://www.nuget.org/packages?q=revo"><img src="https://img.shields.io/nuget/v/Revo.Core?logo=NuGet&style=flat-square" alt="NuGet packages"></a>
-<a href="https://pkgs.dev.azure.com/revoframework/_packaging/revoframework/nuget/v3/index.json"><img src="https://img.shields.io/badge/nuget%20CI-source-blue?logo=NuGet&style=flat-square" alt="CI NuGet feed at Azure"></a><br>
+<a href="https://github.com/orgs/revoframework/packages?repo_name=Revo"><img src="https://img.shields.io/badge/nuget%20CI-source-blue?logo=NuGet&style=flat-square" alt="CI NuGet feed at GitHub Packages"></a><br>
 <a href="https://revoframework.gitbook.io/revo/"><img src="https://img.shields.io/badge/docs-GITBOOK-blue.svg?style=flat-square" alt="Docs"></a>
-<a href="https://gitter.im/revoframework/Revo?utm_source=share-link&utm_medium=link&utm_campaign=share-link"><img src="https://img.shields.io/gitter/room/revoframework/Revo?color=4BB595&logo=gitter&&style=flat-square" alt="Gitter chat"></a>
 <a href="https://github.com/revoframework/Revo/pulls"><img src="https://img.shields.io/badge/PRs-welcome-green?style=flat-square" alt="PRs welcome"></a>
-<a href="https://github.com/revoframework/Revo/blob/develop/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="License"></a>
+<a href="https://github.com/revoframework/Revo/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="License"></a>
 </p>
 
 # Revo Framework
 
 Revo is an application framework for modern server C\#/.NET applications built with _event sourcing_, _CQRS_ and _DDD_.
 
-_Development of this framework is supported by <a href="https://olify.io">OLIFY - smarter solution for facility management & maintenance.</a>_
+_Development of this framework is supported by <a href="https://olify.com">OLIFY - smarter solution for facility management & maintenance.</a>_
 
 ## Contents
 
@@ -28,12 +27,12 @@ _Development of this framework is supported by <a href="https://olify.io">OLIFY 
 * 🚀 [Getting started](#getting-started)
 * 📘 [Full documentation](https://docs.revoframework.net/)
 * 📦 [Packages](#packages)
+* 🔧 [Building](#building)
 * 📑 [License](#license)
 
 ## ⚡️ Features
 
 The project combines the concepts of event sourcing, CQRS and DDD to provide framework for building applications that are scalable, maintainable, can work in distributed environments and are easy to integrate with outside world. As such, it takes some rather opinionated approaches on the design of certain parts of its architecture. Revo also offers other common features and infrastructure that is often necessary for building complete applications – for example, authorizations, validations, messaging, integrations, multi-tenancy or testing.
-Furthermore, its extensions implement other useful features like entity history change-tracking, auditing or user notifications.
 
 [**Domain-Driven Design**](https://revoframework.gitbook.io/revo/reference-guide/domain-building-blocks)  
 Building blocks for rich DDD-style domain models \([aggregates](https://revoframework.gitbook.io/revo/reference-guide/domain-building-blocks#aggregates), [entities](https://revoframework.gitbook.io/revo/reference-guide/domain-building-blocks#entities), [value objects](https://revoframework.gitbook.io/revo/reference-guide/domain-building-blocks#value-objects), [domain events](https://revoframework.gitbook.io/revo/reference-guide/domain-building-blocks#domain-events), [repositories](https://revoframework.gitbook.io/revo/reference-guide/data-persistence#aggregate-repository)...\).
@@ -52,14 +51,14 @@ Segregating command and query responsibilities with:
 Support for both [synchronous](https://revoframework.gitbook.io/revo/reference-guide/events#synchronous-event-processing) and [asynchronous](https://revoframework.gitbook.io/revo/reference-guide/events#asynchronous-event-processing) event processing, guaranteed _at-least-once_ delivery, event queues with strict sequence ordering \(optionally\), event source catch-ups, optional [pseudo-synchronous event dispatch](https://revoframework.gitbook.io/revo/reference-guide/events#pseudo-synchronous-event-dispatch) for listeners \(projectors, for example\).
 
 [**Data access**](https://revoframework.gitbook.io/revo/reference-guide/data-persistence)  
-Thin abstraction layer for easy data persistence (e.g. querying read models) using _Entity Framework Core_, _Entity Framework 6_, _RavenDB,_ testable _in-memory database_ or other data providers. Includes support for simple [database migrations](https://revoframework.gitbook.io/revo/reference-guide/database-migrations).
+Thin abstraction layer for easy data persistence (e.g. querying read models) using _Entity Framework Core_, testable _in-memory database_ or other data providers. Includes support for simple [database migrations](https://revoframework.gitbook.io/revo/reference-guide/database-migrations).
 
 [**Projections**](https://revoframework.gitbook.io/revo/reference-guide/projections)  
-Support for read-model projections with various backends \(e.g. _Entity Framework Core_ (_PostgreSQL_, _MSSQL_, _SQLite_,...), _Entity Framework 6_, _RavenDB_...\), automatic idempotency- and concurrency-handling, etc.
+Support for read-model projections with _Entity Framework Core_ \(_PostgreSQL_, _MSSQL_, _SQLite_...\), automatic idempotency- and concurrency-handling, etc.
 
 [**SOA, messaging and integration**](https://revoframework.gitbook.io/revo/reference-guide/integrations)  
 Scale and integrate by [publishing and receiving events](https://docs.revoframework.net/~/drafts/-LaA9ji7E8zsIXVOg-qo/primary/reference-guide/integrations#rabbitmq-messaging-with-easynetq), commands and queries using common messaging patterns,<br>
-e.g. with _RabbitMQ_ message queue (using _EasyNetQ_ connector or _Rebus_ service bus).
+e.g. with _RabbitMQ_ message queue (using _EasyNetQ_ connector).
 
 [**Sagas**](https://revoframework.gitbook.io/revo/reference-guide/sagas)  
 Coordinating long-running processes or inter-aggregate cooperation with sagas that react to events<br>\(a.k.a. _process managers_\).
@@ -75,9 +74,8 @@ Basic permission/role-based ACL for commands and queries, fine-grained row filte
 * [**Event versioning**](https://revoframework.gitbook.io/revo/reference-guide/events#event-versioning)
 * [**Event upgrades**](https://revoframework.gitbook.io/revo/reference-guide/events#event-upgrades)
 * [**Database migrations**](https://revoframework.gitbook.io/revo/reference-guide/database-migrations)
-* **History and change-tracking**
-* **User notifications:** event-based, with different output channels (mail, etc.), aggregation, buffering, etc.
-* **.NET 6.0+ support (with integration for ASP.NET Core)**
+* **Standard .NET hosting:** services registered with _Microsoft.Extensions.DependencyInjection_, background work running as hosted services
+* **.NET 10 support (with integration for ASP.NET Core)**
 
 ## 👓 Show me how it looks!
 
@@ -228,14 +226,14 @@ public class GetTodosQueryHandler : IQueryHandler<GetTodosQuery, IQueryable<Todo
 
 If you are new to the framework, you can
  * begin with reading the quick walkthrough for the [**Simple TO-DOs example**](https://docs.revoframework.net/general/example-simple-to-dos-task-list-app) (a task list app)
- * or explore the [Todo example application](https://github.com/revoframework/Revo/tree/develop/Examples/Todos) and framework sources on GitHub.
+ * or explore the [example applications](https://github.com/revoframework/Revo/tree/main/Examples) (_Todos_ and _Minimal_, a minimal ASP.NET Core app) and framework sources on GitHub.
  
 You can also start by reading the 📘 [**reference guide**](https://docs.revoframework.net/general/getting-started).
 
 ## 📦 Packages
 
 Released version are available in form of NuGet packages.  
-There is also a separate [**pre-release CI package feed at Azure**](https://pkgs.dev.azure.com/revoframework/_packaging/revoframework/nuget/v3/index.json).
+There is also a separate [**pre-release CI package feed at GitHub Packages**](https://github.com/orgs/revoframework/packages?repo_name=Revo) (`https://nuget.pkg.github.com/revoframework/index.json`; GitHub Packages require authenticating with a personal access token with the `read:packages` scope).
 
 <div style="width:100%";>
 <table border="0" cellpadding="0" cellspacing="0" style="float:left;">
@@ -300,22 +298,6 @@ There is also a separate [**pre-release CI package feed at Azure**](https://pkgs
       <a href="https://www.nuget.org/packages/Revo.EFCore/"><img src="https://img.shields.io/nuget/v/Revo.EFCore.svg" alt="NuGet package version"></a>
     </td>
   </tr>
-  <tr>
-    <td>
-      Revo.EF6
-    </td>
-    <td>
-      <a href="https://www.nuget.org/packages/Revo.EF6/"><img src="https://img.shields.io/nuget/v/Revo.EF6.svg" alt="NuGet package version"></a>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      Revo.RavenDB
-    </td>
-    <td>
-      <a href="https://www.nuget.org/packages/Revo.RavenDB/"><img src="https://img.shields.io/nuget/v/Revo.RavenDB.svg" alt="NuGet package version"></a>
-    </td>
-  </tr>
 </table>
 
 
@@ -357,42 +339,21 @@ There is also a separate [**pre-release CI package feed at Azure**](https://pkgs
       <a href="https://www.nuget.org/packages/Revo.EasyNetQ/"><img src="https://img.shields.io/nuget/v/Revo.EasyNetQ.svg" alt="NuGet package version"></a>
     </td>
   </tr>
-  <tr>
-    <td>
-      Revo.Rebus (service bus, deprecated)
-    </td>
-    <td>
-      <a href="https://www.nuget.org/packages/Revo.Rebus/"><img src="https://img.shields.io/nuget/v/Revo.Rebus.svg" alt="NuGet package version"></a>
-    </td>
-  </tr>
-</table>
-
-<table border="0" cellpadding="0" cellspacing="0" style="float:left;">
-  <tr>
-    <th colspan="2">
-      Other extensions
-    </th>
-  </tr>
-  <tr>
-    <td>
-      Revo.Extensions.History
-    </td>
-    <td>
-      <a href="https://www.nuget.org/packages/Revo.Extensions.History/"><img src="https://img.shields.io/nuget/v/Revo.Extensions.History.svg" alt="NuGet package version"></a>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      Revo.Extensions.Notifications
-    </td>
-    <td>
-      <a href="https://www.nuget.org/packages/Revo.Extensions.Notifications/"><img src="https://img.shields.io/nuget/v/Revo.Extensions.Notifications.svg" alt="NuGet package version"></a>
-    </td>
-  </tr>
 </table>
 </div>
 
-Most applications will require at least **Revo.Core**, **Revo.DataAccess**, **Revo.Domain**, **Revo.Infrastructure** packages to get started with and then typically a platform package like **Revo.Platforms.AspNetCore** (ASP.NET Core platform implementation) and a data-access package like **Revo.EFCore** (for Entity Framework Core support).
+Most applications will require at least **Revo.Core**, **Revo.DataAccess**, **Revo.Domain**, **Revo.Infrastructure** packages to get started with and then typically a platform package like **Revo.AspNetCore** (ASP.NET Core platform implementation) and a data-access package like **Revo.EFCore** (for Entity Framework Core support).
+
+## 🔧 Building
+
+```
+./build.sh     # tests and packs the solution -> artifacts/
+.\build.ps1    # the same on Windows
+```
+
+The build requires the .NET SDK from [global.json](global.json); the PostgreSQL integration tests also need Docker (without it, they are skipped). It is written with [Fallout](https://docs.fallout.build/) in [build/Build.cs](build/Build.cs) - `./build.sh --help` lists its targets and parameters. CI builds of the `main` and `release/*` branches are published to the pre-release feed; releases are published to NuGet by pushing a `Revo-X.Y.Z` tag (see [the release workflow](.github/workflows/release.yml)). The package versions are calculated from these tags by [MinVer](https://github.com/adamralph/minver).
+
+The versions of all packages, including the transitive ones, are pinned in the `packages.lock.json` files. Restoring the solution (`dotnet restore Revo.slnx`) updates them after a package reference changes; CI builds fail if they are not up to date.
 
 ## 📑 License
 

@@ -1,7 +1,6 @@
-﻿namespace Revo.Domain.Entities.EventSourcing
+﻿namespace Revo.Domain.Entities.EventSourcing;
+
+public interface IEventSourcedAggregateRoot : IAggregateRoot
 {
-    public interface IEventSourcedAggregateRoot : IAggregateRoot
-    {
-        void LoadState(AggregateState state);
-    }
+    void LoadState(AggregateState state);
 }

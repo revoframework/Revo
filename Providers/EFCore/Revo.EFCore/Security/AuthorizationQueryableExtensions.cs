@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Revo.Core.Commands;
 using Revo.EFCore.DataAccess.Query;
 using Revo.Infrastructure.Security.Commands;
@@ -45,7 +46,7 @@ namespace Revo.EFCore.Security
                 throw new InvalidOperationException("Cannot authorize query - only queries from EF Core provider can be authorized. Please also make sure EnableCustomQueryProvider has been enabled during Revo provider configuration.");
             }
 
-            return provider.ServiceLocator.Get<IEntityQueryAuthorizer>();
+            return provider.ServiceProvider.GetRequiredService<IEntityQueryAuthorizer>();
         }
     }
 }

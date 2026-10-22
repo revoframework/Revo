@@ -1,10 +1,9 @@
 ﻿using System;
 
-namespace Revo.Core.Tenancy
+namespace Revo.Core.Tenancy;
+
+public interface ITenant
 {
-    public interface ITenant
-    {
-        Guid Id { get; }
-        string Name { get; }
-    }
+    Guid Id { get; }
+    string Name { get; }
 }

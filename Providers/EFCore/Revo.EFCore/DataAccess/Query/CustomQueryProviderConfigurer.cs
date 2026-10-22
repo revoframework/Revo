@@ -1,22 +1,22 @@
-﻿using Microsoft.EntityFrameworkCore;
+using System;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 #if NETCOREAPP3_1
 using Microsoft.EntityFrameworkCore.Query.Internal;
 #else
 using Microsoft.EntityFrameworkCore.Query;
 #endif
-using Revo.Core.Core;
 using Revo.EFCore.DataAccess.Configuration;
 
 namespace Revo.EFCore.DataAccess.Query
 {
     public class CustomQueryProviderConfigurer : IEFCoreConfigurer
     {
-        private readonly IServiceLocator serviceLocator;
+        private readonly IServiceProvider serviceProvider;
 
-        public CustomQueryProviderConfigurer(IServiceLocator serviceLocator)
+        public CustomQueryProviderConfigurer(IServiceProvider serviceProvider)
         {
-            this.serviceLocator = serviceLocator;
+            this.serviceProvider = serviceProvider;
         }
         
         public void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -25,7 +25,7 @@ namespace Revo.EFCore.DataAccess.Query
 
             var extension = optionsBuilder.Options
                                 .FindExtension<CustomQueryDbContextOptionsExtension>()
-                            ?? new CustomQueryDbContextOptionsExtension(serviceLocator);
+                            ?? new CustomQueryDbContextOptionsExtension(serviceProvider);
             builder.AddOrUpdateExtension(extension);
 
             optionsBuilder

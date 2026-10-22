@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
 using Revo.Infrastructure.DataAccess;
 using NSubstitute;
 using Revo.Core.Commands;
-using Revo.Core.Core;
 using Revo.Core.Transactions;
 using Revo.Infrastructure.Repositories;
 using Xunit;
@@ -18,8 +21,8 @@ namespace Revo.Infrastructure.Tests.DataAccess
         private readonly IUnitOfWork unitOfWork;
         private readonly IUnitOfWorkFactory unitOfWorkFactory;
         private readonly CommandContextStack commandContextStack;
+        private readonly IServiceScopeFactory serviceScopeFactory;
         private readonly List<IDatabaseInitializer> initializers;
-
 
         public DatabaseInitializerLoaderTests()
         {
@@ -38,33 +41,29 @@ namespace Revo.Infrastructure.Tests.DataAccess
 
             repository = Substitute.For<IRepository>();
             commandContextStack = new CommandContextStack();
-            
-            sut = new DatabaseInitializerLoader(databaseInitializerDiscovery, new DatabaseInitializerDependencySorter(),
-                () => repository, () => unitOfWorkFactory, () => commandContextStack);
+
+            var scopedServiceProvider = Substitute.For<IServiceProvider>();
+            scopedServiceProvider.GetService(typeof(IUnitOfWorkFactory)).Returns(unitOfWorkFactory);
+            scopedServiceProvider.GetService(typeof(CommandContextStack)).Returns(commandContextStack);
+            scopedServiceProvider.GetService(typeof(IRepository)).Returns(repository);
+
+            var scope = Substitute.For<IServiceScope>();
+            scope.ServiceProvider.Returns(scopedServiceProvider);
+
+            serviceScopeFactory = Substitute.For<IServiceScopeFactory>();
+            serviceScopeFactory.CreateScope().Returns(scope);
+
+            sut = new DatabaseInitializerLoader(databaseInitializerDiscovery,
+                new DatabaseInitializerDependencySorter(), serviceScopeFactory);
         }
 
         [Fact]
-        public void OnApplicationStarted_InitializesAll()
+        public async Task StartedAsync_InitializesAll()
         {
-            sut.OnApplicationStarted();
+            await sut.StartedAsync(CancellationToken.None);
 
             initializers[0].Received(1).InitializeAsync(repository);
             initializers[1].Received(1).InitializeAsync(repository);
-        }
-
-        [Fact]
-        public void OnApplicationStarted_InitializesInDifferentTaskContexts()
-        {
-            TaskContext[] taskContexts = new TaskContext[initializers.Count];
-
-            initializers[0].When(x => x.InitializeAsync(Arg.Any<IRepository>())).Do(ci => taskContexts[0] = TaskContext.Current);
-            initializers[1].When(x => x.InitializeAsync(Arg.Any<IRepository>())).Do(ci => taskContexts[1] = TaskContext.Current);
-
-            sut.OnApplicationStarted();
-
-            taskContexts[0].Should().NotBeNull();
-            taskContexts[1].Should().NotBeNull();
-            taskContexts[0].Should().NotBe(taskContexts[1]);
         }
     }
 }

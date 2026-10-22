@@ -1,62 +1,59 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Revo.Core.Lifecycle;
 using Revo.Core.Types;
 
-namespace Revo.Domain.Sagas
+namespace Revo.Domain.Sagas;
+
+public class SagaConventionConfigurationCache : ISagaConventionConfigurationCache
 {
-    public class SagaConventionConfigurationCache : ISagaConventionConfigurationCache, IApplicationStartedListener
+    private static Dictionary<Type, SagaConfigurationInfo> configurationInfos;
+
+    private readonly ITypeExplorer typeExplorer;
+
+    public SagaConventionConfigurationCache(ITypeExplorer typeExplorer)
     {
-        private static Dictionary<Type, SagaConfigurationInfo> configurationInfos;
+        this.typeExplorer = typeExplorer;
+        CreateConfigurationInfos();
+    }
 
-        private readonly ITypeExplorer typeExplorer;
+    public IReadOnlyDictionary<Type, SagaConfigurationInfo> ConfigurationInfos => configurationInfos;
 
-        public SagaConventionConfigurationCache(ITypeExplorer typeExplorer)
+    public static SagaConfigurationInfo GetSagaConfigurationInfo(Type sagaType)
+    {
+        if (!typeof(IConventionBasedSaga).IsAssignableFrom(sagaType))
         {
-            this.typeExplorer = typeExplorer;
-            CreateConfigurationInfos();
+            throw new ArgumentException($"{sagaType} is not an IConventionBasedSaga");
         }
 
-        public IReadOnlyDictionary<Type, SagaConfigurationInfo> ConfigurationInfos => configurationInfos;
-
-        public void OnApplicationStarted()
+        if (configurationInfos == null)
         {
-            //construction of the object itself is enough
+            return SagaConventionConfigurationScanner.GetSagaConfiguration(sagaType);
         }
 
-        public static SagaConfigurationInfo GetSagaConfigurationInfo(Type sagaType)
+        SagaConfigurationInfo configurationInfo;
+        if (!configurationInfos.TryGetValue(sagaType, out configurationInfo))
         {
-            if (!typeof(IConventionBasedSaga).IsAssignableFrom(sagaType))
-            {
-                throw new ArgumentException($"{sagaType} is not an IConventionBasedSaga");
-            }
-
-            if (configurationInfos == null)
-            {
-                return SagaConventionConfigurationScanner.GetSagaConfiguration(sagaType);
-            }
-
-            SagaConfigurationInfo configurationInfo;
-            if (!configurationInfos.TryGetValue(sagaType, out configurationInfo))
-            {
-                throw new ArgumentException($"Unknown saga type to get convention configuration info for: " + sagaType.FullName);
-            }
-
-            return configurationInfo;
+            throw new ArgumentException($"Unknown saga type to get convention configuration info for: " + sagaType.FullName);
         }
-        
-        private void CreateConfigurationInfos()
+
+        return configurationInfo;
+    }
+
+    private void CreateConfigurationInfos()
+    {
+        // built separately and only then published to the static field, because multiple instances can get
+        // created concurrently (e.g. with multiple hosts in one process)
+        var newConfigurationInfos = new Dictionary<Type, SagaConfigurationInfo>();
+        var sagaTypes = typeExplorer.GetAllTypes()
+            .Where(x => x.IsClass && typeof(IConventionBasedSaga).IsAssignableFrom(x)
+                                  && !x.IsAbstract && !x.IsGenericTypeDefinition);
+
+        foreach (Type sagaType in sagaTypes)
         {
-            configurationInfos = new Dictionary<Type, SagaConfigurationInfo>();
-            var sagaTypes = typeExplorer.GetAllTypes()
-                .Where(x => x.IsClass && typeof(IConventionBasedSaga).IsAssignableFrom(x)
-                    && !x.IsAbstract && !x.IsGenericTypeDefinition);
-
-            foreach (Type sagaType in sagaTypes)
-            {
-                configurationInfos.Add(sagaType, SagaConventionConfigurationScanner.GetSagaConfiguration(sagaType));
-            }
+            newConfigurationInfos.Add(sagaType, SagaConventionConfigurationScanner.GetSagaConfiguration(sagaType));
         }
+
+        configurationInfos = newConfigurationInfos;
     }
 }

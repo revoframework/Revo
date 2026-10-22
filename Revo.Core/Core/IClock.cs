@@ -1,10 +1,9 @@
 ﻿using System;
 
-namespace Revo.Core.Core
+namespace Revo.Core.Core;
+
+public interface IClock
 {
-    public interface IClock
-    {
-        DateTimeOffset Now { get; }
-        DateTimeOffset UtcNow { get; }
-    }
+    DateTimeOffset Now { get; }
+    DateTimeOffset UtcNow { get; }
 }

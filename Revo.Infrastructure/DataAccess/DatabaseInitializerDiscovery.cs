@@ -1,50 +1,49 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Ninject;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Abstractions;
+using Revo.Core.Configuration;
 using Revo.Core.Types;
 
-namespace Revo.Infrastructure.DataAccess
+namespace Revo.Infrastructure.DataAccess;
+
+public class DatabaseInitializerDiscovery : IDatabaseInitializerDiscovery
 {
-    public class DatabaseInitializerDiscovery : IDatabaseInitializerDiscovery
+    private readonly IServiceProvider serviceProvider;
+
+    public DatabaseInitializerDiscovery(IServiceProvider serviceProvider)
     {
-        private readonly ITypeExplorer typeExplorer;
-        private readonly StandardKernel kernel;
+        this.serviceProvider = serviceProvider;
+    }
 
-        public DatabaseInitializerDiscovery(ITypeExplorer typeExplorer, StandardKernel kernel)
+    public static void RegisterDiscoveredInitializers(IRevoConfiguration configuration,
+        IServiceCollection serviceCollection)
+    {
+        var typeExplorer = new TypeExplorer(
+            configuration.GetSection<CoreConfigurationSection>(),
+            NullLogger<TypeExplorer>.Instance);
+
+        var initializerTypes = typeExplorer.GetAllTypes()
+            .Where(t => t.IsClass && !t.IsAbstract && !t.IsGenericTypeDefinition
+                        && typeof(IDatabaseInitializer).IsAssignableFrom(t));
+
+        foreach (var implType in initializerTypes)
         {
-            this.typeExplorer = typeExplorer;
-            this.kernel = kernel;
-        }
+            var alreadyRegistered = serviceCollection.Any(d =>
+                d.ServiceType == typeof(IDatabaseInitializer) && d.ImplementationType == implType);
 
-        public IEnumerable<IDatabaseInitializer> DiscoverDatabaseInitializers()
-        {
-            var databaseInitializerTypes = typeExplorer.GetAllTypes()
-                .Where(x => typeof(IDatabaseInitializer).IsAssignableFrom(x)
-                            && x.IsClass && !x.IsAbstract && !x.IsGenericTypeDefinition);
-
-            RegisterDatabaseInitializers(databaseInitializerTypes);
-            return GetDatabaseInitializers();
-        }
-
-        private void RegisterDatabaseInitializers(IEnumerable<Type> databaseInitializerTypes)
-        {
-            var availableDatabaseInitializers = GetDatabaseInitializers();
-
-            foreach (Type databaseInitializerType in databaseInitializerTypes)
+            if (!alreadyRegistered)
             {
-                if (!availableDatabaseInitializers.Any(x => x.GetType() == databaseInitializerType))
-                {
-                    kernel.Bind<IDatabaseInitializer>()
-                        .To(databaseInitializerType)
-                        .InSingletonScope();
-                }
+                // initializers are run once at startup, resolved from the root provider - the repository they
+                // need is passed to them, so they must not depend on scoped services
+                serviceCollection.AddSingleton(typeof(IDatabaseInitializer), implType);
             }
         }
+    }
 
-        private List<IDatabaseInitializer> GetDatabaseInitializers()
-        {
-            return kernel.GetAll<IDatabaseInitializer>().ToList();
-        }
+    public IEnumerable<IDatabaseInitializer> DiscoverDatabaseInitializers()
+    {
+        return serviceProvider.GetServices<IDatabaseInitializer>();
     }
 }

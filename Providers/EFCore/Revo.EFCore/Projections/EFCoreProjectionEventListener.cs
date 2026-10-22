@@ -1,27 +1,35 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using Revo.Core.Commands;
 using Revo.Core.Events;
-using Revo.Core.Transactions;
 using Revo.Domain.Entities;
 using Revo.Domain.Events;
 using Revo.Infrastructure.Events.Async;
 using Revo.Infrastructure.Projections;
 using Revo.Infrastructure.Tenancy;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Revo.EFCore.Projections
 {
     public class EFCoreProjectionEventListener : ProjectionEventListener
     {
-        public EFCoreProjectionEventListener(Func<IEFCoreProjectionSubSystem> projectionSubSystemFunc,
-            IUnitOfWorkFactory unitOfWorkFactory, Func<CommandContextStack> commandContextStackFunc,
+        public EFCoreProjectionEventListener(IServiceScopeFactory serviceScopeFactory,
             ITenantProvider tenantProvider, EFCoreProjectionEventSequencer eventSequencer) :
-            base(projectionSubSystemFunc, unitOfWorkFactory, commandContextStackFunc, tenantProvider)
+            base(serviceScopeFactory, tenantProvider)
         {
             EventSequencer = eventSequencer;
         }
-        
+
         public override IAsyncEventSequencer EventSequencer { get; }
+
+        protected override IProjectionSubSystem GetProjectionSubSystem(IServiceProvider serviceProvider)
+        {
+            return serviceProvider.GetRequiredService<IEFCoreProjectionSubSystem>();
+        }
+
+        protected override EventProjectionOptions GetEventProjectionOptions()
+        {
+            return new EFCoreEventProjectionOptions(false);
+        }
         
         public class EFCoreProjectionEventSequencer : AsyncEventSequencer<DomainAggregateEvent>
         {
@@ -38,7 +46,7 @@ namespace Revo.EFCore.Projections
 
             protected override IEnumerable<EventSequencing> GetEventSequencing(IEventMessage<DomainAggregateEvent> message)
             {
-                Guid? aggregateClassId = message.Metadata.GetAggregateClassId();
+                System.Guid? aggregateClassId = message.Metadata.GetAggregateClassId();
                 DomainClassInfo classInfo = aggregateClassId != null
                     ? entityTypeManager.TryGetClassInfoByClassId(aggregateClassId.Value)
                     : null;

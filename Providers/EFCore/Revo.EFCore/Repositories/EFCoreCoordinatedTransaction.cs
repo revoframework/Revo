@@ -1,7 +1,7 @@
-﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Revo.Core.Commands;
+using Revo.Core.Services;
 using Revo.Core.Transactions;
 using Revo.EFCore.DataAccess.Entities;
 using Revo.EFCore.Events;
@@ -12,13 +12,13 @@ namespace Revo.EFCore.Repositories
 {
     public class EFCoreCoordinatedTransaction : CoordinatedTransaction, IEFCoreTransactionCoordinator, IUnitOfWorkListener
     {
-        private readonly Lazy<EFCoreSyncProjectionHook> efCoreSyncProjectionHook;
+        private readonly IServiceFactory<EFCoreSyncProjectionHook> efCoreSyncProjectionHookFactory;
 
         public EFCoreCoordinatedTransaction(IEFCoreCrudRepository crudRepository,
             ICommandContext commandContext,
-            Lazy<EFCoreSyncProjectionHook> efCoreSyncProjectionHook) : base(new EFCoreCrudRepositoryTransaction(crudRepository))
+            IServiceFactory<EFCoreSyncProjectionHook> efCoreSyncProjectionHookFactory) : base(new EFCoreCrudRepositoryTransaction(crudRepository))
         {
-            this.efCoreSyncProjectionHook = efCoreSyncProjectionHook;
+            this.efCoreSyncProjectionHookFactory = efCoreSyncProjectionHookFactory;
 
             if (commandContext.UnitOfWork?.IsWorkBegun == true)
             {
@@ -30,7 +30,7 @@ namespace Revo.EFCore.Repositories
         {
             if (!Participants.Any(x => x is EFCoreSyncProjectionHook))
             {
-                Participants.Add(efCoreSyncProjectionHook.Value);
+                Participants.Add(efCoreSyncProjectionHookFactory.GetRequiredService());
             }
 
             Participants = Participants.OrderBy(x =>

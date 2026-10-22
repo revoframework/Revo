@@ -1,7 +1,10 @@
 <Project>
 
   <PropertyGroup>
-    <VersionPrefix>1.38.5</VersionPrefix>
+    <!-- versions come from the Revo-X.Y.Z tags (MinVer); commits after a tag get X.Y.(Z+1)-alpha.0.N -->
+    <MinVerTagPrefix>Revo-</MinVerTagPrefix>
+    <!-- the range of the versions built before the first tag of a new major/minor version -->
+    <MinVerMinimumMajorMinor>2.0</MinVerMinimumMajorMinor>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -11,7 +14,7 @@
     <IncludeSymbols>true</IncludeSymbols>
     <LangVersion>12</LangVersion>
     <PackageIcon>icon-128.png</PackageIcon>
-    <PackageIconUrl>https://raw.githubusercontent.com/revoframework/Revo/develop/res/icon-128.png</PackageIconUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/revoframework/Revo/main/res/icon-128.png</PackageIconUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/revoframework/Revo</PackageProjectUrl>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
@@ -23,7 +26,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All"/>
+    <PackageReference Include="MinVer" Version="8.0.0" PrivateAssets="All"/>
 	<None Include="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), Common.props))/res/icon-128.png" Pack="true" PackagePath="/"/>
 	<None Include="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), Common.props))/README.md" Pack="true" PackagePath="/"/>
   </ItemGroup>

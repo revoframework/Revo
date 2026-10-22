@@ -2,12 +2,11 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Revo.Core.Events
+namespace Revo.Core.Events;
+
+public interface IPublishEventBuffer
 {
-    public interface IPublishEventBuffer
-    {
-        IReadOnlyCollection<IEventMessage> Events { get; }
-        Task FlushAsync(CancellationToken cancellationToken);
-        void PushEvent(IEventMessage message);
-    }
+    IReadOnlyCollection<IEventMessage> Events { get; }
+    Task FlushAsync(CancellationToken cancellationToken);
+    void PushEvent(IEventMessage message);
 }

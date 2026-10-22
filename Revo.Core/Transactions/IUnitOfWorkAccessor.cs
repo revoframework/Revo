@@ -1,7 +1,6 @@
-﻿namespace Revo.Core.Transactions
+﻿namespace Revo.Core.Transactions;
+
+public interface IUnitOfWorkAccessor
 {
-    public interface IUnitOfWorkAccessor
-    {
-        IUnitOfWork UnitOfWork { get; }
-    }
+    IUnitOfWork UnitOfWork { get; }
 }

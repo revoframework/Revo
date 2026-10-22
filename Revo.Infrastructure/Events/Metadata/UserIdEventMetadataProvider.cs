@@ -2,23 +2,22 @@
 using Revo.Core.Events;
 using Revo.Core.Security;
 
-namespace Revo.Infrastructure.Events.Metadata
+namespace Revo.Infrastructure.Events.Metadata;
+
+public class UserIdEventMetadataProvider : IEventMetadataProvider
 {
-    public class UserIdEventMetadataProvider : IEventMetadataProvider
+    private readonly IUserContext userContext;
+
+    public UserIdEventMetadataProvider(IUserContext userContext)
     {
-        private readonly IUserContext userContext;
+        this.userContext = userContext;
+    }
 
-        public UserIdEventMetadataProvider(IUserContext userContext)
+    public Task<(string key, string value)[]> GetMetadataAsync(IEventMessage eventMessage)
+    {
+        return Task.FromResult(new[]
         {
-            this.userContext = userContext;
-        }
-
-        public Task<(string key, string value)[]> GetMetadataAsync(IEventMessage eventMessage)
-        {
-            return Task.FromResult(new[]
-            {
-                (BasicEventMetadataNames.UserId, userContext.UserId?.ToString())
-            });
-        }
+            (BasicEventMetadataNames.UserId, userContext.UserId?.ToString())
+        });
     }
 }

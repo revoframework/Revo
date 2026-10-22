@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Revo.Infrastructure.Events.Async
+namespace Revo.Infrastructure.Events.Async;
+
+public interface IAsyncEventProcessor
 {
-    public interface IAsyncEventProcessor
-    {
-        Task EnqueueForAsyncProcessingAsync(IReadOnlyCollection<IAsyncEventQueueRecord> eventsToProcess, TimeSpan? timeDelay);
-        Task ProcessSynchronously(IReadOnlyCollection<IAsyncEventQueueRecord> eventsToProcess);
-    }
+    Task EnqueueForAsyncProcessingAsync(IReadOnlyCollection<IAsyncEventQueueRecord> eventsToProcess, TimeSpan? timeDelay);
+    Task ProcessSynchronously(IReadOnlyCollection<IAsyncEventQueueRecord> eventsToProcess);
 }

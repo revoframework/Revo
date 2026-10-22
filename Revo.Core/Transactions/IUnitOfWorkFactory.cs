@@ -1,7 +1,6 @@
-﻿namespace Revo.Core.Transactions
+﻿namespace Revo.Core.Transactions;
+
+public interface IUnitOfWorkFactory
 {
-    public interface IUnitOfWorkFactory
-    {
-        IUnitOfWork CreateUnitOfWork();
-    }
+    IUnitOfWork CreateUnitOfWork();
 }

@@ -1,13 +1,12 @@
 ﻿using System;
 
-namespace Revo.Infrastructure.Jobs.InMemory
+namespace Revo.Infrastructure.Jobs.InMemory;
+
+public interface IInMemoryJobSchedulerConfiguration
 {
-    public interface IInMemoryJobSchedulerConfiguration
-    {
-        int HandleAttemptCount { get; }
-        int HandleRetryTimeoutMultiplier { get; }
-        TimeSpan MaxHandleRetryTimeoutStep { get; }
-        TimeSpan MinHandleRetryTimeoutStep { get; }
-        int WorkerTaskParallelism { get; }
-    }
+    int HandleAttemptCount { get; }
+    int HandleRetryTimeoutMultiplier { get; }
+    TimeSpan MaxHandleRetryTimeoutStep { get; }
+    TimeSpan MinHandleRetryTimeoutStep { get; }
+    int WorkerTaskParallelism { get; }
 }

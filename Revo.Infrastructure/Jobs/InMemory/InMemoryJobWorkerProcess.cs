@@ -1,110 +1,111 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Revo.Core.Core;
-using Revo.Core.Lifecycle;
 
-namespace Revo.Infrastructure.Jobs.InMemory
+namespace Revo.Infrastructure.Jobs.InMemory;
+
+public class InMemoryJobWorkerProcess(
+    IJobRunner jobRunner,
+    IInMemoryJobSchedulerConfiguration schedulerConfiguration,
+    ILogger<InMemoryJobWorkerProcess> logger)
+    : IInMemoryJobWorkerProcess, IHostedService
 {
-    public class InMemoryJobWorkerProcess : IApplicationStartedListener, IApplicationStoppingListener, IInMemoryJobWorkerProcess
+    private readonly BlockingCollection<EnqueuedJob> enqueuedJobs = new();
+
+    private Task workerTask;
+
+    public Task StartAsync(CancellationToken cancellationToken)
     {
-        private readonly BlockingCollection<EnqueuedJob> enqueuedJobs = new BlockingCollection<EnqueuedJob>();
-        private readonly IJobRunner jobRunner;
-        private readonly IInMemoryJobSchedulerConfiguration schedulerConfiguration;
-        private readonly ILogger logger;
+        workerTask = Task.Run(() => Run(), cancellationToken);
+        return Task.CompletedTask;
+    }
 
-        private Task workerTask;
+    public async Task StopAsync(CancellationToken cancellationToken)
+    {
+        enqueuedJobs.CompleteAdding();
 
-        public InMemoryJobWorkerProcess(IJobRunner jobRunner, IInMemoryJobSchedulerConfiguration schedulerConfiguration, ILogger logger)
+        if (workerTask != null)
         {
-            this.jobRunner = jobRunner;
-            this.schedulerConfiguration = schedulerConfiguration;
-            this.logger = logger;
+            await workerTask.WaitAsync(cancellationToken);
         }
+    }
 
-        public void OnApplicationStarted()
+    public void EnqueueJob(IJob job, Action<IJob, Exception> errorHandler)
+    {
+        try
         {
-            workerTask = Task.Run(() => Run());
+            enqueuedJobs.Add(new EnqueuedJob(job, errorHandler));
         }
-
-        public void OnApplicationStopping()
+        catch (InvalidOperationException)
         {
-            enqueuedJobs.CompleteAdding();
-            workerTask?.Wait();
+            logger.LogDebug($"Not enqueuing job(s) because scheduler worker process is already stopped");
         }
+    }
 
-        public void EnqueueJob(IJob job, Action<IJob, Exception> errorHandler)
+    private void Run()
+    {
+        ConcurrentDictionary<Task, EnqueuedJob> runningTasks = new ConcurrentDictionary<Task, EnqueuedJob>();
+
+        using (var throttle = new SemaphoreSlim(schedulerConfiguration.WorkerTaskParallelism))
         {
-            try
+            while (!enqueuedJobs.IsCompleted)
             {
-                enqueuedJobs.Add(new EnqueuedJob(job, errorHandler));
-            }
-            catch (InvalidOperationException)
-            {
-                logger.LogDebug($"Not enqueuing job(s) because scheduler worker process is already stopped");
-            }
-        }
-
-        private void Run()
-        {
-            ConcurrentDictionary<Task, EnqueuedJob> runningTasks = new ConcurrentDictionary<Task, EnqueuedJob>();
-
-            using (var throttle = new SemaphoreSlim(schedulerConfiguration.WorkerTaskParallelism))
-            {
-                while (!enqueuedJobs.IsCompleted)
+                EnqueuedJob enqueuedJob;
+                try
                 {
-                    EnqueuedJob enqueuedJob;
-                    try
-                    {
-                        enqueuedJob = enqueuedJobs.Take();
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        continue;
-                    }
-
-                    throttle.Wait();
-                    Task<Task> task = null;
-                    task = Task.Factory.CreateNewWithContextWrapped(async () =>
-                    {
-                        try
-                        {
-                            await jobRunner.RunJobAsync(enqueuedJob.Job, CancellationToken.None);
-                            runningTasks.TryRemove(task, out _);
-                        }
-                        catch (Exception e)
-                        {
-                            enqueuedJob.ErrorHandler(enqueuedJob.Job, e);
-                        }
-                        finally
-                        {
-                            throttle.Release();
-                        }
-                    });
-
-                    var unwrappedTask = task.Unwrap();
-                    runningTasks[unwrappedTask] = enqueuedJob;
-
-                    task.Start();
+                    enqueuedJob = enqueuedJobs.Take();
+                }
+                catch (InvalidOperationException)
+                {
+                    continue;
                 }
 
-                Task.WaitAll(runningTasks.Keys.ToArray());
-            }
-        }
+                throttle.Wait();
+                Task jobTask = null;
+                // created cold and only started after jobTask is tracked, so that the job can't finish
+                // (and untrack itself) before it has even been added to runningTasks
+                var task = new Task<Task>(async () =>
+                {
+                    try
+                    {
+                        // TODO pass CancellationToken
+                        await jobRunner.RunJobAsync(enqueuedJob.Job, CancellationToken.None);
+                    }
+                    catch (Exception e)
+                    {
+                        enqueuedJob.ErrorHandler(enqueuedJob.Job, e);
+                    }
+                    finally
+                    {
+                        // release before untracking, so that the final WaitAll can't dispose the throttle before this
+                        throttle.Release();
+                        runningTasks.TryRemove(jobTask, out _);
+                    }
+                });
 
-        private class EnqueuedJob
+                jobTask = task.Unwrap();
+                runningTasks[jobTask] = enqueuedJob;
+
+                task.Start();
+            }
+
+            Task.WaitAll(runningTasks.Keys.ToArray());
+        }
+    }
+
+    private class EnqueuedJob
+    {
+        public EnqueuedJob(IJob job, Action<IJob, Exception> errorHandler)
         {
-            public EnqueuedJob(IJob job, Action<IJob, Exception> errorHandler)
-            {
-                Job = job;
-                ErrorHandler = errorHandler;
-            }
-
-            public IJob Job { get; }
-            public Action<IJob, Exception> ErrorHandler { get; }
+            Job = job;
+            ErrorHandler = errorHandler;
         }
+
+        public IJob Job { get; }
+        public Action<IJob, Exception> ErrorHandler { get; }
     }
 }

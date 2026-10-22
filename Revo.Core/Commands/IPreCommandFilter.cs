@@ -1,10 +1,9 @@
 ﻿using System.Threading.Tasks;
 
-namespace Revo.Core.Commands
+namespace Revo.Core.Commands;
+
+public interface IPreCommandFilter<in T>
+    where T : ICommandBase
 {
-    public interface IPreCommandFilter<in T>
-        where T : ICommandBase
-    {
-        Task PreFilterAsync(T command);
-    }
+    Task PreFilterAsync(T command);
 }

@@ -1,5 +1,6 @@
 using System;
 using Microsoft.EntityFrameworkCore;
+using Revo.Core.Lifecycle;
 using Revo.DataAccess.Entities;
 using Revo.EFCore.DataAccess.Entities;
 using Xunit;
@@ -12,7 +13,7 @@ namespace Revo.EFCore.Tests.DataAccess.Entities
         public void SaveChanges_AppliesWriteFilters()
         {
             var context = new TestContext();
-            var databaseAccess = new EFCoreDatabaseAccess(new TestDbContextFactory(context), new RequestDbContextCache());
+            var databaseAccess = new EFCoreDatabaseAccess(new TestDbContextFactory(context), new RequestDbContextCache(new NullRequestLifetime()));
             var filter = new WriteFilter();
             var repository = new EFCoreCrudRepository(new IRepositoryFilter[] { filter }, databaseAccess);
 

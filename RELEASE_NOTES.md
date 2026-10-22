@@ -1,5 +1,28 @@
 # RELEASE NOTES
 
+## [2.0.0] - unreleased
+
+### Changed
+- breaking: replaced Ninject with Microsoft.Extensions.DependencyInjection - Revo is set up with services.AddRevo(...) on the app's IServiceCollection, app services are registered with ConfigureServices(...) on the Revo configuration instead of loading Ninject modules, and ASP.NET Core apps use the standard service provider
+- breaking: services bound InTaskScope or InRequestScope are now registered as scoped services - the command bus creates a new service scope for every command; objects that have to live until the end of the HTTP request can be registered for disposal with IRequestLifetime
+- breaking: IApplicationConfigurer and the application lifecycle listeners (IApplicationStartingListener, IApplicationStartedListener, IApplicationStoppingListener) replaced with hosted services - startup work runs in the IHostedLifecycleService phases (StartingAsync: database migrations, StartAsync: in-memory state and job workers, StartedAsync: database initializers, async event catch-up and message bus subscriptions); startup work needing its own service scope can be implemented as an IStartupTask registered with AddScopedHostedService
+- breaking: the database migrator tool loads plugins (IDatabaseMigratorPlugin) registering the migrations instead of Ninject modules
+- rewritten build scripts - the build is now a Fallout build project (build/Build.cs) run with build.sh or build.ps1 instead of Cake, and CI runs on GitHub Actions instead of Azure Pipelines; releases are published to NuGet by pushing a Revo-X.Y.Z tag and the package versions are calculated from these tags (MinVer); the solution file is now Revo.slnx and the versions of the dependencies are pinned with lock files (packages.lock.json)
+- CI packages are published to GitHub Packages (https://nuget.pkg.github.com/revoframework/index.json) instead of Azure Artifacts
+- the Todos example uses minimal hosting and can run on SQLite or PostgreSQL
+
+### Added
+- IVariantServiceResolver - resolves services registered for base or variant generic types (e.g. a command middleware for a base command type), which Microsoft DI does not do on its own; it matches the previous behavior of Ninject's contravariant bindings and is used by the command bus, event bus, job runner and entity query filters
+- Minimal example application (minimal APIs, no persistence)
+- NullUserContext registered as the default IUserContext (for apps without the ASP.NET Core integration)
+
+### Removed
+- breaking: EF6, RavenDB and Rebus providers
+- breaking: History, Notifications and AutoMapper extensions
+
+### Fixed
+- SagaConventionConfigurationCache failing with a duplicate key when multiple hosts start concurrently in one process
+
 ## [1.38.5] - 2026-10-22
 
 ### Fixed

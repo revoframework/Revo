@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using CommandLine;
 
 namespace Revo.Tools.DatabaseMigrator
@@ -11,7 +11,7 @@ namespace Revo.Tools.DatabaseMigrator
         [Option('p', "databaseProvider", Required = true, HelpText = "Used database provider. Currently supported values are: Npgsql, SqlServer, SQLite.")]
         DatabaseProvider DatabaseProvider { get; set; }
 
-        [Option('a', "assemblies", Required = false, HelpText = "Assemblies containing NinjectModules to load. Migrator will execute all migrations registered in these modules.")]
+        [Option('a', "assemblies", Required = false, HelpText = "Assemblies containing IDatabaseMigratorPlugin types to load. Plugins register embedded SQL migrations via DatabaseMigratorBindings.")]
         IEnumerable<string> Assemblies  { get; set; }
 
         [Option('d', "directoryPaths", Required = false, HelpText = "Directory paths to recursively search for migration files. This is not needed when 'assemblies' are specified. Finds any files matching the 'fileNameRegex'.")]

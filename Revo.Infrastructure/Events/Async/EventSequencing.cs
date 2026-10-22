@@ -1,8 +1,7 @@
-﻿namespace Revo.Infrastructure.Events.Async
+﻿namespace Revo.Infrastructure.Events.Async;
+
+public struct EventSequencing
 {
-    public struct EventSequencing
-    {
-        public string SequenceName { get; set; }
-        public long? EventSequenceNumber { get; set; }
-    }
+    public string SequenceName { get; set; }
+    public long? EventSequenceNumber { get; set; }
 }

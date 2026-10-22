@@ -1,18 +1,18 @@
-﻿using Microsoft.EntityFrameworkCore;
+using System;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Query;
-using Revo.Core.Core;
 using Revo.EFCore.DataAccess.Configuration;
 
 namespace Revo.EFCore.DataAccess.Query
 {
     public class CustomQueryTranslationConfigurer : IEFCoreConfigurer
     {
-        private readonly IServiceLocator serviceLocator;
+        private readonly IServiceProvider serviceProvider;
 
-        public CustomQueryTranslationConfigurer(IServiceLocator serviceLocator)
+        public CustomQueryTranslationConfigurer(IServiceProvider serviceProvider)
         {
-            this.serviceLocator = serviceLocator;
+            this.serviceProvider = serviceProvider;
         }
 
         public void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -21,7 +21,7 @@ namespace Revo.EFCore.DataAccess.Query
 
             var extension = optionsBuilder.Options
                                 .FindExtension<CustomQueryDbContextOptionsExtension>()
-                            ?? new CustomQueryDbContextOptionsExtension(serviceLocator);
+                            ?? new CustomQueryDbContextOptionsExtension(serviceProvider);
             builder.AddOrUpdateExtension(extension);
 
             optionsBuilder

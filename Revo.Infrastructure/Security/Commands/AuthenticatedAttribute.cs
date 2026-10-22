@@ -1,8 +1,7 @@
 ﻿using System;
 
-namespace Revo.Infrastructure.Security.Commands
+namespace Revo.Infrastructure.Security.Commands;
+
+public class AuthenticatedAttribute : Attribute
 {
-    public class AuthenticatedAttribute : Attribute
-    {
-    }
 }

@@ -1,25 +1,25 @@
-﻿using Revo.Core.Lifecycle;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Revo.Core.Lifecycle;
 
-namespace Revo.Infrastructure.Sagas
+namespace Revo.Infrastructure.Sagas;
+
+public class SagaConfigurationLoader(
+    IEnumerable<ISagaConfigurator> sagaConfigurators,
+    ISagaRegistry sagaRegistry) : IStartupTask
 {
-    public class SagaConfigurationLoader : IApplicationStartedListener
+    private readonly ISagaConfigurator[] sagaConfigurators = sagaConfigurators.ToArray();
+
+    public Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        private readonly ISagaConfigurator[] sagaConfigurators;
-        private readonly ISagaRegistry sagaRegistry;
-
-        public SagaConfigurationLoader(ISagaConfigurator[] sagaConfigurators,
-            ISagaRegistry sagaRegistry)
+        cancellationToken.ThrowIfCancellationRequested();
+        foreach (ISagaConfigurator sagaConfigurator in sagaConfigurators)
         {
-            this.sagaConfigurators = sagaConfigurators;
-            this.sagaRegistry = sagaRegistry;
+            sagaConfigurator.ConfigureSagas(sagaRegistry);
         }
 
-        public void OnApplicationStarted()
-        {
-            foreach (ISagaConfigurator sagaConfigurator in sagaConfigurators)
-            {
-                sagaConfigurator.ConfigureSagas(sagaRegistry);
-            }
-        }
+        return Task.CompletedTask;
     }
 }

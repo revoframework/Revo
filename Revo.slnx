@@ -1,0 +1,54 @@
+<Solution>
+  <Folder Name="/1_Core/">
+    <Project Path="Revo.Core/Revo.Core.csproj" />
+    <Project Path="Revo.DataAccess/Revo.DataAccess.csproj" />
+    <Project Path="Revo.Domain/Revo.Domain.csproj" />
+    <Project Path="Revo.Infrastructure/Revo.Infrastructure.csproj" />
+    <Project Path="Revo.Testing/Revo.Testing.csproj" />
+  </Folder>
+  <Folder Name="/1_Core/Tests/">
+    <Project Path="Tests/Revo.Core.Tests/Revo.Core.Tests.csproj" />
+    <Project Path="Tests/Revo.DataAccess.Tests/Revo.DataAccess.Tests.csproj" />
+    <Project Path="Tests/Revo.Domain.Tests/Revo.Domain.Tests.csproj" />
+    <Project Path="Tests/Revo.Infrastructure.Tests/Revo.Infrastructure.Tests.csproj" />
+  </Folder>
+  <Folder Name="/2_Providers/" />
+  <Folder Name="/2_Providers/AspNetCore/">
+    <Project Path="Providers/AspNetCore/Revo.AspNetCore/Revo.AspNetCore.csproj" />
+  </Folder>
+  <Folder Name="/2_Providers/AspNetCore/Tests/">
+    <Project Path="Providers/AspNetCore/Tests/Revo.AspNetCore.Tests/Revo.AspNetCore.Tests.csproj" />
+  </Folder>
+  <Folder Name="/2_Providers/EasyNetQ/">
+    <Project Path="Providers/EasyNetQ/Revo.EasyNetQ/Revo.EasyNetQ.csproj" />
+  </Folder>
+  <Folder Name="/2_Providers/EasyNetQ/Tests/">
+    <Project Path="Providers/EasyNetQ/Tests/Revo.EasyNetQ.Tests/Revo.EasyNetQ.Tests.csproj" />
+  </Folder>
+  <Folder Name="/2_Providers/EFCore/">
+    <Project Path="Providers/EFCore/Revo.EFCore/Revo.EFCore.csproj" />
+  </Folder>
+  <Folder Name="/2_Providers/EFCore/Tests/">
+    <Project Path="Providers/EFCore/Tests/Revo.EFCore.Tests/Revo.EFCore.Tests.csproj" />
+  </Folder>
+  <Folder Name="/2_Providers/Hangfire/">
+    <Project Path="Providers/Hangfire/Revo.Hangfire/Revo.Hangfire.csproj" />
+  </Folder>
+  <Folder Name="/4_Tools/">
+    <Project Path="Tools/Revo.Tools.DatabaseMigrator/Revo.Tools.DatabaseMigrator.csproj" />
+  </Folder>
+  <Folder Name="/5_Examples/" />
+  <Folder Name="/5_Examples/Minimal/">
+    <Project Path="Examples/Minimal/Revo.Examples.Minimal/Revo.Examples.Minimal.csproj" />
+  </Folder>
+  <Folder Name="/5_Examples/Todos/">
+    <Project Path="Examples/Todos/Revo.Examples.Todos.Tests/Revo.Examples.Todos.Tests.csproj" />
+    <Project Path="Examples/Todos/Revo.Examples.Todos/Revo.Examples.Todos.csproj" />
+  </Folder>
+  <Folder Name="/6_IntegrationTests/">
+    <Project Path="IntegrationTests/Revo.IntegrationTests/Revo.IntegrationTests.csproj" />
+  </Folder>
+  <Folder Name="/NuGet/">
+    <File Path="NuGet.config" />
+  </Folder>
+</Solution>

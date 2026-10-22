@@ -3,96 +3,97 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Revo.Core.Core;
+using Microsoft.Extensions.DependencyInjection;
+using Revo.Core.Services;
 
-namespace Revo.Core.Commands
+namespace Revo.Core.Commands;
+
+/// <summary>
+/// Executes commands locally, each of them in its own service scope.
+/// </summary>
+/// <remarks>
+/// Command handlers, middlewares and all the other services they use (repositories, unit of work etc.) are
+/// resolved from a new service scope created for every command (including the nested ones sent from other command
+/// handlers) and disposed after the command finishes. Resources that need to outlive the command until the end
+/// of the whole request can be registered with <see cref="Lifecycle.IRequestLifetime"/>.
+/// </remarks>
+public class LocalCommandBus(IServiceScopeFactory serviceScopeFactory) : ILocalCommandBus
 {
-    public class LocalCommandBus : ILocalCommandBus
+    public async Task<TResult> SendAsync<TResult>(ICommand<TResult> command, CommandExecutionOptions executionOptions,
+        CancellationToken cancellationToken)
     {
-        private readonly IServiceLocator serviceLocator;
-        private readonly ICommandBusPipeline pipeline;
+        object result = await ProcessInCommandScopeAsync<TResult>(command, executionOptions, cancellationToken);
+        return (TResult) result;
+    }
 
-        public LocalCommandBus(IServiceLocator serviceLocator, ICommandBusPipeline pipeline)
+    public Task SendAsync(ICommandBase command, CancellationToken cancellationToken)
+    {
+        return SendAsync(command, CommandExecutionOptions.Default, cancellationToken);
+    }
+
+    public async Task SendAsync(ICommandBase command, CommandExecutionOptions executionOptions,
+        CancellationToken cancellationToken)
+    {
+        await ProcessInCommandScopeAsync<object>(command, executionOptions, cancellationToken);
+    }
+
+    public Task<TResult> SendAsync<TResult>(ICommand<TResult> command, CancellationToken cancellationToken)
+    {
+        return SendAsync<TResult>(command, CommandExecutionOptions.Default, cancellationToken);
+    }
+
+    private async Task<object> ProcessInCommandScopeAsync<TResult>(ICommandBase command,
+        CommandExecutionOptions executionOptions, CancellationToken cancellationToken)
+    {
+        await using var scope = serviceScopeFactory.CreateAsyncScope();
+        var pipeline = scope.ServiceProvider.GetRequiredService<ICommandBusPipeline>();
+        var serviceResolver = scope.ServiceProvider.GetRequiredService<IVariantServiceResolver>();
+
+        return await pipeline.ProcessAsync(command,
+            (processedCommand, ct) => ExecutionHandler<TResult>(serviceResolver, processedCommand, ct),
+            this, executionOptions, cancellationToken);
+    }
+
+    private async Task<object> ExecutionHandler<TResult>(IVariantServiceResolver serviceResolver,
+        ICommandBase command, CancellationToken cancellationToken)
+    {
+        if (command == null)
         {
-            this.serviceLocator = serviceLocator;
-            this.pipeline = pipeline;
+            throw new ArgumentNullException(nameof(command));
         }
 
-        public async Task<TResult> SendAsync<TResult>(ICommand<TResult> command, CommandExecutionOptions executionOptions,
-            CancellationToken cancellationToken)
+        Type commandType = command.GetType();
+            
+        Type genericCommandType = command.GetType().GetInterfaces().FirstOrDefault(
+            x => x.IsConstructedGenericType && x.GetGenericTypeDefinition() == typeof(ICommand<>));
+        Type handlerType;
+
+        if (genericCommandType != null)
         {
-            Type handlerType = typeof(ICommandHandler<,>).MakeGenericType(command.GetType(), typeof(TResult));
-            var result = await InvokeHandleAsync<TResult>(handlerType, command, executionOptions, cancellationToken);
-            return result;
+            handlerType = typeof(ICommandHandler<,>).MakeGenericType(command.GetType(),
+                genericCommandType.GetGenericArguments()[0]);
         }
-
-        public Task SendAsync(ICommandBase command, CancellationToken cancellationToken)
+        else
         {
-            return SendAsync(command, CommandExecutionOptions.Default, cancellationToken);
-        }
-
-        public Task SendAsync(ICommandBase command, CommandExecutionOptions executionOptions,
-            CancellationToken cancellationToken)
-        {
-            Type genericCommandType = command.GetType().GetInterfaces().FirstOrDefault(
-                x => x.IsConstructedGenericType && x.GetGenericTypeDefinition() == typeof(ICommand<>));
-            Type handlerType;
-
-            if (genericCommandType != null)
-            {
-                handlerType = typeof(ICommandHandler<,>).MakeGenericType(command.GetType(),
-                    genericCommandType.GetGenericArguments()[0]);
-                return InvokeHandleAsync<object>(handlerType, command, executionOptions, cancellationToken);
-            }
-
             handlerType = typeof(ICommandHandler<>).MakeGenericType(command.GetType());
-            return InvokeHandleAsync<object>(handlerType, command, executionOptions, cancellationToken);
         }
+            
+        // variant resolution, so that a handler for a base command type can handle derived commands
+        object commandHandler = serviceResolver.GetRequiredService(handlerType);
+        var handleMethod = commandHandler.GetType()
+            .GetRuntimeMethod(nameof(ICommandHandler<ICommand>.HandleAsync), [commandType, typeof(CancellationToken)
+            ]);
 
-        public Task<TResult> SendAsync<TResult>(ICommand<TResult> command, CancellationToken cancellationToken)
+        var resultTask = (Task) handleMethod.Invoke(commandHandler, [command, cancellationToken]);
+
+        if (resultTask is Task<TResult> resultObjectTask)
         {
-            return SendAsync<TResult>(command, CommandExecutionOptions.Default, cancellationToken);
+            return await resultObjectTask;
         }
-
-        private async Task<TResult> InvokeHandleAsync<TResult>(Type handlerType, ICommandBase command, CommandExecutionOptions executionOptions,
-            CancellationToken cancellationToken)
+        else
         {
-            CommandBusMiddlewareDelegate executionHandler = async processedCommand =>
-            {
-                if (processedCommand == null)
-                {
-                    throw new ArgumentNullException(nameof(processedCommand));
-                }
-
-                if (!command.GetType().IsInstanceOfType(processedCommand))
-                {
-                    throw new ArgumentException(
-                        $"Command passed back to command bus from a middleware is not of its original type {command.GetType()}");
-                }
-
-                Type commandType = command.GetType();
-                object listener = serviceLocator.Get(handlerType);
-                var handleMethod = listener.GetType()
-                    .GetRuntimeMethod(nameof(ICommandHandler<ICommand>.HandleAsync),
-                        new[] { commandType, typeof(CancellationToken) });
-
-                var resultTask = (Task) handleMethod.Invoke(listener, new object[] {command, cancellationToken});
-
-                if (resultTask is Task<TResult> resultObjectTask)
-                {
-                    return await resultObjectTask;
-                }
-                else
-                {
-                    await resultTask;
-                    return null;
-                }
-            };
-
-            object result = await pipeline.ProcessAsync(command, executionHandler, this,
-                executionOptions, cancellationToken);
-            return (TResult) result;
-            // TODO test with contravariant handlers
+            await resultTask;
+            return default;
         }
     }
 }

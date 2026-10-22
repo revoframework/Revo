@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Revo.AspNetCore.Web;
+using Revo.Core.Commands;
 using Revo.Examples.Todos.Dto;
 using Revo.Examples.Todos.Messages.Commands;
 using Revo.Examples.Todos.Messages.Queries;
@@ -10,7 +11,8 @@ using Revo.Examples.Todos.Messages.Queries;
 namespace Revo.Examples.Todos.Api
 {
     [Route("api/todo-lists")]
-    public class TodoListController : CommandApiController
+    public class TodoListController(ICommandBus commandBus, ICommandGateway commandGateway)
+        : CommandApiController(commandBus, commandGateway)
     {
         [HttpGet("")]
         public Task<IQueryable<TodoListDto>> Get()

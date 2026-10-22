@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Revo.Core.Core;
 using Revo.Core.Events;
@@ -35,7 +36,7 @@ namespace Revo.Infrastructure.Tests.Events.Async
             asyncEventPipelineConfiguration = new AsyncEventPipelineConfiguration()
             {
                 CatchUpProcessingParallelism = 80,
-                SyncQueueProcessingParallelism = 5, // TODO test this
+                SyncQueueProcessingParallelism = 5,
                 AsyncProcessAttemptCount = 3,
                 SyncProcessAttemptCount = 3,
                 AsyncRescheduleDelayAfterSyncProcessFailure = TimeSpan.FromMinutes(1),
@@ -45,14 +46,15 @@ namespace Revo.Infrastructure.Tests.Events.Async
                 SyncProcessRetryTimeoutMultiplier = 4
             };
 
-            IAsyncEventWorker AsyncEventQueueBacklogWorkerFunc()
+            var serviceScopeFactory = Substitute.For<IServiceScopeFactory>();
+            serviceScopeFactory.CreateScope().Returns(ci =>
             {
                 var worker = Substitute.For<IAsyncEventWorker>();
 
                 worker.WhenForAnyArgs(x => x.RunQueueBacklogAsync(null)).Do(
-                    ci =>
+                    innerCi =>
                     {
-                        string queue = ci.ArgAt<string>(0);
+                        string queue = innerCi.ArgAt<string>(0);
 
                         lock (processedQueues)
                         {
@@ -81,15 +83,20 @@ namespace Revo.Infrastructure.Tests.Events.Async
                     asyncEventQueueBacklogWorkers.Add(worker);
                 }
 
-                return worker;
-            }
+                var scopedProvider = Substitute.For<IServiceProvider>();
+                scopedProvider.GetService(typeof(IAsyncEventWorker)).Returns(worker);
 
-            sut = new AsyncEventProcessor(AsyncEventQueueBacklogWorkerFunc,
+                var scope = Substitute.For<IServiceScope>();
+                scope.ServiceProvider.Returns(scopedProvider);
+                return scope;
+            });
+
+            sut = new AsyncEventProcessor(serviceScopeFactory,
                 asyncEventQueueManager, jobScheduler, asyncEventPipelineConfiguration,
                 new NullLogger<AsyncEventProcessor>());
 
             var sleep = Substitute.For<ISleep>();
-            Sleep.SetSleep(() => sleep); // TODO use a thread var
+            Sleep.SetSleep(() => sleep);
 
             events = new List<IAsyncEventQueueRecord>()
             {

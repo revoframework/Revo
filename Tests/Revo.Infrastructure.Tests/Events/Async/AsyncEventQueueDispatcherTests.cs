@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Revo.Core.Core;
+using Revo.Core.Services;
 using Revo.Core.Events;
 using Revo.Infrastructure.Events.Async;
 using NSubstitute;
@@ -15,21 +15,22 @@ namespace Revo.Infrastructure.Tests.Events.Async
     {
         private AsyncEventQueueDispatcher sut;
         private IAsyncEventQueueManager asyncEventQueueManager;
-        private IServiceLocator serviceLocator;
+        private IVariantServiceResolver serviceResolver;
         private List<IEventMessage> eventMessages = new List<IEventMessage>();
         private List<IAsyncEventSequencer> eventSequencers = new List<IAsyncEventSequencer>();
 
         public AsyncEventQueueDispatcherTests()
         {
             asyncEventQueueManager = Substitute.For<IAsyncEventQueueManager>();
-            serviceLocator = Substitute.For<IServiceLocator>();
+            serviceResolver = Substitute.For<IVariantServiceResolver>();
 
-            sut = new AsyncEventQueueDispatcher(asyncEventQueueManager, serviceLocator);
+            sut = new AsyncEventQueueDispatcher(asyncEventQueueManager, serviceResolver);
 
             eventSequencers.Add(Substitute.For<IAsyncEventSequencer<Event1>>());
             eventSequencers.Add(Substitute.For<IAsyncEventSequencer<Event1>>());
 
-            serviceLocator.GetAll(typeof(IAsyncEventSequencer<Event1>)).Returns(eventSequencers);
+            serviceResolver.GetServices(typeof(IAsyncEventSequencer<Event1>))
+                .Returns(eventSequencers);
 
             eventMessages = new List<IEventMessage>()
             {

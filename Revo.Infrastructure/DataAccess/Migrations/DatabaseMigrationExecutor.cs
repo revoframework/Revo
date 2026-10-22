@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,20 +13,20 @@ namespace Revo.Infrastructure.DataAccess.Migrations
         private readonly IDatabaseMigrationDiscovery[] migrationDiscoveries;
         private readonly IDatabaseMigrationSelector migrationSelector;
         private readonly IDatabaseMigrationExecutionOptions options;
-        private readonly ILogger logger;
+        private readonly ILogger<DatabaseMigrationExecutor> logger;
 
         private bool hasDiscoveryRun = false;
 
-        public DatabaseMigrationExecutor(IDatabaseMigrationProvider[] migrationProviders,
+        public DatabaseMigrationExecutor(IEnumerable<IDatabaseMigrationProvider> migrationProviders,
             IDatabaseMigrationRegistry migrationRegistry,
-            IDatabaseMigrationDiscovery[] migrationDiscoveries,
+            IEnumerable<IDatabaseMigrationDiscovery> migrationDiscoveries,
             IDatabaseMigrationSelector migrationSelector,
             IDatabaseMigrationExecutionOptions options,
-            ILogger logger)
+            ILogger<DatabaseMigrationExecutor> logger)
         {
-            this.migrationProviders = migrationProviders;
+            this.migrationProviders = migrationProviders.ToArray();
             this.migrationRegistry = migrationRegistry;
-            this.migrationDiscoveries = migrationDiscoveries;
+            this.migrationDiscoveries = migrationDiscoveries.ToArray();
             this.migrationSelector = migrationSelector;
             this.options = options;
             this.logger = logger;

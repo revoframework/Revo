@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace Revo.Domain.Events
+namespace Revo.Domain.Events;
+
+public abstract class DomainAggregateEvent : DomainEvent
 {
-    public abstract class DomainAggregateEvent : DomainEvent
-    {
-        public Guid AggregateId { get; set; }
-    }
+    public Guid AggregateId { get; set; }
 }

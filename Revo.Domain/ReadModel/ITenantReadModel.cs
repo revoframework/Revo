@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace Revo.Domain.ReadModel
+namespace Revo.Domain.ReadModel;
+
+public interface ITenantReadModel
 {
-    public interface ITenantReadModel
-    {
-        Guid? TenantId { get; set; }
-    }
+    Guid? TenantId { get; set; }
 }
