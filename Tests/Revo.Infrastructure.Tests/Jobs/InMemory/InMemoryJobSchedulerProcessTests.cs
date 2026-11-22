@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading;
-using FluentAssertions;
+using AwesomeAssertions;
 using NSubstitute;
 using Revo.Infrastructure.Jobs;
 using Revo.Infrastructure.Jobs.InMemory;

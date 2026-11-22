@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using AwesomeAssertions;
 using Revo.Infrastructure.DataAccess;
 using Revo.Infrastructure.Repositories;
 using System;

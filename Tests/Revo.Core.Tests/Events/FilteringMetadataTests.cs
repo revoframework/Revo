@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using FluentAssertions;
+using AwesomeAssertions;
 using Revo.Core.Events;
 using Xunit;
 

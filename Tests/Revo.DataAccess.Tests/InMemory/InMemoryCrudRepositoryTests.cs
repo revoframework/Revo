@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using AwesomeAssertions;
 using Revo.DataAccess.InMemory;
 using Revo.Domain.ReadModel;
 using System;

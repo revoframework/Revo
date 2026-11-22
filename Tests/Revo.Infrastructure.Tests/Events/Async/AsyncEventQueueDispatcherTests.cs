@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using FluentAssertions;
+using AwesomeAssertions;
 using Revo.Core.Core;
 using Revo.Core.Events;
 using Revo.Infrastructure.Events.Async;

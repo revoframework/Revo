@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using FluentAssertions;
+using AwesomeAssertions;
 using Revo.Core.ValueObjects;
 using Xunit;
 

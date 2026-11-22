@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using AwesomeAssertions;
 using NSubstitute;
 using Revo.DataAccess.InMemory;
 using Revo.Extensions.Notifications.Channels.Buffering;

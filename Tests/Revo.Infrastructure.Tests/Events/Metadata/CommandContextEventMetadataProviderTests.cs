@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using FluentAssertions;
+using AwesomeAssertions;
 using Revo.Core.Commands;
 using Revo.Core.Events;
 using Revo.Infrastructure.Events.Metadata;

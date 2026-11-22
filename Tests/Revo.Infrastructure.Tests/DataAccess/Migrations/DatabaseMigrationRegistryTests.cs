@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using AwesomeAssertions;
 using Revo.Infrastructure.DataAccess.Migrations;
 using Xunit;
 

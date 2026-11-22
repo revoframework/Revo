@@ -1,5 +1,5 @@
 ﻿using System;
-using FluentAssertions;
+using AwesomeAssertions;
 using Revo.Examples.Todos.Domain;
 using Revo.Examples.Todos.Domain.Events;
 using Revo.Testing.Infrastructure;
