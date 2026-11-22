@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
-using FluentAssertions;
+using AwesomeAssertions;
 using Revo.Core.ValueObjects;
 using Xunit;
 

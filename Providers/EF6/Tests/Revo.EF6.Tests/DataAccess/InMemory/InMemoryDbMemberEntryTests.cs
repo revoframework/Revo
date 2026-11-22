@@ -1,5 +1,5 @@
 ﻿using System;
-using FluentAssertions;
+using AwesomeAssertions;
 using Revo.DataAccess.Entities;
 using Revo.DataAccess.InMemory;
 using Revo.EF6.DataAccess.InMemory;

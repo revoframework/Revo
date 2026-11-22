@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using FluentAssertions;
+using AwesomeAssertions;
 using Revo.Domain.Entities.EventSourcing;
 using Revo.Domain.Events;
 using Revo.Infrastructure.Repositories;

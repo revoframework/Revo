@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentAssertions" Version="8.8.0" />
+    <PackageReference Include="AwesomeAssertions" Version="9.6.0" />
     <PackageReference Include="Hangfire.PostgreSql" Version="1.20.12" />
   </ItemGroup>
 

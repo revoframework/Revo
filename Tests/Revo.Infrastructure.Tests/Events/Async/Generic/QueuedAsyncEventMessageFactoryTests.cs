@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using FluentAssertions;
+using AwesomeAssertions;
 using NSubstitute;
 using Revo.Core.Events;
 using Revo.Core.Types;

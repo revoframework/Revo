@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using EasyNetQ;
 using EasyNetQ.Internals;
-using FluentAssertions;
+using AwesomeAssertions;
 using NSubstitute;
 using Revo.Core.Events;
 using Revo.EasyNetQ.Configuration;

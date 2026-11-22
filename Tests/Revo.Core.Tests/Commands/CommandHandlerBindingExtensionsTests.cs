@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using FluentAssertions;
+using AwesomeAssertions;
 using Ninject;
 using Ninject.Planning.Bindings.Resolvers;
 using Revo.Core.Commands;

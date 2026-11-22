@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using AwesomeAssertions;
 using Revo.Core.Commands;
 using Revo.Core.Transactions;
 using NSubstitute;

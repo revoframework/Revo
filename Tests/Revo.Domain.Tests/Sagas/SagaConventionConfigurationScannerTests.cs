@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FluentAssertions;
+using AwesomeAssertions;
 using Revo.Core.Events;
 using Revo.Domain.Events;
 using Revo.Domain.Sagas;

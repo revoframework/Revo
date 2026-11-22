@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using FluentAssertions;
+using AwesomeAssertions;
 using Revo.Core.Events;
 using Revo.Infrastructure.Events.Async;
 using Xunit;

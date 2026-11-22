@@ -1,5 +1,5 @@
 ﻿using System;
-using FluentAssertions;
+using AwesomeAssertions;
 using Revo.Domain.Events;
 using Revo.Domain.Sagas;
 using Revo.Infrastructure.Sagas;

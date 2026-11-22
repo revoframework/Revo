@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using FluentAssertions;
+using AwesomeAssertions;
 using Ninject.Modules;
 using NSubstitute;
 using Revo.Core.Configuration;

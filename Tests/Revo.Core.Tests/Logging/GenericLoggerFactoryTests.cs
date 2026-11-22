@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using AwesomeAssertions;
 using Microsoft.Extensions.Logging;
 using Revo.Core.Logging;
 using Xunit;

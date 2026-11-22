@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using AwesomeAssertions;
 using Revo.Core.Configuration;
 using Xunit;
 

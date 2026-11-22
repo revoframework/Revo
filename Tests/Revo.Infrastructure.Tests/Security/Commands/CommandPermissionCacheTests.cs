@@ -1,5 +1,5 @@
 ﻿using System;
-using FluentAssertions;
+using AwesomeAssertions;
 using NSubstitute;
 using Revo.Core.Commands;
 using Revo.Core.Security;
