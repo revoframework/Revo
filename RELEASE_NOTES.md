@@ -1,5 +1,10 @@
 # RELEASE NOTES
 
+## [1.38.6] - 2026-11-23
+
+### Changed
+- replaced FluentAssertions 8.8.0 with AwesomeAssertions 9.6.0 in Revo.Testing and the test projects
+
 ## [1.38.5] - 2026-10-22
 
 ### Fixed
