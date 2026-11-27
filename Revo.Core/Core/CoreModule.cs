@@ -13,14 +13,9 @@ using Revo.Core.Types;
 namespace Revo.Core.Core
 {
     [AutoLoadModule(false)]
-    public class CoreModule : NinjectModule
+    public class CoreModule(CoreConfigurationSection coreConfigurationSection) : NinjectModule
     {
-        private readonly CoreConfigurationSection coreConfigurationSection;
-
-        public CoreModule(CoreConfigurationSection coreConfigurationSection)
-        {
-            this.coreConfigurationSection = coreConfigurationSection;
-        }
+        private readonly CoreConfigurationSection coreConfigurationSection = coreConfigurationSection;
 
         public override void Load()
         {

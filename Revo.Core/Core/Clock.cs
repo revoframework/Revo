@@ -13,10 +13,7 @@ namespace Revo.Core.Core
             SystemClock sc = new SystemClock();
             currentFunc = () => sc;
         }
-        
-        public static void SetClock(Func<IClock> clock)
-        {
-            currentFunc = clock;
-        }
+
+        public static void SetClock(Func<IClock> clock) => currentFunc = clock;
     }
 }

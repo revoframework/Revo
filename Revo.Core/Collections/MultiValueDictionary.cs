@@ -7,47 +7,28 @@ namespace Revo.Core.Collections
     public class MultiValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, IReadOnlyCollection<TValue>>
     {
         private readonly Dictionary<TKey, List<TValue>> dictionary;
-        public MultiValueDictionary()
-        {
+        public MultiValueDictionary() => 
             dictionary = new Dictionary<TKey, List<TValue>>();
-        }
 
-        public MultiValueDictionary(IEqualityComparer<TKey> comparer)
-        {
+        public MultiValueDictionary(IEqualityComparer<TKey> comparer) => 
             dictionary = new Dictionary<TKey, List<TValue>>(comparer);
-        }
 
-        public MultiValueDictionary(int capacity)
-        {
+        public MultiValueDictionary(int capacity) => 
             dictionary = new Dictionary<TKey, List<TValue>>(capacity);
-        }
 
-        public MultiValueDictionary(int capacity, IEqualityComparer<TKey> comparer)
-        {
+        public MultiValueDictionary(int capacity, IEqualityComparer<TKey> comparer) => 
             dictionary = new Dictionary<TKey, List<TValue>>(capacity, comparer);
-        }
 
-        public MultiValueDictionary(IEnumerable<KeyValuePair<TKey, IReadOnlyCollection<TValue>>> enumerable) : this()
-        {
+        public MultiValueDictionary(IEnumerable<KeyValuePair<TKey, IReadOnlyCollection<TValue>>> enumerable) : this() => 
             AddRange(enumerable);
-        }
 
         public MultiValueDictionary(IEnumerable<KeyValuePair<TKey, IReadOnlyCollection<TValue>>> enumerable,
-            IEqualityComparer<TKey> comparer) : this(comparer)
-        {
-            AddRange(enumerable);
-        }
+            IEqualityComparer<TKey> comparer) : this(comparer) => AddRange(enumerable);
 
-        public MultiValueDictionary(IEnumerable<IGrouping<TKey, TValue>> values) : this()
-        {
-            AddRange(values);
-        }
+        public MultiValueDictionary(IEnumerable<IGrouping<TKey, TValue>> values) : this() => AddRange(values);
 
         public MultiValueDictionary(IEnumerable<IGrouping<TKey, TValue>> values,
-            IEqualityComparer<TKey> comparer) : this(comparer)
-        {
-            AddRange(values);
-        }
+            IEqualityComparer<TKey> comparer) : this(comparer) => AddRange(values);
 
         public IReadOnlyCollection<TValue> this[TKey key]
         {
@@ -112,21 +93,13 @@ namespace Revo.Core.Collections
             }
         }
 
-        public void Clear()
-        {
-            dictionary.Clear();
-        }
+        public void Clear() => dictionary.Clear();
 
-        public bool ContainsKey(TKey key)
-        {
-            return dictionary.ContainsKey(key);
-        }
+        public bool ContainsKey(TKey key) => dictionary.ContainsKey(key);
 
-        public IEnumerator<KeyValuePair<TKey, IReadOnlyCollection<TValue>>> GetEnumerator()
-        {
-            return new Enumerator(dictionary.GetEnumerator());
-        }
-        
+        public IEnumerator<KeyValuePair<TKey, IReadOnlyCollection<TValue>>> GetEnumerator() => 
+            new Enumerator(dictionary.GetEnumerator());
+
         public bool TryGetValue(TKey key, out IReadOnlyCollection<TValue> value)
         {
             bool result = dictionary.TryGetValue(key, out var listValue);
@@ -134,10 +107,7 @@ namespace Revo.Core.Collections
             return result;
         }
 
-        public bool Remove(TKey key)
-        {
-            return dictionary.Remove(key);
-        }
+        public bool Remove(TKey key) => dictionary.Remove(key);
 
         public bool Remove(TKey key, TValue value)
         {
@@ -153,30 +123,16 @@ namespace Revo.Core.Collections
 
             return false;
         }
-        
-        IEnumerator IEnumerable.GetEnumerator()
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        private class Enumerator(IEnumerator<KeyValuePair<TKey, List<TValue>>> enumerator) : IEnumerator<KeyValuePair<TKey, IReadOnlyCollection<TValue>>>
         {
-            return GetEnumerator();
-        }
+            private readonly IEnumerator<KeyValuePair<TKey, List<TValue>>> enumerator = enumerator;
 
-        private class Enumerator : IEnumerator<KeyValuePair<TKey, IReadOnlyCollection<TValue>>>
-        {
-            private readonly IEnumerator<KeyValuePair<TKey, List<TValue>>> enumerator;
+            public bool MoveNext() => enumerator.MoveNext();
 
-            public Enumerator(IEnumerator<KeyValuePair<TKey, List<TValue>>> enumerator)
-            {
-                this.enumerator = enumerator;
-            }
-
-            public bool MoveNext()
-            {
-                return enumerator.MoveNext();
-            }
-
-            public void Reset()
-            {
-                enumerator.Reset();
-            }
+            public void Reset() => enumerator.Reset();
 
             public KeyValuePair<TKey, IReadOnlyCollection<TValue>> Current =>
                 new KeyValuePair<TKey, IReadOnlyCollection<TValue>>(
@@ -185,10 +141,7 @@ namespace Revo.Core.Collections
 
             object IEnumerator.Current => ((IEnumerator)enumerator).Current;
 
-            public void Dispose()
-            {
-                enumerator.Dispose();
-            }
+            public void Dispose() => enumerator.Dispose();
         }
     }
 }

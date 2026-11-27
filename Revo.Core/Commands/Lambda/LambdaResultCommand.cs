@@ -2,15 +2,9 @@
 
 namespace Revo.Core.Commands.Lambda
 {
-    public class LambdaResultCommand : ICommand<object>
+    public class LambdaResultCommand(Delegate @delegate, Type resultType) : ICommand<object>
     {
-        public LambdaResultCommand(Delegate @delegate, Type resultType)
-        {
-            Delegate = @delegate;
-            ResultType = resultType;
-        }
-
-        public Delegate Delegate { get; }
-        public Type ResultType { get; }
+        public Delegate Delegate { get; } = @delegate;
+        public Type ResultType { get; } = resultType;
     }
 }

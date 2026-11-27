@@ -9,17 +9,11 @@ namespace Revo.Core.Transactions
         private readonly ITransaction innerTransaction;
         private int transactionCounter = 0;
 
-        public CoordinatedTransaction(ITransaction innerTransaction)
-        {
-            this.innerTransaction = innerTransaction;
-        }
+        public CoordinatedTransaction(ITransaction innerTransaction) => this.innerTransaction = innerTransaction;
 
         protected List<ITransactionParticipant> Participants { get; set; } = new List<ITransactionParticipant>();
 
-        public void AddTransactionParticipant(ITransactionParticipant participant)
-        {
-            Participants.Add(participant);
-        }
+        public void AddTransactionParticipant(ITransactionParticipant participant) => Participants.Add(participant);
 
         public async Task CommitAsync()
         {

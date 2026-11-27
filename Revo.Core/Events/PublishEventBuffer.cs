@@ -4,15 +4,10 @@ using System.Threading.Tasks;
 
 namespace Revo.Core.Events
 {
-    public class PublishEventBuffer : IPublishEventBuffer
+    public class PublishEventBuffer(IEventBus eventBus) : IPublishEventBuffer
     {
-        private readonly IEventBus eventBus;
+        private readonly IEventBus eventBus = eventBus;
         private readonly List<IEventMessage> messages = new List<IEventMessage>();
-
-        public PublishEventBuffer(IEventBus eventBus)
-        {
-            this.eventBus = eventBus;
-        }
 
         public IReadOnlyCollection<IEventMessage> Events => messages;
         
@@ -26,9 +21,6 @@ namespace Revo.Core.Events
             messages.Clear();
         }
 
-        public void PushEvent(IEventMessage message)
-        {
-            messages.Add(message);
-        }
+        public void PushEvent(IEventMessage message) => messages.Add(message);
     }
 }

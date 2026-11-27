@@ -6,14 +6,9 @@ using Revo.Core.Core;
 
 namespace Revo.Core.Events
 {
-    public class EventBus : IEventBus
+    public class EventBus(IServiceLocator serviceLocator) : IEventBus
     {
-        private readonly IServiceLocator serviceLocator;
-
-        public EventBus(IServiceLocator serviceLocator)
-        {
-            this.serviceLocator = serviceLocator;
-        }
+        private readonly IServiceLocator serviceLocator = serviceLocator;
 
         public async Task PublishAsync(IEventMessage message, CancellationToken cancellationToken)
         {

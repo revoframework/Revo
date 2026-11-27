@@ -4,14 +4,9 @@ using System.Threading.Tasks;
 
 namespace Revo.Core.Commands
 {
-    public class CommandGateway : ICommandGateway
+    public class CommandGateway(ICommandRouter commandRouter) : ICommandGateway
     {
-        private readonly ICommandRouter commandRouter;
-
-        public CommandGateway(ICommandRouter commandRouter)
-        {
-            this.commandRouter = commandRouter;
-        }
+        private readonly ICommandRouter commandRouter = commandRouter;
 
         public Task SendAsync(ICommandBase command, CommandExecutionOptions executionOptions,
             CancellationToken cancellationToken = default(CancellationToken))
@@ -21,10 +16,8 @@ namespace Revo.Core.Commands
             return commandBus.SendAsync(command, executionOptions, cancellationToken);
         }
 
-        public Task<TResult> SendAsync<TResult>(ICommand<TResult> command, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            return SendAsync(command, CommandExecutionOptions.Default, cancellationToken);
-        }
+        public Task<TResult> SendAsync<TResult>(ICommand<TResult> command, CancellationToken cancellationToken = default(CancellationToken)) =>
+            SendAsync(command, CommandExecutionOptions.Default, cancellationToken);
 
         public Task<TResult> SendAsync<TResult>(ICommand<TResult> command, CommandExecutionOptions executionOptions,
             CancellationToken cancellationToken = default(CancellationToken))
@@ -34,9 +27,7 @@ namespace Revo.Core.Commands
             return commandBus.SendAsync(command, executionOptions, cancellationToken);
         }
 
-        public Task SendAsync(ICommandBase command, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            return SendAsync(command, CommandExecutionOptions.Default, cancellationToken);
-        }
+        public Task SendAsync(ICommandBase command, CancellationToken cancellationToken = default(CancellationToken)) =>
+            SendAsync(command, CommandExecutionOptions.Default, cancellationToken);
     }
 }

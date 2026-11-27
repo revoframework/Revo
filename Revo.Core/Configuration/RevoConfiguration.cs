@@ -12,11 +12,12 @@ namespace Revo.Core.Configuration
         {
             if (sections.TryGetValue(typeof(T), out var section))
             {
-                return (T) section;
+                return (T)section;
             }
 
             var newSection = new T();
             sections[typeof(T)] = newSection;
+
             return newSection;
         }
     }

@@ -21,9 +21,7 @@ namespace Revo.Core.Collections
             return sb.ToString();
         }
 
-        public static IEnumerable<T> AsNotNull<T>(this IEnumerable<T> original)
-        {
-            return original ?? Enumerable.Empty<T>();
-        }
+        public static IEnumerable<T> AsNotNull<T>(this IEnumerable<T> original) =>
+            original ?? Enumerable.Empty<T>();
     }
 }

@@ -2,15 +2,9 @@
 
 namespace Revo.Core.Commands
 {
-    public class CommandContext : ICommandContext
+    public class CommandContext(ICommandBase currentCommand, IUnitOfWork unitOfWork) : ICommandContext
     {
-        public CommandContext(ICommandBase currentCommand, IUnitOfWork unitOfWork)
-        {
-            CurrentCommand = currentCommand;
-            UnitOfWork = unitOfWork;
-        }
-
-        public ICommandBase CurrentCommand { get; }
-        public IUnitOfWork UnitOfWork { get; }
+        public ICommandBase CurrentCommand { get; } = currentCommand;
+        public IUnitOfWork UnitOfWork { get; } = unitOfWork;
     }
 }

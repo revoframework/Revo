@@ -11,14 +11,8 @@ namespace Revo.Core.Commands
         public IUnitOfWork UnitOfWork => contexts.Count > 0 ? contexts.Peek().UnitOfWork : null;
         public ICommandContext PeekOrDefault => contexts.Count > 0 ? contexts.Peek() : null;
 
-        public void Push(ICommandContext context)
-        {
-            contexts.Push(context);
-        }
+        public void Push(ICommandContext context) => contexts.Push(context);
 
-        public ICommandContext Pop()
-        {
-            return contexts.Pop();
-        }
+        public ICommandContext Pop() => contexts.Pop();
     }
 }

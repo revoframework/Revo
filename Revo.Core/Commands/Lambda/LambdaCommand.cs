@@ -2,13 +2,8 @@
 
 namespace Revo.Core.Commands.Lambda
 {
-    public class LambdaCommand : ICommand
+    public class LambdaCommand(Delegate @delegate) : ICommand
     {
-        public LambdaCommand(Delegate @delegate)
-        {
-            Delegate = @delegate;
-        }
-
-        public Delegate Delegate { get; }
+        public Delegate Delegate { get; } = @delegate;
     }
 }

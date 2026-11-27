@@ -16,10 +16,7 @@ namespace Revo.Core.Configuration
         public IReadOnlyDictionary<Type, bool> LoadedModuleOverrides => loadedModuleOverrides;
         public IReadOnlyCollection<Action<IKernelConfigurationContext>> KernelActions => kernelActions;
 
-        public void AddAction(Action<IKernelConfigurationContext> kernelAction)
-        {
-            kernelActions.Add(kernelAction);
-        }
+        public void AddAction(Action<IKernelConfigurationContext> kernelAction) => kernelActions.Add(kernelAction);
 
         public void OverrideModuleLoading(Type moduleType, bool isLoaded)
         {

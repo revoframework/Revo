@@ -8,10 +8,7 @@ namespace Revo.Core.ValueObjects
 {
     public class DictionaryAsValue<TKey, TValue> : ValueObject<DictionaryAsValue<TKey, TValue>>, IReadOnlyDictionary<TKey, TValue>
     {
-        public DictionaryAsValue(IImmutableDictionary<TKey, TValue> dictionary)
-        {
-            Dictionary = dictionary;
-        }
+        public DictionaryAsValue(IImmutableDictionary<TKey, TValue> dictionary) => Dictionary = dictionary;
 
         public IReadOnlyDictionary<TKey, TValue> Dictionary { get; }
         public int Count => Dictionary.Count;
@@ -66,9 +63,7 @@ namespace Revo.Core.ValueObjects
             return true;
         }
 
-        protected override IEnumerable<(string Name, object Value)> GetValueComponents()
-        {
-            return Dictionary.Select(x => (x.Key.ToString(), (object)x.Value));
-        }
+        protected override IEnumerable<(string Name, object Value)> GetValueComponents() =>
+            Dictionary.Select(x => (x.Key.ToString(), (object)x.Value));
     }
 }
